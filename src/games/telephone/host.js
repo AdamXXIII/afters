@@ -132,7 +132,7 @@ export class TelephoneHost {
     const T = TIMERS[this.mode];
     this.pending = {};
     this.nudge = { n: this.nudge.n, to: null, from: null };
-    const payload = { step: s, steps: this.steps, mode: this.mode, kind, max: LIMITS.text };
+    const payload = { step: s, steps: this.steps, mode: this.mode, kind, max: LIMITS.text, order: this.seats };
     const priv = (pl) => {
       const c = this._chainOf(pl.id, s);
       if (c < 0) return null;

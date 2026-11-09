@@ -26,9 +26,9 @@ reveal 6 lines x ~30 s + votes ~4:00 => about 9-10 minutes. 8 players about 13 m
 ## Modes (host picks on the intro card; guests see the host's finger)
 | Mode | What changes | Timers (write / draw / guess) |
 |---|---|---|
-| **Classic** | write, then draw / guess alternate | 40 s / 60 s / 25 s |
+| **Classic** | write, then draw / guess alternate | 30 s / 50 s / 22 s |
 | **Speedy** | same, everything faster, Cyril heckles more | 25 s / 30 s / 15 s |
-| **Flipbook** | write, then *every* step draws the next frame of an animation of that sentence (you see the last frame faintly under your pen); the reveal plays it as a flipbook | 40 s / 45 s / - |
+| **Flipbook** | write, then *every* step draws the next frame of an animation of that sentence (you see the last frame faintly under your pen); the reveal plays it as a flipbook | 30 s / 45 s / - |
 
 ## Phases (phase ids are prefixed `telephone-`)
 | Phase | Layout | Time | Payload / private |
@@ -39,7 +39,7 @@ reveal 6 lines x ~30 s + votes ~4:00 => about 9-10 minutes. 8 players about 13 m
 | `telephone-guess` | input | guess timer | `{step, steps, mode, max}`; private `{chain, drawing, from}` |
 | `telephone-wait` | input | (screen only) | shown on your phone once you've sent this step |
 | `telephone-reveal` | show | per line, sum of beats | `{index, count, mode, chain:{id, steps:[{kind, text|drawing, authorId, auto, match}]}, beats:[{at, dur, step}], end:{at, verdict, crossedAt}}` |
-| `telephone-vote` | split | 12 s, ends when all voted | `{index, count, moments:[{key, kind, text|drawing, authorId}]}` |
+| `telephone-vote` | split | 9 s, ends when all voted | `{index, count, moments:[{key, kind, text|drawing, authorId}]}` |
 | `telephone-awards` | show | 9 s | `{moment, straight, crossed, rows}` then `api.finish` -> shared results |
 
 Rotation: line *c* is started by seat *c*; at step *s* it is held by seat *(c + s) mod N*. Every player
@@ -101,3 +101,14 @@ real sentence so "kept the thread" happens; vote at random (never their own).
 - `node scripts/e2e-telephone.mjs`: 3 phones over real PeerJS; the host writes, draws (real pointer strokes on
   the canvas), guesses and votes through the UI; players on autopilot; reaches results, then back to the menu.
 - `node scripts/shoot.mjs --screens telephone-intro,...` for every screen at 3, 5 and 8 players.
+
+## Changes after the paper play-test (round 1)
+The play-tester (6 players, Classic, on paper) said: the reveal drags, quick finishers wait on the slowest,
+the write step is a blank-page freeze, and voting after every line is a tax. What changed:
+- Reveal beats cut ~20% (sentence 2.3 s, guess 2.7 s, drawing replay max 3.4 s + 1 s hold, end 3.2 s), typing
+  sped up; the host's **Next line** skips a line any time.
+- Write 40 -> 30 s, draw 60 -> 50 s, guess 25 -> 22 s, vote 12 -> 9 s (ends as soon as everyone has voted).
+- The Stuck? card is on screen from the first second (one tap to use it, one to deal another).
+- In the reveal each drawing now carries the sentence it was drawn from, and each guess appears as a caption on
+  the finished drawing, so nobody has to remember the previous step.
+- Not changed (on purpose): the per-line vote stays, because it happens while the line is still funny; it is short.

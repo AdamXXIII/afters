@@ -18,7 +18,8 @@ function enc(pts) {
 function kit(rng) {
   const j = (a) => (rng() - 0.5) * 2 * a;
   const out = [];
-  const add = (pts, c = 0, s = 1) => { if (pts.length) out.push({ c, s, p: enc(pts) }); };
+  const BOLD = [1, 2, 2, 3];
+  const add = (pts, c = 0, s = 1) => { if (pts.length) out.push({ c, s: BOLD[s] ?? s, p: enc(pts) }); };
   return {
     out,
     /** wobbly ellipse */

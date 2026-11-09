@@ -48,7 +48,17 @@ const write = {
     const btn = iconBtn('Pass it on', 'send', { e2e: 'submit', onClick: () => send() });
     const title = h('div.tp-write-title', 'Start a rumour.');
     const sub = h('div.tp-write-sub', next ? ['It goes to ', who(next, { size: 20 }), ' to draw.'] : 'Somebody has to draw it.');
-    const body = h('div.tp-sheet', head(ctx, null), h('div.tp-write-card', title, sub), field, card, cyrilNote(ctx.line('tpWrite')), h('div.tp-grow'), btn);
+    // where this rumour will travel: seats from me onwards (the host rotates by seat order)
+    const order = ctx.payload.order || null;
+    const seats = order ? order.map((id) => ctx.player(id)).filter(Boolean) : ctx.players;
+    const k = Math.max(0, seats.findIndex((p) => p.id === ctx.meId));
+    const route = seats.slice(k).concat(seats.slice(0, k));
+    const kinds = route.map((_, i) => (i === 0 ? 'writes' : ctx.payload.mode === 'flip' ? 'draws' : i % 2 ? 'draws' : 'guesses'));
+    const routeEl = h('div.tp-wroute', h('div.t-eyebrow', 'Where your rumour goes'),
+      h('div.tp-wroute-row', ...route.flatMap((p, i) => [
+        h('div.tp-wroute-seat', av(p, { size: route.length > 6 ? 30 : 38 }), h('i', kinds[i])),
+        i < route.length - 1 ? h('span.tp-wroute-cord', { html: cordSvg(24, 14, { loops: 2, stroke: 2.2 }) }) : null])));
+    const body = h('div.tp-sheet', head(ctx, null), h('div.tp-write-card', title, sub), field, card, routeEl, h('div.tp-grow'), btn);
     sheet.append(body);
     function send() {
       const text = field.input.value.trim();
@@ -208,10 +218,17 @@ const wait = {
     };
     const head2 = h('div.t-eyebrow.tp-slow-head');
     const doneRow = h('div.tp-done-row');
-    sheet.append(h('div.tp-sheet.tp-wait', head(ctx, null), h('div.tp-wait-card', title, route), h('div.tp-slow-box', h('div.tp-slow-top', head2, doneRow), list), note));
+    const party = h('div.tp-party');
+    const renderParty = (c) => party.replaceChildren(...c.players.map((p) => {
+      const done = c.progress.done?.[p.id] || p.id === c.meId;
+      return h(`div.tp-party-seat${done ? '.done' : ''}`, { style: { '--pc': p.colour } }, av(p, { size: 44 }), h('span', p.id === c.meId ? 'You' : p.name), h('i', done ? 'Done' : verb));
+    }));
+    renderParty(ctx);
+    sheet.append(h('div.tp-sheet.tp-wait', head(ctx, null), h('div.tp-wait-card', title, route), h('div.tp-slow-box', h('div.tp-slow-top', head2, doneRow), list), h('div.tp-party-box', h('div.t-eyebrow', 'The party line'), party), note));
+    void renderParty;
     render(ctx);
     const nudged = nudgeWatcher(ctx);
-    return { update(c) { render(c); nudged(c); } };
+    return { update(c) { render(c); renderParty(c); nudged(c); } };
   },
 };
 

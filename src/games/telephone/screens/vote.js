@@ -71,7 +71,7 @@ const awards = {
         cls === 'crossed' && b.crossedBy ? h('div.tp-plaque-foot', 'Wires crossed by ', who(ctx.player(b.crossedBy), { size: 16 })) : cls === 'straight' ? h('div.tp-plaque-foot', `${b.matches} guess${b.matches === 1 ? '' : 'es'} nailed`) : null);
     };
     const plaques = h('div.tp-plaques', plaque('straight', 'Straightest line', p.straight), plaque('crossed', 'Most crossed wires', p.crossed));
-    show.append(h('div.tp-aw', hero, plaques));
+    show.append(h('div.tp-aw', h('div.tp-aw-rays'), hero, plaques));
     const tl = timeline([
       { at: 0, fn: (c) => { c.cyril.react('drumroll', { duration: S(1400) }); if (!quiet) { c.audio.sfx('drumroll', { duration: S(1300) / 1000 }); c.say(c.line('tpAwards'), { hold: 1200, compact: true }); } } },
       { at: S(1400), fn: (c) => { hero.classList.add('in'); if (!quiet) { c.audio.sfx('fanfare'); c.stage.shake?.(); } c.cyril.react('delight'); if (m?.authorId === c.meId) c.haptic('win'); } },

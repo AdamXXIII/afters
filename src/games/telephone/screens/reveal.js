@@ -207,7 +207,7 @@ export default {
         if (live.st.kind === 'guess' && !live.verdictShown && n >= s.length && bt > s.length * TYPE_MS + 380) {
           live.verdictShown = true;
           const ok = !!live.st.match;
-          live.card.append(h(`div.tp-pill.${ok ? 'ok' : 'no'}`, ok ? 'Nailed it' : 'Lost it'));
+          live.card.append(h(`div.tp-pill.${ok ? 'ok' : 'no'}`, ok ? 'Nailed it!' : 'Lost it!'));
           setTrack(cur);
           const crosser = cur === p.end.crossedAt;
           if (ok) { c.cyril.react('delight'); sfx('select'); if (!quiet && c.phase.seed % 2 === cur % 2) c.say(c.line('tpNailed'), { hold: 1100, compact: true }); } else {
