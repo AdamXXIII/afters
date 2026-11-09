@@ -26,7 +26,7 @@ export function nightStrip(ctx, rows, { big = false } = {}) {
     return el;
   }
   const list = h('ol.night-list');
-  const max = 2;
+  const max = big ? (rows.length > 5 ? 3 : 8) : 2;
   rows.slice(0, max).forEach((r, i) => {
     const p = ctx.player(r.id);
     if (!p) return;

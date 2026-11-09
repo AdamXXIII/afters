@@ -24,7 +24,18 @@
 - `node scripts/shoot.mjs`: all 29 screens (incl. menu, menu-first, menu-adult, results), no blank frames, no console errors.
 
 ## Critic loop (menu + results)
-CRITIC_PLACEHOLDER
+Fresh harsh critic each round ("AAA art director, compare against Jackbox Party Pack menus"); blind A/B against the previous round from round 2 (neutral file names, order swapped). Stopped at the 4-round cap.
+
+| Round | Polish | Type | Layout | Readability | Fun/charm | Consistency | A/B vs previous | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 6 | 6 | 5 | 6 | 7 | 5 | - | NOT YET |
+| 2 | 6 | 7 | 6 | 6 | 8 | 6 | new won menu, first visit, results | NOT YET |
+| 3 | 7 | 7 | 5 | 6 | 7 | 7 | new won menu + guest, results a tie | NOT YET |
+| 4 | 7 | 7 | 5 | 6 | 8 | 7 | new won menu; guest's outlined "Adults only" label lost -> reverted to the solid chip | NOT YET |
+
+What changed because of it: "In the oven" stamps -> small "Coming soon" paper tags; a brass room-code plaque; Cyril framed in his own clear space (the header moved right); "N fancy this" chip explains guests' avatars; the selected dish lifts, glows and dims the rest; guest button is a full primary; results got a headline ("Alex takes it"), a taller winner row ("Toast of the table"), side-by-side buttons, compact rows for 6-8 players and the full cherry board; dish hints ("Draw it, pass it on").
+
+Still NOT YET (round 4 critic, worst first): the top 40% of the menu is busy (Cyril's bubble, plaque, title, toggle, cherry strip); shelves are tight (trifle cream near its label, Pie Chart's % flag); the bottom detail card repeats the selected dish. The critic also wanted the three locked domes smaller than the playable dish; that fixes itself as the three teams land their games.
 
 ## For the three new-game teams
 - Own only `src/games/<id>/`. Replace your placeholder `index.js` (drop `comingSoon`, add `createHost`, `screens`, `bot`, `demos`). Prefix phase and screen ids with your id.
