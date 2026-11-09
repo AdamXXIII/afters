@@ -347,7 +347,5 @@
 .r2-stamp .sn { color: var(--c-claret); }
 .r2-card.truth .t-eyebrow, .r2-card.truth .lbl { color: #3E2608 !important; }
 .r2-row .chip .nm { font-size: 18px; max-width: 9ch; }
-.r2-boop { width: 92px; height: 92px; padding: 16px; }
-.r2-dots i { width: 8px; height: 8px; opacity: .85; }
 .r2-field .input { border-color: rgba(122,30,44,.35); }
 .r2-track-i.dud.cur::before { display: none; }
