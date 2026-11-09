@@ -5,6 +5,8 @@ import { h, onTap } from '../ui/components.js';
 
 const CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+const PEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l2.5-7.5L15 4l5 5-8.5 8.5z" fill="currentColor" opacity=".2"/><path d="M4 20l2.5-7.5L15 4l5 5-8.5 8.5zM4 20l5-2M12 7l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+
 /** "‹ Back" text link for the sheet header row (48 px hit area). */
 export function backLink(onClick) {
   const b = h('button.fd-back', { type: 'button', 'aria-label': 'Back to the start' }, h('span', { html: CHEVRON }), 'Back');
@@ -28,6 +30,7 @@ export function nameCard(field, { kicker = 'Reserved for', tilt = -2 } = {}) {
   const card = h('div.fd-card', { style: { '--tilt': `${tilt}deg` }, 'aria-hidden': 'true' },
     h('div.fd-card-kicker', h('i'), kicker, h('i')),
     name,
+    h('span.fd-pen', { html: PEN }),
   );
   const sync = (bump) => {
     const v = field.input.value.trim();
