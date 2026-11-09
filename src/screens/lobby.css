@@ -293,7 +293,6 @@ body[data-screen="lobby"] #sheet {
   .lb-wait-av { width: 46px; height: 46px; }
 
   /* show column: the code placard fits the column, clear of the settings button */
-  .lc-placard { right: auto; width: calc(var(--land-l) - 84px - var(--safe-l)); max-width: 280px; }
   .lc-tile { height: 46px; font-size: 32px; }
   .lc-invite { height: 46px; width: 52px; }
   body[data-screen="lobby"] .bubble.compact { max-width: calc(var(--land-l) - 24px); }

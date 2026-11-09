@@ -89,13 +89,18 @@
 /* ===== Landscape (844x390): the guttering candle on the left, the card on the right, both on screen ===== */
 @media (orientation: landscape) and (max-height: 600px) {
   .dim.rc-dim {
-    flex-direction: row; align-items: center; justify-content: center; gap: 28px;
+    flex-direction: row; align-items: center; justify-content: flex-end; gap: 22px;
     padding: 10px calc(16px + var(--safe-r)) max(10px, var(--safe-b)) calc(16px + var(--safe-l));
     background: linear-gradient(90deg, rgba(20,8,8,.35), rgba(20,8,8,.78) 46%, rgba(20,8,8,.92));
   }
   .dim.rc-dim::before { background: radial-gradient(ellipse 34% 60% at 24% 50%, rgba(0,0,0,0), rgba(20,8,8,.55) 70%, rgba(20,8,8,.85)); }
-  .rc-stagearea { flex: none; width: 300px; height: 210px; align-self: center; padding-bottom: 0; }
-  .rc-box { width: min(420px, 52%); max-height: 100%; padding: 16px 20px 6px; flex: none; }
+  /* the reserved card hugs the dialog's left edge, low on the cloth, clear of Cyril's face */
+  .rc-stagearea { flex: 1; align-self: stretch; justify-content: flex-end; align-items: flex-end; padding-bottom: 14px; max-width: none; }
+  .rc-art { width: 160px; height: 110px; }
+  .rc-art::before { left: -60px; right: -20px; }
+  .rc-card { right: 0; width: 136px; padding: 13px 8px 10px; }
+  .rc-card-v { font-size: 34px; line-height: 36px; }
+  .rc-box { width: min(410px, 50%); max-height: 100%; padding: 16px 20px 6px; flex: none; }
   .rc-title { font-size: 26px; line-height: 30px; margin: 4px 0; }
   .rc-body { font-size: 16px; line-height: 21px; margin-bottom: 10px; max-width: 36ch; }
   .rc-quote { display: none; }
