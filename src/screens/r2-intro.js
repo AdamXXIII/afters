@@ -6,7 +6,7 @@ import { waxSeal, hostSkip, sayLater } from './r2-kit.js';
 const STEPS = [
   ['Read a true fact with a gap'],
   ['Fill it with a believable lie'],
-  ['Spot the real answer'],
+  ['Spot the weird true one'],
 ];
 
 export default {
@@ -22,8 +22,8 @@ export default {
       h('div.r2-menu-title', 'Porkies'),
       h('ol.r2-steps', STEPS.map(([a], i) => h('li', h('span.n', String(i + 1)), h('span.tx', h('b', a))))),
       h('div.r2-prices',
-        h('div.r2-price', h('span.l', 'Spot the truth'), h('span.dots'), h('span.v', '1000')),
-        h('div.r2-price', h('span.l', 'Every fool'), h('span.dots'), h('span.v', '500'))),
+        h('div.r2-price', h('span.l', 'Spot the truth'), h('span.dots'), h('span.v', '+1000')),
+        h('div.r2-price', h('span.l', 'Each one you fool'), h('span.dots'), h('span.v', '+500'))),
     );
     show.append(h('div.r2-intro-wrap', card));
     if (!ctx.frozen) {

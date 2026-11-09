@@ -37,8 +37,9 @@ export function avatarDisc(player, cls = '') {
 }
 
 /** Avatar + name pill used on reveal cards. */
-export function nameTag(player, { cls = '' } = {}) {
-  return h(`span.r2-tag${cls}`, avatarDisc(player), h('span.nm', player?.name || '?'));
+export function nameTag(player, { cls = '', meId = null } = {}) {
+  const me = meId && player?.id === meId;
+  return h(`span.r2-tag${cls}${me ? '.you' : ''}`, avatarDisc(player), h('span.nm', me ? 'You' : player?.name || '?'));
 }
 
 export function hostSkip(ctx, show) {

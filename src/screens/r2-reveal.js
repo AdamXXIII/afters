@@ -44,7 +44,7 @@ export default {
             h('div.r2-sentback', 'Sent back'));
         });
         stageEl.replaceChildren(h('div.r2-nobody',
-          h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for it'), h('span.r2-nobody-sub', 'Zero fooled. Sent back to the kitchen.')),
+          h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for it'), h('span.r2-nobody-sub', 'Not even the cat bought it.')),
           h('div.r2-duds', cards)));
         sfx('groan');
         ctx.cyril.react('shock', { duration: quiet ? 60000 : 1200 });
@@ -53,15 +53,19 @@ export default {
         const o = byId.get(s.optionId);
         setCurrent([o.id]); mark([o.id], 'porky');
         const pts = h('span.r2-pts', '+0');
-        const fooled = o.pickers.map((id) => nameTag(pl(id), { cls: '.big' }));
+        const fooled = o.pickers.map((id) => nameTag(pl(id), { cls: '.big', meId: ctx.meId }));
+        fact.setFill(o.text); fact.gap.classList.add('lie');
+        const youFell = o.pickers.includes(ctx.meId);
+        const youTold = o.authors.includes(ctx.meId);
         hop(fooled, 420);
         const card = h('div.r2-card.porky', { style: { '--tilt': `${tilt(seed, o.id, 2)}deg` } },
-          h('div.r2-card-top', h('span.r2-card-l', letterOf.get(o.id)), h('span.t-eyebrow', 'A porky')),
+          h('div.r2-card-top', h('span.r2-card-l', letterOf.get(o.id))),
           h('div.r2-card-txt', o.text),
           h('div.r2-stamp', h('span.sn', { html: snoutSvg({ ring: false }) }), 'Porky!'),
           authorsLine(o),
           h('div.r2-fooled', h('span.lbl', o.pickers.length === 1 ? 'Fooled' : `Fooled all ${o.pickers.length}`), h('span.list', fooled)),
           o.kind === 'house' ? h('div.r2-pts-row', h('span.each', 'Mine. No points for anyone. Sorry.')) : h('div.r2-pts-row', pts, h('span.each', `to ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}${o.authors.length > 1 ? ' each' : ''}`)),
+          youFell || youTold ? h('div.r2-you', youFell ? `You fell for ${o.kind === 'house' ? 'my' : `${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}\u2019s`} porky.` : `Your porky fooled ${o.pickers.length}. Shameless.`) : null,
         );
         stageEl.replaceChildren(card);
         if (o.kind !== 'house') countTo(pts, 500 * o.pickers.length, { prefix: '+', frozen: quiet, ms: 700 });
@@ -75,7 +79,8 @@ export default {
         const o = byId.get(s.optionId);
         setCurrent([o.id]); mark([o.id], 'truth');
         fact.setFill(o.text); fact.gap.classList.add('gold');
-        const found = o.pickers.map((id) => nameTag(pl(id), { cls: '.big' }));
+        const found = o.pickers.map((id) => nameTag(pl(id), { cls: '.big', meId: ctx.meId }));
+        fact.gap.classList.remove('lie');
         hop(found, 520);
         const pts = h('span.r2-pts.gold', '+0');
         const card = h('div.r2-card.truth',
@@ -85,7 +90,8 @@ export default {
           o.pickers.length
             ? h('div.r2-fooled', h('span.lbl', o.pickers.length > 1 ? 'Spotted by' : 'Spotted by'), h('span.list', found))
             : h('div.r2-fooled.none', h('span.lbl', 'Found by nobody. Not one of you.')),
-          o.pickers.length ? h('div.r2-pts-row', pts, o.pickers.length > 1 ? h('span.each', 'each') : null) : null,
+          o.pickers.length ? h('div.r2-pts-row', pts, h('span.each', o.pickers.length > 1 ? 'each' : `to ${o.pickers[0] === ctx.meId ? 'you' : pl(o.pickers[0])?.name || '?'}`)) : null,
+          ctx.mine?.pick && ctx.mine.pick !== o.id && !o.pickers.includes(ctx.meId) ? h('div.r2-you.under', 'Not you, though.') : null,
           h('div.r2-sparkle', Array.from({ length: 9 }, (_, i) => h('i', { style: { '--i': i, '--x': `${(tilt(seed, `s${i}`, 1) * 0.5 + 0.5) * 100}%`, '--y': `${(tilt(seed, `y${i}`, 1) * 0.5 + 0.5) * 38}%` } }))),
         );
         stageEl.replaceChildren(card);

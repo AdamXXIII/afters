@@ -334,3 +334,20 @@
 
 .r2-field .input { font-family: var(--f-hand); font-size: calc(28px * var(--ts)); font-weight: 700; color: var(--c-claret); }
 .r2-field .input::placeholder { font-family: var(--f-ui); font-size: 20px; font-weight: 500; }
+
+/* round 6 */
+.r2-gap.lie .r2-gap-ink { color: var(--c-claret); text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: rgba(122,30,44,.7); }
+.r2-gap.lie { border-bottom-color: rgba(122,30,44,.35); }
+.r2-you { position: absolute; left: 50%; top: -18px; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; background: var(--c-ink); color: var(--c-linen); font-size: 16px; line-height: 20px; font-weight: 700; padding: 6px 14px; border-radius: 999px; box-shadow: var(--sh-2); animation: pop 300ms var(--ease-out-back) 900ms both; z-index: 3; }
+.r2-card.porky .r2-you { position: static; display: inline-block; transform: rotate(-1.5deg); margin-top: 10px; white-space: normal; }
+.r2-you.under { position: static; display: inline-block; margin-top: 8px; transform: none; background: rgba(42,26,23,.12); color: #5A3A10; box-shadow: none; animation: none; }
+.r2-tag.you { box-shadow: 0 0 0 3px var(--c-ink), var(--sh-2) !important; }
+.r2-card.porky { box-shadow: var(--sh-3), 0 26px 50px rgba(20,8,6,.45), inset 0 0 0 1px rgba(122,74,42,.12); }
+.r2-stamp { mix-blend-mode: normal; }
+.r2-stamp .sn { color: var(--c-claret); }
+.r2-card.truth .t-eyebrow, .r2-card.truth .lbl { color: #3E2608 !important; }
+.r2-row .chip .nm { font-size: 18px; max-width: 9ch; }
+.r2-boop { width: 92px; height: 92px; padding: 16px; }
+.r2-dots i { width: 8px; height: 8px; opacity: .85; }
+.r2-field .input { border-color: rgba(122,30,44,.35); }
+.r2-track-i.dud.cur::before { display: none; }
