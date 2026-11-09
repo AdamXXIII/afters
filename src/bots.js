@@ -4,6 +4,8 @@ import { LocalTransport } from './net/LocalTransport.js';
 import { BOT_ANSWERS, BOT_NAMES } from './content/index.js';
 import { mulberry32, shuffle, subSeed } from './util/rng.js';
 
+const USED = new Set();
+
 /**
  * Attach an automatic brain to any GameClient.
  * @param {GameClient} client
@@ -14,7 +16,15 @@ export function attachBrain(client, { mode = 'realtime', speed = 1, seed = 1, re
   const rng = mulberry32(seed >>> 0);
   const answers = shuffle(BOT_ANSWERS, rng);
   let ai = 0;
-  const nextAnswer = () => answers[ai++ % answers.length];
+  // Bots on one page share a pool so the table doesn't see the same joke twice.
+  const nextAnswer = () => {
+    for (let k = 0; k < answers.length; k++) {
+      const a = answers[ai++ % answers.length];
+      if (!USED.has(a)) { USED.add(a); return a; }
+    }
+    USED.clear();
+    return answers[ai++ % answers.length];
+  };
   const timers = new Set();
   const brain = { enabled: true, mode, gate, detach, actNow: () => act(true) };
   let handledSeq = -1;

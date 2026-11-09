@@ -15,14 +15,16 @@ export default {
     const winners = h('div.podium-names', top3.map((r, i) => h(`div.podium-name.p${i + 1}`,
       h('div.t-eyebrow.on-dark', ['Winner', 'Second', 'Third'][i]),
       h(i === 0 ? 'div.t-title-xl.on-dark' : 'div.t-heading.on-dark', ctx.player(r.id)?.name || '?'),
-      h('div.podium-score', `${r.score}`))));
+      h('div.podium-score', `${r.score}`),
+      i === 0 && r.award ? h('div.podium-award', r.award.title) : null)));
+    // The bill lists everyone (awards for all); the top 3 also get the big type above.
     const bill = h('div.bill',
       h('div.bill-head', h('span.t-eyebrow', 'The bill'), h('span.t-eyebrow', 'Table awards')),
-      rows.map((r) => h('div.bill-row', h('span.bill-rank', `${r.rank}.`), chip(ctx.player(r.id)), h('span.bill-award', r.award?.title || ''), h('span.bill-score', String(r.score)))));
+      rows.map((r) => h('div.bill-row', h('span.bill-rank', `${r.rank}.`), chip(ctx.player(r.id), { compact: true }), h('span.bill-name', ctx.player(r.id)?.name || '?'), h('span.bill-award', r.award?.title || ''), h('span.bill-score', String(r.score)))));
     show.append(h('div.podium-wrap', winners, bill));
     ctx.cyril.react('delight');
     if (top3[0]?.id === ctx.meId) ctx.haptic('win');
     if (!ctx.frozen) ctx.audio.sfx('fanfare');
-    return { unmount: sayLater(ctx, ctx.line('podium'), { delay: 1200, hold: 2600 }) };
+    return { unmount: sayLater(ctx, ctx.line('podium'), { delay: 1200, hold: 2600, placement: 'side' }) };
   },
 };

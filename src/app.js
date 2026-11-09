@@ -45,7 +45,7 @@ export class App {
     this.applySettings();
     const canvas = document.getElementById('stage');
     const automated = typeof navigator !== 'undefined' && navigator.webdriver;
-    this.stage = new Stage(canvas, { quality: params.quality, reducedMotion: this.settings.reducedMotion, autoQuality: !automated });
+    this.stage = new Stage(canvas, { quality: params.quality, reducedMotion: this.settings.reducedMotion, autoQuality: !automated, maxFps: params.fps || (automated ? 4 : 0) });
     this.router = new Router({
       stage: this.stage,
       showEl: document.getElementById('show'),

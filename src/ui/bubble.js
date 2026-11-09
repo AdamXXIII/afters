@@ -42,6 +42,7 @@ export class Bubbles {
         if (token !== this.token) return;
         await this._wait(i === list.length - 1 ? hold : Math.min(hold, 1400), token);
       }
+      if (token === this.token && !instant) this.clear(); // bubbles never linger over the show
     })();
   }
 

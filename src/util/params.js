@@ -29,6 +29,7 @@ export const params = {
   transport: q.get('transport') || 'auto', // auto | peer | local
   signal: q.get('signal') || null,         // host:port of a PeerJS server (tests)
   quality: q.get('quality') || 'auto',     // auto | low | high
+  fps: num('fps', 0),                      // cap render rate (0 = uncapped; automation defaults to 4)
   nosw: bool('nosw'),
   e2e: bool('e2e'),
   debug: bool('debug'),

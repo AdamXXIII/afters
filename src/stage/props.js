@@ -63,8 +63,9 @@ export function buildRoom() {
   const backGeo = new THREE.ExtrudeGeometry([back, splat], { depth: 0.03, bevelEnabled: true, bevelSize: 0.006, bevelThickness: 0.006, bevelSegments: 2, curveSegments: 10 });
   backGeo.translate(0, 0, -0.015);
   const chairs = new THREE.InstancedMesh(backGeo, chairMat, 8);
+  const chairAngles = [22, -22, 62, -62, 102, -102, 142, -142].map((d) => THREE.MathUtils.degToRad(d));
   for (let i = 0; i < 8; i++) {
-    const a = seatAngle(i);
+    const a = chairAngles[i];
     const m = new THREE.Matrix4().compose(
       new THREE.Vector3(Math.sin(a) * 1.8, TABLE_Y + 0.02, -Math.cos(a) * 1.8),
       new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -a),

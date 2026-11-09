@@ -4,9 +4,10 @@
 
 .show-timer { position: absolute; left: calc(var(--safe-l) + 14px); top: calc(var(--safe-t) + 12px); }
 
-.skip-wrap { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; transition: opacity var(--d-small); }
+.skip-wrap { position: absolute; left: calc(var(--safe-l) + 8px); top: calc(var(--safe-t) + 10px); display: flex; transition: opacity var(--d-small); }
 
-.round-wrap { position: absolute; inset: 0; display: grid; place-items: center; padding: calc(var(--safe-t) + 70px) 24px 24px; perspective: 900px; }
+.round-wrap { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: calc(var(--safe-t) + 70px) 24px 20px; perspective: 900px; }
+.round-wrap .round-card { height: auto; min-height: 300px; max-height: 50vh; }
 
 .scores-wrap {
   position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--safe-t) + 70px);

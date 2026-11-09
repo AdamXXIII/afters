@@ -12,13 +12,13 @@ export const SHOTS = {
   create: { pos: [0, 0.42, 0.75], target: [0.12, 0.2, 0] },
   join: { pos: [0, 0.42, 0.75], target: [0.12, 0.2, 0] },
   lobby: { pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { pos: [0, 0.4, 0.8], target: [0, 0.2, 0] },
+  intro: { pos: [0, 0.4, 0.8], target: [0, 0.1, 0] },
   write: { pos: [0, 0.205, 0.42], target: [0, 0.2, 0] },
   vote: { pos: [0, 0.7, 1.0], target: [0, 0.18, 0] },
   reveal: { pos: [0, 0.42, 0.95], target: [0, 0.12, 0] },
   scores: { pos: [0, 0.55, 1.15], target: [0, 0.45, 0] },
-  podiumStart: { pos: [0, 0.6, 1.4], target: [0, 0.2, 0] },
-  podium: { pos: [0, 0.35, 0.7], target: [0, 0.17, 0] },
+  podiumStart: { pos: [0, 0.75, 1.7], target: [0, 0.2, -0.2] },
+  podium: { pos: [0, 0.5, 1.25], target: [0, 0.2, -0.22] },
   end: { pos: [0, 0.6, 1.15], target: [0, 0.15, 0] },
 };
 
@@ -50,7 +50,8 @@ export class Stage {
    * @param {HTMLCanvasElement} canvas
    * @param {{quality?:string, reducedMotion?:boolean, autoQuality?:boolean}} o
    */
-  constructor(canvas, { quality = 'auto', reducedMotion = false, autoQuality = true } = {}) {
+  constructor(canvas, { quality = 'auto', reducedMotion = false, autoQuality = true, maxFps = 0 } = {}) {
+    this.maxFps = maxFps; // 0 = uncapped (rAF). Tests cap it so software GL never queues frames.
     this.canvas = canvas;
     this.reduced = reducedMotion;
     this.autoQuality = autoQuality && quality === 'auto';
@@ -118,7 +119,7 @@ export class Stage {
     // Cake (podium)
     this.cake = buildCake();
     this.cake.visible = false;
-    this.cake.position.set(0.12, TABLE_Y, -0.08);
+    this.cake.position.set(0.07, TABLE_Y, -0.36);
     this.scene.add(this.cake);
     this.cakeRise = 0;
     this.podiumIds = null;
@@ -287,7 +288,7 @@ export class Stage {
     this.podiumIds = top3;
     this.cake.visible = !!top3;
     this.cakeRise = 0;
-    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.17, TABLE_Y + 0.02, 0.06) : this.cyrilHome);
+    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.19, TABLE_Y + 0.02, -0.12) : this.cyrilHome);
     if (!top3) {
       for (const s of this.seats.values()) { s.group.position.set(s.home.x, TABLE_Y, s.home.z); s.group.rotation.y = -seatAngle(s.seat); }
     }
@@ -335,6 +336,7 @@ export class Stage {
   _frame() {
     const now = performance.now();
     if (this.layout === 'input' && now - this.lastRender < 30) return; // 30 fps in writing phases
+    if (this.maxFps && now - this.lastRender < 1000 / this.maxFps) return;
     const dt = Math.min(0.05, (now - this._last) / 1000);
     this._last = now;
     this.time += dt;
@@ -392,7 +394,7 @@ export class Stage {
         const rank = this.podiumIds.indexOf(id);
         if (rank >= 0) {
           const tier = this.cake.userData.tiers[2 - rank] || this.cake.userData.tiers[0];
-          const off = rank === 0 ? new THREE.Vector3(-0.02, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.07, 0, 0.09) : new THREE.Vector3(0.06, 0, 0.15);
+          const off = rank === 0 ? new THREE.Vector3(0, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.1, 0, 0.08) : new THREE.Vector3(0.14, 0, 0.13);
           const goal = this.cake.position.clone().add(off);
           goal.y = TABLE_Y + tier.top * this.cakeRise;
           s.group.position.x += (goal.x - s.group.position.x) * fk;
@@ -434,21 +436,23 @@ export class Stage {
     }
   }
 
-  /** Render now and measure the frame (screenshot harness: proves WebGL isn't blank). */
+  /** Render now and measure the frame (screenshot harness: proves WebGL isn't blank).
+   * Downsamples via a 2D canvas (full-size readPixels is very slow under software GL). */
   snapshotStats() {
     this.renderer.render(this.scene, this.camera);
-    const gl = this.renderer.getContext();
-    const w = gl.drawingBufferWidth; const h = gl.drawingBufferHeight;
-    const px = new Uint8Array(w * h * 4);
-    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    const w = 72; const h = Math.round(72 * this.h / Math.max(1, this.w));
+    const c = this._statCanvas || (this._statCanvas = document.createElement('canvas'));
+    c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(this.canvas, 0, 0, w, h);
+    const px = g.getImageData(0, 0, w, h).data;
     let sum = 0; let sum2 = 0; let bright = 0; const n = w * h;
-    for (let i = 0; i < px.length; i += 16) {
+    for (let i = 0; i < px.length; i += 4) {
       const l = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
       sum += l; sum2 += l * l;
       if (l > 90) bright++;
     }
-    const m = n / 4;
-    const mean = sum / m;
-    return { w, h, mean: Math.round(mean), std: Math.round(Math.sqrt(Math.max(0, sum2 / m - mean * mean))), brightFrac: +(bright / m).toFixed(3) };
+    const mean = sum / n;
+    return { w: this.canvas.width, h: this.canvas.height, mean: Math.round(mean), std: Math.round(Math.sqrt(Math.max(0, sum2 / n - mean * mean))), brightFrac: +(bright / n).toFixed(3) };
   }
 }

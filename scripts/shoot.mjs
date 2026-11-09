@@ -2,7 +2,7 @@
 // usage: node scripts/shoot.mjs --screens title,lobby|all --out <dir> [--wait 2500] [--seed 7] [--players 5]
 //        [--me host|guest] [--no-freeze] [--extra "&t=4000"] [--base http://host:port] [--no-build-check]
 import { createRequire } from 'node:module';
-import { mkdirSync, existsSync } from 'node:fs';
+import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from './serve.mjs';
@@ -48,18 +48,29 @@ for (const id of o.list) {
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   const url = `${base}/?demo=${encodeURIComponent(id)}&seed=${o.seed}&players=${o.players}&me=${o.me}${o.freeze ? '&freeze=1' : ''}${o.extra}`;
   let stats = null;
+  const T = [Date.now()];
   try {
     await page.goto(url, { waitUntil: 'load', timeout: 30000 });
-    await page.waitForFunction(() => window.__afters && window.__afters.ready, null, { timeout: 30000 });
+    T.push(Date.now());
+    await page.waitForFunction(() => window.__afters && window.__afters.ready, null, { timeout: 30000, polling: 100 });
+    T.push(Date.now());
     await page.waitForTimeout(o.wait);
-    stats = await page.evaluate(() => window.__afters.stats());
+    T.push(Date.now());
+    // Stop the render loop (one last frame is rendered by stats()) so the capture is instant.
+    stats = await page.evaluate(() => { window.__afters.app.stage.stop(); return window.__afters.stats(); });
+    T.push(Date.now());
+    await page.waitForTimeout(60);
     const screen = await page.evaluate(() => window.__afters.screen);
     const file = path.join(o.out, `${id}.png`);
-    await page.screenshot({ path: file });
+    // CDP capture is ~10x faster than page.screenshot() under software GL.
+    const cdp = await context.newCDPSession(page);
+    const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' });
+    writeFileSync(file, Buffer.from(data, 'base64'));
+    T.push(Date.now());
     const blank = !stats || stats.std < 4 || stats.mean < 3;
     if (blank || errors.length) failed++;
     results.push({ id, screen, file, stats, blank, errors });
-    console.log(`${blank ? 'BLANK' : 'ok   '} ${id.padEnd(10)} screen=${screen} gl(mean=${stats?.mean} std=${stats?.std}) -> ${file}${errors.length ? `\n      console errors:\n        ${errors.join('\n        ')}` : ''}`);
+    console.log(`${blank ? 'BLANK' : 'ok   '} ${id.padEnd(10)} screen=${screen} gl(mean=${stats?.mean} std=${stats?.std}) -> ${file} [${T.slice(1).map((t, i) => t - T[i]).join('/')} ms]${errors.length ? `\n      console errors:\n        ${errors.join('\n        ')}` : ''}`);
   } catch (e) {
     failed++;
     console.log(`FAIL  ${id}: ${e.message}${errors.length ? `\n      console errors:\n        ${errors.join('\n        ')}` : ''}`);

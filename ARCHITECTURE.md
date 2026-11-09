@@ -149,6 +149,7 @@ Messages (client -> host): `hello, ping, profile, settings, start, skip, again, 
 | `?room=ABCD&name=X` | join screen prefilled (share links) |
 | `&transport=local|peer|auto`, `&signal=host:port` | transport selection; `local` bridges tabs with BroadcastChannel; `signal` points PeerJS at a local server |
 | `&quality=low|high`, `&nosw=1` | quality tier, skip service worker |
+| `&fps=<n>` | cap the render rate (automation defaults to 4 so software GL never queues frames) |
 
 ## Tests and harnesses
 
