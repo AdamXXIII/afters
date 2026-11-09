@@ -712,3 +712,119 @@
 .pc-pod-col.p2 .pc-pod-sc, .pc-pod-col.p2 .pc-pod-rank { color: #2A1A17; }
 .pc-pod-sc { color: #fff; }
 .pc-pod-col.p1 .pc-pod-sc { color: #FFD27A; }
+
+/* ===================== LANDSCAPE (844x390 class) =====================
+   Split screens: show layer (question + Cyril) on the left, the sheet on the right as a tall card.
+   Show screens: two columns (content left, hero right). Scoped with :has() to Pie Chart screens only;
+   a box-wide landscape layout would be better (see reports/percentages.md). */
+@media (orientation: landscape) and (max-height: 560px) {
+  body[data-layout="split"]:has(.pc-sheet) #show { height: 100%; width: 46%; }
+  body[data-layout="split"]:has(.pc-sheet) #sheet { left: auto; right: 0; width: 54%; height: 100%; border-radius: 28px 0 0 28px; }
+  body[data-layout="split"]:has(.pc-sheet) #sheet::before { display: none; }
+  body:has(.pc-sheet) .sheet-page { padding-top: 12px; padding-bottom: 12px; gap: 8px; }
+  .pc-top { padding-right: 8px; }
+  .pc-qcard { --mx: calc(100% + 60px); }
+  .pc-qhead { padding-right: 0; }
+  .pc-q { font-size: 26px; }
+  .pc-qcard.long .pc-q { font-size: 23px; }
+  .pc-qcard.xlong .pc-q { font-size: 21px; }
+  .pc-heckles { height: 50%; }
+  .pc-bettors { bottom: 8px; }
+  .pc-bettor .pc-av { width: 40px !important; height: 40px !important; }
+
+  /* dial + watch: pie and controls side by side */
+  .pc-dialsheet, .pc-watchsheet { display: grid; grid-template-columns: 1fr 150px; grid-template-rows: auto 1fr; gap: 8px 12px; align-items: center; }
+  .pc-dialhead { grid-column: 1 / -1; }
+  .pc-dialwrap { grid-row: 2; grid-column: 1; min-height: 0; height: 100%; }
+  .pc-dialwrap .pc-pie { width: min(270px, calc(100vh - 100px)) !important; height: min(270px, calc(100vh - 100px)) !important; --pc-size: 260px; }
+  .pc-dialrow { grid-row: 2; grid-column: 2; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+  .pc-dialrow .pc-lock { grid-column: 1 / -1; grid-row: 2; height: 64px; }
+  .pc-heckrow { grid-row: 2; grid-column: 2; grid-template-columns: 1fr; }
+  .pc-heckbtn { height: 96px; flex-direction: column; gap: 2px; }
+
+  /* poll: buttons fill, players under */
+  .pc-pollsheet .pc-pollrow { min-height: 0; }
+  .pc-pollbtn { min-height: 0; height: 100%; font-size: 26px; gap: 6px; }
+  .pc-pollbtn .ic { width: 42px; height: 42px; }
+  .pc-pollp .pc-av { width: 38px !important; height: 38px !important; }
+  .pc-tally.big { flex-direction: row; gap: 10px; }
+
+  /* bet + sweat: 2x2 board with the cut number between */
+  .pc-board { gap: 6px; }
+  .pc-board .pc-bet { min-height: 0; padding: 6px; }
+  .pc-board .pc-betic { width: 28px; height: 28px; }
+  .pc-board .pc-betlb { font-size: 20px; }
+  .pc-cuthero { margin: 0; }
+  .pc-cuthero-n { font-size: 60px; }
+  .pc-cuthero-face .pc-av { width: 40px !important; height: 40px !important; }
+  .pc-ask-q.center { font-size: 18px; }
+
+  /* final pick (input layout): three columns */
+  .pc-finalsheet { gap: 6px; }
+  .pc-finalsheet .pc-ask-q { font-size: 20px; line-height: 22px; }
+  .pc-finalsheet .pc-opts { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pc-opt, .pc-opt:nth-child(n) { min-height: 0; padding: 4px 8px; font-size: 15px; line-height: 17px; }
+  .pc-opt:nth-child(9) { grid-column: auto; min-height: 0; }
+  .pc-serve .btn { height: 48px; }
+
+  /* intro cards: art left, words right, Cyril keeps the right of the screen */
+  .pc-dim { background: linear-gradient(90deg, rgba(10,5,3,.92) 0, rgba(10,5,3,.85) 55%, rgba(10,5,3,0) 78%); }
+  .pc-cardwrap { justify-content: flex-start; align-items: center; padding: 0 0 calc(var(--rail-h) - 20px) calc(var(--safe-l) + 28px); }
+  .pc-card { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto auto; column-gap: 22px; max-width: 560px; text-align: left; padding: 0; }
+  .pc-card-art { grid-column: 1; grid-row: 1 / span 4; margin: 0; align-self: center; }
+  .pc-card-art .pc-pie { width: 180px !important; height: 180px !important; }
+  .pc-card-eye, .pc-card-title, .pc-card-lede, .pc-card-tags { grid-column: 2; }
+  .pc-card-title { font-size: 58px; }
+  .pc-card.final .pc-card-title { font-size: 52px; }
+  .pc-card-lede { font-size: 19px; line-height: 23px; }
+  .pc-card.final .pc-card-lede { font-size: 20px; line-height: 24px; }
+  .pc-card-tags { justify-self: start; font-size: 20px; margin-top: 8px; }
+
+  /* reveal: question + lanes on the left, the pie on the right */
+  .pc-rv { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; gap: 8px 16px; padding: calc(var(--safe-t) + 8px) 64px 8px calc(var(--safe-l) + 12px); bottom: calc(var(--rail-h) - 8px); }
+  .pc-rv .pc-qcard { grid-column: 1; grid-row: 1; --mx: calc(100% + 60px); }
+  .pc-rv-mid { grid-column: 2; grid-row: 1 / span 2; }
+  .pc-rv-pie .pc-pie { width: min(260px, calc(100vh - 150px)) !important; height: min(260px, calc(100vh - 150px)) !important; --pc-size: 240px; }
+  .pc-rv-pie .pc-num { font-size: 60px; }
+  .pc-stamp { margin-top: -30px; }
+  .pc-stamp-t { font-size: 28px; }
+  .pc-rv .pc-note { grid-column: 1; grid-row: 2; align-self: start; }
+  .pc-lanes { grid-column: 1; grid-row: 2; align-self: end; }
+  .pc-lane { min-height: 88px; }
+
+  /* standings: podium left, also-rans right */
+  .pc-scores2 { top: calc(var(--safe-t) + 8px); bottom: calc(var(--rail-h) + 4px); left: 0; right: 0; display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: auto 1fr; gap: 6px 18px; padding: 0 64px 0 24px; }
+  .pc-scores2::before { display: none; }
+  .pc-scores2-head { grid-column: 1 / -1; margin: 0; text-align: left; }
+  .pc-scores2-t { font-size: 32px; }
+  .pc-pod { grid-column: 1; grid-row: 2; margin: 0; align-self: end; }
+  .pc-pod-col.p1 .pc-pod-block { min-height: 110px; }
+  .pc-pod-col.p2 .pc-pod-block { min-height: 84px; }
+  .pc-pod-col.p3 .pc-pod-block { min-height: 64px; }
+  .pc-pod-col .pc-av { width: 52px !important; height: 52px !important; }
+  .pc-pod-col.p1 .pc-av { width: 64px !important; height: 64px !important; }
+  .pc-pod-sc { font-size: 24px; margin-top: 4px; }
+  .pc-pod-col.p1 .pc-pod-sc { font-size: 30px; }
+  .pc-pod-block { padding: 6px 4px; }
+  .pc-rest { grid-column: 2; grid-row: 2; grid-template-columns: 1fr; align-self: end; }
+
+  /* final reveal: bars left, No. 1 right */
+  .pc-frv { display: grid; grid-template-columns: 1.15fr 1fr; grid-template-rows: auto 1fr auto; gap: 6px 14px; padding: calc(var(--safe-t) + 8px) 64px 8px calc(var(--safe-l) + 12px); bottom: calc(var(--rail-h) - 8px); }
+  .pc-frv-head { grid-column: 1; grid-row: 1; padding: 8px 14px; --mx: calc(100% + 60px); }
+  .pc-frv-q { font-size: 21px; }
+  .pc-bars { grid-column: 1; grid-row: 2 / span 2; justify-content: flex-end; }
+  .pc-bar:not(.top) { height: 26px; }
+  .pc-bar.top { height: 40px; }
+  .pc-hero1 { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+  .pc-hero1-t { font-size: 30px; }
+  .pc-hero1-n { font-size: 58px; }
+  .pc-frv .pc-final-pts { grid-column: 2; grid-row: 3; margin: 0; font-size: 18px; padding: 8px 16px; }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .pc-sheet > :first-child { padding-right: 52px; }
+  .pc-pollsheet { padding-top: 40px; }
+  .pc-board .pc-board-row:first-child { padding-right: 52px; }
+  .pc-rv-pie .pc-pie { width: min(240px, calc(100vh - 175px)) !important; height: min(240px, calc(100vh - 175px)) !important; }
+  .pc-rv-mid { justify-content: flex-start; padding-top: 6px; }
+}
+.pc-count { white-space: nowrap; }
