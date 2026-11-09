@@ -34,9 +34,9 @@ export default {
         bar,
         h('span.r1-row-rank', { html: rankHtml(animate ? (r.prevRank ?? 0) + 1 : rank) }),
         avatarDisc(pl, { size: 38 }),
-        h('span.r1-row-name', pl?.name || '?', r.id === ctx.meId ? h('span.r1-you', 'you') : null),
+        h('span.r1-row-name', pl?.name || '?', r.id === ctx.meId ? h('span.r1-you', 'you') : null, tied(r) ? h('span.r1-joint', 'joint') : null),
         move ? h(`span.r1-row-move${move > 0 ? '.up' : '.down'}`, { html: move > 0 ? R1_ICONS.up : R1_ICONS.down }, String(Math.abs(move))) : null,
-        h('span.r1-row-right', r.delta > 0 && !animate ? h('span.r1-row-delta', `+${r.delta}`) : null, score),
+        h('span.r1-row-right', r.delta > 0 && (r.prev ?? 0) > 0 && !animate ? h('span.r1-row-delta', `+${r.delta}`) : null, score),
         rank === 1 ? h('span.r1-row-crown', { html: ICONS.crown }) : null);
       el.scoreEl = score; el.bar = bar; el.rankEl = el.querySelector('.r1-row-rank');
       els.set(r.id, el);
@@ -67,7 +67,7 @@ export default {
         }
         rows.forEach((r) => {
           const e = els.get(r.id);
-          if (r.delta > 0) e.querySelector('.r1-row-right').prepend(h('span.r1-row-delta', `+${r.delta}`));
+          if (r.delta > 0 && (r.prev ?? 0) > 0) e.querySelector('.r1-row-right').prepend(h('span.r1-row-delta', `+${r.delta}`));
           e.bar.style.setProperty('--k', String(r.score / top));
           countTo(e.scoreEl, r.prev ?? 0, r.score, { ms: 700 });
         });

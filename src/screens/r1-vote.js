@@ -4,7 +4,7 @@
 import './r1.css';
 import { h, timerRing, onTap } from '../ui/components.js';
 import { ICONS } from '../ui/icons.js';
-import { avatarDisc, tiltFor, fitText, cyrilNote, R1_LINES } from './r1-kit.js';
+import { avatarDisc, tiltFor, fitText, cyrilNote } from './r1-kit.js';
 
 export default {
   id: 'r1-vote',
@@ -51,7 +51,7 @@ export default {
       sheet.append(h('div.r1-vote-sheet.r1-in',
         h('div.r1-vote-ask', h('div.r1-vote-q', 'Which plate goes down better?'), h('div.r1-vote-hint', 'Tap one. Change your mind until the candle burns down.')),
         optA, or, optB,
-        cyrilNote(R1_LINES.voter[0])));
+        cyrilNote(ctx.line('r1Vote'))));
     }
 
     const update = (c) => {

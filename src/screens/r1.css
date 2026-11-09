@@ -392,7 +392,7 @@
 .r1-field .count { font-size: 14px; font-weight: 700; }
 /* reveal: dead heat */
 .r1-rv-cards { position: relative; }
-.r1-heat { position: absolute; right: calc(var(--gutter) + 6px); top: calc(var(--safe-t) + 168px); rotate: 5deg; z-index: 3; display: flex; flex-direction: column; align-items: center; padding: 8px 20px 9px; border-radius: 12px; background: var(--c-claret); color: var(--c-linen); box-shadow: 0 10px 24px rgba(42,20,14,.5), inset 0 0 0 2px rgba(251,244,234,.5), 0 0 0 3px var(--c-candle); animation: r1Seal 380ms var(--ease-out-back) 300ms both; white-space: nowrap; }
+.r1-heat { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; top: -34px; rotate: -4deg; z-index: 3; display: flex; flex-direction: column; align-items: center; padding: 8px 20px 9px; border-radius: 12px; background: var(--c-claret); color: var(--c-linen); box-shadow: 0 10px 24px rgba(42,20,14,.5), inset 0 0 0 2px rgba(251,244,234,.5), 0 0 0 3px var(--c-candle); animation: r1Seal 380ms var(--ease-out-back) 300ms both; white-space: nowrap; }
 .r1-heat span { font: italic 900 26px/28px var(--f-display); color: var(--c-candle); }
 .r1-heat b { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; }
 
