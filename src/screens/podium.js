@@ -8,13 +8,36 @@ import { avatarIcon } from '../ui/icons.js';
 import { AVATARS } from '../game/constants.js';
 import { getPodiumSet } from '../stage/podium-set.js';
 
-const ORD = ['1st', '2nd', '3rd'];
 const fmt = (n) => Math.round(n).toLocaleString('en-GB');
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 const easeOut = (x) => 1 - (1 - x) ** 3;
 
 /** Shared with end.js: the podium's rows (with awards) survive into the end screen. */
 export const finaleMemo = { rows: null };
+
+// The engine hands out one fallback award to everyone left over; give each of them their own
+// (same order on every phone, so the whole table sees the same bill).
+const SPARE_AWARDS = ['Quietly Brilliant', 'Dark Horse', 'Good Sport', 'Crumb Collector', 'Napkin Folder', 'Last Biscuit', 'Steady Hand', 'The Regular'];
+export function dedupeAwards(rows) {
+  const used = new Set();
+  let k = 0;
+  return rows.map((r) => {
+    if (!r.award) return r;
+    let title = r.award.title;
+    if (used.has(title)) { while (used.has(SPARE_AWARDS[k % SPARE_AWARDS.length]) && k < 40) k++; title = SPARE_AWARDS[k % SPARE_AWARDS.length]; }
+    used.add(title);
+    return title === r.award.title ? r : { ...r, award: { ...r.award, title } };
+  });
+}
+
+/** Display ranks with dead heats: equal scores share a rank, shown as "=7". */
+export function tieRanks(rows) {
+  return rows.map((r, i) => {
+    let j = i; while (j > 0 && rows[j - 1].score === r.score) j--;
+    const tied = (i > 0 && rows[i - 1].score === r.score) || (i < rows.length - 1 && rows[i + 1].score === r.score);
+    return { ...r, shownRank: tied ? `=${j + 1}` : String(j + 1) };
+  });
+}
 
 export function glyph(player, cls = '') {
   const colour = AVATARS[player?.avatar]?.colour || '#7A4A2A';
@@ -26,7 +49,7 @@ export default {
   layout: 'show',
   shot: 'podiumStart',
   mount({ show }, ctx) {
-    const rows = ctx.payload.rows || [];
+    const rows = tieRanks(dedupeAwards(ctx.payload.rows || []));
     finaleMemo.rows = rows;
     const set = getPodiumSet(ctx.stage);
     set.show({ rows, players: ctx.players, mode: 'podium', duration: ctx.duration || 14000, reduced: ctx.reduced });
@@ -49,7 +72,6 @@ export default {
 
     // --- place cards under 2nd and 3rd
     const tags = rows.slice(1, 3).map((r, i) => h(`div.fin-tag.r${i + 2}`,
-      h('div.fin-tag-rank', ORD[i + 1]),
       h('div.fin-tag-name', name(r.id)),
       h('div.fin-tag-score', fmt(r.score))));
 
@@ -58,21 +80,21 @@ export default {
     const total = rows.reduce((s, r) => s + (r.score || 0), 0);
     const dense = rows.length > 5;
     const bill = h(`div.fin-bill${dense ? '.dense' : ''}`,
-      h('div.fin-bill-head', h('span', 'The bill'), h('span', ctx.room ? `Table ${ctx.room}` : 'Table for ' + rows.length)),
+      h('div.fin-bill-head', h('span', 'The bill'), h('span.fin-bill-table', `Table for ${rows.length}`)),
       h('div.fin-bill-rows', rows.map((r, i) => {
         const p = ctx.player(r.id);
         return h(`div.fin-row${r.id === ctx.meId ? '.me' : ''}${i < 3 ? `.top.t${i + 1}` : ''}`, { style: { '--i': i } },
-          h('span.fin-row-rank', String(r.rank)),
+          h('span.fin-row-rank', r.shownRank),
           glyph(p),
-          h('span.fin-row-who', h('span.fin-row-name', p?.name || '?'), h('span.fin-row-award', r.award?.title || '')),
+          h('span.fin-row-who', h('span.fin-row-name', p?.name || '?', r.id === ctx.meId ? h('span.fin-you', 'You') : null), h('span.fin-row-award', r.award?.title || '')),
           h('span.fin-row-dots'),
           h('span.fin-row-score', fmt(r.score)));
       })),
       h('div.fin-bill-foot',
         h('div.fin-foot-line', h('span', 'Table total'), h('span.fin-row-dots'), h('span', fmt(total))),
-        h('div.fin-foot-line.muted', h('span', drips ? `Wax drips tonight: ${drips}` : 'Wax drips tonight: none'), h('span.fin-row-dots'), h('span', 'Service not included'))));
+        h('div.fin-foot-line.muted', h('span', drips ? `Wax drips: ${drips}` : 'Wax drips: none'), h('span.fin-row-dots'), h('span', 'Service not incl.'))));
 
-    const root = h('div.fin', { dataset: { step: '0' } }, head, h('div.fin-tags', tags), bill);
+    const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
     show.append(root);
 
     // --- beats (fire once, in order; frozen screenshots fire them all at once)

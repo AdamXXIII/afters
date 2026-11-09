@@ -9,7 +9,8 @@ import { radialTexture } from './textures.js';
 
 const CONFETTI = 240;
 const SPARKS = 70; // per sparkler
-const PAPER = ['#E2553B', '#E0A526', '#2F5D7C', '#7F9A74', '#7A1E2C', '#FBF4EA', '#C89B3C', '#FFC86B', '#B5527E'];
+const PAPER = ['#F2643F', '#FFC23D', '#FFE6A8', '#9CC08C', '#E46C9C', '#FFF6E6', '#7C8CE8', '#5FB8B2'];
+const FOIL = '#FFD46B'; // every 4th piece is gold foil and glints
 
 const hash = (i, k = 0) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
@@ -269,6 +270,28 @@ export class PodiumSet {
     this.crown.visible = false;
     this.slots[0].avatarSlot.add(this.crown);
 
+    // a brass cloche hides the winner's spot until the reveal, then lifts away
+    const clProf = [[0, 0.372], [0.011, 0.371], [0.013, 0.362], [0.009, 0.352], [0.018, 0.344], [0.042, 0.334], [0.07, 0.31], [0.091, 0.26], [0.101, 0.18], [0.104, 0.08], [0.105, 0.012], [0.114, 0.006], [0.114, 0]];
+    const cloche = new THREE.Mesh(new THREE.LatheGeometry(clProf.slice().reverse().map(([x, y]) => new THREE.Vector2(x, y)), 64),
+      new THREE.MeshStandardMaterial({ color: '#F2D49A', roughness: 0.2, metalness: 0.78, emissive: '#5A3A12', emissiveIntensity: 0.32 }));
+    this.cloche = new THREE.Group();
+    this.cloche.add(cloche);
+    const glint = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTexture({ size: 64, inner: 'rgba(255,245,220,1)', mid: 'rgba(255,220,160,0.35)', outer: 'rgba(255,200,120,0)' }), blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+    glint.scale.set(0.09, 0.09, 1);
+    glint.position.set(-0.045, 0.27, 0.07);
+    this.cloche.add(glint);
+    this.clocheGlint = glint;
+    this.cloche.position.set(0, 0.0145, 0.05);
+    this.root.add(this.cloche);
+
+    // Cyril presides from a brass candlestick so the cakes never hide him
+    const stickProf = [[0, 0], [0.07, 0], [0.072, 0.008], [0.05, 0.016], [0.026, 0.03], [0.02, 0.05], [0.028, 0.06], [0.018, 0.075], [0.016, 0.11], [0.03, 0.122], [0.05, 0.13], [0.052, 0.136], [0, 0.136]];
+    this.stick = new THREE.Mesh(new THREE.LatheGeometry(stickProf.map(([x, y]) => new THREE.Vector2(x, y)), 48),
+      new THREE.MeshStandardMaterial({ color: '#D2A64E', roughness: 0.3, metalness: 0.6, emissive: '#6A4416', emissiveIntensity: 0.4 }));
+    this.stickH = 0.136;
+    this.stick.visible = false;
+    stage.scene.add(this.stick);
+
     // spotlight cone + halo over the winner
     this.cone = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.2, 1.1, 40, 1, true), coneMaterial());
     this.cone.position.set(0, 0.66, 0.04);
@@ -306,21 +329,21 @@ export class PodiumSet {
     }
 
     // napkin confetti (one InstancedMesh)
-    const cgeo = new THREE.PlaneGeometry(0.016, 0.011);
+    const cgeo = new THREE.PlaneGeometry(0.02, 0.013);
     const cmat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, toneMapped: false });
     this.confetti = new THREE.InstancedMesh(cgeo, cmat, CONFETTI);
     this.confetti.frustumCulled = false;
     const col = new THREE.Color();
     this.pieces = [];
     for (let i = 0; i < CONFETTI; i++) {
-      col.set(PAPER[Math.floor(hash(i, 9) * PAPER.length)]);
+      col.set(i % 4 === 0 ? FOIL : PAPER[Math.floor(hash(i, 9) * PAPER.length)]);
       this.confetti.setColorAt(i, col);
       this.baseCols = this.baseCols || [];
       this.baseCols.push(col.clone());
       const rain = i >= CONFETTI * 0.62;
       const side = i % 2 ? 1 : -1;
       const p = rain
-        ? { p0: new THREE.Vector3((hash(i, 1) - 0.5) * 0.9, 0.95 + hash(i, 2) * 0.4, (hash(i, 3) - 0.4) * 0.6), v0: new THREE.Vector3((hash(i, 4) - 0.5) * 0.1, 0, 0), delay: 150 + hash(i, 5) * 2600 }
+        ? { p0: new THREE.Vector3((hash(i, 1) - 0.5) * 0.8, 0.62 + hash(i, 2) * 0.22, (hash(i, 3) - 0.3) * 0.5), v0: new THREE.Vector3((hash(i, 4) - 0.5) * 0.1, 0, 0), delay: 150 + hash(i, 5) * 2600 }
         : { p0: new THREE.Vector3(side * 0.42, 0.04, 0.44), v0: new THREE.Vector3(-side * (0.28 + hash(i, 1) * 0.55), 1.15 + hash(i, 2) * 0.85, -0.35 - hash(i, 3) * 0.45), delay: hash(i, 5) * 120 };
       p.ph = hash(i, 6) * Math.PI * 2;
       p.spin = new THREE.Vector3(4 + hash(i, 7) * 9, 3 + hash(i, 8) * 7, 2 + hash(i, 10) * 5);
@@ -376,7 +399,7 @@ export class PodiumSet {
         if (i === 0) {
           const box = new THREE.Box3().setFromObject(a);
           this.crownY = box.max.y - 0.006;
-          this.crownScale = Math.max(0.95, Math.min(1.45, (box.max.x - box.min.x) / 0.085 * 1.2));
+          this.crownScale = Math.max(0.9, Math.min(1.4, (box.max.x - box.min.x) / 0.085 * 1.1));
         }
         s.avatarSlot.add(a);
         this.avatars[i] = a;
@@ -391,11 +414,13 @@ export class PodiumSet {
 
   hide() {
     this.root.visible = false;
+    this.stick.visible = false;
     if (this.unhook) { this.unhook(); this.unhook = null; }
     const st = this.stage;
     if (this.saved) { st.warm.position.copy(this.saved.warmPos); st.warm.intensity = this.saved.warmI; st.warm.distance = this.saved.warmD; this.saved = null; }
     st.cyrilGoal.copy(st.cyrilHome);
     st.cyril.group.scale.setScalar(1);
+    st.props.visible = true;
     st.cyril.lookAt(null);
     for (const s of st.seats.values()) s.group.visible = true;
   }
@@ -419,16 +444,16 @@ export class PodiumSet {
     const T = this.T;
     let pos; let target;
     if (this.mode === 'end') {
-      pos = new THREE.Vector3(0.06, TABLE_Y + 0.4, 1.22);
-      target = new THREE.Vector3(0.06, TABLE_Y + 0.27, 0);
+      pos = new THREE.Vector3(0.05, TABLE_Y + 0.34, 1.3);
+      target = new THREE.Vector3(0.05, TABLE_Y + 0.235, 0);
     } else {
       const hero = { pos: new THREE.Vector3(0, TABLE_Y + 0.36, 1.78), target: new THREE.Vector3(0, TABLE_Y + 0.15, 0.02) };
       const start = { pos: new THREE.Vector3(0, TABLE_Y + 0.95, 2.3), target: new THREE.Vector3(0, TABLE_Y + 0.05, 0) };
       const k = this.reduced ? 1 : easeInOutQuint(clamp01(t / (3000 * T.scale)));
       // before the bill arrives the podium sits lower (fills the frame); then it cranes up for the bill
       const crane = this.reduced ? (t >= T.bill ? 1 : 0) : easeInOutQuint(clamp01((t - T.bill) / (900 * T.scale)));
-      hero.pos.y += 0.13 * (1 - crane);
-      hero.target.y += 0.13 * (1 - crane);
+      hero.pos.y += 0.13 - 0.22 * crane;
+      hero.target.y += 0.13 - 0.22 * crane;
       pos = start.pos.clone().lerp(hero.pos, k);
       target = start.target.clone().lerp(hero.target, k);
       // drumroll push-in, then a kick back on the reveal
@@ -454,9 +479,13 @@ export class PodiumSet {
     for (const s of st.seats.values()) s.group.visible = false;
     st.cake.visible = false;
     // Cyril compères from stage right, a touch smaller so the cakes are the stars
-    if (this.mode === 'end') st.cyrilGoal.set(0.3, TABLE_Y + 0.02, -0.16);
-    else st.cyrilGoal.set(0.27, TABLE_Y + 0.02, -0.34);
-    st.cyril.group.scale.setScalar(0.82);
+    if (this.mode === 'end') st.cyrilGoal.set(0.3, TABLE_Y + 0.01 + this.stickH, -0.2);
+    else st.cyrilGoal.set(0.3, TABLE_Y + 0.01 + this.stickH, -0.36);
+    this.stick.visible = true;
+    this.stick.position.set(st.cyril.group.position.x, TABLE_Y, st.cyril.group.position.z);
+    this.stick.scale.set(1, Math.max(0.01, st.cyril.group.position.y - TABLE_Y - 0.01) / this.stickH, 1);
+    st.cyril.group.scale.setScalar(this.mode === 'end' ? 0.85 : 0.95);
+    st.props.visible = false; // clear the table: the cakes are the only dinner now
     // light: lift the warm fill onto the cakes
     st.warm.position.set(0.05, 0.75, 0.95);
     st.warm.intensity = 3.2;
@@ -473,11 +502,13 @@ export class PodiumSet {
       s.rosette.material.opacity = 1;
       const a = this.avatars[i];
       if (!a) return;
-      const dropT = reveal[i] + (i === 0 ? 0 : 350 * T.scale);
+      // the winner is placed under the cloche during the drumroll; 2nd/3rd drop on after their cake
+      const dropT = i === 0 ? T.cake1 + 800 * T.scale : reveal[i] + 350 * T.scale;
       const dk = this.reduced ? (t >= dropT ? 1 : 0) : clamp01((t - dropT) / (650 * T.scale));
       a.visible = t >= dropT;
       const hgt = bounce(dk);
-      a.position.y = hgt * 0.3;
+      const hk = i === 0 && !this.reduced ? clamp01((t - T.win - 100 * T.scale) / (520 * T.scale)) : 0;
+      a.position.y = i === 0 ? Math.sin(hk * Math.PI) * 0.07 : hgt * 0.3;
       // squash on each landing
       const land = dk > 0.5 && dk < 0.62 ? Math.sin(((dk - 0.5) / 0.12) * Math.PI) : 0;
       const sq = 1 - land * 0.18;
@@ -489,11 +520,21 @@ export class PodiumSet {
       a.rotation.y = i === 0 && dk >= 1 && !this.reduced ? Math.sin(time * 1.6) * 0.25 : 0;
     });
 
+    // cloche: sits from the start, gleams under the drumroll spotlight, then flies up on the reveal
+    const lk = this.reduced ? (t >= T.win ? 1 : 0) : clamp01((t - T.win + 120 * T.scale) / (650 * T.scale));
+    this.cloche.visible = lk < 1;
+    this.cloche.position.y = 0.0145 + easeOutCubic(lk) * 0.9 * (this.reduced ? 0 : 1);
+    this.cloche.rotation.z = -lk * 0.5;
+    this.cloche.position.x = lk * 0.12;
+    const rattle = !this.reduced && t > T.cake1 && t < T.win ? Math.sin(time * 38) * 0.006 * clamp01((t - T.cake1) / (T.win - T.cake1)) : 0;
+    this.cloche.rotation.x = rattle;
+    this.clocheGlint.material.opacity = 0.5 + 0.5 * Math.abs(Math.sin(time * 1.3));
+
     // crown drops in after the winner lands
     const ck = this.reduced ? (t >= T.win ? 1 : 0) : clamp01((t - T.win - 700 * T.scale) / (550 * T.scale));
     this.crown.visible = ck > 0 && !!this.avatars[0];
     this.crown.scale.setScalar(this.crownScale || 1.3);
-    this.crown.position.y = (this.crownY || 0.1) + (1 - easeOutCubic(ck)) * 0.22;
+    this.crown.position.y = (this.crownY || 0.1) + 0.017 * (this.crownScale || 1.3) + (1 - easeOutCubic(ck)) * 0.22;
     this.crown.rotation.set(0.12 * (1 - ck), time * 0.6 * (this.reduced ? 0 : 1), -0.16);
 
     // spotlight + halo: dim sweep during the drumroll, full on the winner
@@ -542,8 +583,10 @@ export class PodiumSet {
       this.confetti.setMatrixAt(i, m);
       // fake paper shading: brighter when the face turns to the camera / up to the light
       this._n.set(0, 0, 1).applyQuaternion(q);
-      const lit = landed ? 0.78 : 0.5 + 0.5 * Math.abs(this._n.z * 0.7 + this._n.y * 0.5);
-      this._c.copy(this.baseCols[i]).multiplyScalar(lit * 0.92);
+      const face = Math.abs(this._n.z * 0.7 + this._n.y * 0.5);
+      let lit = landed ? 0.8 : 0.62 + 0.45 * face;
+      if (i % 4 === 0 && !landed) lit += face > 0.86 ? 1.1 : 0; // foil glint
+      this._c.copy(this.baseCols[i]).multiplyScalar(lit);
       this.confetti.setColorAt(i, this._c);
     }
     this.confetti.visible = any;

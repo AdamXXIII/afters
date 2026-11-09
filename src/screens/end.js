@@ -1,9 +1,11 @@
 // end: the winner stays up on the cake (show), and your receipt stub + Same again / New table
 // (host) or a waiting card (guests), with Leave for everyone.
 import './podium.css';
-import { h, button } from '../ui/components.js';
+import { h, button, onTap } from '../ui/components.js';
+import { ICONS } from '../ui/icons.js';
+import { computeAwards } from '../game/awards.js';
 import { getPodiumSet } from '../stage/podium-set.js';
-import { finaleMemo, glyph } from './podium.js';
+import { finaleMemo, glyph, dedupeAwards } from './podium.js';
 
 const ORD = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'}`;
 const fmt = (n) => Math.round(n || 0).toLocaleString('en-GB');
@@ -21,7 +23,15 @@ export default {
     ctx.stage.setPodium(null);
     const rows = ctx.payload?.rows || [];
     // awards come from the podium payload (end rows don't carry them)
-    const awardOf = (id) => finaleMemo.rows?.find((r) => r.id === id)?.award || null;
+    // (fallback for a phone that joined straight into the end, e.g. a demo: the host can recompute)
+    let memo = finaleMemo.rows;
+    if (!memo) {
+      try {
+        const eng = window.__afters?.engine?.();
+        if (eng?.players) { const aw = computeAwards(eng.players); memo = dedupeAwards(rows.map((r) => ({ ...r, award: aw[r.id] }))); }
+      } catch { memo = null; }
+    }
+    const awardOf = (id) => memo?.find((r) => r.id === id)?.award || null;
     const set = getPodiumSet(ctx.stage);
     if (rows.length) set.show({ rows, players: ctx.players, mode: 'end', reduced: ctx.reduced });
     ctx.cyril.setMood?.('calm');
@@ -31,6 +41,7 @@ export default {
     if (wp) {
       show.append(h('div.end-show', h('div.end-ribbon', glyph(wp), h('span', h('b', wp.name), ' takes the cake'))));
     }
+    document.body.classList.add('end-nohandle');
 
     const meRow = rows.find((r) => r.id === ctx.meId);
     const award = meRow ? awardOf(meRow.id) : null;
@@ -43,7 +54,7 @@ export default {
       stub = h('div.end-stub',
         h('span.end-stub-av', glyph(ctx.me), h(`span.end-stub-medal.${r <= 3 ? `r${r}` : 'rx'}`, String(r))),
         h('div.end-stub-text', place,
-          h('div.end-stub-sub', `${fmt(meRow.score)} pts · out of ${rows.length}`),
+          h('div.end-stub-sub', `${ORD(r)} of ${rows.length} · ${fmt(meRow.score)} pts`),
           award ? h('div.end-stub-award', award.title) : null));
     }
 
@@ -51,7 +62,7 @@ export default {
     const leave = button('Leave the table', { kind: 'ghost', onClick: () => ctx.actions.leave(), e2e: 'leave' });
     const page = h('div.end-page');
     // Cyril's last word lives on the sheet (a bubble would sit on the winner); his mouth still moves
-    const line = ctx.isHost ? 'Same again? I\u2019ve got wick for one more.' : 'Same again? That\u2019s up to whoever\u2019s holding the table.';
+    const line = ctx.isHost ? 'Same again? I\u2019ve got wick for one more.' : 'Not my call, I\u2019m only the candle.';
     const quote = h('p.end-quote', h('span.end-quote-text', `\u201c${line}\u201d`), h('span.end-quote-by', '\u2014 Cyril'));
     const talk = ctx.frozen ? null : setTimeout(() => { ctx.cyril.setTalking(true); ctx.cyril.react('smug'); }, 450);
     const hush = ctx.frozen ? null : setTimeout(() => ctx.cyril.setTalking(false), 2400);
@@ -73,12 +84,20 @@ export default {
         stub,
         h('div.end-actions',
           h('div.end-wait', h('span.end-glass', { html: glassSvg }),
-            h('div.t-heading', `Waiting for ${host?.name || 'the host'} to pour another round.`)),
+            h('div.end-wait-text', h('div.t-heading', `${host?.name || 'The host'} is deciding`, h('span.end-dots', h('i'), h('i'), h('i'))),
+              h('div.end-wait-sub', 'Hold your glass.'))),
+          h('div.end-throw', h('span.end-throw-label', 'While you wait'),
+            h('div.end-throw-row', ...[['roll', 'Roll'], ['rose', 'Rose'], ['applause', 'Applaud']].map(([kind, label]) => {
+              const b = h('button.end-throw-btn', { type: 'button', 'data-e2e': `end-react-${kind}` }, h('span.end-throw-ic', { html: ICONS[kind] || '' }), h('span', label));
+              let last = 0;
+              onTap(b, () => { const now = Date.now(); if (now - last < 400) return; last = now; ctx.client.react(kind); }, { sound: null });
+              return b;
+            }))),
           leave));
     }
     sheet.append(page);
     return {
-      unmount() { set.hide(); clearTimeout(talk); clearTimeout(hush); ctx.cyril.setTalking(false); },
+      unmount() { document.body.classList.remove('end-nohandle'); set.hide(); clearTimeout(talk); clearTimeout(hush); ctx.cyril.setTalking(false); },
     };
   },
 };
