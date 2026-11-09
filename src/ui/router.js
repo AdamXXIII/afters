@@ -69,8 +69,9 @@ function staggerIn(container, baseDelay) {
   const kids = [...container.children].slice(0, 7);
   kids.forEach((el, i) => {
     el.animate(
-      [{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
-      { duration: 340, delay: baseDelay + i * 45, easing: EASE_OUT, fill: 'backwards' },
+      // land with a small overshoot, like a card dealt onto linen (DESIGN 3.7 ease-out-back)
+      [{ opacity: 0, transform: 'translateY(22px) scale(.97)' }, { opacity: 1, transform: 'translateY(-3px) scale(1.008)', offset: 0.65 }, { opacity: 1, transform: 'none' }],
+      { duration: 420, delay: baseDelay + i * 50, easing: EASE_OUT, fill: 'backwards' },
     );
   });
 }
@@ -171,6 +172,8 @@ export class Router {
       console.error(`[screen ${id}] mount`, e);
       sheet.append(h('p.t-body', 'Something went wrong drawing this screen.'));
     }
+    // draw the first frame now so timers and timelines never flash an empty state
+    try { cur.inst?.frame?.(ctx, 0); cur.strip?.frame(ctx); } catch (e) { console.error(`[screen ${id}] first frame`, e); }
     // new sheet content waits until the old content has mostly gone (no layer soup)
     if (layout !== 'show' && prev) staggerIn(sheet, sameLayout ? 150 : prev.layout === 'show' ? 100 : 200);
     if (prev && this._shared) { sharedTo(this._shared, show); this._shared = null; }

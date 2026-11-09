@@ -416,10 +416,11 @@ body.kb-open[data-layout="input"] #bubbles .bubble { left: calc(var(--safe-l) + 
 body[data-layout="split"]:not([data-screen="r1-vote"]) #bubbles .bubble {
   top: auto !important; bottom: calc(60% + 10px) !important;
   left: 14px !important; right: 14px !important; margin: 0 auto; width: fit-content; max-width: 340px;
-  font-size: 15px; line-height: 20px; padding: 9px 14px 9px 36px; border-radius: 16px;
+  font-size: 16px; line-height: 21px; padding: 10px 16px 10px 38px; border-radius: var(--r-3);
   transform-origin: 50% 100%;
 }
-body[data-layout="split"]:not([data-screen="r1-vote"]) #bubbles .bubble::after { display: none; }
+/* same bubble family as everywhere else: a tail, here pointing up at Cyril */
+body[data-layout="split"]:not([data-screen="r1-vote"]) #bubbles .bubble::after { left: 50%; margin-left: -11px; bottom: auto; top: -10px; clip-path: polygon(50% 0, 0 100%, 100% 100%); width: 22px; height: 11px; }
 body[data-layout="split"]:not([data-screen="r1-vote"]) #bubbles .bubble::before {
   content: ""; position: absolute; left: 13px; top: 50%; width: 14px; height: 18px; margin-top: -10px;
   background: radial-gradient(60% 55% at 50% 70%, #FFF4D6 0 35%, var(--c-candle) 60%, var(--c-tomato) 100%);
@@ -428,3 +429,7 @@ body[data-layout="split"]:not([data-screen="r1-vote"]) #bubbles .bubble::before 
 }
 /* shared-element ghost used by the router */
 .shared-ghost { position: fixed; z-index: 7; pointer-events: none; margin: 0; transform-origin: 0 0; }
+
+/* strip: the done tick sits beside the face, not on it */
+.strip-inner .chip .badge { width: 14px; height: 14px; right: -4px; bottom: auto; top: -3px; }
+.strip-inner .chip .badge svg { width: 10px; height: 10px; }
