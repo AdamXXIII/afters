@@ -35,7 +35,7 @@ export const DEMOS = {
   'r3-write': { match: (e) => e.phase.id === 'r3-write', me: 'idle', bots: 'act', t: 21000 },
   'r3-swipe': { match: (e) => e.phase.id === 'r3-swipe', me: 'idle', bots: 'act', t: (p) => Math.round(p.payload.perCard * 1.4) },
   'r3-reveal': { match: (e) => e.phase.id === 'r3-reveal', t: (p) => p.payload.toastAt + 1800 },
-  podium: { match: (e) => e.phase.id === 'podium', t: 6500 },
+  podium: { match: (e) => e.phase.id === 'podium', t: 11000 },
   end: { match: (e) => e.phase.id === 'end', t: 1500 },
   reconnect: { match: (e, me) => e.phase.id === 'r1-vote' && !meIsAuthor(e, me), me: 'idle', bots: 'idle', t: 5200, after: 'reconnect' },
 };
