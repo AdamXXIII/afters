@@ -5,7 +5,7 @@ import { TABLE_POLLS } from './content/polls.js';
 import { FINALS } from './content/finals.js';
 
 export const PC = {
-  intro: 6000, poll: 12000, dial: 25000, bet: 12000, reveal: 8500, scores: 6000,
+  intro: 6000, poll: 12000, dial: 25000, bet: 12000, reveal: 10500, scores: 6000,
   finalIntro: 5000, final: 25000, finalReveal: 11000,
 };
 // reveal timeline (ms, before api.dur): when the real slice starts sweeping, lands, bets resolve, aside

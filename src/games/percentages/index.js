@@ -86,8 +86,8 @@ export default {
   lines: {
     family: {
       pcIntro: [
-        ['Pie Chart. I asked the nation some questions.', 'One of you cuts the pie to a guess. The rest of you bet on how badly.'],
-        ['Pie Chart. Questions for the nation, slices for you.', 'One holds the knife. Everyone else heckles. Very British.'],
+        ['Pie Chart! I asked the nation some very personal questions.', 'The nation answered. Mostly honestly. Knives out.'],
+        ['Pie Chart. Questions for the nation, slices for you.', 'Shout at whoever holds the knife. It\'s tradition.'],
       ],
       pcIntroAgain: [['More pie? Splendid. I\'ll fetch a bigger knife.'], ['Second slice. Nobody\'s counting. I am, actually.']],
       pcDial: [
@@ -112,7 +112,7 @@ export default {
       ],
       pcPollReveal: [['That\'s this table. I\'m not looking at anyone. I\'m looking at everyone.'], ['Well. Some of you have explaining to do.']],
       pcScores: [['Who\'s had the most pie so far. Before the last slice.'], ['The standings. All to play for. Mostly.']],
-      pcFinalIntro: [['The last slice. Nine answers, pick the top three.'], ['Last slice! Find the three the nation said most.']],
+      pcFinalIntro: [['Last slice! Everything to play for. Except dignity.'], ['The finale. I\'ve saved the best pie for last.']],
       pcFinal: [['Three picks. The nation\'s favourites. No pressure.']],
       pcFinalReveal: [['And the nation\'s favourite is...'], ['Lowest first. Drumroll, please. Not too loud.']],
     },

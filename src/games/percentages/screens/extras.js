@@ -1,5 +1,5 @@
 // Pie Chart: intro card, standings, the last slice (intro, pick 3, reveal).
-import { h, onTap, leaderboard } from '../../../ui/components.js';
+import { h, onTap } from '../../../ui/components.js';
 import { ICONS } from '../../../ui/icons.js';
 import { pie, disc, easeOut } from './kit.js';
 
@@ -16,14 +16,15 @@ function skipBtn(ctx, show) {
   return (c) => b.classList.toggle('on', c.elapsed() > 1500 / (c.phase?.speed || 1));
 }
 
-function menuCard({ eyebrow, title, rules, slice = 37 }) {
-  const art = pie({ size: 150, ticks: false, number: false });
+function menuCard({ eyebrow, title, lede, tags, slice = 37 }) {
+  const art = pie({ size: 196, ticks: false, number: false });
   art.slice(slice); art.knife(slice);
   return h('div.pc-card',
     h('div.pc-card-eye', eyebrow),
-    h('div.pc-card-art', art),
     h('div.pc-card-title', title),
-    h('div.pc-card-rules', rules.map((r, i) => h('div.pc-rule', h('span.n', String(i + 1)), h('span', r)))));
+    h('div.pc-card-art', art),
+    h('div.pc-card-lede', lede),
+    h('div.pc-card-tags', tags.map(([big, small]) => h('div.pc-tag', h('b', big), h('span', small)))));
 }
 
 const intro = {
@@ -34,11 +35,8 @@ const intro = {
     const card = menuCard({
       eyebrow: ctx.adult ? 'Today’s pie · after dark' : 'Today’s pie',
       title: 'Pie Chart',
-      rules: [
-        'I asked the nation. One of you cuts the pie to a guess.',
-        'Everyone else heckles, then bets higher or lower.',
-        'Then a poll of this very table. Then the last slice.',
-      ],
+      lede: 'Cut the pie to guess the percent. Everyone else bets on your cut.',
+      tags: [['2000', 'spot-on cut'], ['1000', 'brave bet']],
     });
     show.append(h('div.pc-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -48,16 +46,34 @@ const intro = {
   },
 };
 
+const PODIUM = ['1st', '2nd', '3rd'];
 const scores = {
   id: 'percentages-scores',
   layout: 'show',
   shot: 'scores',
   mount({ show }, ctx) {
     const rows = ctx.payload.rows || [];
-    const board = leaderboard(rows, ctx.player, { animate: false });
-    show.append(h('div.pc-scores', h('div.t-eyebrow', 'Before the last slice'), h('h2.pc-scores-t', 'Who’s had the most pie'), board));
-    const cancel = say(ctx, ctx.line('pcScores'), {}, 1200);
-    return { unmount: cancel };
+    const top = rows.slice(0, 3);
+    const order = [top[1], top[0], top[2]].filter(Boolean);
+    const pod = h('div.pc-pod', order.map((r) => {
+      const i = rows.indexOf(r);
+      const pl = ctx.player(r.id);
+      return h(`div.pc-pod-col.p${i + 1}`, { style: { animationDelay: `${(2 - i) * 140}ms` } },
+        disc(pl, { size: i === 0 ? 76 : 58 }),
+        h('div.pc-pod-nm', pl?.name || '?'),
+        h('div.pc-pod-block', h('div.pc-pod-rank', PODIUM[i]), h('div.pc-pod-sc', String(r.score))));
+    }));
+    const rest = rows.slice(3).map((r, i) => {
+      const pl = ctx.player(r.id);
+      return h('div.pc-rest-row', h('span.rk', String(i + 4)), disc(pl, { size: 28 }), h('span.nm', pl?.name || '?'), h('span.sc', String(r.score)));
+    });
+    show.append(h('div.pc-scores2',
+      h('div.pc-scores2-head', h('div.t-eyebrow.on-dark', 'Before the last slice'), h('div.pc-scores2-t', 'Most pie so far')),
+      pod,
+      rest.length ? h('div.pc-rest', rest) : null));
+    if (!ctx.frozen) ctx.audio.sfx('fanfare');
+    ctx.cyril.react('delight', { duration: ctx.frozen ? 60000 : 1200 });
+    return {};
   },
 };
 
@@ -70,7 +86,8 @@ const finalIntro = {
       eyebrow: 'The finale',
       title: 'The Last Slice',
       slice: 88,
-      rules: [ctx.payload.q, 'Nine answers. Pick the three most people said.', '1000 a hit. 500 more for the top one.'],
+      lede: ctx.payload.q,
+      tags: [['Pick 3', 'of nine'], ['1000', 'a hit'], ['+500', 'for No. 1']],
     });
     card.classList.add('final');
     show.append(h('div.pc-cardwrap', card));
@@ -177,9 +194,8 @@ const finalReveal = {
         if (!quiet && myPts) { ctx.audio.sfx('fanfare'); ctx.haptic('win'); }
       }
     };
-    const cancel = say(ctx, ctx.line('pcFinalReveal'), { hold: 1800 }, 300);
     run(ctx);
-    return { frame: run, unmount: cancel };
+    return { frame: run };
   },
 };
 

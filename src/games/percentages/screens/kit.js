@@ -176,7 +176,9 @@ export function heckleFeed(ctx) {
       if (seen.has(hk.n)) continue;
       seen.add(hk.n);
       const pl = ctx.player(hk.id);
-      const x = 8 + srand(ctx.phase.seed, `hx${hk.n}`) * 62;
+      // beside Cyril, never over him (he stands in the middle of the show layer)
+      const r = srand(ctx.phase.seed, `hx${hk.n}`);
+      const x = r < 0.5 ? 2 + r * 24 : 58 + (r - 0.5) * 12;
       const tilt = (srand(ctx.phase.seed, `ht${hk.n}`) - 0.5) * 14;
       const tag = h(`div.pc-heckle.${hk.dir}`, { style: { left: `${x}%`, '--tilt': `${tilt}deg`, '--pc': AVATARS[pl?.avatar]?.colour || '#7A4A2A' } },
         disc(pl, { size: 26 }), h('span.nm', pl?.name || '?'), h('b', hk.dir === 'up' ? 'Higher!' : 'Lower!'));
