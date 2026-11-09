@@ -3,6 +3,7 @@ import './tp.css';
 import { drawingView } from '../../../shared/drawing.js';
 import { onTap } from '../../../ui/components.js';
 import { h, av, who, tilt, kindLabel, TP_ICONS, cordSvg, timeline } from './kit.js';
+import { fitToContent } from '../doodles.js';
 
 const vote = {
   id: 'telephone-vote',
@@ -15,12 +16,13 @@ const vote = {
       h('div', h('div.t-eyebrow', `Line ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s rumour`), h('div.tp-vote-q', 'Best bit?')),
       h('div.tp-vote-sub', h('b', '+500'), h('span', 'a vote')));
     const views = [];
-    const list = [...p.moments].sort((a, b) => (a.authorId === ctx.meId) - (b.authorId === ctx.meId));
+    const rank = (m) => (m.authorId === ctx.meId ? 2 : 0) + (m.kind === 'draw' ? 0 : 1);
+    const list = [...p.moments].sort((a, b) => rank(a) - rank(b) || a.step - b.step);
     const tiles = list.map((m, i) => {
       const pl = ctx.player(m.authorId);
       const mine = m.authorId === ctx.meId;
       let inner;
-      if (m.kind === 'draw') { const v = drawingView(m.drawing, { className: 'tp-vc-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-vc-txt', { style: { '--fs': `${m.text.length > 44 ? 22 : m.text.length > 24 ? 26 : 32}px` } }, m.text);
+      if (m.kind === 'draw') { const v = drawingView(fitToContent(m.drawing), { className: 'tp-vc-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-vc-txt', { style: { '--fs': `${m.text.length > 44 ? 28 : m.text.length > 24 ? 34 : 42}px` } }, m.text);
       const btn = h('button.tp-vc-btn', { type: 'button', disabled: mine, 'data-e2e': mine ? 'moment-mine' : 'moment' },
         h('span', { html: TP_ICONS.star }), mine ? 'Yours' : 'This one!');
       const card = h(`div.tp-vc.k-${m.kind}${mine ? '.mine' : ''}`, { style: { '--pc': pl?.colour, '--tilt': `${tilt(ctx.phase.seed, m.key, 1.2)}deg` } },
@@ -63,7 +65,7 @@ const awards = {
       const pl = ctx.player(m.authorId);
       let body;
       let view = null;
-      if (m.kind === 'draw') { view = drawingView(m.drawing, { className: 'tp-aw-view' }); body = view.el; } else body = h('div.tp-aw-txt', m.text);
+      if (m.kind === 'draw') { view = drawingView(fitToContent(m.drawing, 40), { className: 'tp-aw-view' }); body = view.el; } else body = h('div.tp-aw-txt', m.text);
       hero = h(`div.tp-aw-hero.k-${m.kind}`, { style: { '--pc': pl?.colour } },
         h('div.tp-aw-ribbon', h('span', { html: TP_ICONS.star }), 'Moment of the night'),
         m.kind === 'draw' && m.prompt ? h('div.tp-aw-prompt', 'Asked to draw: ', h('b', `“${m.prompt}”`)) : null,

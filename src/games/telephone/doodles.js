@@ -186,3 +186,15 @@ export function doodleFor(text, rng = Math.random) {
   const hit = DOODLE_WORDS.find(([, re]) => re.test(t));
   return hit ? hit[0] : DOODLE_KEYS[Math.floor(rng() * DOODLE_KEYS.length)];
 }
+
+/** Scale + centre a drawing so its strokes fill the board (for heroes and tiles). */
+export function fitToContent(d, pad = 70) {
+  const strokes = d?.strokes || [];
+  let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
+  for (const s of strokes) { let x = 0; let y = 0; for (let i = 0; i + 1 < s.p.length; i += 2) { if (i === 0) { x = s.p[0]; y = s.p[1]; } else { x += s.p[i]; y += s.p[i + 1]; } x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); } }
+  if (!strokes.length || !isFinite(x0)) return d;
+  const w = Math.max(60, x1 - x0); const hh = Math.max(60, y1 - y0);
+  const k = Math.min(2.2, (1000 - pad * 2) / Math.max(w, hh));
+  const ox = 500 - ((x0 + x1) / 2) * k; const oy = 500 - ((y0 + y1) / 2) * k;
+  return { v: 1, strokes: strokes.map((s) => ({ c: s.c, s: s.s, p: s.p.map((v, i) => (i < 2 ? Math.round(v * k + (i ? oy : ox)) : Math.round(v * k))) })) };
+}
