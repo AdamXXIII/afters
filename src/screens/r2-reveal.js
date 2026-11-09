@@ -37,7 +37,7 @@ export default {
           stageEl.replaceChildren(card);
           sfx('oink'); ctx.stage.shake(); ctx.haptic('stamp');
           if (o.authors.includes(ctx.meId) && o.pickers.length) ctx.haptic('fooled');
-          if (o.pickers.length >= 3) ctx.say(ctx.line('r2FooledMany', { n: o.pickers.length }), { hold: 1400 });
+          if (o.pickers.length >= 3) ctx.say(ctx.line('r2FooledMany', { n: o.pickers.length }), { hold: 1400, placement: 'side' });
           else ctx.cyril.react('guffaw');
         } else if (s.kind === 'truth') {
           const o = byId.get(s.optionId);
@@ -50,9 +50,9 @@ export default {
           sfx('truth');
           ctx.cyril.react(o.pickers.length ? 'delight' : 'sad');
           if (o.pickers.includes(ctx.meId)) ctx.haptic('win');
-          if (!o.pickers.length) ctx.say(ctx.line('r2Nobody'), { hold: 1600 });
+          if (!o.pickers.length) ctx.say(ctx.line('r2Nobody'), { hold: 1600, placement: 'side' });
         } else if (s.kind === 'aside') {
-          ctx.say(p.aside, { hold: 1800 });
+          ctx.say(p.aside, { hold: 1800, placement: 'side' });
         }
       },
     }));

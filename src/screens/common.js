@@ -81,7 +81,7 @@ export function scoresScreen({ id, title, lineKey }) {
       const rows = ctx.payload.rows || [];
       const board = leaderboard(rows, ctx.player, { animate: !ctx.frozen, delay: 700 });
       show.append(h('div.scores-wrap', h('div.t-eyebrow.on-dark', 'The standings'), h('h2.t-round.on-dark.scores-title', title), board));
-      const cancel = sayLater(ctx, ctx.line(lineKey), { delay: 1800, hold: 2400 });
+      const cancel = sayLater(ctx, ctx.line(lineKey), { delay: 1800, hold: 2400, placement: 'side' });
       return { unmount: cancel };
     },
   };

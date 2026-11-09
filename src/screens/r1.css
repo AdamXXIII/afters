@@ -3,9 +3,10 @@
 .ab-cards .t-answer { font-size: 26px; line-height: 1.05; }
 .ab-key { position: absolute; top: -12px; left: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--c-mustard); color: var(--c-ink); display: grid; place-items: center; font-weight: 800; font-size: 15px; box-shadow: var(--sh-1); }
 
-.reveal-wrap { position: absolute; inset: 0; padding: calc(var(--safe-t) + 70px) calc(var(--gutter) + var(--safe-r)) 16px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; gap: 16px; }
-.reveal-cards { display: grid; grid-template-columns: 1fr; gap: 26px; margin-top: auto; margin-bottom: auto; }
-.reveal-card { position: relative; min-height: 120px; display: flex; flex-direction: column; justify-content: center; text-align: center; transition: transform var(--d-medium) var(--ease-in-quint), opacity var(--d-medium); }
+.reveal-wrap { position: absolute; inset: 0; padding: calc(var(--safe-t) + 70px) calc(var(--gutter) + var(--safe-r)) 16px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; gap: 10px; }
+.reveal-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; align-items: end; }
+.reveal-cards .t-answer { font-size: 27px; }
+.reveal-card { position: relative; min-height: 150px; padding-top: 28px; display: flex; flex-direction: column; justify-content: center; text-align: center; transition: transform var(--d-medium) var(--ease-in-quint), opacity var(--d-medium); }
 .reveal-card.win { box-shadow: var(--sh-3), 0 0 0 3px var(--c-mustard); }
 .reveal-card.out { transform: translateX(-120%) rotate(-8deg); opacity: 0; }
 .reveal-card:nth-child(2).out { transform: translateX(120%) rotate(8deg); }

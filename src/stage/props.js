@@ -51,7 +51,7 @@ export function buildRoom() {
   group.add(floor);
 
   // Chair silhouettes around the back of the table (merged into one mesh)
-  const chairMat = new THREE.MeshStandardMaterial({ color: '#3F2318', roughness: 0.7 });
+  const chairMat = new THREE.MeshStandardMaterial({ color: '#4A2A1C', roughness: 0.6 });
   const back = new THREE.Shape();
   back.moveTo(-0.2, -0.33); back.lineTo(-0.2, 0.18);
   back.quadraticCurveTo(-0.2, 0.33, 0, 0.35); back.quadraticCurveTo(0.2, 0.33, 0.2, 0.18);
@@ -66,7 +66,7 @@ export function buildRoom() {
   for (let i = 0; i < 8; i++) {
     const a = seatAngle(i);
     const m = new THREE.Matrix4().compose(
-      new THREE.Vector3(Math.sin(a) * 1.55, TABLE_Y + 0.12, -Math.cos(a) * 1.55),
+      new THREE.Vector3(Math.sin(a) * 1.8, TABLE_Y + 0.02, -Math.cos(a) * 1.8),
       new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -a),
       new THREE.Vector3(1, 1, 1),
     );

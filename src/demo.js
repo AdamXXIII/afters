@@ -54,6 +54,7 @@ export async function runDemo(app, id) {
   if (!spec) { console.warn('[demo] unknown screen', id); app.preScreen = 'title'; return; }
 
   app._suppress = true;
+  app.stage.stop(); // don't render while fast-forwarding (much faster under software GL)
   const seed = params.seed || 7;
   const nBots = params.players - 1;
   let reached = false;
@@ -97,11 +98,9 @@ export async function runDemo(app, id) {
   const ph = app.client.state.phase;
   const t = typeof spec.t === 'function' ? spec.t(ph) : spec.t;
   app._demoT = { [id]: t ?? 0, ...(spec.after ? { [spec.after]: t ?? 0 } : {}) };
-  if (!params.freeze && ph) {
-    // re-anchor the phase so the timer runs from the demo moment
-  }
   if (params.autopilot || params.autoplay) app.setAutopilot(true);
   app._suppress = false;
+  app.stage.start();
   if (spec.after === 'reconnect') {
     app.client.state.status = 'reconnecting';
     app.render();

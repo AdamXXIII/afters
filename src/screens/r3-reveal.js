@@ -34,7 +34,7 @@ export default {
       banner.replaceChildren(h('div.t-round.on-dark', 'Toast of the Table'));
       sfx('fanfare');
       ctx.cyril.react('delight');
-      ctx.say(ctx.line('r3Toast'), { hold: 1500 });
+      ctx.say(ctx.line('r3Toast'), { hold: 1500, placement: 'side' });
       if (!ctx.reduced && !quiet) {
         const conf = h('div.confetti', Array.from({ length: 40 }, (_, i) => h('i', { style: {
           left: `${(i * 37) % 100}%`, background: i % 3 ? '#FBF4EA' : '#C89B3C', animationDelay: `${(i % 10) * 0.08}s`,

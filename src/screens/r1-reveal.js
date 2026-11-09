@@ -57,7 +57,7 @@ export default {
         ctx.cyril.react(mood);
         if (o === 'clean') sfx('fanfare');
         const key = { clean: 'r1Clean', tie: 'r1Tie', empty: 'r1Empty', novotes: 'r1NoVotes' }[o] || 'r1Normal';
-        ctx.say(ctx.line(key), { hold: 1500 });
+        ctx.say(ctx.line(key), { hold: 1500, placement: 'side' });
       } },
       { at: S(5600), fn: () => { if (!quiet) cards.forEach((c) => c.classList.add('out')); } },
     ]);
