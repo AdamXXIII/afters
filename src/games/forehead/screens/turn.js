@@ -42,9 +42,10 @@ function mountTable(show, ctx0) {
   const card = h('div.fh-card', { style: { '--dc': p.deck.colour } },
     h('div.fh-card-band', h('i', { html: deckIcon(p.deck.icon) }), h('span', p.deck.name), cardNo),
     h('div.fh-card-face', word),
-    h('div.fh-card-foot', p.modifier ? h('span.fh-card-mod', p.modifier.name, h('small', p.modifier.rule)) : h('span.fh-card-hint', 'Shout it, act it, hum it')));
+    h('div.fh-card-foot', p.modifier ? h('span.fh-card-mod', p.modifier.name, h('small', p.modifier.rule)) : h('span.fh-card-hint', 'Close enough counts')));
   const stack = h('div.fh-stack', h('div.fh-card-ghost.g2', { style: { '--dc': p.deck.colour } }), h('div.fh-card-ghost', { style: { '--dc': p.deck.colour } }), card);
-  const count = h('div.fh-count', h('small', 'Phone on your bonce'), h('b', '3'));
+  const count = h('div.fh-count', h('small', 'Phone on your bonce'), h('b', '3'),
+    p.modifier ? h('div.fh-count-rule', h('small', 'House rule'), h('strong', p.modifier.name), h('span', p.modifier.rule)) : null);
   const quip = h('div.fh-quip', h('i', { html: CYRIL_BADGE }), h('span'));
   const teamTag = p.team ? h('span.fh-team-tag', { style: { '--tc': TEAMS[p.team].colour } }, TEAMS[p.team].name) : null;
 
@@ -65,11 +66,9 @@ function mountTable(show, ctx0) {
     foul.addEventListener('pointerdown', () => send('foul'));
     btns = h('div.fh-slabs', foul);
   } else {
-    const pass = h('button.fh-slab.pass', { type: 'button', 'data-e2e': 'fh-pass' }, h('i', { html: '<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' }), h('b', 'Pass'));
-    const hit = h('button.fh-slab.hit', { type: 'button', 'data-e2e': 'fh-hit' }, h('i', { html: ICONS.tick }), h('b', 'Got it!'));
-    pass.addEventListener('pointerdown', () => send('pass'));
+    const hit = h('button.fh-slab.hit', { type: 'button', 'data-e2e': 'fh-hit' }, h('i', { html: ICONS.tick }), h('b', 'Got it!'), h('small', `Only ${g?.name || 'they'} can pass`));
     hit.addEventListener('pointerdown', () => send('hit'));
-    btns = h('div.fh-slabs', pass, hit);
+    btns = h('div.fh-slabs', hit);
   }
 
   const root = h(`div.fh-turn${foulOnly ? '.foul-mode' : ''}`, { style: { '--dc': p.deck.colour } }, top, h('div.fh-mid', stack, count), quip, h('div.fh-tally', hitsBox, tray), btns);
@@ -134,15 +133,16 @@ function mountTable(show, ctx0) {
     if (s.counting) {
       const n = Math.max(1, Math.ceil((p.countdown - 500 - s.el) / ((p.countdown - 500) / 3)));
       const label = s.el > p.countdown - 500 ? 'Go!' : String(n);
-      if (count.lastChild.textContent !== label) {
-        count.lastChild.textContent = label;
-        if (!c.frozen) { count.lastChild.animate([{ transform: 'scale(1.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.34,1.56,.64,1)' }); c.audio.sfx('tick'); }
+      const num = count.children[1];
+      if (num.textContent !== label) {
+        num.textContent = label;
+        if (!c.frozen) { num.animate([{ transform: 'scale(1.8)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.34,1.56,.64,1)' }); c.audio.sfx('tick'); }
       }
       count.firstChild.textContent = `Phone on your bonce, ${g?.name || 'you'}!`;
       word.textContent = '';
       return;
     }
-    if (!saidGo) { saidGo = true; setQuip(firstLine(c.line('fhGo'))); if (!c.frozen) c.audio.sfx('bell'); }
+    if (!saidGo) { saidGo = true; setQuip(firstLine(c.line(p.modifier ? `fhMod_${p.modifier.id}` : 'fhGo'))); if (!c.frozen) c.audio.sfx('bell'); }
     paintCard(s, seen > 0 || s.idx > 0);
     if (s.results.length > seen) { for (const r of s.results.slice(seen)) onResult(r, s); seen = s.results.length; }
     const sec = Math.ceil(s.left / 1000);
@@ -165,13 +165,13 @@ function mountGuesser(show, ctx0) {
   const word = h('div.fh-g-word');
   const hits = h('b', '0');
   const bar = h('i');
-  const status = h('div.fh-g-status', h('span.fh-g-deck', h('i', { html: deckIcon(p.deck.icon) }), p.deck.name), p.modifier ? h('span.fh-g-mod', p.modifier.name) : null, h('span.fh-g-hits', hits, ' got'));
+  const status = h('div.fh-g-status', h('span.fh-g-deck', { style: { '--dc': p.deck.colour } }, h('i', { html: deckIcon(p.deck.icon) }), p.deck.name), p.modifier ? h('span.fh-g-mod', p.modifier.name) : null, h('span.fh-g-hits', hits, h('small', 'got')));
   const flash = h('div.fh-g-flash');
   const count = h('div.fh-g-count', h('small', 'Phone on your forehead. Screen out.'), h('b', '3'));
   const hintL = h('div.fh-g-half.left', { 'data-e2e': 'fh-g-pass' }, h('span', 'Tap: pass'));
   const hintR = h('div.fh-g-half.right', { 'data-e2e': 'fh-g-hit' }, h('span', 'Tap: got it'));
   const inner = h('div.fh-g-inner', status, h('div.fh-g-card', word), h('div.fh-g-bar', bar), count, flash, hintL, hintR);
-  const root = h('div.fh-guess', { style: { '--dc': p.deck.colour } }, inner);
+  const root = h('div.fh-guess.fh-burst', { style: { '--dc': p.deck.colour } }, inner);
   show.append(root);
   document.body.classList.add('fh-guessing');
 

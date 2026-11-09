@@ -6,9 +6,9 @@ import { ADULT_DECKS } from './adult.js';
 export const DECKS = { family: FAMILY_DECKS, adult: ADULT_DECKS };
 
 export const MODIFIERS = [
-  { id: 'mime', name: 'Mime only', rule: 'No talking. No noises. Arms only.' },
-  { id: 'oneword', name: 'One word clues', rule: 'One word at a time. No "sounds like".' },
-  { id: 'posh', name: 'Posh voices', rule: 'Every clue in your best Downton.' },
+  { id: 'mime', name: 'Mime only', rule: 'No talking. No noises. Arms only.', not: ['telly', 'accents', 'firstdate', 'nostalgia'] },
+  { id: 'oneword', name: 'One word clues', rule: 'One word at a time. No "sounds like".', not: ['accents', 'actout', 'saucytelly'] },
+  { id: 'posh', name: 'Posh voices', rule: 'Every clue in your best Downton.', not: ['accents'] },
 ];
 
 export const TEAMS = {

@@ -7,11 +7,11 @@ export const FH = {
   pick: 10000,
   countdown: 3500,
   turn: 60000,
-  recap: 10000,
+  recap: 12000,
   cardsPerTurn: 30,
   hit: 100,
   streakBonus: 50,
-  shout: 150,
+  shout: 100,
 };
 
 export class ForeheadHost {
@@ -33,7 +33,7 @@ export class ForeheadHost {
 
   start() {
     const n = this.api.players.length;
-    this.setup = { mode: 'ffa', goes: n <= 4 ? 2 : 1 };
+    this.setup = { mode: 'ffa', goes: n <= 6 ? 2 : 1 };
     this.go = false;
     this.api.enter('forehead-intro', FH.intro, this._introPayload(), {
       progress: () => ({ done: { [this._hostId()]: this.go }, counts: {}, setup: { ...this.setup } }),
@@ -139,16 +139,11 @@ export class ForeheadHost {
     this.ready = false;
     const rng = this.api.sub('pick');
     this.offer = this._offerDecks(rng);
-    let modifier = null;
-    if (this.turnIndex > 0 && this.lastMod === null && rng() < 0.4) {
-      modifier = MODIFIERS[Math.floor(rng() * MODIFIERS.length)];
-    }
-    this.lastMod = modifier ? modifier.id : null;
-    this.turn = { guesserId, team: this._teamOf(guesserId), modifier };
+    this.turn = { guesserId, team: this._teamOf(guesserId), modifier: null };
     this.api.enter('forehead-pick', FH.pick, {
       turn: this.turnIndex + 1, of: this.order.length, guesserId, team: this.turn.team, teams: this.teams,
       decks: this.offer.map(({ id, name, blurb, icon, colour }) => ({ id, name, blurb, icon, colour })),
-      modifier, scores: this._standings(),
+      scores: this._standings(),
     }, {
       progress: () => {
         const done = {};
@@ -182,6 +177,12 @@ export class ForeheadHost {
     const rng = this.api.sub('deck');
     const deck = pool[Math.floor(rng() * pool.length)];
     this.usedDecks.add(deck.id);
+    // House rule: picked AFTER the deck so it always fits (no mime on Shout at the Telly).
+    let modifier = null;
+    const fits = MODIFIERS.filter((m) => !(m.not || []).includes(deck.id));
+    if (this.turnIndex > 0 && this.lastMod === null && fits.length && rng() < 0.4) modifier = fits[Math.floor(rng() * fits.length)];
+    this.lastMod = modifier ? modifier.id : null;
+    this.turn.modifier = modifier;
     const cards = this.api.take(deck.cards.map((text, i) => ({ id: `${deck.id}-${i}`, text })), `fh-${deck.id}`, FH.cardsPerTurn, rng)
       .map((c) => c.text);
     Object.assign(this.turn, { deck: { id: deck.id, name: deck.name, icon: deck.icon, colour: deck.colour }, cards, idx: 0, results: [], streak: 0, startsAt: this.api.now(), votes: { ...this.votes } });
@@ -215,6 +216,7 @@ export class ForeheadHost {
     if (r === 'foul') {
       if (!t.team || myTeam === t.team) return;
     } else if (r === 'hit' || r === 'pass') {
+      if (!isGuesser && r === 'pass') return; // only the guesser may pass
       if (!isGuesser && t.team && myTeam !== t.team) return;
     } else return;
     let pts = 0;

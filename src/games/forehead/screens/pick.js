@@ -1,43 +1,42 @@
-// forehead-pick: the table picks the guesser's poison (one of 3 decks); the guesser gets ready.
+// forehead-pick: "Pick Dev's poison". The three decks are the only thing on screen: big, loud,
+// tappable tiles with voters' avatars landing on them. The guesser watches and taps I'm ready.
 import './forehead.css';
 import { h, button, timerRing } from '../../../ui/components.js';
-import { deckIcon, disc, cyrilCard, HEAD_SVG, TILT_DOWN_SVG, TILT_UP_SVG, teamOf, TEAMS, armGuesser, rnd } from './kit.js';
+import { deckIcon, disc, teamOf, TEAMS, armGuesser, HEAD_SVG, CYRIL_BADGE } from './kit.js';
 
 export default {
   id: 'forehead-pick',
-  layout: 'split',
+  layout: 'show',
   shot: 'vote',
   rail: false,
-  mount({ show, sheet }, ctx0) {
+  mount({ show }, ctx0) {
     let ctx = ctx0;
     const p = ctx.payload;
     const g = ctx.player(p.guesserId);
     const meG = p.guesserId === ctx.meId;
     const myTeam = teamOf(p.teams, ctx.meId);
     const canVote = !meG && (!p.team || myTeam === p.team);
-    const seed = ctx.phase.seed;
 
-    // ---- show: whose bonce, the three decks with votes landing on them ----
     const ring = timerRing();
-    const mini = p.decks.map((d, i) => {
-      const votes = h('div.fh-mini-votes');
-      const el = h('div.fh-mini', { style: { '--dc': d.colour, '--rot': `${(i - 1) * 7 + (rnd(seed, d.id) - 0.5) * 3}deg`, '--i': i } },
-        h('i', { html: deckIcon(d.icon) }), h('b', d.name), votes);
-      el.votes = votes;
-      return el;
-    });
-    const head = h('div.fh-pick-head',
-      h('div.fh-pick-who', disc(g, { size: 46 }), h('div',
-        h('div.fh-eyebrow-dark', `Bonce ${p.turn} of ${p.of}${p.team ? ` · ${TEAMS[p.team].name}` : ''}`),
-        h('div.fh-pick-name', meG ? 'Your bonce!' : `${g?.name || '?'}'s bonce`))),
+    const head = h('div.fh-pk-head',
+      h('div.fh-pk-titles',
+        h('div.fh-pk-eyebrow', disc(g, { size: 30 }), `Bonce ${p.turn} of ${p.of}${p.team ? ` · ${TEAMS[p.team].name}` : ''}`),
+        h('div.fh-pk-title', meG ? h('span', 'Your', h('br'), 'fate') : h('span', `Pick ${g?.name || '?'}'s`, h('br'), 'poison'))),
       h('div.fh-ring', ring));
-    const mod = p.modifier ? h('div.fh-mod-stamp', h('small', 'House rule'), h('b', p.modifier.name)) : null;
-    show.append(h('div.fh-pick-show', head, h('div.fh-mini-row', mini), mod));
 
-    // ---- sheet ----
-    const page = h('div.fh-sheet');
-    sheet.append(page);
-    const opts = [];
+    const tiles = p.decks.map((d, i) => {
+      const votes = h('span.fh-pk-votes');
+      const tile = h(`${canVote ? 'button' : 'div'}.fh-pk-tile`, { type: canVote ? 'button' : undefined, 'data-e2e': canVote ? 'fh-deck' : undefined, style: { '--dc': d.colour, '--i': i } },
+        h('i.fh-pk-icon', { html: deckIcon(d.icon) }),
+        h('span.fh-pk-txt', h('b', d.name), h('small', d.blurb)),
+        votes);
+      tile.votes = votes;
+      tile.deck = d.id;
+      if (canVote) tile.addEventListener('click', () => { ctx.client.act('fh-vote', { deck: d.id }, { vote: d.id }); ctx.haptic('select'); ctx.audio.sfx('select'); paint(); });
+      return tile;
+    });
+
+    const foot = h('div.fh-pk-foot');
     let readyBtn = null;
     if (meG) {
       readyBtn = button('I\'m ready', {
@@ -49,50 +48,34 @@ export default {
           await armGuesser();
         },
       });
-      page.append(
-        h('div.fh-prep',
-          h('i.fh-prep-head', { html: HEAD_SVG }),
-          h('div', h('div.fh-prep-title', 'Turn it sideways. Screen out. On your forehead.'),
-            h('div.fh-prep-tilts', h('span', h('i', { html: TILT_DOWN_SVG }), 'Nod down: got it'), h('span', h('i', { html: TILT_UP_SVG }), 'Tip up: pass')))),
-        h('div.fh-prep-note', 'They\'re picking your deck right now. Don\'t peek.'),
-        h('div.fh-grow'), readyBtn);
-    } else if (canVote) {
-      page.append(h('div.fh-sheet-title', `Pick ${g?.name || 'their'}'s poison`));
-      for (const d of p.decks) {
-        const count = h('span.fh-opt-count');
-        const b = h('button.fh-opt', { type: 'button', 'data-e2e': 'fh-deck', style: { '--dc': d.colour } },
-          h('i', { html: deckIcon(d.icon) }), h('span.fh-opt-txt', h('b', d.name), h('small', d.blurb)), count);
-        b.addEventListener('click', () => { ctx.client.act('fh-vote', { deck: d.id }, { vote: d.id }); ctx.haptic('select'); ctx.audio.sfx('select'); paint(); });
-        b.count = count; b.deck = d.id;
-        opts.push(b);
-        page.append(b);
-      }
+      foot.append(h('div.fh-pk-prep', h('i', { html: HEAD_SVG }), h('span', h('b', 'Phone sideways, screen out, on your forehead.'), ' Nod for got it, tip back to pass.')), readyBtn);
+    } else if (!canVote) {
+      foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', h('b', 'Your job: catch them cheating.'), ' Say any word on the card and it\'s a FOUL.')));
     } else {
-      page.append(h('div.fh-other-team',
-        h('div.fh-sheet-title', `${TEAMS[p.team].name} are choosing`),
-        h('div.fh-body', 'Your job this go: watch them like a hawk. If anyone says the word, slam FOUL.'),
-        h('div.fh-foul-preview', 'FOUL!')));
+      foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', ctx.line('fhPick', { name: g?.name || 'them' }).join(' '))));
     }
+    const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}`, head, h('div.fh-pk-tiles', tiles), foot);
+    show.append(root);
+    if (!ctx.frozen) tiles.forEach((t, i) => t.animate([{ transform: 'translateY(60px) rotate(6deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, delay: 80 + i * 90, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
 
     const paint = () => {
       const votes = ctx.progress.votes || {};
       const mine = ctx.mine.game.vote || votes[ctx.meId];
+      const counts = p.decks.map((d) => Object.values(votes).filter((v) => v === d.id).length + (mine === d.id && votes[ctx.meId] !== d.id ? 1 : 0));
+      const top = Math.max(...counts);
       p.decks.forEach((d, i) => {
         const who = Object.entries(votes).filter(([, v]) => v === d.id).map(([id]) => id);
         if (mine === d.id && !who.includes(ctx.meId)) who.push(ctx.meId);
-        const have = new Set([...mini[i].votes.children].map((c) => c.dataset.id));
-        for (const id of who) if (!have.has(id)) { const dsc = disc(ctx.player(id), { size: 26 }); dsc.dataset.id = id; mini[i].votes.append(dsc); }
-        for (const c of [...mini[i].votes.children]) if (!who.includes(c.dataset.id)) c.remove();
-        mini[i].classList.toggle('lead', who.length > 0 && who.length === Math.max(...p.decks.map((x) => Object.values(votes).filter((v) => v === x.id).length)));
-        const b = opts.find((o) => o.deck === d.id);
-        if (b) { b.classList.toggle('on', mine === d.id); b.setAttribute('aria-pressed', String(mine === d.id)); b.count.textContent = who.length ? `${who.length}` : ''; }
+        const have = new Set([...tiles[i].votes.children].map((c) => c.dataset.id));
+        for (const id of who) if (!have.has(id)) { const dsc = disc(ctx.player(id), { size: 32 }); dsc.dataset.id = id; tiles[i].votes.append(dsc); }
+        for (const c of [...tiles[i].votes.children]) if (!who.includes(c.dataset.id)) c.remove();
+        tiles[i].classList.toggle('lead', top > 0 && counts[i] === top);
+        tiles[i].classList.toggle('on', mine === d.id);
+        if (canVote) tiles[i].setAttribute('aria-pressed', String(mine === d.id));
       });
       if (readyBtn && (ctx.progress.ready || ctx.mine.game.ready)) { readyBtn.disabled = true; readyBtn.textContent = 'Bonce on!'; }
     };
     paint();
-    const key = meG ? 'fhPickMe' : 'fhPick';
-    const quip = cyrilCard(p.modifier ? ctx.line(`fhMod_${p.modifier.id}`) : ctx.line(key, { name: g?.name || 'them' }));
-    if (canVote) page.append(quip); else page.insertBefore(quip, page.querySelector('.fh-grow') || null);
     return {
       update: (c) => { ctx = c; paint(); },
       frame(c) { ctx = c; ring.set(c.remaining(), c.duration); },

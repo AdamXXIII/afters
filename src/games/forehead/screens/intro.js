@@ -1,12 +1,13 @@
-// forehead-intro: the Bonce card with three picture rules; the host sets the mode and starts.
+// forehead-intro: a full-screen Bonce poster (one hero: the title + the head with a phone on it),
+// three big rules, and a compact host control bar; guests see who's at the table.
 import './forehead.css';
 import { h, button } from '../../../ui/components.js';
-import { HEAD_SVG, TILT_DOWN_SVG, TILT_UP_SVG, SHOUT_SVG, disc, cyrilCard, TEAMS } from './kit.js';
+import { HEAD_SVG, disc, CYRIL_BADGE } from './kit.js';
 
-function seg(options, value, onPick, e2e) {
-  const row = h('div.fh-seg', { role: 'radiogroup' });
+function pills(options, value, onPick, e2e) {
+  const row = h('div.fh-pills', { role: 'radiogroup' });
   const btns = options.map((o) => {
-    const b = h('button.fh-seg-btn', { type: 'button', 'data-e2e': `${e2e}-${o.value}`, disabled: !!o.disabled }, h('b', o.label), o.sub ? h('small', o.sub) : null);
+    const b = h('button.fh-pill', { type: 'button', 'data-e2e': `${e2e}-${o.value}`, disabled: !!o.disabled }, o.label);
     b.addEventListener('click', () => { if (!b.disabled) onPick(o.value); });
     row.append(b);
     return [o.value, b];
@@ -18,51 +19,45 @@ function seg(options, value, onPick, e2e) {
 
 export default {
   id: 'forehead-intro',
-  layout: 'split',
-  shot: 'vote',
-  mount({ show, sheet }, ctx0) {
+  layout: 'show',
+  shot: 'intro',
+  rail: false,
+  mount({ show }, ctx0) {
     let ctx = ctx0;
     const p = ctx.payload;
-    const card = h('div.fh-bonce-card',
-      h('div.fh-bc-eyebrow', 'Tonight\'s jelly'),
-      h('div.fh-bc-title', 'Bonce'),
-      h('div.fh-bc-rules',
-        h('div.fh-rule', h('i', { html: HEAD_SVG }), h('span', 'Phone on', h('br'), 'your bonce')),
-        h('div.fh-rule', h('i', { html: SHOUT_SVG }), h('span', 'The sofa', h('br'), 'shouts')),
-        h('div.fh-rule', h('i.pair', h('i', { html: TILT_DOWN_SVG }), h('i', { html: TILT_UP_SVG })), h('span', h('b', 'Down'), ' got it', h('br'), h('b', 'Up'), ' pass')),
-      ),
-      h('div.fh-bc-foot', '60 seconds a go · 100 a card'));
-    show.append(h('div.fh-intro-wrap', card));
-    card.animate([{ transform: 'translateY(30px) rotate(-6deg) scale(.9)', opacity: 0 }, { transform: 'rotate(-2deg)', opacity: 1 }], { duration: ctx.frozen ? 1 : 700, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
-
+    const head = h('i.fh-po-head', { html: HEAD_SVG });
+    const title = h('div.fh-po-title', 'Bonce');
+    const rules = h('ol.fh-po-rules',
+      h('li', h('b', '1'), h('span', 'Phone on your head, screen out')),
+      h('li', h('b', '2'), h('span', 'Everyone else shouts, acts, hums')),
+      h('li', h('b', '3'), h('span', h('em', 'Nod'), ' = got it. ', h('em', 'Tip back'), ' = pass')));
     const setup = () => ({ ...(ctx.progress.setup || { mode: 'ffa', goes: 1 }), ...(ctx.mine.game.setup || {}) });
-    const page = h('div.fh-sheet');
-    sheet.append(page);
-    let modeSeg = null; let goesSeg = null; let go = null; let order = null; let summary = null;
+    const bar = h('div.fh-po-bar');
+    let modeP = null; let goesP = null; let summary = null;
     if (ctx.isHost) {
-      const send = (patch) => { const next = { ...setup(), ...patch }; ctx.client.act('fh-setup', next, { setup: next }); ctx.haptic('select'); ctx.audio.sfx('select'); modeSeg.set(next.mode); goesSeg.set(next.goes); };
-      modeSeg = seg([
-        { value: 'ffa', label: 'Everyone for themselves', sub: 'Guess for you' },
-        { value: 'teams', label: `${TEAMS.gravy.name.replace('Team ', '')} vs ${TEAMS.custard.name.replace('Team ', '')}`, sub: p.canTeams ? 'Two teams, shout FOUL' : '4+ players', disabled: !p.canTeams },
-      ], setup().mode, (v) => send({ mode: v }), 'fh-mode');
-      goesSeg = seg([{ value: 1, label: '1 go each' }, { value: 2, label: '2 goes each' }], setup().goes, (v) => send({ goes: v }), 'fh-goes');
-      go = button('Bonces up!', { e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
-      page.append(h('div.t-eyebrow', 'How are we playing?'), modeSeg, goesSeg,
-        cyrilCard(ctx.line('fhIntro')), h('div.fh-grow'), go);
+      const send = (patch) => { const next = { ...setup(), ...patch }; ctx.client.act('fh-setup', next, { setup: next }); ctx.haptic('select'); ctx.audio.sfx('select'); paint(); };
+      modeP = pills([{ value: 'ffa', label: 'Every bonce for itself' }, { value: 'teams', label: p.canTeams ? 'Gravy v Custard' : 'Teams (4+)', disabled: !p.canTeams }], setup().mode, (v) => send({ mode: v }), 'fh-mode');
+      goesP = pills([{ value: 1, label: '1 go each' }, { value: 2, label: '2 goes each' }], setup().goes, (v) => send({ goes: v }), 'fh-goes');
+      const go = button('Bonces up!', { e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
+      bar.append(modeP, goesP, go);
     } else {
       const host = ctx.players.find((x) => x.isHost);
-      summary = h('div.fh-summary');
-      order = h('div.fh-order', ctx.players.map((x) => disc(x, { size: 40 })));
-      page.append(h('div.t-eyebrow', 'At the table'), order, summary, cyrilCard(ctx.line('fhIntro')),
-        h('div.fh-wait', h('span.fh-dots', h('i'), h('i'), h('i')), `${host?.name || 'The host'} is setting the table`));
+      summary = h('div.fh-po-summary');
+      bar.append(h('div.fh-po-table', ctx.players.map((x) => disc(x, { size: 38 }))), summary,
+        h('div.fh-po-wait', h('i', { html: CYRIL_BADGE }), h('span', `${host?.name || 'The host'} is pouring the jelly`, h('span.fh-dots', h('i'), h('i'), h('i')))));
+    }
+    const root = h('div.fh-poster.fh-burst', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, head, rules, bar);
+    show.append(root);
+    if (!ctx.frozen) {
+      title.animate([{ transform: 'scale(.4) rotate(-12deg)', opacity: 0 }, { transform: 'rotate(-4deg)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
+      [...rules.children].forEach((li, i) => li.animate([{ transform: 'translateX(-40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, delay: 350 + i * 120, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' }));
     }
     const paint = () => {
       const s = setup();
-      if (summary) summary.replaceChildren(h('b', s.mode === 'teams' ? 'Gravy vs Custard' : 'Everyone for themselves'), h('span', ` · ${s.goes} go${s.goes > 1 ? 'es' : ''} each`));
-      if (modeSeg) { modeSeg.set(s.mode); goesSeg.set(s.goes); }
+      if (summary) summary.textContent = `${s.mode === 'teams' ? 'Gravy v Custard' : 'Every bonce for itself'} · ${s.goes} go${s.goes > 1 ? 'es' : ''} each`;
+      modeP?.set(s.mode); goesP?.set(s.goes);
     };
     paint();
-    if (!ctx.frozen) ctx.cyril.react('delight');
     return { update: (c) => { ctx = c; paint(); } };
   },
 };
