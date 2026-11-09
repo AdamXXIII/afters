@@ -7,7 +7,7 @@ import { params } from '../util/params.js';
 import { sayLater } from './common.js';
 import { sheetHead, nameCard } from './create-namecard.js';
 
-const LINK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
+const LINK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="4.2" fill="currentColor" fill-opacity=".16" stroke="currentColor" stroke-width="1.9"/><path d="M12.2 12H21M17.5 12v3M20.5 12v2.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
 
 const ERRORS = {
   'no-room': 'No table with that code. Check the letters?',
@@ -88,7 +88,7 @@ export default {
       h('div.code-group', row,
         h('p.fd-hint.code-caption', h('span.fd-hint-icon', { html: LINK }),
           h('span', invited ? 'Filled in from your invite. Just add your name.' : h('span', 'Four letters. ', h('b', 'No vowels'), ', so nothing rude.')))),
-      nameCard(name, { kicker: 'Reserved for', tilt: 1.2, compact: true }),
+      h('div.fd-mid', nameCard(name, { kicker: 'Reserved for', tilt: 1.2, compact: true })),
       h('div.fd-actions', seat),
     ));
     mark();
