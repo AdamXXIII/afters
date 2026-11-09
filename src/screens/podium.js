@@ -77,7 +77,6 @@ export default {
 
     // --- the bill: everyone, with awards
     const drips = ctx.cyril?.tallyCount ?? 0;
-    const total = rows.reduce((s, r) => s + (r.score || 0), 0);
     const dense = rows.length > 5;
     const bill = h(`div.fin-bill${dense ? '.dense' : ''}`,
       h('div.fin-bill-head', h('span', 'The bill'), h('span.fin-bill-table', `Table for ${rows.length}`)),
@@ -91,8 +90,8 @@ export default {
           h('span.fin-row-score', fmt(r.score)));
       })),
       h('div.fin-bill-foot',
-        h('div.fin-foot-line', h('span', 'Table total'), h('span.fin-row-dots'), h('span', fmt(total))),
-        h('div.fin-foot-line.muted', h('span', drips ? `Wax drips: ${drips}` : 'Wax drips: none'), h('span.fin-row-dots'), h('span', 'Service not incl.'))));
+        h('div.fin-foot-line', h('span', 'Tip for Cyril'), h('span.fin-row-dots'), h('span', 'Applause')),
+        h('div.fin-foot-line.muted', h('span', 'Wax drips'), h('span.fin-row-dots'), h('span', drips ? String(drips) : 'None, miraculously'))));
 
     const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
     show.append(root);

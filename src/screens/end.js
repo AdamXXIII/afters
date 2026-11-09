@@ -54,7 +54,7 @@ export default {
       stub = h('div.end-stub',
         h('span.end-stub-av', glyph(ctx.me), h(`span.end-stub-medal.${r <= 3 ? `r${r}` : 'rx'}`, String(r))),
         h('div.end-stub-text', place,
-          h('div.end-stub-sub', `${ORD(r)} of ${rows.length} · ${fmt(meRow.score)} pts`),
+          h('div.end-stub-sub', `Out of ${rows.length} \u00b7 ${fmt(meRow.score)} pts`),
           award ? h('div.end-stub-award', award.title) : null));
     }
 
@@ -63,7 +63,7 @@ export default {
     const page = h('div.end-page');
     // Cyril's last word lives on the sheet (a bubble would sit on the winner); his mouth still moves
     const line = ctx.isHost ? 'Same again? I\u2019ve got wick for one more.' : 'Not my call, I\u2019m only the candle.';
-    const quote = h('p.end-quote', h('span.end-quote-text', `\u201c${line}\u201d`), h('span.end-quote-by', '\u2014 Cyril'));
+    const quote = h('p.end-quote', h('span.end-quote-text', `\u201c${line}\u201d`), h('span.end-quote-by', '\u2014 Cyril, your host'));
     const talk = ctx.frozen ? null : setTimeout(() => { ctx.cyril.setTalking(true); ctx.cyril.react('smug'); }, 450);
     const hush = ctx.frozen ? null : setTimeout(() => ctx.cyril.setTalking(false), 2400);
     if (ctx.isHost) {
@@ -86,9 +86,9 @@ export default {
           h('div.end-wait', h('span.end-glass', { html: glassSvg }),
             h('div.end-wait-text', h('div.t-heading', `${host?.name || 'The host'} is deciding`, h('span.end-dots', h('i'), h('i'), h('i'))),
               h('div.end-wait-sub', 'Hold your glass.'))),
-          h('div.end-throw', h('span.end-throw-label', 'While you wait'),
-            h('div.end-throw-row', ...[['roll', 'Roll'], ['rose', 'Rose'], ['applause', 'Applaud']].map(([kind, label]) => {
-              const b = h('button.end-throw-btn', { type: 'button', 'data-e2e': `end-react-${kind}` }, h('span.end-throw-ic', { html: ICONS[kind] || '' }), h('span', label));
+          h('div.end-throw', h('span.end-throw-label', 'While you wait, heckle'),
+            h('div.end-throw-row', ...[['roll', 'Throw a bread roll'], ['rose', 'Throw a rose'], ['applause', 'Applaud'], ['groan', 'Groan']].map(([kind, label]) => {
+              const b = h('button.end-throw-btn.rail-btn', { type: 'button', 'aria-label': label, 'data-e2e': `end-react-${kind}`, html: ICONS[kind] || '' });
               let last = 0;
               onTap(b, () => { const now = Date.now(); if (now - last < 400) return; last = now; ctx.client.react(kind); }, { sound: null });
               return b;

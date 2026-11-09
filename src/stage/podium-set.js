@@ -9,7 +9,7 @@ import { radialTexture } from './textures.js';
 
 const CONFETTI = 240;
 const SPARKS = 70; // per sparkler
-const PAPER = ['#F2643F', '#FFC23D', '#FFE6A8', '#9CC08C', '#E46C9C', '#FFF6E6', '#7C8CE8', '#5FB8B2'];
+const PAPER = ['#E2553B', '#E0A526', '#FFC86B', '#FBF4EA', '#B0243A', '#F3E6CF', '#E2553B', '#FFE6A8'];
 const FOIL = '#FFD46B'; // every 4th piece is gold foil and glints
 
 const hash = (i, k = 0) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
@@ -115,6 +115,28 @@ function rosetteTexture(n) {
   return tex(c);
 }
 
+/** Polished brass matcap: warm body, hot candle highlight, dark mahogany reflections at the rim. */
+let _brassMatcap = null;
+function brassMatcap() {
+  if (_brassMatcap) return _brassMatcap;
+  const S = 256; const c = canvas(S); const g = c.getContext('2d');
+  const base = g.createRadialGradient(S * 0.5, S * 0.5, 0, S * 0.5, S * 0.5, S * 0.5);
+  base.addColorStop(0, '#E9C379'); base.addColorStop(0.55, '#C99A44'); base.addColorStop(0.82, '#7A5222'); base.addColorStop(0.95, '#3B1F18'); base.addColorStop(1, '#5A3424');
+  g.fillStyle = base; g.fillRect(0, 0, S, S);
+  const band = g.createLinearGradient(0, S * 0.62, 0, S * 0.9); // reflected tablecloth
+  band.addColorStop(0, 'rgba(255,236,200,0)'); band.addColorStop(0.5, 'rgba(255,230,180,0.35)'); band.addColorStop(1, 'rgba(255,236,200,0)');
+  g.fillStyle = band; g.fillRect(0, 0, S, S);
+  const hot = g.createRadialGradient(S * 0.36, S * 0.3, 0, S * 0.36, S * 0.3, S * 0.2); // the candle
+  hot.addColorStop(0, 'rgba(255,252,240,1)'); hot.addColorStop(0.35, 'rgba(255,230,170,0.75)'); hot.addColorStop(1, 'rgba(255,210,140,0)');
+  g.fillStyle = hot; g.fillRect(0, 0, S, S);
+  const rim = g.createRadialGradient(S * 0.72, S * 0.4, 0, S * 0.72, S * 0.4, S * 0.08); // window
+  rim.addColorStop(0, 'rgba(210,225,255,0.6)'); rim.addColorStop(1, 'rgba(210,225,255,0)');
+  g.fillStyle = rim; g.fillRect(0, 0, S, S);
+  _brassMatcap = tex(c);
+  return _brassMatcap;
+}
+const brassMat = (o = {}) => new THREE.MeshMatcapMaterial({ matcap: brassMatcap(), ...o });
+
 /** Additive light cone with a soft fresnel edge (fake volumetric spotlight). */
 function coneMaterial() {
   return new THREE.ShaderMaterial({
@@ -197,7 +219,7 @@ function buildCrown() {
     pos.setY(i, -0.018 + 0.016 + 0.022 * (1 - k));
   }
   geo.computeVertexNormals();
-  const gold = new THREE.MeshStandardMaterial({ color: '#F0C25E', roughness: 0.32, metalness: 0.55, side: THREE.DoubleSide, emissive: '#B07A20', emissiveIntensity: 0.45 });
+  const gold = brassMat({ side: THREE.DoubleSide });
   const crown = new THREE.Group();
   crown.add(new THREE.Mesh(geo, gold));
   const jewel = new THREE.MeshStandardMaterial({ color: '#B0243A', roughness: 0.15, metalness: 0.2, emissive: '#5A0A12', emissiveIntensity: 0.4 });
@@ -231,7 +253,7 @@ export class PodiumSet {
     this.reduced = false;
 
     // board + doily
-    const board = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.34, 0.014, 72), new THREE.MeshStandardMaterial({ color: '#C89B3C', roughness: 0.3, metalness: 0.85 }));
+    const board = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.34, 0.014, 72), brassMat());
     board.position.y = 0.007;
     const doily = new THREE.Mesh(new THREE.CircleGeometry(0.32, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: doilyTexture(), transparent: true, alphaTest: 0.4, roughness: 0.9 }));
     doily.position.y = 0.0145;
@@ -271,14 +293,27 @@ export class PodiumSet {
     this.slots[0].avatarSlot.add(this.crown);
 
     // a brass cloche hides the winner's spot until the reveal, then lifts away
-    const clProf = [[0, 0.372], [0.011, 0.371], [0.013, 0.362], [0.009, 0.352], [0.018, 0.344], [0.042, 0.334], [0.07, 0.31], [0.091, 0.26], [0.101, 0.18], [0.104, 0.08], [0.105, 0.012], [0.114, 0.006], [0.114, 0]];
-    const cloche = new THREE.Mesh(new THREE.LatheGeometry(clProf.slice().reverse().map(([x, y]) => new THREE.Vector2(x, y)), 64),
-      new THREE.MeshStandardMaterial({ color: '#F2D49A', roughness: 0.2, metalness: 0.78, emissive: '#5A3A12', emissiveIntensity: 0.32 }));
+    // smooth bell profile (superellipse), bottom to top
+    const prof = [];
+    const CR = 0.104; const CH = 0.3;
+    for (let i = 0; i <= 40; i++) {
+      const a = (i / 40) * Math.PI / 2;
+      prof.push(new THREE.Vector2(CR * Math.cos(a) ** 0.62, 0.008 + CH * Math.sin(a) ** 1.25));
+    }
+    const brass = brassMat();
+    const cloche = new THREE.Mesh(new THREE.LatheGeometry(prof, 72), brass);
+    const lip = new THREE.Mesh(new THREE.TorusGeometry(CR + 0.002, 0.0055, 12, 72).rotateX(Math.PI / 2), brass);
+    lip.position.y = 0.008;
+    const knobProf = [[0, 0], [0.012, 0], [0.006, 0.01], [0.005, 0.018], [0.014, 0.026], [0.016, 0.032], [0.01, 0.04], [0, 0.042]];
+    const knob = new THREE.Mesh(new THREE.LatheGeometry(knobProf.map(([x, y]) => new THREE.Vector2(x, y)), 32), brass);
+    knob.position.y = CH + 0.004;
+    const bead = new THREE.Mesh(new THREE.TorusGeometry(CR * 0.55, 0.0028, 8, 64).rotateX(Math.PI / 2), brass);
+    bead.position.y = 0.008 + CH * Math.sin(Math.acos((0.55) ** (1 / 0.62))) ** 1.25;
     this.cloche = new THREE.Group();
-    this.cloche.add(cloche);
+    this.cloche.add(cloche, lip, knob, bead);
     const glint = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTexture({ size: 64, inner: 'rgba(255,245,220,1)', mid: 'rgba(255,220,160,0.35)', outer: 'rgba(255,200,120,0)' }), blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
     glint.scale.set(0.09, 0.09, 1);
-    glint.position.set(-0.045, 0.27, 0.07);
+    glint.position.set(-0.04, 0.25, 0.075);
     this.cloche.add(glint);
     this.clocheGlint = glint;
     this.cloche.position.set(0, 0.0145, 0.05);
@@ -287,7 +322,7 @@ export class PodiumSet {
     // Cyril presides from a brass candlestick so the cakes never hide him
     const stickProf = [[0, 0], [0.07, 0], [0.072, 0.008], [0.05, 0.016], [0.026, 0.03], [0.02, 0.05], [0.028, 0.06], [0.018, 0.075], [0.016, 0.11], [0.03, 0.122], [0.05, 0.13], [0.052, 0.136], [0, 0.136]];
     this.stick = new THREE.Mesh(new THREE.LatheGeometry(stickProf.map(([x, y]) => new THREE.Vector2(x, y)), 48),
-      new THREE.MeshStandardMaterial({ color: '#D2A64E', roughness: 0.3, metalness: 0.6, emissive: '#6A4416', emissiveIntensity: 0.4 }));
+      brassMat());
     this.stickH = 0.136;
     this.stick.visible = false;
     stage.scene.add(this.stick);
@@ -344,7 +379,7 @@ export class PodiumSet {
       const side = i % 2 ? 1 : -1;
       const p = rain
         ? { p0: new THREE.Vector3((hash(i, 1) - 0.5) * 0.8, 0.62 + hash(i, 2) * 0.22, (hash(i, 3) - 0.3) * 0.5), v0: new THREE.Vector3((hash(i, 4) - 0.5) * 0.1, 0, 0), delay: 150 + hash(i, 5) * 2600 }
-        : { p0: new THREE.Vector3(side * 0.42, 0.04, 0.44), v0: new THREE.Vector3(-side * (0.28 + hash(i, 1) * 0.55), 1.15 + hash(i, 2) * 0.85, -0.35 - hash(i, 3) * 0.45), delay: hash(i, 5) * 120 };
+        : { p0: new THREE.Vector3(side * 0.42, 0.04, 0.44), v0: new THREE.Vector3(-side * (0.3 + hash(i, 1) * 0.55), 0.95 + hash(i, 2) * 0.6, -0.35 - hash(i, 3) * 0.45), delay: hash(i, 5) * 120 };
       p.ph = hash(i, 6) * Math.PI * 2;
       p.spin = new THREE.Vector3(4 + hash(i, 7) * 9, 3 + hash(i, 8) * 7, 2 + hash(i, 10) * 5);
       p.k = 2.4 + hash(i, 11) * 1.4;
@@ -395,11 +430,11 @@ export class PodiumSet {
         const p = players.find((pl) => pl.id === ids[i]);
         if (!p) return;
         const a = buildAvatar(p.avatar ?? i);
-        a.scale.setScalar(i === 0 ? 1.18 : 1);
+        a.scale.setScalar(i === 0 ? 1.34 : 1);
         if (i === 0) {
           const box = new THREE.Box3().setFromObject(a);
           this.crownY = box.max.y - 0.006;
-          this.crownScale = Math.max(0.9, Math.min(1.4, (box.max.x - box.min.x) / 0.085 * 1.1));
+          this.crownScale = Math.max(0.85, Math.min(1.35, (box.max.x - box.min.x) / 0.085 * 0.95));
         }
         s.avatarSlot.add(a);
         this.avatars[i] = a;
@@ -408,7 +443,7 @@ export class PodiumSet {
     this.slots.forEach((s, i) => { s.holder.visible = i < rows.length; });
     this.root.visible = true;
     const st = this.stage;
-    if (!this.saved) this.saved = { warmPos: st.warm.position.clone(), warmI: st.warm.intensity, warmD: st.warm.distance };
+    if (!this.saved) this.saved = { warmPos: st.warm.position.clone(), warmI: st.warm.intensity, warmD: st.warm.distance, hemiI: st.hemi.intensity };
     if (!this.unhook) this.unhook = st.onFrame((dt, time) => this._frame(dt, time));
   }
 
@@ -417,7 +452,7 @@ export class PodiumSet {
     this.stick.visible = false;
     if (this.unhook) { this.unhook(); this.unhook = null; }
     const st = this.stage;
-    if (this.saved) { st.warm.position.copy(this.saved.warmPos); st.warm.intensity = this.saved.warmI; st.warm.distance = this.saved.warmD; this.saved = null; }
+    if (this.saved) { st.warm.position.copy(this.saved.warmPos); st.warm.intensity = this.saved.warmI; st.warm.distance = this.saved.warmD; st.hemi.intensity = this.saved.hemiI; this.saved = null; }
     st.cyrilGoal.copy(st.cyrilHome);
     st.cyril.group.scale.setScalar(1);
     st.props.visible = true;
@@ -444,8 +479,8 @@ export class PodiumSet {
     const T = this.T;
     let pos; let target;
     if (this.mode === 'end') {
-      pos = new THREE.Vector3(0.05, TABLE_Y + 0.34, 1.3);
-      target = new THREE.Vector3(0.05, TABLE_Y + 0.235, 0);
+      pos = new THREE.Vector3(0.06, TABLE_Y + 0.33, 1.1);
+      target = new THREE.Vector3(0.06, TABLE_Y + 0.25, 0);
     } else {
       const hero = { pos: new THREE.Vector3(0, TABLE_Y + 0.36, 1.78), target: new THREE.Vector3(0, TABLE_Y + 0.15, 0.02) };
       const start = { pos: new THREE.Vector3(0, TABLE_Y + 0.95, 2.3), target: new THREE.Vector3(0, TABLE_Y + 0.05, 0) };
@@ -488,7 +523,9 @@ export class PodiumSet {
     st.props.visible = false; // clear the table: the cakes are the only dinner now
     // light: lift the warm fill onto the cakes
     st.warm.position.set(0.05, 0.75, 0.95);
-    st.warm.intensity = 3.2;
+    const dim = this.mode === 'end' || this.reduced ? 0 : clamp01((t - T.cake1) / (500 * T.scale)) * (1 - clamp01((t - T.win) / (400 * T.scale)));
+    st.warm.intensity = 3.2 * (1 - 0.7 * dim);
+    st.hemi.intensity = (this.saved?.hemiI ?? 0.35) * (1 - 0.5 * dim);
     st.warm.distance = 4;
 
     const reveal = [T.win, T.t2, T.t3];
@@ -499,11 +536,11 @@ export class PodiumSet {
       s.holder.scale.setScalar(s.scale);
       s.lift.position.y = -(H + 0.03) * (1 - easeOutBack(k, 1.3));
       s.lift.visible = k > 0;
-      s.rosette.material.opacity = 1;
+      s.rosette.visible = this.mode === 'end' || t < T.bill + 200 * T.scale;
       const a = this.avatars[i];
       if (!a) return;
       // the winner is placed under the cloche during the drumroll; 2nd/3rd drop on after their cake
-      const dropT = i === 0 ? T.cake1 + 800 * T.scale : reveal[i] + 350 * T.scale;
+      const dropT = i === 0 ? T.win - 200 * T.scale : reveal[i] + 350 * T.scale;
       const dk = this.reduced ? (t >= dropT ? 1 : 0) : clamp01((t - dropT) / (650 * T.scale));
       a.visible = t >= dropT;
       const hgt = bounce(dk);
@@ -512,7 +549,7 @@ export class PodiumSet {
       // squash on each landing
       const land = dk > 0.5 && dk < 0.62 ? Math.sin(((dk - 0.5) / 0.12) * Math.PI) : 0;
       const sq = 1 - land * 0.18;
-      const base = i === 0 ? 1.18 : 1;
+      const base = i === 0 ? 1.34 : 1;
       a.scale.set(base * (2 - sq), base * sq, base * (2 - sq));
       animateAvatar(a, time, this.reduced ? 0.5 : 1);
       if (a.userData.lift !== undefined) a.userData.lift = 0;
@@ -526,7 +563,7 @@ export class PodiumSet {
     this.cloche.position.y = 0.0145 + easeOutCubic(lk) * 0.9 * (this.reduced ? 0 : 1);
     this.cloche.rotation.z = -lk * 0.5;
     this.cloche.position.x = lk * 0.12;
-    const rattle = !this.reduced && t > T.cake1 && t < T.win ? Math.sin(time * 38) * 0.006 * clamp01((t - T.cake1) / (T.win - T.cake1)) : 0;
+    const rattle = !this.reduced && t > T.cake1 && t < T.win ? Math.sin(time * 38) * 0.02 * clamp01((t - T.cake1) / (T.win - T.cake1)) : 0;
     this.cloche.rotation.x = rattle;
     this.clocheGlint.material.opacity = 0.5 + 0.5 * Math.abs(Math.sin(time * 1.3));
 
@@ -541,11 +578,11 @@ export class PodiumSet {
     const pre = clamp01((t - T.cake1) / (900 * T.scale));
     const on = clamp01((t - T.win) / (300 * T.scale));
     const flick = this.reduced ? 1 : 0.92 + 0.08 * Math.sin(time * 13) * Math.sin(time * 7.3);
-    this.cone.material.uniforms.uAlpha.value = (0.18 * pre * (1 - on) + 0.42 * on) * flick;
-    this.cone.rotation.z = (1 - on) * Math.sin(time * 2.2) * 0.25 * (this.reduced ? 0 : 1);
+    this.cone.material.uniforms.uAlpha.value = (0.5 * pre * (1 - on) + 0.42 * on) * flick;
+    this.cone.rotation.z = (1 - pre) * Math.sin(time * 2.2) * 0.25 * (this.reduced ? 0 : 1);
     this.halo.material.opacity = (0.22 * pre + 0.6 * on) * (this.mode === 'end' ? 0.5 : 1);
     this.halo.scale.setScalar(0.5 + 0.08 * on + (this.reduced ? 0 : Math.sin(time * 2) * 0.02));
-    this.pool.material.opacity = 0.4 + 0.6 * on;
+    this.pool.material.opacity = 0.4 + 0.6 * Math.max(on, pre);
 
     // sparklers
     const sOn = t > T.win + 250 * T.scale;
