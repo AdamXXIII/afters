@@ -256,7 +256,7 @@
 .r1-rv { position: absolute; inset: 0; padding: calc(var(--safe-t) + 14px) calc(var(--gutter) + var(--safe-r)) 26px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; }
 .r1-rv-top {
   margin-right: 58px; padding: 10px 14px 12px; border-radius: 16px;
-  background-color: rgba(255,251,244,.97); background-image: var(--paper); box-shadow: 0 10px 24px rgba(30,12,8,.4); border-top: 6px solid var(--c-mustard);
+  background-color: rgba(255,251,244,.97); background-image: var(--paper); box-shadow: 0 10px 24px rgba(30,12,8,.4); border-left: 5px solid var(--c-mustard);
 }
 .r1-rv-prompt { margin-top: 3px; font-family: var(--f-display); font-weight: 650; font-size: 22px; line-height: 1.18; color: var(--c-ink); font-variation-settings: "SOFT" 50, "WONK" 0, "opsz" 48; text-wrap: balance; }
 .r1-rv-cards { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; padding-top: 56px; }
