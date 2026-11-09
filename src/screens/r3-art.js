@@ -4,9 +4,9 @@ import { SHOTS } from '../stage/Stage.js';
 
 // Camera shots for the finale (added at runtime so the shared SHOTS table stays untouched).
 // Cyril framed small and high so the HTML cards below never sit on his face.
-SHOTS['r3-intro'] ??= { pos: [0, 0.46, 1.3], target: [0, 0.0, 0] };
+SHOTS['r3-intro'] ??= { pos: [0, 0.5, 1.5], target: [0, -0.04, 0] };
 SHOTS['r3-swipe'] ??= { pos: [0, 0.62, 1.12], target: [0, 0.16, 0] };
-SHOTS['r3-reveal'] ??= { pos: [0, 0.52, 1.55], target: [0, -0.1, 0] };
+SHOTS['r3-reveal'] ??= { pos: [0, 0.56, 1.75], target: [0, -0.16, 0] };
 
 const uid = (() => { let n = 0; return (p) => `${p}${++n}`; })();
 
@@ -104,6 +104,7 @@ export function r3Timeline(steps) {
 export function sayIfFresh(ctx, lines, { at = 0, window = 2500, ...o } = {}) {
   const late = ctx.elapsed() - at;
   if (late > window) return () => {};
+  if (ctx.frozen && late < 0) return () => {}; // frozen before the line is due: it hasn't been said yet
   const t = setTimeout(() => ctx.say(lines, o), ctx.frozen ? 0 : Math.max(0, -late));
   return () => clearTimeout(t);
 }

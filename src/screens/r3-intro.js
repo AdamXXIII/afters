@@ -23,15 +23,16 @@ export default {
       h('h1.r3i-title', 'Last Orders'),
       h('div.r3i-rule', { html: ruleSvg() }),
       h('ol.r3i-menu',
-        step(penSvg(), 'Write', 'Up to 4 · 60s', 0),
-        step(swipeSvg(), 'Swipe', '5 glasses each', 1),
+        step(penSvg(), 'Write', 'Up to four', 0),
+        step(swipeSvg(), 'Swipe', 'Five glasses', 1),
         step(crownSvg(), 'Toast', 'Most glasses', 2)),
       h('div.r3i-prices',
         h('span.r3i-price', h('b', '+200'), ' a glass'),
         h('span.r3i-dot', '·'),
         h('span.r3i-price', h('b', '+1000'), ' the toast')),
     );
-    const wrap = h('div.r3i-wrap', bell, card);
+    card.prepend(bell);
+    const wrap = h('div.r3i-wrap', card);
     show.append(wrap);
 
     // host skip (after 3 s), copied from common.hostSkip so it can be styled for this card

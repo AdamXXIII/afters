@@ -1,6 +1,6 @@
 // r3-swipe: synced deck, perCard ms each, auto-advance. Swipe right / Cheers spends one of your
 // five glasses; left / Pass. Your own cards show "yours, skip". Show layer: the prompt on a menu
-// slip, Cyril, and a rail of tiny cards for deck progress (shared, no herd voting).
+// slip with a segmented deck-progress rail, and Cyril (shared, no herd voting).
 import './r3.css';
 import { h, button } from '../ui/components.js';
 import { glassSvg, clinkSvg, passSvg, sayIfFresh } from './r3-art.js';
@@ -18,18 +18,19 @@ export default {
 
     // ---------- show layer ----------
     const counter = h('span.r3s-count');
+    const pips = deck.map(() => h('i'));
+    const rail = h('div.r3s-rail', pips);
     const slip = h('div.r3s-slip',
       h('div.r3s-slip-top', h('span.r3s-eyebrow', 'Last orders'), counter),
-      h(`div.r3s-slip-t${p.prompt.length > 48 ? '.long' : ''}`, p.prompt));
-    const pips = deck.map((_, i) => h('i', { style: { '--r': `${((i * 37) % 7) - 3}deg` } }));
-    const rail = h('div.r3s-rail', pips);
-    show.append(slip, rail);
+      h(`div.r3s-slip-t${p.prompt.length > 48 ? '.long' : ''}`, p.prompt),
+      rail);
+    show.append(slip);
 
     // ---------- sheet ----------
     const glassEls = Array.from({ length: p.glasses }, () => h('span.r3s-glass'));
     const left = h('span.r3s-left');
     const tray = h('div.r3s-tray', h('div.r3s-tray-g', glassEls), left);
-    const head = h('div.r3s-head', h('div.r3s-head-l', h('span.r3s-q', 'Raise a glass?'), h('span.r3s-hint', 'Right to cheers · left to pass')), tray);
+    const head = h('div.r3s-head', h('div.r3s-head-l', h('span.r3s-q', 'Raise a glass?'), h('span.r3s-hint', '← Pass  ·  Cheers →')), tray);
 
     const area = h('div.r3s-area');
     const fuse = h('i');
@@ -71,6 +72,8 @@ export default {
       cheersLabel.textContent = out ? 'Out of glasses' : 'Cheers';
       cardEl?.classList.toggle('dry', out && !mine && !decided);
     }
+    const said = new Set();
+    const quip = (key, text) => { if (said.has(key) || ctx.frozen) return; said.add(key); ctx.say(text, { compact: true, hold: 1200, placement: 'side' }); };
     function decide(yes) {
       const card = deck[idx];
       if (!card || own.has(card.id) || ctx.client.state.mine.swipes[card.id] !== undefined) return;
@@ -90,6 +93,8 @@ export default {
       area.append(afterNote(yes));
       renderGlasses(true);
       refreshButtons();
+      if (yes && used() >= p.glasses) quip('dry', 'That\'s your last glass. Choose wisely? Too late.');
+      else quip(yes ? 'yes' : 'no', yes ? 'Bold choice.' : 'Ruthless.');
     }
     function afterNote(yes) {
       return h(`div.r3s-after${yes ? '.yes' : ''}`,
@@ -116,11 +121,13 @@ export default {
         h(`div.r3s-text${card.text.length > 28 ? '.long' : ''}`, card.text),
         mine ? h('div.r3s-skip', 'Modesty, please. Skipping this one.') : null,
         h('div.r3s-fuse', fuse),
+        mine ? null : h('div.r3s-sides', h('span', '‹ pass'), h('span', 'cheers ›')),
         h('span.r3s-stamp.yes', 'Cheers!'),
         h('span.r3s-stamp.no', 'Pass'),
       );
       const ghosts = [h('div.r3s-ghost.g2'), h('div.r3s-ghost.g1')];
       area.replaceChildren(...(i < deck.length - 1 ? ghosts : ghosts.slice(1)), cardEl);
+      if (mine) quip('mine', 'Yours. I\'ll look away.');
       if (decided !== undefined) {
         cardEl.remove();
         area.append(afterNote(decided));

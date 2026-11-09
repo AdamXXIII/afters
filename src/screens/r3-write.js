@@ -4,6 +4,9 @@ import './r3.css';
 import { h, button, textField } from '../ui/components.js';
 import { sayIfFresh } from './r3-art.js';
 
+const EMPTY = ['Your first order goes here', 'And another…', 'Keep them coming', 'Last one, chef'];
+const QUIPS = [null, 'One down. Splendid.', 'Two! Steady on.', 'Three. Show-off.', 'Four. Kitchen\'s closed.'];
+
 export default {
   id: 'r3-write',
   layout: 'input',
@@ -13,6 +16,7 @@ export default {
     const maxN = p.maxAnswers || 4;
     const field = textField({ max: p.max || 45, placeholder: 'Quick, another one…', onSubmit: () => add() });
     field.classList.add('r3w-field');
+    field.prepend(h('span.r3w-pen', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 20l1.5-5L16 4.5l3.5 3.5L9 18.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 6.5l3.5 3.5" stroke="currentColor" stroke-width="2"/></svg>' }));
     const btnLabel = h('span.r3w-btn-l', 'Another!');
     const btnLeft = h('span.r3w-btn-n');
     const btn = button('', { onClick: () => add(), e2e: 'submit' });
@@ -20,14 +24,14 @@ export default {
     btn.replaceChildren(btnLabel, btnLeft);
 
     const prompt = h('div.r3w-prompt',
-      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', `As many as you can`)),
+      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Up to four · go!')),
       h(`div.r3w-prompt-t${p.prompt.length > 60 ? '.long' : ''}`, p.prompt));
 
     const tally = h('span.r3w-tally');
     const slots = Array.from({ length: maxN }, (_, i) => h('div.r3w-slot', { style: { '--tilt': `${[-1.2, 0.8, -0.6, 1.1][i % 4]}deg` } },
       h('span.r3w-no', `No.${i + 1}`),
       h('span.r3w-txt', ''),
-      h('span.r3w-empty', i === 0 ? 'Your first order goes here' : 'Another one here'),
+      h('span.r3w-empty', EMPTY[i % EMPTY.length]),
     ));
     const pad = h('div.r3w-pad', slots);
     const done = h('div.r3w-done', h('span.r3w-done-stamp', 'Order in'), h('span.r3w-done-s', 'That\'s your four. Lovely.'));
@@ -62,6 +66,7 @@ export default {
           if (animate) {
             s.classList.add('fresh');
             setTimeout(() => s.classList.remove('fresh'), 700);
+            if (i === n - 1 && QUIPS[n]) c.say(QUIPS[n], { compact: true, hold: 1300 });
           }
         }
         s.classList.toggle('next', i === n);

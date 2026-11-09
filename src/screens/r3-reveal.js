@@ -3,6 +3,7 @@
 // #1 (or a joint #1) becomes TOAST OF THE TABLE: gold foil, +1000, napkin-and-foil confetti.
 import './r3.css';
 import { h, chip } from '../ui/components.js';
+import { avatarIcon } from '../ui/icons.js';
 import { glassSvg, clinkSvg, r3Timeline, sayIfFresh, countTo } from './r3-art.js';
 
 const TOAST_LINE = ['Splendid. Raise them high.'];
@@ -38,6 +39,13 @@ export default {
     }
 
     const author = (c) => ctx.player(c.authorId);
+    // shared ranks for ties ("=1"): rank = 1 + number of cards with strictly more glasses
+    const rankOf = (c) => {
+      const n = c.glasses.length;
+      const r = 1 + top.filter((o) => o.glasses.length > n).length;
+      const tied = top.some((o) => o !== c && o.glasses.length === n);
+      return { r, label: tied ? `=${r}` : String(r) };
+    };
     let hero = null;
 
     function heroCard(c, late) {
@@ -49,7 +57,7 @@ export default {
       const stamp = h('div.r3r-by', who ? chip(who) : h('span.r3r-anon', 'Someone'), h('span.r3r-stamp', pts));
       const el = h(`div.r3r-card.hero${n === 0 ? '.dry' : ''}`, { style: { '--tilt': `${(c.rank % 2 ? -1 : 1) * 1.2}deg` } },
         h('div.r3r-ribbon', h('span.r3r-ribbon-i', { html: clinkSvg() }), h('span', joint ? 'Joint toast of the table' : 'Toast of the table')),
-        h('div.r3r-coin', h('small', 'No.'), String(c.rank)),
+        h(`div.r3r-coin${rankOf(c).label.length > 1 ? '.tied' : ''}`, rankOf(c).label.length > 1 ? null : h('small', 'No.'), rankOf(c).label),
         h(`div.r3r-text${c.text.length > 26 ? '.long' : ''}`, c.text),
         h('div.r3r-glasses', n ? glasses : h('span.r3r-none', 'Not a single glass')),
         stamp,
@@ -89,10 +97,10 @@ export default {
     function ladderRow(c) {
       const who = author(c);
       const row = h(`div.r3r-row${toastSet.has(c.id) ? '.tie' : ''}`,
-        h('span.r3r-rk', String(c.rank)),
+        h('span.r3r-rk', rankOf(c).label),
         h('span.r3r-row-t', c.text),
         h('span.r3r-row-g', { html: glassSvg(1) }, h('b', String(c.glasses.length))),
-        h('span.r3r-row-by', { style: { '--pc': who ? (who.colour || 'var(--c-toffee)') : 'var(--c-toffee)' } }, who?.name || '?'),
+        h('span.r3r-row-by', h('span.r3r-av', { style: { '--pc': who?.colour || '#7A4A2A' }, html: who ? avatarIcon(who.avatar) : '' }), h('span.r3r-nm', who?.name || '?')),
       );
       row.c = c;
       return row;
@@ -166,12 +174,12 @@ export default {
 
     function confetti(late) {
       // tiny folded napkins + gold foil, seeded so every phone throws the same handful
-      const bits = Array.from({ length: 44 }, (_, i) => {
+      const bits = Array.from({ length: 40 }, (_, i) => {
         const napkin = i % 3 === 0;
         const x = (i * 37 + 11) % 100;
         const drift = ((i * 53) % 60) - 30;
         const delay = ((i * 7) % 12) * 0.06;
-        const dur = 2.2 + ((i * 13) % 10) / 10;
+        const dur = 3.2 + ((i * 13) % 10) / 10;
         const spin = (i % 2 ? 1 : -1) * (360 + ((i * 29) % 360));
         return h(`i.${napkin ? 'nap' : 'foil'}`, { style: {
           left: `${x}%`, '--dx': `${drift}px`, '--spin': `${spin}deg`, '--s': `${0.7 + ((i * 17) % 6) / 10}`,
