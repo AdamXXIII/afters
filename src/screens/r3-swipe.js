@@ -124,6 +124,7 @@ export default {
         h(`div.r3s-text${card.text.length > 28 ? '.long' : ''}`, card.text),
         mine ? h('div.r3s-skip', 'Modesty, please. Skipping this one.') : null,
         h('div.r3s-fuse', fuse),
+        mine || i > 1 ? null : h('div.r3s-sides', h('span', '‹ pass'), h('span', 'cheers ›')),
         h('span.r3s-stamp.yes', 'Cheers!'),
         h('span.r3s-stamp.no', 'Pass'),
       );
