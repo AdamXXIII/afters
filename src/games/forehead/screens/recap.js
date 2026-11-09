@@ -51,7 +51,7 @@ export default {
     const grid = h('div.fh-rc-plate', h('i.fh-plate', { html: PLATE_SVG }), pile);
     const shout = h('div.fh-rc-shout');
     const lead = h('div.fh-rc-lead');
-    const root = h('div.fh-recap.fh-burst', hero, grid, misses, shout, lead);
+    const root = h('div.fh-recap.fh-burst', h('div.fh-rc-left', hero, h('div.fh-rc-after', shout, lead)), h('div.fh-rc-right', grid, misses));
     show.append(root);
 
     const paintShout = () => {

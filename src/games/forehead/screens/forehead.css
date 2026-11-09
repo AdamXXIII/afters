@@ -440,3 +440,117 @@ body[data-screen="forehead-intro"] #show, body[data-screen="forehead-pick"] #sho
 .fh-pk-fan .fh-pk-tile { width: 120px; max-width: 120px; margin: 0 -10px; }
 .fh-pk-fan .fh-pk-tile { transform-origin: 50% 50%; } .fh-pk-fan { padding-left: 6px; padding-right: 6px; } .fh-pk-fan .fh-pk-tile.lead { scale: 1.04; }
 .fh-pk-fan .fh-pk-tile { margin: 0 -3px; }
+
+/* ================================================================== round 5: structure for both orientations */
+/* portrait: wrappers dissolve, order puts things back */
+.fh-po-copy, .fh-pk-side, .fh-rc-left, .fh-rc-right, .fh-rc-after { display: contents; }
+.fh-po-eyebrow { order: 0; } .fh-po-title { order: 1; } .fh-po-stage { order: 2; } .fh-po-rule { order: 3; } .fh-po-bar { order: 4; }
+.fh-pk-head { order: 0; } .fh-pk-fan { order: 1; } .fh-pk-foot { order: 2; }
+.fh-hero { order: 0; } .fh-rc-plate { order: 1; } .fh-rc-misses { order: 2; } .fh-rc-shout { order: 3; } .fh-rc-lead { order: 4; }
+.fh-side { display: flex; flex-direction: column; }
+
+/* intro copy: three short lines, highlight in its own colour (not the button's) */
+.fh-po-rule { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 21px; line-height: 26px; }
+.fh-po-rule em { color: var(--c-linen); background: var(--c-claret); padding: 0 10px 2px; border-radius: 8px; display: inline-block; transform: rotate(-2deg); }
+
+/* pick (portrait): bigger, flatter cards in the middle, smaller title */
+.fh-pk-title { font-size: 40px; line-height: 42px; }
+.fh-pk-fan { gap: 6px; padding: 18px 0 18px; }
+.fh-pk-fan .fh-pk-tile { width: 114px; max-width: 114px; height: 318px; margin: 0; padding: 16px 8px 20px; }
+.fh-pk-fan .fh-pk-tile:nth-child(1) { transform: rotate(-4deg) translateY(8px); }
+.fh-pk-fan .fh-pk-tile:nth-child(2) { transform: translateY(-10px); }
+.fh-pk-fan .fh-pk-tile:nth-child(3) { transform: rotate(4deg) translateY(8px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(1) { transform: rotate(-4deg) translateY(-14px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(2) { transform: translateY(-30px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(3) { transform: rotate(4deg) translateY(-14px); }
+.fh-pk-fan .fh-pk-icon { width: 80px; height: 80px; }
+.fh-pk-fan .fh-pk-icon svg { width: 56px; height: 56px; }
+.fh-pk-fan .fh-pk-txt { gap: 8px; }
+.fh-pk-fan .fh-pk-txt b { font-size: 22px; line-height: 24px; hyphens: auto; }
+.fh-pk-fan .fh-pk-txt small { font-size: 15px; line-height: 19px; font-weight: 600; }
+.fh-pk-fan .fh-pk-tile.lead { scale: 1; }
+
+/* recap (portrait): no overlaps, readable misses, vote after the reveal */
+.fh-rc-pile .fh-rc-tile.hit { margin: 4px; }
+.fh-rc-pile .fh-rc-tile.hit { transform: rotate(calc(var(--rot) * .45)); }
+.fh-rc-misses { gap: 6px; }
+.fh-rc-miss { background: rgba(42,26,23,.5); padding: 5px 10px 5px 5px; border-radius: 99px; font-size: 15px; color: var(--c-linen); text-decoration-color: rgba(251,244,234,.7); }
+.fh-rc-miss.in { opacity: 1; }
+.fh-rc-shout, .fh-rc-lead { opacity: 0; transform: translateY(16px); transition: opacity 300ms, transform 400ms var(--ease-out-back); }
+.fh-recap.done .fh-rc-shout, .fh-recap.done .fh-rc-lead { opacity: 1; transform: none; }
+
+/* guesser: Cyril peeks in, bigger crowd strip */
+.fh-g-cyril { position: absolute; left: 6px; bottom: -36px; width: 96px; height: 127px; z-index: 2; display: grid; transform: rotate(8deg); pointer-events: none; }
+.fh-g-cyril svg { width: 96px; height: 127px; }
+.fh-g-foot { padding-left: 96px; }
+.fh-g-crowd { font-size: 14px; gap: 6px; }
+.fh-g-crowd .fh-disc { --sz: 40px !important; width: 40px; height: 40px; }
+.fh-g-crowd > i { display: none; }
+.fh-g-bar { height: 16px; border-radius: 8px; }
+
+/* ================================================================== LANDSCAPE (phones on their side, ~844x390) */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* intro: Cyril left, the poster copy right */
+  .fh-poster { flex-direction: row; align-items: stretch; padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 18px) max(12px, var(--safe-b)) calc(var(--safe-l) + 12px); gap: 8px; }
+  .fh-po-stage { flex: 0 0 42%; order: 0; }
+  .fh-po-stage .fh-po-head, .fh-po-stage .fh-po-head svg { width: 230px; height: 302px; }
+  .fh-po-copy { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding-right: 40px; }
+  .fh-po-title { font-size: 88px; margin: 0 0 4px; }
+  .fh-po-rule { font-size: 19px; line-height: 23px; margin: 0 0 8px; }
+  .fh-po-bar { width: 100%; max-width: 380px; gap: 6px; }
+  .fh-po-bar .btn { height: 52px; }
+  .fh-po-wait { padding: 8px; }
+  .fh-po-table .fh-disc { --sz: 32px; }
+  .fh-po-shout { font-size: 18px; }
+
+  /* pick: title + note left, the fanned hand right */
+  .fh-pick { flex-direction: row; padding: calc(var(--safe-t) + 12px) calc(var(--safe-r) + 14px) max(12px, var(--safe-b)) calc(var(--safe-l) + 16px); gap: 10px; }
+  .fh-pk-side { display: flex; flex: 0 0 34%; flex-direction: column; justify-content: space-between; gap: 10px; }
+  .fh-pk-head { padding-right: 0; flex-direction: column; gap: 8px; }
+  .fh-pk-head .fh-ring { position: absolute; right: 70px; top: calc(var(--safe-t) + 10px); }
+  .fh-pk-title { font-size: 46px; line-height: 46px; }
+  .fh-pk-fan { flex: 1; padding: 14px 0 6px; gap: 10px; }
+  .fh-pk-fan .fh-pk-tile { width: 150px; max-width: 150px; height: 300px; }
+  .fh-pk-fan .fh-pk-txt b { font-size: 24px; line-height: 26px; }
+  .fh-pk-note, .fh-pk-prep { font-size: 15px; line-height: 19px; padding: 8px 12px; }
+  .fh-pk-prep > i, .fh-pk-prep > i svg { width: 48px; height: 48px; }
+  .fh-pk-foot .btn { height: 52px; }
+
+  /* turn (table): card left, controls right */
+  .fh-turn { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr; column-gap: 16px; padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 14px) max(10px, var(--safe-b)) calc(var(--safe-l) + 14px); }
+  .fh-top { grid-column: 2; grid-row: 1; padding-right: 44px; }
+  .fh-mid { grid-column: 1; grid-row: 1 / 3; }
+  .fh-side { grid-column: 2; grid-row: 2; justify-content: flex-end; }
+  .fh-stack { width: 100%; height: calc(100% - 24px); max-height: 340px; }
+  .fh-word { font-size: 64px; }
+  .fh-slabs .fh-slab { height: 92px; }
+  .fh-quip { margin: 0 0 4px; }
+  .fh-tally { margin: 2px 0 8px; justify-content: flex-start; }
+  .fh-count b { font-size: 120px; }
+  .fh-count-rule { margin-top: 4px; padding: 6px 14px; }
+
+  /* recap: hero + vote left, the plate right */
+  .fh-recap { flex-direction: row; padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 16px) 6px calc(var(--safe-l) + 16px); gap: 12px; }
+  .fh-rc-left { display: flex; flex: 0 0 44%; flex-direction: column; justify-content: space-between; gap: 6px; }
+  .fh-rc-after { display: flex; flex-direction: column; gap: 6px; }
+  .fh-rc-right { display: flex; flex: 1; flex-direction: column; gap: 6px; padding-right: 40px; }
+  .fh-hero-n { font-size: 96px; }
+  .fh-hero-who { font-size: 22px; }
+  .fh-hero-quip { margin-top: 0; }
+  .fh-plate { width: min(300px, 40vw); }
+  .fh-rc-pile { width: 300px; }
+  .fh-rc-pile .fh-rc-tile.hit .fh-rc-txt { font-size: 16px; line-height: 18px; }
+  .fh-shout-q { font-size: 18px; margin-bottom: 4px; }
+  .fh-shout-btn { width: 62px; padding: 5px 2px; font-size: 12px; }
+  .fh-shout-btn .fh-disc { --sz: 28px; }
+}
+.fh-plate { width: auto; height: min(100%, 370px); max-width: 94vw; }
+.fh-rc-plate { min-height: 220px; }
+@media (orientation: landscape) and (max-height: 600px) {
+  .fh-pk-head { flex-direction: row; align-items: flex-start; gap: 6px; }
+  .fh-pk-head .fh-ring { position: static; }
+  .fh-pk-title { font-size: 40px; line-height: 42px; }
+  .fh-rc-left { padding-bottom: 64px; }
+  .fh-rc-right { padding-bottom: 6px; }
+  .fh-rc-plate { min-height: 0; }
+}

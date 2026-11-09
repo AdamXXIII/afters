@@ -21,7 +21,7 @@ export default {
     const head = h('div.fh-pk-head',
       h('div.fh-pk-titles',
         h('div.fh-pk-eyebrow', disc(g, { size: 30 }), `Bonce ${p.turn} of ${p.of}${p.team ? ` · ${TEAMS[p.team].name}` : ''}`),
-        h('div.fh-pk-title', meG ? h('span', 'Your', h('br'), 'fate') : h('span', `Pick ${g?.name || '?'}'s`, h('br'), 'poison'))),
+        h('div.fh-pk-title', meG ? h('span', 'Your fate') : h('span', `Pick ${g?.name || '?'}'s poison`))),
       h('div.fh-ring', ring));
 
 
@@ -55,7 +55,7 @@ export default {
     } else {
       foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', ctx.line('fhPick', { name: g?.name || 'them' }).join(' '))));
     }
-    const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}${meG ? '.blind' : ''}`, head, h('div.fh-pk-fan', tiles), foot);
+    const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}${meG ? '.blind' : ''}`, h('div.fh-pk-side', head, foot), h('div.fh-pk-fan', tiles));
     show.append(root);
     if (!ctx.frozen) tiles.forEach((t, i) => t.animate([{ translate: '0 260px', rotate: '0deg', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 520, delay: 80 + i * 110, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
 

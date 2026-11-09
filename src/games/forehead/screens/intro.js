@@ -27,7 +27,7 @@ export default {
     const p = ctx.payload;
     const head = h('i.fh-po-head', { html: CYRIL_BONCE_SVG });
     const title = h('div.fh-po-title', 'Bonce');
-    const rules = h('div.fh-po-rule', 'Phone on your head. ', h('em', 'Everyone shouts.'), h('br'), 'Nod = got it. Tip back = pass.');
+    const rules = h('div.fh-po-rule', h('span', 'Phone on your head.'), h('span', h('em', 'The sofa shouts.')), h('span', 'Nod = got it. Tip back = pass.'));
     const setup = () => ({ ...(ctx.progress.setup || { mode: 'ffa', goes: 1 }), ...(ctx.mine.game.setup || {}) });
     const bar = h('div.fh-po-bar');
     let modeP = null; let goesP = null; let summary = null;
@@ -47,7 +47,7 @@ export default {
       bar.append(h('div.fh-po-table', ctx.players.map((x) => disc(x, { size: 38 }))), summary,
         h('div.fh-po-wait', h('i', { html: CYRIL_BADGE }), h('span', `${host?.name || 'The host'} is pouring the jelly`, h('span.fh-dots', h('i'), h('i'), h('i')))));
     }
-    const root = h('div.fh-poster.fh-burst', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, h('div.fh-po-stage', head, h('span.fh-po-shout.s1', 'Gravy!'), h('span.fh-po-shout.s2', 'Hum it!'), h('span.fh-po-shout.s3', 'Ooh ooh!')), rules, bar);
+    const root = h('div.fh-poster.fh-burst', h('div.fh-po-stage', head, h('span.fh-po-shout.s1', 'Gravy!'), h('span.fh-po-shout.s2', 'Hum it!'), h('span.fh-po-shout.s3', 'Ooh ooh!')), h('div.fh-po-copy', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, rules, bar));
     show.append(root);
     if (!ctx.frozen) {
       title.animate([{ transform: 'scale(.4) rotate(-12deg)', opacity: 0 }, { transform: 'rotate(-4deg)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });

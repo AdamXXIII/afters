@@ -3,7 +3,7 @@
 import './forehead.css';
 import { h, timerRing } from '../../../ui/components.js';
 import { ICONS } from '../../../ui/icons.js';
-import { CYRIL_BADGE, deckIcon, disc, fit, teamOf, TEAMS, getTilt, setTiltHandler, vibrate, BUZZ } from './kit.js';
+import { CYRIL_BADGE, CYRIL_BONCE_SVG, deckIcon, disc, fit, teamOf, TEAMS, getTilt, setTiltHandler, vibrate, BUZZ } from './kit.js';
 
 
 const firstLine = (lines) => (Array.isArray(lines) ? lines[0] : lines) || '';
@@ -71,7 +71,7 @@ function mountTable(show, ctx0) {
     btns = h('div.fh-slabs', hit);
   }
 
-  const root = h(`div.fh-turn${foulOnly ? '.foul-mode' : ''}`, { style: { '--dc': p.deck.colour } }, top, h('div.fh-mid', stack, count), quip, h('div.fh-tally', hitsBox, tray), btns);
+  const root = h(`div.fh-turn${foulOnly ? '.foul-mode' : ''}`, { style: { '--dc': p.deck.colour } }, top, h('div.fh-mid', stack, count), h('div.fh-side', quip, h('div.fh-tally', hitsBox, tray), btns));
   show.append(root);
 
   let shownIdx = -1;
@@ -173,7 +173,8 @@ function mountGuesser(show, ctx0) {
   const clock = h('b.fh-g-clock', '60');
   const shouters = ctx.players.filter((x) => x.id !== p.guesserId && (!p.team || (p.teams?.[p.team] || []).includes(x.id)));
   const crowd = h('div.fh-g-crowd', h('small', 'Shouting:'), shouters.map((x) => disc(x, { size: 30 })), h('i', { html: CYRIL_BADGE }));
-  const inner = h('div.fh-g-inner', status, h('div.fh-g-mid', h('div.fh-g-card', word)), h('div.fh-g-foot', crowd, h('div.fh-g-bar', bar)), count, flash, hintL, hintR);
+  const peek = h('i.fh-g-cyril', { html: CYRIL_BONCE_SVG });
+  const inner = h('div.fh-g-inner', peek, status, h('div.fh-g-mid', h('div.fh-g-card', word)), h('div.fh-g-foot', crowd, h('div.fh-g-bar', bar)), count, flash, hintL, hintR);
   status.insertBefore(h('span.fh-g-clockwrap', clock), status.lastChild);
   const root = h('div.fh-guess.fh-burst', { style: { '--dc': p.deck.colour } }, inner);
   show.append(root);
