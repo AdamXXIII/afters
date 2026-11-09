@@ -121,7 +121,10 @@ export default {
     const soonRow = soonList ? h('div.mn-soon', h('div.mn-soon-k', h('span', 'Coming soon'), h('span.mn-soon-n', 'still in the oven')), soonList) : null;
     const trolley = h(`div.mn-trolley.live-${Math.min(live, 4)}`, picks, soonRow);
 
-    const card = h('div.mn-d-card');
+    const noteSlot = h('div.mn-note-slot');
+    const txtSlot = h('div.mn-d-txt');
+    const actSlot = h('div.mn-d-act');
+    const card = h('div.mn-d-card', noteSlot, heroArt, txtSlot, actSlot);
     const detail = h('section.mn-detail', { 'aria-live': 'polite' }, card);
     const bay = h('div.mn-bay', nightBox, trolley, detail);
     root.append(bay);
@@ -174,7 +177,7 @@ export default {
       if (key === lastDetail) return;
       lastDetail = key;
       if (!g) {
-        card.replaceChildren(h('div.mn-hint', c.isHost
+        detail.replaceChildren(h('div.mn-hint', c.isHost
           ? h('span', h('b', 'The trolley’s empty.'), ' New dishes are still in the oven.')
           : h('span', h('b', `${c.player(c.state?.hostId)?.name || 'The host'} is choosing.`), ' Hang tight.')));
         return;
@@ -218,16 +221,14 @@ export default {
         const fancied = myFancy() === g.id;
         action = button(fancied ? `You fancy ${g.title} ✓` : `I fancy ${g.title}`, { kind: fancied ? 'secondary' : 'primary', e2e: 'fancy', onClick: () => fancyBtn(g) });
       }
-      card.replaceChildren(
-        note,
-        heroArt,
-        h('div.mn-d-txt',
-          h('div.mn-d-course', g.course || ''),
-          h('h2.mn-d-title', g.title),
-          h('p.mn-d-blurb', g.blurb || g.tagline || ''),
-          h('div.mn-d-meta', h('span', `${lo}–${hi} players`), h('span', `${g.minutes || 10} min`),
-            !c.isHost && fanCount ? h('span.fan', `${fanCount} fancy it`) : null)),
-        h('div.mn-d-act', action));
+      noteSlot.replaceChildren(note);
+      txtSlot.replaceChildren(
+        h('div.mn-d-course', g.course || ''),
+        h('h2.mn-d-title', g.title),
+        h('p.mn-d-blurb', g.blurb || g.tagline || ''),
+        h('div.mn-d-meta', h('span', `${lo}\u2013${hi} players`), h('span', `${g.minutes || 10} min`),
+          !c.isHost && fanCount ? h('span.fan', `${fanCount} fancy it`) : null));
+      actSlot.replaceChildren(action);
     }
 
     let served = false;
