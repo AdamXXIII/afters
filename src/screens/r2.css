@@ -10,8 +10,8 @@
 .r2-gap-ink { font-family: var(--f-hand); font-weight: 700; font-size: 1.32em; color: var(--c-claret); line-height: .9; display: inline-block; min-height: .9em; }
 .r2-gap.filled { min-width: 1em; border-bottom-style: solid; }
 .r2-gap.filled .r2-gap-ink { animation: inkIn 260ms var(--ease-out-quint) both; }
-.r2-gap.filled:not(.gold) { border-bottom: 3px solid var(--c-claret); }
-.r2-gap.filled:not(.gold) .r2-gap-ink { color: var(--c-claret); }
+.r2-gap.filled:not(.gold) { border-bottom: 2px dashed rgba(122,30,44,.5); background: repeating-linear-gradient(-45deg, rgba(122,30,44,.06) 0 6px, transparent 6px 12px); border-radius: 4px 4px 0 0; }
+.r2-gap.filled:not(.gold) .r2-gap-ink { color: rgba(122,30,44,.72); }
 .r2-field .count { font-size: 15px; }
 .r2-factcard .t-eyebrow, .r2-pick-fact .t-eyebrow, .r2-rev-fact .t-eyebrow { font-size: 14px; }
 .r2-gap.gold { border-bottom: 3px solid var(--c-brass); background: linear-gradient(180deg, transparent 55%, rgba(255,200,107,.45) 55%); border-radius: 3px; }
@@ -169,14 +169,7 @@
 .r2-pick-q { white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: 24px; line-height: 1.1; color: var(--c-claret); font-variation-settings: "SOFT" 100, "WONK" 1; }
 .r2-pick-hint { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-family: var(--f-display); font-style: italic; font-size: 16px; line-height: 20px; color: var(--c-toffee); font-weight: 600; text-align: right; }
 .r2-opts { display: flex; flex-direction: column; gap: 8px; padding-bottom: calc(var(--safe-b) + 14px); }
-.r2-opts.many { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.r2-opts.many .r2-opt { padding: 8px 10px 8px 8px; gap: 8px; align-items: center; }
-.r2-opts.many .r2-opt .txt { font-size: calc(21px * var(--ts)); overflow-wrap: break-word; hyphens: auto; }
-.r2-opts.many .r2-opt { padding-right: 26px !important; min-height: 60px !important; }
-.r2-opts.many .r2-opt .l { width: 26px !important; height: 26px !important; font-size: 15px !important; border-radius: 7px; }
-.r2-pick-head:has(+ .r2-opts.many) .r2-pick-hint { display: none; }
-.r2-opts.many .r2-opt .tick { top: 6px; right: 6px; margin: 0; width: 22px; height: 22px; }
-.r2-opts.many .r2-opt .yours { top: auto; bottom: 4px; right: 6px; transform: rotate(-4deg); font-size: 11px; }
+.r2-opts.many .r2-opt { min-height: 52px; }
 .r2-opt {
   appearance: none; cursor: pointer; width: 100%; min-height: 60px; position: relative; text-align: left;
   display: flex; align-items: center; gap: 14px; padding: 8px 48px 8px 10px; border-radius: var(--r-2);
@@ -189,7 +182,6 @@
 .r2-opt:active:not(:disabled) { transform: translateY(2px) scale(.99); }
 .r2-opt .l { width: 38px; height: 38px; flex: none; border-radius: 10px; display: grid; place-items: center; background: rgba(122,30,44,.08); color: var(--c-claret); font-family: var(--f-display); font-weight: 800; font-size: 20px; transition: background var(--d-small), color var(--d-small); }
 .r2-opt .txt { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--f-hand); font-weight: 700; font-size: calc(28px * var(--ts)); line-height: 1; padding-top: 2px; }
-.r2-opts.many .r2-opt { min-height: 64px; }
 .r2-opts.many .r2-opt .l { width: 30px; height: 30px; font-size: 17px; }
 
 .r2-opt .tick { position: absolute; right: 12px; top: 50%; width: 28px; height: 28px; margin-top: -14px; border-radius: 50%; background: var(--c-brass); color: var(--c-linen); display: grid; place-items: center; transform: scale(0); transition: transform 220ms var(--ease-out-back); box-shadow: var(--sh-1); }
@@ -319,7 +311,7 @@
 .r2-row:first-child { background-color: #FFF6E0; box-shadow: 0 0 0 2px var(--c-brass), 0 2px 0 rgba(42,26,23,.18), 0 10px 22px rgba(20,8,6,.35); }
 .r2-row:first-child .r2-row-rank { color: var(--c-brass); }
 .r2-row.me .chip .nm::after { content: " (you)"; font-weight: 600; color: var(--c-willow); }
-.r2-row .r2-seal.row { position: absolute; left: 66px; top: -12px; width: 30px; height: 30px; transform: rotate(-14deg); z-index: 2; }
+.r2-row .r2-seal.row { position: absolute; right: -6px; top: -12px; width: 34px; height: 34px; transform: rotate(14deg); z-index: 2; }
 .r2-row:first-child { height: 72px; }
 .r2-row:first-child .r2-row-score { font-size: 30px; }
 .r2-row:first-child .r2-row-rank { font-size: 32px; }

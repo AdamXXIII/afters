@@ -50,6 +50,7 @@ export default {
     sheet.append(
       h('div.r2-pick-head', h('div.r2-pick-q', 'Which one is true?'), hint),
       h(`div.r2-opts${n > 6 ? '.many' : ''}`, { style: { '--rows': n } }, order),
+      n > 6 ? h('div.r2-more', 'More below') : null,
     );
 
     const setPicked = (c) => {

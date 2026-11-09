@@ -39,7 +39,7 @@ export default {
       h('div.r2-scores-head',
         h('div.t-eyebrow.on-dark', 'The bill so far'),
         h('h2.r2-scores-title', 'After course two'),
-        best && best.delta > 0 ? h('div.r2-scores-sub', h('b', ctx.player(best.id)?.name || '?'), best.id === rows[0]?.id ? ` had the best course (+${best.delta}) and leads the table.` : ` had the best course (+${best.delta}). ${leader?.name || '?'} still leads.`) : null),
+        best && best.delta > 0 ? h('div.r2-scores-sub', h('b', ctx.player(best.id)?.name || '?'), best.id === rows[0]?.id ? ` told the best porkies (+${best.delta}) and leads the table.` : ` told the best porkies (+${best.delta}). ${leader?.name || '?'} still leads.`) : null),
       board));
 
     let t1 = 0;
