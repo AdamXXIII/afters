@@ -134,8 +134,7 @@
 .r1-rival-ic svg { width: 22px; height: 22px; color: var(--c-tablecloth); }
 .r1-field .input { height: 68px; font-size: calc(20px * var(--ts)); background: #fff; border-color: var(--c-crumb); box-shadow: inset 0 2px 4px rgba(122,74,42,.08); }
 .r1-field .input:focus { border-color: var(--c-mustard); box-shadow: 0 0 0 4px rgba(224,165,38,.25); }
-.r1-actions { padding-top: 2px; }
-.r1-write .r1-note { margin-top: auto; }
+.r1-actions { margin-top: auto; padding-top: 4px; }
 .r1-field .input::placeholder { color: rgba(122,74,42,.72); font-weight: 600; }
 .r1-btn-ic { display: inline-grid; width: 24px; height: 24px; }
 .r1-btn-ic svg { width: 24px; height: 24px; }
