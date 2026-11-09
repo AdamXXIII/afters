@@ -19,7 +19,7 @@
 .code-slot:focus-within { background: var(--c-linen); box-shadow: inset 0 0 0 3px var(--c-claret), 0 0 0 5px rgba(122,30,44,.14); }
 .code-slot.current { background-color: var(--c-linen); box-shadow: inset 0 0 0 2.5px var(--c-claret), 0 0 0 6px rgba(224,165,38,.22), 0 6px 14px rgba(59,31,24,.16); }
 .code-slot.current::before { opacity: 0; }
-.code-slot.current::after { width: 26px; height: 3px; margin-left: -13px; background: var(--c-claret); animation: caretBlink 1.1s ease-in-out infinite; }
+.code-slot.current::after { width: 2.5px; height: 38px; bottom: 22px; margin-left: -1px; background: var(--c-claret); animation: caretBlink 1.1s ease-in-out infinite; }
 .code-slot.current { animation: tileGlow 1.6s ease-in-out infinite; }
 @keyframes tileGlow { 0%,100% { box-shadow: inset 0 0 0 2.5px var(--c-claret), 0 0 0 5px rgba(224,165,38,.18), 0 6px 14px rgba(59,31,24,.16); } 50% { box-shadow: inset 0 0 0 2.5px var(--c-claret), 0 0 0 8px rgba(224,165,38,.30), 0 6px 14px rgba(59,31,24,.16); } }
 .code-slot:focus-within::after { background: var(--c-claret); animation: caretBlink 1.1s ease-in-out infinite; }
