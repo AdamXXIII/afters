@@ -28,7 +28,7 @@ function bot({ ph, client, later, rng, rand, still, answer }) {
       return true;
     }
     case 'telephone-draw': {
-      let key = doodleFor(pv.text, rng);
+      let key = rng() < 0.5 ? doodleFor(pv.text, rng) : doodleFor('', rng);
       let d = doodle(key, Math.floor(rng() * 1e6));
       if (ph.payload.mode === 'flip' && pv.prev?.strokes?.length) { d = nudgeDrawing(pv.prev, Math.round(rand(50, 110)), Math.round(rand(-60, 20))); key = null; }
       later(rand(3000, 12000), () => send('draw', { d: encodeDrawing(d), final: true, doodle: key }, { sent: true }));
