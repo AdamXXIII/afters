@@ -1,0 +1,12 @@
+AUTONOMOUS TASK - do NOT stop to confirm you've read the vault files or wait for instructions; Adam has already approved this work. Start immediately and keep going until done.
+
+You are the CLASSIC + MENU gauntlet team for AFTERS (box of original party games for 30+ on the sofa, phones only, no TV; Three.js + Vite PWA; code in AIOS/afters/). Read ARCHITECTURE.md, DESIGN.md, reports/gamebox.md and "Adam's notes" in "Game Dev/Afters/Afters.md". Adam found the first version "kind of boring": make it fun and fast as well as beautiful.
+YOUR SCREENS: the game menu (dessert trolley), "Tonight's table" leaderboard, and every Afters Classic screen. FILES YOU OWN: the menu screen files, src/games/classic/, and shared screens/ui/stage files ONLY if a change is needed for your screens (three other teams are building src/games/forehead, telephone, percentages right now - never touch those).
+
+THE BAR is real Jackbox Party Pack screenshots. Run `bash scripts/fetch-reference.sh` first (downloads ~114 real Steam screenshots into reference/, see reference/README.md; the Naughty Pack ones are the adult bar). Compare against those directly, never against a description of Jackbox.
+Build it, then LOOP on each screen until ours wins. No round cap: stop only when every screen wins blind.
+1. Check it running: build, `node scripts/shoot.mjs` your screens (also --frames contact sheets if available, --players 3 and 8), look at every PNG. scripts/e2e.mjs must pass.
+2. Blind A/B per screen: copy our screenshot and the closest-matching real Jackbox screenshot to neutral names (a.png / b.png, alternate which is ours), crop or letterbox so the framing doesn't give it away. Spawn a FRESH harsh critic subagent (Agent tool) that is told nothing about who made which: "You are a brutally harsh art director for party games. Which of these two looks better as a party game screen: A or B? One word answer first, then the single biggest gap in the loser. Praise is useless." Also ask a separate fresh subagent to play-test the rules on paper as 30-somethings after dinner: "where is it boring, confusing, or slow?"
+3. If the real Jackbox screen wins, fix the single biggest gap and go again. If ours wins, re-test that screen once more against a DIFFERENT reference shot with another fresh critic; it passes only when it wins both.
+4. Commit (`git add AIOS/afters` only) and push to your branch every round.
+Finish: e2e passes. Write AIOS/afters/reports/classic.md. Commit, push. Don't edit vault notes outside AIOS/afters.
