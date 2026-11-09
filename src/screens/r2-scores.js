@@ -18,11 +18,15 @@ export default {
     for (const r of frozen ? rows : byPrev) {
       const rank = frozen ? rows.indexOf(r) : r.prevRank ?? rows.indexOf(r);
       const score = h('span.r2-row-score', String(frozen ? r.score : r.prev ?? r.score));
-      const delta = h('span.r2-row-delta', r.delta > 0 ? `+${r.delta}` : 'no change');
+      const finalRank = rows.indexOf(r);
+      const moved = (r.prevRank ?? finalRank) - finalRank;
+      const delta = h('span.r2-row-delta', r.delta > 0 ? `+${r.delta}` : '+0');
+      const arrow = moved ? h(`span.r2-move${moved > 0 ? '.up' : '.down'}`, moved > 0 ? `\u25B2${moved}` : `\u25BC${-moved}`) : null;
       if (!(r.delta > 0)) delta.classList.add('zero');
       const row = h(`div.r2-row${r.id === best?.id ? '.best' : ''}${r.id === ctx.meId ? '.me' : ''}`,
         h('span.r2-row-rank', String(rank + 1)),
         chip(ctx.player(r.id)),
+        arrow,
         h('span.r2-row-right', score, delta),
         r.id === best?.id ? waxSeal('.row') : null);
       row.scoreEl = score; row.rankEl = row.firstChild; row.deltaEl = delta;

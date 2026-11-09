@@ -28,7 +28,7 @@ export const DEMOS = {
   'r2-intro': { match: (e) => e.phase.id === 'r2-intro', t: 3200 },
   'r2-write': { match: (e) => e.phase.id === 'r2-write', me: 'idle', bots: 'some', t: 14000 },
   'r2-wait': { match: (e) => e.phase.id === 'r2-write', me: 'act', bots: 'some', t: 22000 },
-  'r2-pick': { match: (e) => e.phase.id === 'r2-pick', me: 'idle', bots: 'some', t: 6500 },
+  'r2-pick': { match: (e) => e.phase.id === 'r2-pick', me: 'act', bots: 'some', t: 6500 },
   'r2-reveal': { match: (e) => e.phase.id === 'r2-reveal', t: (p) => { const s = p.payload.steps.find((x) => x.kind === 'truth'); return s ? s.at + 1600 : 4000; } },
   'r2-scores': { match: (e) => e.phase.id === 'r2-scores', t: 2600 },
   'r3-intro': { match: (e) => e.phase.id === 'r3-intro', t: 3200 },

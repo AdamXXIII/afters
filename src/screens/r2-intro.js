@@ -4,23 +4,23 @@ import { h } from '../ui/components.js';
 import { waxSeal, hostSkip, sayLater } from './r2-kit.js';
 
 const STEPS = [
-  ['Read a true fact', 'with a word missing.'],
-  ['Fill the gap with a lie', 'good enough to fool the table.'],
-  ['Find the real answer', 'among everyone\'s porkies.'],
+  ['Read a true fact with a gap'],
+  ['Fill it with a believable lie'],
+  ['Spot the real answer'],
 ];
 
 export default {
   id: 'r2-intro',
   layout: 'show',
   shot: 'intro',
+  rail: false,
   mount({ show }, ctx) {
     const seal = waxSeal('.intro');
     const card = h('div.r2-menu',
       seal,
       h('div.r2-menu-eyebrow', 'Course Two'),
       h('div.r2-menu-title', 'Porkies'),
-      h('div.r2-menu-sub', 'A course of lies, with one true thing on the plate.'),
-      h('ol.r2-steps', STEPS.map(([a, b], i) => h('li', h('span.n', String(i + 1)), h('span.tx', h('b', a), ' ', b)))),
+      h('ol.r2-steps', STEPS.map(([a], i) => h('li', h('span.n', String(i + 1)), h('span.tx', h('b', a))))),
       h('div.r2-prices',
         h('div.r2-price', h('span.l', 'Find the truth'), h('span.dots'), h('span.v', '1000')),
         h('div.r2-price', h('span.l', 'Each person you fool'), h('span.dots'), h('span.v', '500'))),

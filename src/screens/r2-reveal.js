@@ -19,7 +19,7 @@ export default {
 
     const fact = factText(p.fact.text);
     const tracker = h('div.r2-track', p.options.map((o) => h('span.r2-track-i', { dataset: { id: o.id } }, letterOf.get(o.id))));
-    const factCard = h('div.card.r2-rev-fact', h('div.r2-pick-meta', h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`), tracker), fact);
+    const factCard = h('div.card.r2-rev-fact', h('div.r2-pick-meta', h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`)), fact, tracker);
     const stageEl = h('div.r2-rev-stage');
     show.append(h('div.r2-rev', factCard, stageEl));
 
@@ -46,13 +46,13 @@ export default {
           h('div.r2-nobody-head', h('span.r2-nobody-big', 'Nobody fell for these'), h('span.r2-nobody-sub', 'Zero fooled. Back to the kitchen.')),
           h('div.r2-duds', cards)));
         sfx('groan');
-        if (!quiet) ctx.cyril.react('smug');
+        ctx.cyril.react('smug', { duration: quiet ? 60000 : 1600 });
       },
       porky(s) {
         const o = byId.get(s.optionId);
         setCurrent([o.id]); mark([o.id], 'porky');
         const pts = h('span.r2-pts', '+0');
-        const fooled = o.pickers.map((id) => nameTag(pl(id)));
+        const fooled = o.pickers.map((id) => nameTag(pl(id), { cls: '.big' }));
         hop(fooled, 420);
         const card = h('div.r2-card.porky', { style: { '--tilt': `${tilt(seed, o.id, 2)}deg` } },
           h('div.r2-card-top', h('span.r2-card-l', letterOf.get(o.id)), h('span.t-eyebrow', 'A porky')),
@@ -60,7 +60,7 @@ export default {
           h('div.r2-stamp', h('span.sn', { html: snoutSvg({ ring: false }) }), 'Porky!'),
           authorsLine(o),
           h('div.r2-fooled', h('span.lbl', o.pickers.length === 1 ? 'Fooled' : `Fooled all ${o.pickers.length}`), h('span.list', fooled)),
-          o.kind === 'house' ? null : h('div.r2-pts-row', pts, h('span.each', o.authors.length > 1 ? 'each, for the fibbers' : 'for the fibber')),
+          o.kind === 'house' ? h('div.r2-pts-row', h('span.each', 'Mine. No points for anyone. Sorry.')) : h('div.r2-pts-row', pts, h('span.each', `to ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}${o.authors.length > 1 ? ' each' : ''}`)),
         );
         stageEl.replaceChildren(card);
         if (o.kind !== 'house') countTo(pts, 500 * o.pickers.length, { prefix: '+', frozen: quiet, ms: 700 });
@@ -68,13 +68,13 @@ export default {
         if (!quiet) { ctx.stage.shake(); ctx.haptic('stamp'); }
         if (o.authors.includes(ctx.meId) && o.pickers.length) ctx.haptic('fooled');
         if (o.pickers.length >= 3) ctx.say(ctx.line('r2FooledMany', { n: o.pickers.length }), { hold: 1400, placement: 'side' });
-        else if (!quiet) ctx.cyril.react('guffaw');
+        ctx.cyril.react(o.pickers.length >= 2 ? 'guffaw' : 'smug', { duration: quiet ? 60000 : 1400 });
       },
       truth(s) {
         const o = byId.get(s.optionId);
         setCurrent([o.id]); mark([o.id], 'truth');
         fact.setFill(o.text); fact.gap.classList.add('gold');
-        const found = o.pickers.map((id) => nameTag(pl(id)));
+        const found = o.pickers.map((id) => nameTag(pl(id), { cls: '.big' }));
         hop(found, 520);
         const pts = h('span.r2-pts.gold', '+0');
         const card = h('div.r2-card.truth',
@@ -84,13 +84,14 @@ export default {
           o.pickers.length
             ? h('div.r2-fooled', h('span.lbl', 'Spotted by'), h('span.list', found))
             : h('div.r2-fooled.none', h('span.lbl', 'Found by nobody. Not one of you.')),
-          o.pickers.length ? h('div.r2-pts-row', pts, h('span.each', o.pickers.length > 1 ? 'each, for the honest' : 'for the honest one')) : null,
+          o.pickers.length ? h('div.r2-pts-row', pts, h('span.each', o.pickers.length > 1 ? 'each for spotting it' : `to ${pl(o.pickers[0])?.name || '?'} for spotting it`)) : null,
           h('div.r2-sparkle', Array.from({ length: 9 }, (_, i) => h('i', { style: { '--i': i, '--x': `${(tilt(seed, `s${i}`, 1) * 0.5 + 0.5) * 100}%`, '--y': `${(tilt(seed, `y${i}`, 1) * 0.5 + 0.5) * 100}%` } }))),
         );
         stageEl.replaceChildren(card);
         if (o.pickers.length) countTo(pts, 1000, { prefix: '+', frozen: quiet, ms: 700 });
         sfx('truth');
-        if (!quiet) ctx.cyril.react(o.pickers.length ? 'delight' : 'sad');
+        ctx.cyril.react(o.pickers.length ? 'delight' : 'sad', { duration: quiet ? 60000 : 1600 });
+        ctx.cyril.setMood?.(o.pickers.length ? 'celebrate' : 'calm');
         if (o.pickers.includes(ctx.meId)) ctx.haptic('win');
         if (!o.pickers.length) ctx.say(ctx.line('r2Nobody'), { hold: 1600, placement: 'side' });
       },

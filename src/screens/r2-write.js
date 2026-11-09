@@ -1,7 +1,7 @@
 // r2-write: the fact on a menu card; your porky writes itself into the gap as you type.
 // Field (max 40), a Cyril tip, the price of a good lie, and "Tell a porky". Too-honest => shake + note.
 import { h, button, textField } from '../ui/components.js';
-import { factText, snoutSvg, sayLater, tilt } from './r2-kit.js';
+import { factText, tilt } from './r2-kit.js';
 
 export { factText };
 
@@ -37,14 +37,13 @@ export default {
     const card = h('div.card.r2-factcard',
       h('div.r2-fc-head',
         h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`),
-        h('span.r2-fc-true', h('span.dot'), 'True story')),
+        h('span.r2-fc-true', 'True, bar the gap')),
       fact,
-      h('span.r2-fc-snout', { html: snoutSvg() }),
     );
     sheet.append(
       card,
       h('div.r2-field', field, note),
-      h('div.r2-tip', h('span.q', '“'), h('span.tx', tip), h('span.by', 'Cyril')),
+      h('div.r2-tip', h('span.q', '“'), h('span.tx', p.index === 0 ? 'Write a porky so convincing your own nan would believe it.' : tip), h('span.by', 'Cyril')),
       h('div.sheet-actions.r2-actions',
         h('div.r2-pay', h('span', 'Every fool'), h('b', '+500'), h('span.sep'), h('span', 'Spot the truth'), h('b', '+1000')),
         btn),
@@ -62,7 +61,6 @@ export default {
       }
     });
     if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
-    const cancel = p.index === 0 ? sayLater(ctx, ctx.line('r2Write'), { delay: 300, compact: true }) : () => {};
-    return { unmount() { offReject(); cancel(); } };
+    return { unmount() { offReject(); } };
   },
 };

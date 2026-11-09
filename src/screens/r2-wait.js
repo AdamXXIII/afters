@@ -1,7 +1,7 @@
 // r2-wait: "Porky told. Keep a straight face." Your lie sealed on a place card,
 // who we're still waiting on (chips), and a boop-the-snout fidget.
-import { h, chip } from '../ui/components.js';
-import { waxSeal, snoutSvg, tilt } from './r2-kit.js';
+import { h } from '../ui/components.js';
+import { waxSeal, snoutSvg, tilt, avatarDisc } from './r2-kit.js';
 
 const BOOPS = ['Boop.', 'Oink.', 'Steady on.', 'Again?', 'Mind the flame.', 'Snout of order.', 'Frankly, rude.'];
 
@@ -26,7 +26,7 @@ export default {
     const setWaiting = (c) => {
       const list = waiting(c);
       label.textContent = list.length ? `Still fibbing (${list.length})` : 'Everyone’s lied. Here we go.';
-      chipsWrap.replaceChildren(...list.map((p) => chip(p, { state: 'waiting' })));
+      chipsWrap.replaceChildren(...list.map((p, i) => h('div.r2-fibber', { style: { '--i': i } }, avatarDisc(p, '.lg'), h('span.nm', p.name), h('span.r2-dots', h('i'), h('i'), h('i')))));
     };
     setWaiting(ctx);
 
