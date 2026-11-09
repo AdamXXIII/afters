@@ -828,3 +828,22 @@
   .pc-rv-mid { justify-content: flex-start; padding-top: 6px; }
 }
 .pc-count { white-space: nowrap; }
+/* landscape round 2: the question owns the left column; intro titles twice the size */
+@media (orientation: landscape) and (max-height: 560px) {
+  body[data-layout="split"]:has(.pc-sheet) .pc-top { bottom: 64px; }
+  body[data-layout="split"]:has(.pc-sheet) .pc-qcard { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 12px 18px 16px 14px; }
+  body[data-layout="split"]:has(.pc-sheet) .pc-qhead { position: absolute; top: 10px; left: 10px; }
+  body[data-layout="split"]:has(.pc-sheet) .pc-q, body[data-layout="split"]:has(.pc-sheet) .pc-qcard.long .pc-q { font-size: 36px; line-height: 1.05; margin-top: 44px; }
+  body[data-layout="split"]:has(.pc-sheet) .pc-qcard.xlong .pc-q { font-size: 31px; }
+  .pc-heckles { display: none; }
+  .pc-dialwrap { position: relative; }
+  .pc-dialsheet .pc-heckles, .pc-watchsheet .pc-heckles { display: block; }
+  .pc-bettors { bottom: 6px; gap: 2px 6px; }
+  .pc-card-title { font-size: 84px; }
+  .pc-card.final .pc-card-title { font-size: 68px; }
+  .pc-card-tags { font-size: 26px; }
+  .pc-dim { background: linear-gradient(90deg, rgba(10,5,3,.9) 0, rgba(10,5,3,.75) 50%, rgba(10,5,3,0) 70%); }
+  .pc-rv .pc-q { font-size: 24px; }
+  .pc-frv-q { font-size: 26px; }
+  .pc-finalsheet .pc-ask-q { font-size: 26px; line-height: 28px; }
+}
