@@ -9,14 +9,14 @@ import { avatarDisc, tiltFor, fitText, cyrilNote } from './r1-kit.js';
 export default {
   id: 'r1-vote',
   layout: 'split',
-  shot: 'vote',
+  shot: 'scores', // keeps Cyril whole and visible below the prompt card in split layout
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
     const seed = ctx.phase.seed;
     const author = ctx.priv.role === 'author';
     const timer = timerRing();
     const voters = (p.voterIds || []).map((id) => ctx.player(id)).filter(Boolean);
-    const discs = new Map(voters.map((v) => [v.id, avatarDisc(v, { size: 26, cls: '.r1-voter' })]));
+    const discs = new Map(voters.map((v) => [v.id, avatarDisc(v, { size: 30, cls: '.r1-voter' })]));
     const tally = h('span.r1-tally-n');
     const promptText = h('div.r1-vote-prompt', p.prompt);
     show.append(h('div.r1-vote-top',
@@ -44,7 +44,7 @@ export default {
     const or = h('div.r1-or', h('span', 'or'));
     if (author) {
       sheet.append(h('div.r1-vote-sheet.r1-in',
-        h('div.r1-vote-ask', h('div.r1-vote-q', 'This one’s yours.'), h('div.r1-vote-hint', 'Look innocent. Votes are coming in.')),
+        h('div.r1-vote-ask', h('div.r1-vote-q', 'One of these is yours.'), h('div.r1-vote-hint', 'You can’t vote on your own plate. Look innocent.')),
         optA, or, optB,
         cyrilNote('I’ve seen poker faces at funerals. *Hold it.*')));
     } else {

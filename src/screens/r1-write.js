@@ -54,8 +54,8 @@ export default {
         setTimeout(() => ctx.client.submit(text, cur.matchupId), 220);
       }
       note = cyrilNote(TIPS[idx % TIPS.length]);
-      body.replaceChildren(card, field, note, h('div.r1-actions', serveBtn));
-      fitText(promptText, { max: 30, min: 22, maxH: 150 });
+      body.replaceChildren(card, field, h('div.r1-actions', serveBtn), note);
+      fitText(promptText, { max: 32, min: 23, maxH: 150 });
       body.classList.remove('r1-in'); void body.offsetWidth; body.classList.add('r1-in');
       if (!c.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
     };

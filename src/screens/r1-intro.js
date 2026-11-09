@@ -2,12 +2,12 @@
 // "prices" for the rules. Cyril explains in 2 bubbles above. Host may skip after 3 s.
 import './r1.css';
 import { h } from '../ui/components.js';
-import { sayLater, hostSkip, coursePips, R1_ICONS } from './r1-kit.js';
+import { sayLater, hostSkip, coursePips, R1_ICONS, R1_LINES } from './r1-kit.js';
 
 const MENU = [
-  { icon: 'pen', dish: 'Answer two questions', price: '80s' },
-  { icon: 'rival', dish: 'One secret rival each', price: '1 v 1' },
-  { icon: 'fork', dish: 'The table votes', price: '1000' },
+  { icon: 'pen', dish: 'Answer two questions', price: '80 sec' },
+  { icon: 'rival', dish: 'Each against a rival', price: '1 on 1' },
+  { icon: 'fork', dish: 'The table votes', price: '1000 pts' },
 ];
 
 export default {
@@ -18,21 +18,20 @@ export default {
     const card = h('div.r1-menu',
       h('div.r1-menu-band', h('span', 'Course One'), coursePips(1, 3)),
       h('div.r1-menu-title', 'Plate Up'),
-      h('div.r1-menu-sub', 'Head to head. Best answer wins the plate.'),
-      h('div.r1-menu-rule', h('i'), h('span', { html: R1_ICONS.fork }), h('i')),
+      h('div.r1-menu-sub', 'Write the funniest answer. Win the table.'),
       h('ul.r1-menu-items', MENU.map((m) => h('li',
         h('span.ic', { html: R1_ICONS[m.icon] }),
         h('span.dish', m.dish),
         h('span.lead'),
         h('span.price', m.price)))),
-      h('div.r1-menu-foot', h('span.r1-menu-seal', 'Every vote?'), h('span', 'Clean plate, ', h('b', '+250'))),
+      h('div.r1-menu-foot', h('span.r1-menu-seal', 'Clean plate'), h('span', 'Win every vote: ', h('b', '+250 pts'))),
     );
     const wrap = h('div.r1-intro-wrap', card);
     show.append(wrap);
     if (ctx.frozen) card.classList.add('settled');
     else card.classList.add('enter');
     const skip = hostSkip(ctx, show);
-    const cancel = sayLater(ctx, ctx.line('r1Intro'), { delay: 900, hold: 2400, placement: 'above' });
+    const cancel = sayLater(ctx, R1_LINES.intro, { delay: 900, hold: 2400, placement: 'above' });
     return { frame: (c) => skip?.frame(c), unmount: cancel };
   },
 };

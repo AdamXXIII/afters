@@ -138,3 +138,21 @@ export const R1_ICONS = {
 };
 
 export { ICONS };
+
+/** Extra Round 1 lines in Cyril's voice; picked by seed so every phone says the same thing. */
+export const R1_LINES = {
+  intro: ['Course one. Two of you, one question, no mercy.', 'Best answer wins. Worst answer gets my sympathy.'],
+  normal: [
+    'Splendid. The table has spoken.',
+    'A clear winner. The loser may sulk into the gravy.',
+    'Decisive. I have seen softer verdicts at the Old Bailey.',
+    'The people have chosen. Frankly, I agree with them.',
+    'Well plated. The other one was… also food.',
+  ],
+  novotes: ['Nobody voted. I\'ll assume you were all chewing.'],
+  scores: [
+    'Somebody\'s leading. Somebody isn\'t. I love them all equally. Nearly.',
+    'Early days. I once saw a man come back from last with a single pun.',
+  ],
+};
+export const pickLine = (list, seed, salt = 0) => list[((seed >>> 0) + salt) % list.length];

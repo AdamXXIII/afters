@@ -3,7 +3,7 @@
 import './r1.css';
 import { h } from '../ui/components.js';
 import { ICONS } from '../ui/icons.js';
-import { timeline, avatarDisc, tiltFor, fitText, countTo, R1_ICONS } from './r1-kit.js';
+import { timeline, avatarDisc, tiltFor, fitText, countTo, R1_ICONS, R1_LINES, pickLine } from './r1-kit.js';
 
 export default {
   id: 'r1-reveal',
@@ -19,7 +19,6 @@ export default {
     const cards = p.answers.map((a, i) => {
       const txt = h('div.r1-rc-txt', a.empty ? 'sent out an empty plate' : a.text);
       const card = h(`div.r1-rc${a.empty ? '.empty' : ''}`, { style: { '--tilt': `${(i ? 1.6 : -1.6) + tiltFor(seed, a.key, 1)}deg`, '--i': i } },
-        h('span.r1-rc-key', a.key),
         txt,
         h('div.r1-rc-votes'));
       card.txt = txt;
@@ -42,14 +41,16 @@ export default {
       } },
       { at: S(600), fn: () => {
         p.answers.forEach((a, i) => {
-          const list = a.votes.map((vid) => avatarDisc(ctx.player(vid), { size: 26, cls: '.r1-tok' }));
+          const list = a.votes.map((vid) => avatarDisc(ctx.player(vid), { size: 32, cls: '.r1-tok' }));
           if (a.house) list.push(h('span.r1-av.r1-tok.house', { title: 'House vote (half)', html: ICONS.flame }));
           list.forEach((t, k) => {
             t.style.setProperty('--d', `${quiet ? 0 : k * 90 + i * 45}ms`);
             t.style.setProperty('--fx', `${(i ? -1 : 1) * (30 + k * 12)}px`);
             cards[i].votes.append(t);
           });
-          if (!list.length) cards[i].votes.append(h('span.r1-novote', 'no votes'));
+          if (!list.length) cards[i].votes.append(h('span.r1-novote', 'No votes'));
+          const n = a.votes.length;
+          cards[i].append(h('div.r1-rc-count', a.house ? `${n} vote${n === 1 ? '' : 's'} + Cyril’s half` : `${n} vote${n === 1 ? '' : 's'}`));
         });
       } },
       { at: S(2200), fn: () => {
@@ -65,14 +66,15 @@ export default {
           const pts = a.points + a.bonus;
           const share = totalVotes ? Math.round(((a.votes.length + (a.house ? 0.5 : 0)) / totalVotes) * 100) : 0;
           const num = h('span.n', '+0');
-          cards[i].append(h('div.r1-rc-pts', num, h('span.share', `${share}%`)));
+          const other0 = p.answers[1 - i];
+          const won = a.points > other0.points;
+          cards[i].append(h(`div.r1-rc-pts${won ? '.won' : ''}`, won ? h('span.lau', { html: R1_ICONS.laurel }) : null, num, h('span.share', `${share}%`)));
           countTo(num, 0, pts, { ms: 650, prefix: '+', frozen: quiet });
           const other = p.answers[1 - i];
           const win = a.points > other.points;
           const tie = a.points === other.points && a.points > 0;
           cards[i].classList.toggle('win', win);
           cards[i].classList.toggle('lose', !win && !tie);
-          if (win) cards[i].append(h('div.r1-rc-crown', { html: R1_ICONS.laurel }));
           if (a.bonus) cards[i].append(h('div.r1-rc-clean', h('span', 'Clean plate'), h('b', `+${a.bonus}`)));
           if (win && a.authorId === ctx.meId) ctx.haptic('win');
         });
@@ -83,8 +85,8 @@ export default {
         const mood = o === 'clean' ? 'delight' : o === 'tie' ? 'smug' : o === 'empty' ? 'sad' : 'guffaw';
         ctx.cyril.react(mood);
         if (o === 'clean') sfx('fanfare');
-        const key = { clean: 'r1Clean', tie: 'r1Tie', empty: 'r1Empty', novotes: 'r1NoVotes' }[o] || 'r1Normal';
-        ctx.say(ctx.line(key), { hold: 1500, placement: 'side' });
+        const key = { clean: 'r1Clean', tie: 'r1Tie', empty: 'r1Empty', novotes: 'r1NoVotes' }[o];
+        ctx.say(key ? ctx.line(key) : [pickLine(R1_LINES.normal, seed, p.index)], { hold: 1500, placement: 'side' });
       } },
       { at: S(5600), fn: () => { if (!quiet) cards.forEach((c) => c.classList.add('out')); } },
     ]);

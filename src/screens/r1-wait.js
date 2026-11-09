@@ -24,7 +24,7 @@ export default {
 
     // spin-the-plate fidget
     const plate = h('button.r1-spin', { type: 'button', 'aria-label': 'Spin the plate', html: willowPlate() });
-    const count = h('div.r1-spin-count', 'Tap the plate. Go on.');
+    const count = h('div.r1-spin-count', 'Spin the plate. Go on.');
     let spin = 0; let spins = 0;
     plate.addEventListener('pointerdown', () => {
       spins++;
@@ -53,7 +53,7 @@ export default {
     renderWaiting(ctx);
 
     sheet.append(h('div.r1-wait.r1-in',
-      h('div.r1-wait-head', h('div.r1-wait-title', 'Plated.'), h('div.r1-wait-sub', 'Both answers are on the pass. Keep a straight face.')),
+      h('div.r1-wait-head', h('div.r1-wait-title', 'Plated.'), h('div.r1-wait-sub', 'Both answers are on the pass. Now keep a straight face.')),
       h('div.r1-served-row', served),
       h('div.r1-spin-wrap', plate, count),
       h('div.r1-wait-foot', status, chips)));
