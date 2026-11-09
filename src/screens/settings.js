@@ -5,7 +5,7 @@ import './settings.css';
 import { h, toggle, onTap, iconButton } from '../ui/components.js';
 import { setHaptics, hapticsEnabled } from '../ui/haptics.js';
 
-const I = (body) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const I = (body) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 const ICON = {
   // two quavers
   music: I('<path d="M9 18V6l10-2v12"/><path d="M9 9.5l10-2"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor" stroke="none"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor" stroke="none"/>'),

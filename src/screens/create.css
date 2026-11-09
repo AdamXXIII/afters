@@ -29,7 +29,7 @@
     linear-gradient(180deg, transparent 0 48%, rgba(122,74,42,.07) 50%, transparent 52%),
     var(--paper);
   border-radius: 6px 6px 10px 10px;
-  box-shadow: 0 1px 0 rgba(42,26,23,.10), 0 10px 18px -6px rgba(59,31,24,.30), 0 2px 4px rgba(59,31,24,.12), inset 0 0 0 1px rgba(122,74,42,.14);
+  box-shadow: 0 1px 0 rgba(42,26,23,.12), 0 16px 26px -8px rgba(59,31,24,.42), 0 3px 6px rgba(59,31,24,.16), inset 0 0 0 1px rgba(122,74,42,.16);
   transform: rotate(var(--tilt));
 }
 .fd-card::before { /* brass foil hairline frame, menu-card style */
@@ -51,7 +51,7 @@
   text-align: center; font-family: var(--f-hand); font-weight: 650; font-size: calc(44px * var(--ts)); line-height: 1.15; height: 1.2em;
   color: var(--c-ink); caret-color: var(--c-claret); -webkit-appearance: none; appearance: none;
 }
-.fd-card-input::placeholder { color: rgba(122,74,42,.5); }
+.fd-card-input::placeholder { color: rgba(122,74,42,.64); }
 .fd-card .count { position: absolute; left: 14px; bottom: 9px; font-size: 13px; font-weight: 700; color: var(--c-toffee); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity var(--d-small); }
 .fd-card:focus-within .count, .fd-card .count.hot { opacity: .9; }
 .fd-card .count.hot { color: var(--c-tomato); }

@@ -88,7 +88,7 @@ export default {
       h('div.code-group', row,
         h('p.fd-hint.code-caption', h('span.fd-hint-icon', { html: LINK }),
           h('span', invited ? 'Filled in from your invite. Just add your name.' : h('span', 'Four letters. ', h('b', 'No vowels'), ', so nothing rude.')))),
-      h('div.fd-mid', nameCard(name, { kicker: 'Reserved for', tilt: 1.2, compact: true })),
+      h('div.fd-mid', nameCard(name, { kicker: 'Reserved for', tilt: 1.5 })),
       h('div.fd-actions', seat),
     ));
     mark();
