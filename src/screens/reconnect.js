@@ -85,6 +85,7 @@ export default {
       bar.classList.toggle('hurry', s <= 15);
       bar.style.setProperty('--k', (left / HOLD_MS).toFixed(4));
       const key = `${lost}`;
+      if (!lost) retryNote.textContent = `Knocking again by ourselves in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
       if (key === lastState) return;
       lastState = key;
       box.classList.toggle('lost', lost);
@@ -94,7 +95,7 @@ export default {
         ? 'Check your Wi-Fi or signal, then try again. If the host has left, the table may have closed.'
         : 'Finding the table again. Your seat and your score are safe.';
       if (!retry.disabled) retry.textContent = lost ? 'Try again' : 'Try again now';
-      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : 'We knock again every couple of seconds on our own.';
+      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : `Knocking again by ourselves in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
     };
     paint(ctx);
     const tick = setInterval(() => paint(ctx), 250);

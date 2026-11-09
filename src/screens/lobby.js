@@ -75,7 +75,7 @@ export default {
       } catch { /* cancelled */ }
     });
     const placard = h('div.lc-placard',
-      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Tap to copy')),
+      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Type it in to join')),
       h('div.lc-row', tiles, invite),
     );
     const tagsLayer = h('div.lc-tags', { 'aria-hidden': 'true' });
@@ -90,6 +90,7 @@ export default {
       const b = h('button.lb-cell', { type: 'button', role: 'radio', 'aria-label': AVATAR_NAMES[i], style: { '--pc': a.colour }, 'data-e2e': `avatar-${i}` },
         h('span.lb-plate'),
         thumbs[i] ? h('img', { src: thumbs[i], alt: '', draggable: false }) : h('span.lb-glyph', { html: avatarIcon(i) }),
+        h('span.lb-label', AVATAR_NAMES[i]),
         owner,
         h('span.lb-tick', { html: ICONS.tick }));
       b.owner = owner;
@@ -134,7 +135,7 @@ export default {
       h('span.lb-pill-txt', h('span.lb-pill-k', 'Adult table'), h('span.lb-pill-s', 'Clean words')), h('span.lb-switch', h('i')));
     onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
     const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
-      h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music'), h('span.lb-pill-v')),
+      h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')),
       h('span.lb-chev', { html: '<svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' }));
     onTap(speakerPill, () => {
       const ps = ctx.app.client.state.players;
@@ -307,10 +308,10 @@ export default {
       guestInfo.replaceChildren(
         h('span.lb-info-i', h('span.lb-info-k', 'Words'), h('span.lb-info-v', st.adult ? 'Anything goes' : 'Clean')),
         h('span.lb-info-i', h('span.lb-info-k', 'Music'), h('span.lb-info-v', spk ? (spk.id === meId ? 'Your phone' : `${spk.name}\u2019s phone`) : 'Off')));
-      speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'This phone' : spk ? `${spk.name}’s` : 'Off';
+      speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : spk ? spk.name : 'Off';
 
       startBtn.disabled = n < MIN_PLAYERS;
-      const want = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : 'Ring the bell';
+      const want = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : `Ring the bell \u00b7 ${n} at the table`;
       if (startBtn.dataset.lbl !== want) { startBtn.dataset.lbl = want; setStart(want, n >= MIN_PLAYERS); }
       const host = ps.find((p) => p.id === hostId);
       waitCard.querySelector('.lb-wait-txt').textContent = n < MIN_PLAYERS
