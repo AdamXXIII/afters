@@ -99,7 +99,7 @@ export default {
         h('span.r3r-rk', rankOf(c).label),
         h('span.r3r-row-t', c.text),
         h('span.r3r-row-g', { html: glassSvg(1) }, h('b', String(c.glasses.length))),
-        h('span.r3r-row-by', { style: { '--pc': who?.colour || '#7A4A2A' } }, h('span.r3r-nm', who?.name || '?')),
+        h('span.r3r-row-by', { style: { '--pc': who?.colour || '#7A4A2A' } }, h('span.r3r-nm', who?.name || '?'), h('span.r3r-row-pts', `+${200 * c.glasses.length}`)),
       );
       row.c = c;
       return row;
@@ -190,7 +190,7 @@ export default {
       });
       const el = h('div.r3r-card.hero.is-toast.joint',
         h('div.r3r-ribbon', h('span.r3r-ribbon-i', { html: clinkSvg() }), h('span', 'Joint toast of the table')),
-        h('div.r3r-coin.tied', '=1'),
+        h('div.r3r-coin.tied', h('small', 'Joint'), '1st'),
         h(`div.r3r-minis.n${shown.length}`, minis));
       if (!frozen && late < 400 && !reduced) el.classList.add('enter');
       return el;

@@ -32,10 +32,6 @@ export default {
         h('span.r3i-price', h('b', '+1000'), ' the toast')),
     );
     card.prepend(bell);
-    const fill = h('i');
-    const secs = h('b', '');
-    const soon = h('div.r3i-soon', h('span.r3i-soon-t', 'First orders in ', secs), h('span.r3i-soon-bar', fill));
-    card.append(soon);
     const wrap = h('div.r3i-wrap', card);
     show.append(wrap);
 
@@ -68,9 +64,6 @@ export default {
     return {
       frame(c) {
         tl(c);
-        const rem = c.remaining ? c.remaining() : 0;
-        secs.textContent = `${Math.max(0, Math.ceil(rem / 1000))}s`;
-        if (c.duration) fill.style.width = `${Math.max(0, Math.min(100, (rem / c.duration) * 100))}%`;
         if (skip) skip.classList.toggle('on', c.elapsed() > 3000 / (c.phase?.speed || 1));
       },
       unmount() { cancel(); ctx.cyril.setMood('calm'); },

@@ -24,7 +24,7 @@ export default {
     btn.replaceChildren(btnLabel, btnLeft);
 
     const prompt = h('div.r3w-prompt',
-      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Sends itself at 0s')),
+      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Sends when time\'s up')),
       h(`div.r3w-prompt-t${p.prompt.length > 60 ? '.long' : ''}`, p.prompt));
 
     const tally = h('span.r3w-tally');
@@ -32,6 +32,7 @@ export default {
       h('span.r3w-no', `No.${i + 1}`),
       h('span.r3w-txt', ''),
       h('span.r3w-empty', EMPTY[i % EMPTY.length]),
+      h('span.r3w-nextup', 'Next up'),
     ));
     const pad = h('div.r3w-pad', slots);
     const done = h('div.r3w-done', h('span.r3w-done-stamp', 'Order in'), h('span.r3w-done-s', 'That\'s your four. Lovely.'));
