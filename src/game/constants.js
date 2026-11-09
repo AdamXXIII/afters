@@ -22,7 +22,7 @@ export const DUR = {
   'r3-swipe-max': 65000,
   'r3-reveal-card': 2800,
   'r3-reveal-toast': 3600,
-  podium: 13000,
+  podium: 15500,      // +2.5 s for the Last Orders swing before the cake
   'early-grace': 800,   // pause after everyone has acted before the phase ends
   'skip-after': 1500,   // host can skip intros after this
   squeeze: 10000,       // all but one done writing: the clock drops to this

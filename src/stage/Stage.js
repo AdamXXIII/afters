@@ -16,7 +16,7 @@ export const SHOTS = {
   create: { expr: 'welcome', pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   join: { expr: 'welcome', pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   lobby: { expr: 'welcome', pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { expr: 'welcome', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
+  intro: { expr: 'welcome', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3, maxS: 0.44 },
   write: { expr: 'attentive', pos: [0, 0.27, 1.05], target: [0, 0.21, 0], subject: 'head' },
   vote: { expr: 'sly', pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
   reveal: { expr: 'eager', pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
