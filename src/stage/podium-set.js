@@ -514,7 +514,7 @@ export class PodiumSet {
     for (const s of st.seats.values()) s.group.visible = false;
     st.cake.visible = false;
     // Cyril compères from stage right, a touch smaller so the cakes are the stars
-    if (this.mode === 'end') st.cyrilGoal.set(0.32, TABLE_Y + 0.01 + this.stickH * 0.6, 0.1);
+    if (this.mode === 'end') st.cyrilGoal.set(0.3, TABLE_Y + 0.01 + this.stickH, -0.2);
     else st.cyrilGoal.set(0.265, TABLE_Y + 0.01 + this.stickH, -0.4);
     this.stick.visible = true;
     this.stick.position.set(st.cyril.group.position.x, TABLE_Y, st.cyril.group.position.z);
