@@ -8,9 +8,10 @@ Rules: original name, content and look (genre mechanics are fine; never copy the
 FILES YOU OWN: src/games/forehead/ only (plus your demo entries and the one registry line in src/games/index.js). Need a shared change? Write it in your report.
 
 Write DESIGN section first: AIOS/afters/src/games/forehead/DESIGN.md (rules, phases, timers, scoring, what each phone shows per phase, Cyril lines, content).
-Build it, then LOOP (stop when blind A/B shows no gain for 2 rounds in a row; max 5 rounds):
+THE BAR is real Jackbox Party Pack screenshots. Run `bash scripts/fetch-reference.sh` first (downloads ~114 real Steam screenshots into reference/, see reference/README.md; the Naughty Pack ones are the adult bar). Compare against those directly, never against a description of Jackbox.
+Build it, then LOOP on each screen until ours wins. No round cap: stop only when every screen wins blind.
 1. Check it running: build, `node scripts/shoot.mjs` your screens (also --frames contact sheets if available, --players 3 and 8), look at every PNG. Add your game to scripts/e2e.mjs or write scripts/e2e-forehead.mjs that plays a full game with 3 phones - it must pass.
-2. Fresh harsh critic subagent (Agent tool) with only PNGs + DESIGN quality bar: "brutally harsh AAA art director who shipped Jackbox-calibre games; compare against Jackbox Party Pack and the best phone party games; score 1-10 polish, typography, layout, readability, FUN/charm, motion, consistency; flaws worst first; WOWED or NOT YET; default NOT YET". Also ask a second fresh subagent to play-test the rules on paper as a group of 30-somethings after dinner: "where is it boring, confusing, or slow?"
-3. From round 2: blind A/B with a different fresh critic (neutral filenames, alternate order); revert what loses.
-4. Fix, commit (`git add AIOS/afters` only), push to your branch.
+2. Blind A/B per screen: copy our screenshot and the closest-matching real Jackbox screenshot to neutral names (a.png / b.png, alternate which is ours), crop or letterbox so the framing doesn't give it away. Spawn a FRESH harsh critic subagent (Agent tool) that is told nothing about who made which: "You are a brutally harsh art director for party games. Which of these two looks better as a party game screen: A or B? One word answer first, then the single biggest gap in the loser. Praise is useless." Also ask a separate fresh subagent to play-test the rules on paper as 30-somethings after dinner: "where is it boring, confusing, or slow?"
+3. If the real Jackbox screen wins, fix the single biggest gap and go again. If ours wins, re-test that screen once more against a DIFFERENT reference shot with another fresh critic; it passes only when it wins both.
+4. Commit (`git add AIOS/afters` only) and push to your branch every round.
 Finish: all e2e scripts pass. Write AIOS/afters/reports/forehead.md. Commit, push. Don't edit vault notes outside AIOS/afters.

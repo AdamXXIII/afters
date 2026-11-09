@@ -1,3 +1,5 @@
 node_modules
 dist
 shots
+reference/*.jpg
+reference/urls-*.txt
