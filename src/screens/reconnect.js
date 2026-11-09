@@ -5,30 +5,12 @@ import './overlays.css';
 import './reconnect.css';
 import { h, button, onTap } from '../ui/components.js';
 import { AVATARS } from '../game/constants.js';
+import { SHOTS } from '../stage/Stage.js';
+
+// Close on the real 3D Cyril, framed in the top 40% above the panel.
+SHOTS['rc-host'] ||= { pos: [0, 0.3, 1.05], target: [0, 0.17, 0] };
 
 const HOLD_MS = 90000;
-
-function candleSvg() {
-  return `<svg viewBox="0 0 64 96" aria-hidden="true">
-    <defs>
-      <radialGradient id="rcGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFC86B" stop-opacity=".7"/><stop offset="1" stop-color="#FFC86B" stop-opacity="0"/></radialGradient>
-      <linearGradient id="rcWax" x1="0" x2="1"><stop offset="0" stop-color="#E9D7B8"/><stop offset=".45" stop-color="#FBF1DE"/><stop offset="1" stop-color="#DCC6A2"/></linearGradient>
-      <linearGradient id="rcBrass" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#E9C779"/><stop offset="1" stop-color="#A87C2A"/></linearGradient>
-    </defs>
-    <circle class="rc-glow" cx="32" cy="20" r="22" fill="url(#rcGlow)"/>
-    <path class="rc-flame" d="M32 6c3 6 7 9 7 15a7 7 0 0 1-14 0c0-5 4-8 7-15z" fill="#FFC86B"/>
-    <path class="rc-flame-core" d="M32 15c1.5 3 3 4.5 3 7a3 3 0 0 1-6 0c0-2.5 1.5-4 3-7z" fill="#FFF4D6"/>
-    <path d="M32 27v6" stroke="#2B1D18" stroke-width="2" stroke-linecap="round"/>
-    <path d="M17 34q15-4 30 0v42H17z" fill="url(#rcWax)"/>
-    <path d="M22 34v9a2.5 2.5 0 0 0 5 0v-9M38 34v14a2.5 2.5 0 0 0 5 0V34" fill="#FBF1DE"/>
-    <g class="rc-eyes"><circle cx="26.5" cy="52" r="4.2" fill="#FFFDF7"/><circle cx="37.5" cy="52" r="4.2" fill="#FFFDF7"/><circle class="rc-pupil" cx="25.5" cy="52.6" r="2.1" fill="#2A1A17"/><circle class="rc-pupil" cx="36.5" cy="52.6" r="2.1" fill="#2A1A17"/></g>
-    <path d="M22.5 47.5q3-2.6 6.5-3M41.5 47.5q-3-2.6-6.5-3" stroke="#7A4A2A" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <path d="M28.5 60q3.5 2.6 7 0" stroke="#7A1E2C" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <path d="M26 66l6 3 6-3-6 3z M26 66v6l6-3zM38 66v6l-6-3z" fill="#7A1E2C"/>
-    <ellipse cx="32" cy="80" rx="22" ry="5" fill="url(#rcBrass)"/>
-    <rect x="10" y="76" width="44" height="6" rx="3" fill="url(#rcBrass)"/>
-  </svg>`;
-}
 
 export default {
   id: 'reconnect',
@@ -42,7 +24,11 @@ export default {
     const bubbles = document.getElementById('bubbles');
     if (bubbles) bubbles.style.visibility = 'hidden';
     // the gear and the game behind belong to the paused show; one clock on screen at a time
-    const hideEls = ['topbar', 'strip'].map((id) => document.getElementById(id)).filter(Boolean);
+    const hideEls = ['topbar', 'strip', 'show', 'sheet', 'rail', 'fx'].map((id) => document.getElementById(id)).filter(Boolean);
+    const st = ctx.stage;
+    const prev = { shot: st?.shotName, layout: st?.layout };
+    if (st) { st.setLayout('split', { instant: ctx.frozen }); st.setShot('rc-host', { duration: 900, instant: ctx.frozen }); }
+    ctx.cyril?.setMood?.('hurry');
     hideEls.forEach((el) => { el.style.visibility = 'hidden'; });
     document.body.classList.add('rc-paused');
 
@@ -65,12 +51,11 @@ export default {
       setTimeout(() => { if (Date.now() - armed >= 2900) { leave.textContent = 'Leave the table'; leave.classList.remove('armed'); } }, 3000);
     });
     const art = h('div.rc-art',
-      h('div.rc-candle', { html: candleSvg() }),
       h('div.rc-card', { style: { '--pc': colour } }, h('span.rc-card-k', 'Reserved'), h('span.rc-card-v', me?.name || 'You')),
     );
     const quote = h('p.rc-quote', '“I’ve kept your seat warm. Literally.”', h('span', '— Cyril'));
     const box = h('div.rc-box', { role: 'alertdialog', 'aria-live': 'assertive', 'aria-labelledby': 'rc-title' },
-      h('span.rc-fold'), leave, eyebrow, title, body, h('div.rc-hold', held, bar), quote, h('div.rc-actions', retry, retryNote));
+      eyebrow, title, body, h('div.rc-hold', held, bar), quote, h('div.rc-actions', retry, retryNote, leave));
     title.id = 'rc-title';
     overlay.append(h('div.dim.rc-dim', h('div.rc-stagearea', art), box));
 
@@ -85,7 +70,7 @@ export default {
       bar.classList.toggle('hurry', s <= 15);
       bar.style.setProperty('--k', (left / HOLD_MS).toFixed(4));
       const key = `${lost}`;
-      if (!lost) retryNote.textContent = `Knocking again by ourselves in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
+      if (!lost) retryNote.textContent = `Knocking again in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
       if (key === lastState) return;
       lastState = key;
       box.classList.toggle('lost', lost);
@@ -95,7 +80,7 @@ export default {
         ? 'Check your Wi-Fi or signal, then try again. If the host has left, the table may have closed.'
         : 'Finding the table again. Your seat and your score are safe.';
       if (!retry.disabled) retry.textContent = lost ? 'Try again' : 'Try again now';
-      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : `Knocking again by ourselves in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
+      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : `Knocking again in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
     };
     paint(ctx);
     const tick = setInterval(() => paint(ctx), 250);
@@ -104,6 +89,9 @@ export default {
       if (bubbles) bubbles.style.visibility = '';
       hideEls.forEach((el) => { el.style.visibility = ''; });
       document.body.classList.remove('rc-paused');
+      ctx.cyril?.setMood?.('calm');
+      if (st && prev.layout) st.setLayout(prev.layout);
+      if (st && prev.shot) st.setShot(prev.shot, { duration: 700 });
     } };
   },
 };

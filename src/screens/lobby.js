@@ -13,7 +13,7 @@ import { TABLE_Y, seatAngle } from '../stage/props.js';
 
 // Own camera: lower and further back than the shared 'lobby' shot, so the far arc of chairs sits
 // in the middle of the show strip under the code placard instead of hiding behind it.
-SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.53, -0.6] };
+SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.56, -0.6] };
 
 const LOBBY_SCALE = 1.75;
 
@@ -32,6 +32,13 @@ const FULL = lobbySlots(8);
 const FREE_SLOTS = [FULL[3], FULL[4], FULL[2], FULL[5], FULL[1], FULL[6], FULL[0], FULL[7]];
 const AVATAR_NAMES = ['Jelly', 'Sprout', 'Teacup', 'Cheese', 'Pepper', 'Pudding', 'Egg', 'Bourbon'];
 const CYRIL_SCALE = 1.5;
+const HOST_LINES = {
+  3: 'Three. Intimate. Someone will have to laugh at everything.',
+  4: 'Four. Like a bridge club, but louder. Ring when ready.',
+  5: 'Five. A respectable number. Nobody has to share a fork.',
+  6: 'Six. Lovely. I\'ll need a bigger tablecloth.',
+  7: 'Seven. One more and I fetch the wobbly chair.',
+};
 const CYRIL_FWD = 0.3;
 
 // Cyril greets each new arrival by name (his voice: short, dry, never mean to a player).
@@ -132,7 +139,7 @@ export default {
 
     // host controls: two compact pills
     const adultPill = h('button.lb-pill.lb-switchpill', { type: 'button', role: 'switch', 'aria-checked': 'false' },
-      h('span.lb-pill-txt', h('span.lb-pill-k', 'Adult table'), h('span.lb-pill-s', 'Clean words')), h('span.lb-switch', h('i')));
+      h('span.lb-pill-txt', h('span.lb-pill-k', 'Rude words'), h('span.lb-pill-s', 'Filtered')), h('span.lb-switch', h('i')));
     onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
     const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
       h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')),
@@ -149,7 +156,11 @@ export default {
     const BELL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a1.3 1.3 0 0 1 1.3 1.3v.6a6 6 0 0 1 4.7 5.9v4.2l1.6 2.3H4.4L6 15.2V11a6 6 0 0 1 4.7-5.9v-.6A1.3 1.3 0 0 1 12 3.2z" fill="currentColor"/><circle cx="12" cy="20" r="1.9" fill="currentColor"/></svg>';
     const setStart = (label, bell) => { startBtn.innerHTML = ''; if (bell) startBtn.append(h('span.lb-bell', { html: BELL })); startBtn.append(h('span', label)); };
     const guestInfo = h('div.lb-info');
-    const waitAv = h('span.lb-wait-av');
+    const waitAv = h('button.lb-wait-av', { type: 'button', 'aria-label': 'Fidget' });
+    onTap(waitAv, () => {
+      ctx.stage.hop?.(ctx.meId);
+      waitAv.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-12deg) scale(1.1)' }, { transform: 'rotate(9deg)' }, { transform: 'rotate(0)' }], { duration: 420, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    }, { sound: 'select', buzz: 'tap' });
     const waitCard = h('div.lb-wait', waitAv,
       h('span.lb-wait-col', h('span.lb-wait-txt'), h('span.lb-wait-sub')),
       h('span.lb-dots', h('i'), h('i'), h('i')));
@@ -216,19 +227,20 @@ export default {
         items.push({ el, w, x: Math.max(w / 2 + 6, Math.min(showW - w / 2 - 6, p.x)), y: p.y });
       });
       items.sort((a, b) => a.x - b.x);
-      const rowEnd = [];
-      for (const it of items) {
-        // two rows; if both are blocked, nudge the card along the row with the most room
-        let row = [0, 1, 2].find((r) => rowEnd[r] == null || it.x - it.w / 2 >= rowEnd[r] + 4);
-        if (row == null) {
-          row = [0, 1, 2].reduce((a, r) => (rowEnd[r] < rowEnd[a] ? r : a), 0);
-          it.x = Math.min(showW - it.w / 2 - 4, rowEnd[row] + 4 + it.w / 2);
-        }
+      // Each card stays directly under its own guest. A crowded table alternates two rows (the back
+      // row hangs on a longer cocktail stick), and any leftover overlap is nudged a few px apart.
+      const crowded = items.length > 3;
+      const rowEnd = [-1e9, -1e9];
+      items.forEach((it, rank) => {
+        const row = crowded ? rank % 2 : 0;
+        if (it.x - it.w / 2 < rowEnd[row] + 3) it.x = rowEnd[row] + 3 + it.w / 2;
         rowEnd[row] = it.x + it.w / 2;
+        const dy = row * 28;
         it.el.style.opacity = '';
         it.el.style.zIndex = String(20 - row);
-        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 4 + row * 26).toFixed(1)}px) translate(-50%, 0) rotate(var(--tilt, 0deg))`;
-      }
+        it.el.style.setProperty('--stick', `${dy + 2}px`);
+        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 2 + dy).toFixed(1)}px) translate(-50%, 0) rotate(var(--tilt, 0deg))`;
+      });
       const n = c.players.length;
       emptyEls.forEach((el, i) => {
         if (i < n || c.reduced) { el.style.display = 'none'; return; }
@@ -303,11 +315,11 @@ export default {
       // host controls
       const st = c.settings || {};
       adultPill.setAttribute('aria-checked', String(!!st.adult));
-      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Filter off' : 'Clean words';
+      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Allowed' : 'Filtered';
       const spk = ps.find((p) => p.id === st.speakerId);
       guestInfo.replaceChildren(
-        h('span.lb-info-i', h('span.lb-info-k', 'Words'), h('span.lb-info-v', st.adult ? 'Anything goes' : 'Clean')),
-        h('span.lb-info-i', h('span.lb-info-k', 'Music'), h('span.lb-info-v', spk ? (spk.id === meId ? 'Your phone' : `${spk.name}\u2019s phone`) : 'Off')));
+        h('span.lb-info-i', h('span.lb-info-k', 'Rude words'), h('span.lb-info-v', st.adult ? 'Allowed' : 'Filtered')),
+        h('span.lb-info-i', h('span.lb-info-k', 'Music from'), h('span.lb-info-v', spk ? (spk.id === meId ? 'My phone' : spk.name) : 'Off')));
       speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : spk ? spk.name : 'Off';
 
       startBtn.disabled = n < MIN_PLAYERS;
@@ -319,11 +331,11 @@ export default {
         : `Waiting on ${host?.name || 'the host'}`;
       waitCard.querySelector('.lb-wait-sub').textContent = n < MIN_PLAYERS
         ? 'Share the code. Fold a napkin swan.'
-        : 'They\u2019ll ring the bell. Sit tight.';
-      if (host && waitAv.dataset.av !== String(host.avatar)) {
-        waitAv.dataset.av = String(host.avatar);
-        waitAv.style.setProperty('--pc', AVATARS[host.avatar]?.colour || '#7A4A2A');
-        waitAv.replaceChildren(thumbFor(host.avatar));
+        : `Tap your ${AVATAR_NAMES[me?.avatar ?? 0].toLowerCase()} to fidget.`;
+      if (me && waitAv.dataset.av !== String(me.avatar)) {
+        waitAv.dataset.av = String(me.avatar);
+        waitAv.style.setProperty('--pc', AVATARS[me.avatar]?.colour || '#7A4A2A');
+        waitAv.replaceChildren(thumbFor(me.avatar));
       }
 
       if (n !== lastCount) {
@@ -333,7 +345,7 @@ export default {
         const line = n >= MAX_PLAYERS ? c.line('lobbyFull')
           : arrived && arrived.id !== meId ? [joinLine(arrived)]
             : n < MIN_PLAYERS ? c.line('lobbyWaiting')
-              : c.isHost ? [n === 3 ? 'Three. Intimate. Someone will have to laugh at everything.' : 'A proper table at last. Ring the bell when you\'re ready.']
+              : c.isHost ? [HOST_LINES[n] || HOST_LINES[5]]
                 : [`We're waiting on ${host?.name || 'the host'}. No pressure. Some pressure.`];
         c.say(line, { hold: 4000, placement: 'above', compact: true });
       }

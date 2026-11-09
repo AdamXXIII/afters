@@ -57,7 +57,7 @@
   position: absolute; left: 50%; top: 70%; transform: translate(-50%, 0);
   display: flex; flex-direction: column; align-items: center; padding: 5px 18px 6px; border-radius: 6px;
   background: linear-gradient(180deg, #E9C779 0%, #C89B3C 48%, #A87C2A 52%, #D8B25E 100%);
-  box-shadow: 0 2px 0 #7A5A1C, 0 8px 18px rgba(20,10,8,.45), inset 0 1px 0 rgba(255,255,255,.55);
+  box-shadow: 0 2px 0 #7A5A1C, 0 3px 2px rgba(20,10,8,.5), 0 14px 22px -4px rgba(20,10,8,.6), inset 0 1px 0 rgba(255,255,255,.55);
   color: #4A3210; text-shadow: 0 1px 0 rgba(255,240,200,.6);
   animation: inPlate 520ms var(--ease-out-back) both; white-space: nowrap;
 }
@@ -67,7 +67,7 @@
 }
 .in-plate::before { left: 6px; } .in-plate::after { right: 6px; }
 .in-plate-k { font: 800 11px/13px var(--f-ui); letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
-.in-plate-v { font: 800 18px/21px var(--f-display); font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0; letter-spacing: .04em; font-variant: small-caps; }
+.in-plate-v { font: 800 21px/24px var(--f-display); font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0; letter-spacing: .04em; font-variant: small-caps; }
 @keyframes inPlate { from { opacity: 0; transform: translate(-50%, 16px) scale(.9); } }
 
 @media (max-height: 760px) {
@@ -83,7 +83,7 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
 .in-face {
   width: 36px; height: 36px; margin: 0 -1px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
   background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--pc) 45%, #FFFBF4), #FFFBF4 75%);
-  box-shadow: 0 0 0 2px var(--c-linen), 0 0 0 3.5px var(--pc), 0 3px 6px rgba(59,31,24,.25);
+  box-shadow: 0 0 0 2px var(--c-linen), 0 0 0 3.5px var(--c-brass), 0 3px 6px rgba(59,31,24,.25);
   animation: inFace 420ms var(--ease-out-back) both;
 }
 .in-face img { width: 100%; height: 100%; object-fit: contain; margin-top: 3px; }
@@ -107,3 +107,5 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
   content: ""; position: absolute; left: -7px; right: -7px; top: -2px; bottom: -3px;
   border: 2px solid var(--c-tomato); border-radius: 50% 46% 52% 48% / 60% 55% 48% 52%; transform: rotate(-3deg); opacity: .85;
 }
+
+.in-faces.many .in-face { width: 30px; height: 30px; }

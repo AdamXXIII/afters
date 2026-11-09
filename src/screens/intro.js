@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { h, onTap } from '../ui/components.js';
 import { AVATARS } from '../game/constants.js';
 import { SHOTS } from '../stage/Stage.js';
+import { seatAngle } from '../stage/props.js';
 import { sayLater } from './common.js';
 
 SHOTS['intro-host'] ||= { pos: [0, 0.4, 2.3], target: [0, 0.6, 0] };
@@ -48,16 +49,15 @@ export default {
     ), 1150 + i * 220, e));
     let thumbs = [];
     try { thumbs = ctx.stage.thumbnails(160); } catch { /* fine without */ }
-    const faces = h('div.in-faces', ctx.players.map((p, i) => beat(h('span.in-face', { style: { '--pc': AVATARS[p.avatar]?.colour || '#7A4A2A' } },
+    const faces = h(`div.in-faces${ctx.players.length > 6 ? '.many' : ''}`, ctx.players.map((p, i) => beat(h('span.in-face', { style: { '--pc': AVATARS[p.avatar]?.colour || '#7A4A2A' } },
       thumbs[p.avatar] ? h('img', { src: thumbs[p.avatar], alt: '' }) : null), 1800 + i * 60, e)));
-    const progress = h('i');
+
 
     const menu = beat(h('div.in-menu', { role: 'group', 'aria-label': 'Tonight\'s menu' },
       h('div.in-eyebrow', h('i'), 'Three courses of comedy', h('i')),
       h('div.in-title', 'Tonight\'s menu'),
       h('ol.in-courses', courses),
       beat(h('div.in-table', h('span.in-table-k', 'Tonight\'s table'), faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1750, e),
-      h('div.in-progress', { 'aria-hidden': 'true' }, progress),
     ), 650, e);
 
     const plate = beat(h('div.in-plate', h('span.in-plate-k', 'Your host'), h('span.in-plate-v', 'Cyril Waxley')), 200, e);
@@ -73,6 +73,35 @@ export default {
 
     ctx.cyril.react('delight');
 
+    // Tonight's table, in 3D: the guests gather either side of Cyril (two little rows each side),
+    // so the faces on the menu are also sitting at the table. Restored to their seats on unmount.
+    const flank = (n) => {
+      const out = [];
+      for (let i = 0; i < n; i++) {
+        const side = i % 2 === 0 ? -1 : 1;
+        const k = Math.floor(i / 2);              // 0..3 per side
+        const back = k % 2 === 1;
+        const x = side * (0.26 + Math.floor(k / 2) * 0.1 + (back ? 0.05 : 0));
+        out.push([x, back ? -0.22 : -0.02]);
+      }
+      return out;
+    };
+    const spots = flank(ctx.players.length);
+    const seatGuests = (c, dt) => {
+      const st = c.stage;
+      const kk = c.frozen ? 1 : Math.min(1, dt * 5);
+      c.players.forEach((p, i) => {
+        const s = st.seats?.get?.(p.id);
+        if (!s) return;
+        const [x, z] = spots[i];
+        s.group.position.x += (x - s.group.position.x) * kk;
+        s.group.position.z += (z - s.group.position.z) * kk;
+        s.group.rotation.y += (-x * 1.2 - s.group.rotation.y) * kk;
+        const sc = s.group.scale.x;
+        s.group.scale.setScalar(sc + (0.85 - sc) * kk);
+      });
+    };
+
     // the nameplate is screwed to the front of Cyril's brass holder
     const tmp = new THREE.Vector3();
     const place = (c) => {
@@ -85,14 +114,22 @@ export default {
     };
     place(ctx);
     const cancel = sayLater(ctx, ctx.line('intro'), { delay: 250, hold: 2000, placement: 'above' });
-    const dur = ctx.duration || 6000;
-    const frame = (c) => {
+    const frame = (c, dt = 0.016) => {
       place(c);
-      const k = Math.max(0, Math.min(1, c.elapsed() / dur));
-      progress.style.transform = `scaleX(${k.toFixed(4)})`;
+      seatGuests(c, dt);
       if (skip) skip.classList.toggle('on', c.elapsed() > 3000 / (c.phase?.speed || 1));
     };
     frame(ctx);
-    return { frame, unmount: cancel };
+    return {
+      frame,
+      unmount: () => {
+        cancel();
+        for (const s of ctx.stage.seats?.values?.() || []) {
+          s.group.scale.setScalar(1);
+          if (s.home) { s.group.position.x = s.home.x; s.group.position.z = s.home.z; }
+          if (s.seat != null) s.group.rotation.y = -seatAngle(s.seat);
+        }
+      },
+    };
   },
 };
