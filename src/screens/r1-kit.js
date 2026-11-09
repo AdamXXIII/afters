@@ -149,6 +149,8 @@ export const R1_LINES = {
     'The people have chosen. Frankly, I agree with them.',
     'Well plated. The other one was… also food.',
   ],
+  house: ['My half-vote, cast with total confidence. You\'re welcome.'],
+  voter: ['Vote with your heart. Or your stomach. Same thing at this hour.'],
   novotes: ['Nobody voted. I\'ll assume you were all chewing.'],
   scores: [
     'Somebody\'s leading. Somebody isn\'t. I love them all equally. Nearly.',

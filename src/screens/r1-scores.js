@@ -4,7 +4,7 @@
 import './r1.css';
 import { h } from '../ui/components.js';
 import { ICONS } from '../ui/icons.js';
-import { avatarDisc, countTo, coursePips, R1_ICONS, R1_LINES, pickLine } from './r1-kit.js';
+import { avatarDisc, countTo, R1_ICONS, R1_LINES, pickLine } from './r1-kit.js';
 
 const ord = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'}`;
 const rankHtml = (n) => { const o = ord(n); return `${n}<sup>${o.slice(String(n).length)}</sup>`; };
@@ -34,9 +34,9 @@ export default {
         bar,
         h('span.r1-row-rank', { html: rankHtml(animate ? (r.prevRank ?? 0) + 1 : rank) }),
         avatarDisc(pl, { size: 38 }),
-        h('span.r1-row-name', pl?.name || '?', r.id === ctx.meId ? h('span.r1-you', 'you') : null, tied(r) ? h('span.r1-joint', 'joint') : null),
+        h('span.r1-row-name', pl?.name || '?', r.id === ctx.meId ? h('span.r1-you', 'you') : null),
         move ? h(`span.r1-row-move${move > 0 ? '.up' : '.down'}`, { html: move > 0 ? R1_ICONS.up : R1_ICONS.down }, String(Math.abs(move))) : null,
-        h('span.r1-row-right', r.delta > 0 && (r.prev ?? 0) > 0 && !animate ? h('span.r1-row-delta', `+${r.delta}`) : null, score),
+        h('span.r1-row-right', r.delta > 0 && !animate ? h('span.r1-row-delta', `+${r.delta}`) : null, score),
         rank === 1 ? h('span.r1-row-crown', { html: ICONS.crown }) : null);
       el.scoreEl = score; el.bar = bar; el.rankEl = el.querySelector('.r1-row-rank');
       els.set(r.id, el);
@@ -46,7 +46,7 @@ export default {
     const many = rows.length > 6;
     show.append(h(`div.r1-scores${many ? '.many' : ''}`,
       h('div.r1-scores-head',
-        h('div.r1-scores-eye', h('span.t-eyebrow', 'The standings'), coursePips(1, 3)),
+        h('div.r1-scores-eye', h('span.t-eyebrow', 'The standings · course 1 of 3')),
         h('h2.r1-scores-title', 'After course one'),
         h('div.r1-scores-sub', h('span.q', pickLine(R1_LINES.scores, ctx.phase?.seed || 0)), h('span.by', '— Cyril'))),
       board));
@@ -67,7 +67,7 @@ export default {
         }
         rows.forEach((r) => {
           const e = els.get(r.id);
-          if (r.delta > 0 && (r.prev ?? 0) > 0) e.querySelector('.r1-row-right').prepend(h('span.r1-row-delta', `+${r.delta}`));
+          if (r.delta > 0) e.querySelector('.r1-row-right').prepend(h('span.r1-row-delta', `+${r.delta}`));
           e.bar.style.setProperty('--k', String(r.score / top));
           countTo(e.scoreEl, r.prev ?? 0, r.score, { ms: 700 });
         });

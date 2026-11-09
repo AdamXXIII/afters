@@ -77,9 +77,10 @@ export default {
           cards[i].classList.toggle('win', win);
           cards[i].classList.toggle('lose', !win && !tie);
           if (a.bonus) cards[i].append(h('div.r1-rc-clean', h('span', 'Clean plate'), h('b', `+${a.bonus}`)));
+          if (win) cards[i].append(h('div.r1-win-stamp', h('span', a.bonus ? 'Clean' : 'Best'), h('b', 'plate')));
           if (win && a.authorId === ctx.meId) ctx.haptic('win');
         });
-        if (p.outcome === 'tie') wrapCards.append(h('div.r1-heat', h('span', 'Dead heat'), h('b', 'Points shared')));
+        if (p.outcome === 'tie') show.append(h('div.r1-heat', h('span', 'Dead heat'), h('b', 'Points shared')));
         sfx('countup');
       } },
       { at: S(3600), fn: () => {
@@ -88,7 +89,8 @@ export default {
         ctx.cyril.react(mood);
         if (o === 'clean') sfx('fanfare');
         const key = { clean: 'r1Clean', tie: 'r1Tie', empty: 'r1Empty', novotes: 'r1NoVotes' }[o];
-        ctx.say(key ? ctx.line(key) : [pickLine(R1_LINES.normal, seed, p.index)], { hold: 1500, placement: 'side' });
+        const houseWin = p.answers.some((a) => a.house && a.points > 0);
+        if (o !== 'tie') ctx.say(key ? ctx.line(key) : houseWin ? R1_LINES.house : [pickLine(R1_LINES.normal, seed, p.index)], { hold: 1500, placement: 'side' });
       } },
       { at: S(5600), fn: () => { if (!quiet) cards.forEach((c) => c.classList.add('out')); } },
     ]);

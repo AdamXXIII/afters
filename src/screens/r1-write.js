@@ -41,7 +41,7 @@ export default {
       serveBtn.insertAdjacentHTML('afterbegin', `<span class="r1-btn-ic">${R1_ICONS.cloche}</span>`);
       const promptText = h('div.r1-prompt-text', cur.prompt);
       const card = h('div.r1-prompt-card',
-        h('div.r1-prompt-head', h('span.t-eyebrow', `Plate ${idx + 1} of ${prompts.length}`), pips(cur)),
+        h('div.r1-prompt-head', h('span.t-eyebrow', `Plate ${idx + 1} of ${prompts.length}`)),
         promptText,
         h('div.r1-rival', h('span.r1-rival-ic', { html: R1_ICONS.rival }), h('span', 'A secret rival is answering this too.')));
       function serve() {

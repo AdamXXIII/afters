@@ -4,7 +4,7 @@
 import './r1.css';
 import { h, timerRing, onTap } from '../ui/components.js';
 import { ICONS } from '../ui/icons.js';
-import { avatarDisc, tiltFor, fitText, cyrilNote } from './r1-kit.js';
+import { avatarDisc, tiltFor, fitText, cyrilNote, R1_LINES } from './r1-kit.js';
 
 export default {
   id: 'r1-vote',
@@ -25,7 +25,7 @@ export default {
           h('span.t-eyebrow', `Head to head · ${p.index + 1} of ${p.count}`),
           h('div.r1-tally', h('div.r1-voters', [...discs.values()]), tally))),
         promptText)));
-    fitText(promptText, { max: 26, min: 19, maxH: 104 });
+    fitText(promptText, { max: 27, min: 20, maxH: 100 });
 
     const opts = p.answers.map((a, i) => {
       const yours = author && ctx.priv.mine === a.key;
@@ -51,7 +51,7 @@ export default {
       sheet.append(h('div.r1-vote-sheet.r1-in',
         h('div.r1-vote-ask', h('div.r1-vote-q', 'Which plate goes down better?'), h('div.r1-vote-hint', 'Tap one. Change your mind until the candle burns down.')),
         optA, or, optB,
-        cyrilNote(ctx.line('r1Vote'))));
+        cyrilNote(R1_LINES.voter[0])));
     }
 
     const update = (c) => {
