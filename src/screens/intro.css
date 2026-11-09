@@ -1,0 +1,119 @@
+/* ===== Intro: Tonight's menu ===== */
+.in-wrap {
+  position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 62px);
+  display: flex; justify-content: center; padding: 0 22px; perspective: 900px;
+}
+.in-menu {
+  position: relative; width: 100%; max-width: 340px; padding: 18px 20px 14px;
+  background-color: var(--c-linen); background-image: var(--paper);
+  border-radius: 6px 6px 18px 18px;
+  box-shadow: var(--sh-3), 0 30px 60px rgba(20,10,8,.35), inset 0 0 0 1px rgba(122,74,42,.12);
+  transform-origin: 50% 0; transform: rotate(-1.4deg);
+  animation: inMenu 760ms var(--ease-out-quint) both;
+}
+.in-menu::before { /* double menu-card hairline */
+  content: ""; position: absolute; inset: 8px; border-radius: 3px 3px 12px 12px; pointer-events: none;
+  border: 1px solid rgba(122,30,44,.35); box-shadow: inset 0 0 0 3px var(--c-linen), inset 0 0 0 4px rgba(122,30,44,.18);
+}
+@keyframes inMenu { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: rotate(-1.4deg); } }
+
+.in-eyebrow {
+  text-wrap: nowrap;
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  font: 800 13px/15px var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--c-claret);
+}
+.in-eyebrow i { flex: 1; max-width: 46px; height: 1px; background: currentColor; opacity: .45; }
+.in-title {
+  margin: 4px 0 8px; text-align: center; color: var(--c-ink);
+  font: 800 32px/34px var(--f-display); font-variation-settings: "opsz" 96, "SOFT" 100, "WONK" 1; letter-spacing: -.01em;
+}
+.in-courses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.in-course {
+  display: flex; gap: 12px; align-items: center; padding: 5px 0;
+  border-top: 1px dashed rgba(122,74,42,.28);
+  animation: inCourse 520ms var(--ease-out-quint) both;
+}
+.in-num {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px;
+  background: var(--round); color: var(--c-linen);
+  font: 800 14px/1 var(--f-display); font-variation-settings: "opsz" 24; letter-spacing: .02em;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 2px 4px rgba(59,31,24,.2);
+}
+.in-cbody { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.in-cname { font: 700 22px/26px var(--f-display); font-variation-settings: "opsz" 48, "SOFT" 60; color: var(--c-ink); }
+.in-cwhat { font: 500 16px/20px var(--f-ui); color: var(--c-ink); opacity: .82; }
+@keyframes inCourse { from { opacity: 0; transform: translateX(-14px); } }
+
+.in-table {
+  margin-top: 2px; padding-top: 8px; border-top: 1px solid rgba(122,30,44,.3);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  animation: inCourse 520ms var(--ease-out-quint) both;
+}
+.in-table-k { font: 800 13px/15px var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--c-toffee); }
+.in-table-v { font: 700 24px/25px var(--f-hand); color: var(--c-claret); text-wrap: balance; }
+
+/* engraved brass nameplate on Cyril's holder */
+.in-plate {
+  position: absolute; left: 50%; top: 70%; transform: translate(-50%, 0);
+  display: flex; flex-direction: column; align-items: center; padding: 5px 18px 6px; border-radius: 6px;
+  background: linear-gradient(180deg, #E9C779 0%, #C89B3C 48%, #A87C2A 52%, #D8B25E 100%);
+  box-shadow: 0 2px 0 #7A5A1C, 0 3px 2px rgba(20,10,8,.5), 0 14px 22px -4px rgba(20,10,8,.6), inset 0 1px 0 rgba(255,255,255,.55);
+  color: #4A3210; text-shadow: 0 1px 0 rgba(255,240,200,.6);
+  animation: inPlate 520ms var(--ease-out-back) both; white-space: nowrap;
+}
+.in-plate::before, .in-plate::after { /* screws */
+  content: ""; position: absolute; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFF1C4, #8A6420); box-shadow: 0 0 0 1px rgba(74,50,16,.35);
+}
+.in-plate::before { left: 6px; } .in-plate::after { right: 6px; }
+.in-plate-k { font: 800 11px/13px var(--f-ui); letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
+.in-plate-v { font: 800 21px/24px var(--f-display); font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0; letter-spacing: .04em; font-variant: small-caps; }
+@keyframes inPlate { from { opacity: 0; transform: translate(-50%, 16px) scale(.9); } }
+
+@media (max-height: 760px) {
+  .in-cwhat { display: none; }
+  .in-course { padding: 7px 0; }
+}
+
+.in-table-v.long { font-size: 21px; line-height: 22px; }
+/* Cyril's welcome reads in fewer, wider lines here so it never climbs onto the menu */
+body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
+
+.in-faces { display: flex; justify-content: center; margin: 4px 0 1px; }
+.in-face {
+  width: 36px; height: 36px; margin: 0 -1px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--pc) 45%, #FFFBF4), #FFFBF4 75%);
+  box-shadow: 0 0 0 2px var(--c-linen), 0 0 0 3.5px var(--c-brass), 0 3px 6px rgba(59,31,24,.25);
+  animation: inFace 420ms var(--ease-out-back) both;
+}
+.in-face img { width: 100%; height: 100%; object-fit: contain; margin-top: 3px; }
+@keyframes inFace { from { opacity: 0; transform: translateY(8px) scale(.5); } }
+.in-progress { position: absolute; left: 20px; right: 20px; bottom: 3px; height: 4px; border-radius: 3px; background: rgba(200,155,60,.25); overflow: hidden; }
+.in-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #E9C779, var(--c-brass)); transform-origin: 0 50%; box-shadow: 0 0 8px rgba(255,200,107,.6); }
+.in-skip {
+  position: absolute; left: calc(var(--safe-l) + 14px); top: calc(var(--safe-t) + 14px); z-index: 4;
+  appearance: none; border: 0; cursor: pointer; height: 44px; padding: 0 12px 0 16px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(251,244,234,.14); color: var(--c-linen); font: 700 16px/18px var(--f-ui);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); box-shadow: inset 0 0 0 1px rgba(251,244,234,.25);
+  opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity var(--d-small), transform var(--d-small) var(--ease-out-quint);
+}
+.in-skip.on { opacity: 1; pointer-events: auto; transform: none; }
+.in-skip span { width: 16px; height: 16px; display: block; }
+.in-skip svg { width: 100%; height: 100%; display: block; }
+
+.in-me { position: relative; white-space: nowrap; }
+.in-me::after { /* a red-ink ring drawn round your own name */
+  content: ""; position: absolute; left: -7px; right: -7px; top: -2px; bottom: -3px;
+  border: 2px solid var(--c-tomato); border-radius: 50% 46% 52% 48% / 60% 55% 48% 52%; transform: rotate(-3deg); opacity: .85;
+}
+
+.in-faces.many .in-face { width: 30px; height: 30px; }
+
+.in-count { /* brass tab clipped to the top of the menu */
+  position: absolute; right: 18px; top: -13px; padding: 4px 10px 5px; border-radius: 6px;
+  background: linear-gradient(180deg, #E9C779, #C89B3C 55%, #B08530); color: #3E2A0C;
+  font: 800 13px/15px var(--f-ui); letter-spacing: .06em; font-variant-numeric: tabular-nums; white-space: nowrap;
+  box-shadow: 0 2px 0 #7A5A1C, 0 6px 12px rgba(20,10,8,.35), inset 0 1px 0 rgba(255,255,255,.5); transform: rotate(2deg);
+}
+.in-face { background: radial-gradient(circle at 50% 70%, #FFF4E2, #FFFBF4 75%); }

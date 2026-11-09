@@ -1,9 +1,6 @@
 .overlay-root { position: absolute; inset: 0; }
 .dim { position: absolute; inset: 0; background: rgba(42,26,23,.72); display: flex; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn var(--d-small) both; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 .dim-light { background: rgba(42,26,23,.45); justify-content: flex-end; }
-.reconnect-box { display: flex; flex-direction: column; gap: 14px; padding: 26px 22px 18px; width: calc(100% - 32px); max-width: 380px; background: var(--c-linen); background-image: var(--paper); border-radius: var(--r-3); box-shadow: var(--sh-3); color: var(--c-ink); animation: enterUp var(--d-medium) var(--ease-out-quint) both; }
-.reconnect-box .on-dark { color: var(--c-ink); }
-.reconnect-box .btn-ghost.on-dark { --text: var(--c-toffee); }
 .settings-sheet {
   width: 100%; background: var(--c-linen); background-image: var(--paper); border-radius: var(--r-4) var(--r-4) 0 0; box-shadow: var(--sh-3);
   padding: 18px calc(var(--gutter) + var(--safe-r)) max(20px, var(--safe-b)) calc(var(--gutter) + var(--safe-l));
