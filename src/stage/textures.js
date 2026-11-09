@@ -195,3 +195,43 @@ export function paperTexture(size = 128, base = '#FBF4EA') {
   g.putImageData(img, 0, 0);
   return tex(c);
 }
+
+/** Candle wax: vertical drip streaks, faint mottling, a warmer band near the melted top.
+ * Lathe UVs: u wraps around, v runs bottom (0) to top (1). */
+export function waxTexture(w = 256, h = 256) {
+  const c = canvas(w, h);
+  const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, h, 0, 0);
+  grd.addColorStop(0, '#E9D6B8');
+  grd.addColorStop(0.55, '#F3E6CF');
+  grd.addColorStop(0.9, '#F7EBD6');
+  grd.addColorStop(1, '#FBEFD9');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, w, h);
+  // drip streaks from the top edge
+  let seed = 3;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < 26; i++) {
+    const x = rnd() * w; const len = h * (0.12 + rnd() * 0.5); const wd = 2 + rnd() * 6;
+    const sg = g.createLinearGradient(0, 0, 0, len);
+    sg.addColorStop(0, 'rgba(255,248,232,0.55)');
+    sg.addColorStop(1, 'rgba(255,248,232,0)');
+    g.fillStyle = sg;
+    g.beginPath();
+    g.moveTo(x - wd / 2, 0); g.lineTo(x + wd / 2, 0); g.lineTo(x + wd * 0.3, len - wd); g.arc(x, len - wd, wd * 0.3, 0, Math.PI); g.closePath();
+    g.fill();
+  }
+  // soft mottling
+  const img = g.getImageData(0, 0, w, h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const n = (Math.sin(x * 0.11 + Math.sin(y * 0.05) * 3) + Math.sin(y * 0.07 + x * 0.02)) * 2.2 + (rnd() - 0.5) * 3;
+      img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n * 0.8;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  const t = tex(c);
+  t.wrapS = THREE.RepeatWrapping;
+  return t;
+}

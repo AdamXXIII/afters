@@ -2,7 +2,7 @@
 // Build: merged wax body (1 draw call) + flame shader + eyes/brows/mouth/bow tie + brass holder.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { radialTexture } from './textures.js';
+import { radialTexture, waxTexture } from './textures.js';
 
 const WAX = '#F3E6CF';
 const CLARET = '#7A1E2C';
@@ -114,7 +114,7 @@ export class Cyril {
   }
 
   _build() {
-    const wax = new THREE.MeshStandardMaterial({ color: WAX, roughness: 0.55, emissive: new THREE.Color('#FFC890'), emissiveIntensity: 0.1 });
+    const wax = new THREE.MeshStandardMaterial({ color: '#FFFFFF', map: waxTexture(), roughness: 0.5, emissive: new THREE.Color('#FFC890'), emissiveIntensity: 0.1 });
     // Fake subsurface: the wax glows more near the flame (emissive ramps with height).
     wax.onBeforeCompile = (sh) => {
       sh.vertexShader = sh.vertexShader
@@ -122,7 +122,13 @@ export class Cyril {
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWaxY = position.y;');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying float vWaxY;')
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.55, 2.2, smoothstep(0.02, 0.245, vWaxY));');
+        .replace('#include <emissivemap_fragment>', [
+          '#include <emissivemap_fragment>',
+          'totalEmissiveRadiance *= mix(0.45, 1.7, smoothstep(0.02, 0.245, vWaxY));',
+          // wax translucency: light bleeds through the silhouette edges, warmest near the flame
+          'float waxFres = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.2);',
+          'totalEmissiveRadiance += vec3(1.0, 0.58, 0.26) * waxFres * mix(0.12, 0.55, smoothstep(0.05, 0.24, vWaxY));',
+        ].join('\n'));
     };
     this.waxMat = wax;
 
@@ -131,18 +137,57 @@ export class Cyril {
       [0.0, 0.0], [0.084, 0.0], [0.0855, 0.006], [0.085, 0.03], [0.0835, 0.09], [0.081, 0.16],
       [0.0785, 0.222], [0.0775, 0.231], [0.0745, 0.2375], [0.069, 0.2405], [0.06, 0.241], [0.05, 0.236], [0.0, 0.232],
     ].map(([x, y]) => new THREE.Vector2(x, y));
-    const body = new THREE.LatheGeometry(prof, 48);
-    const dish = new THREE.TorusGeometry(0.07, 0.012, 8, 32);
+    const body = new THREE.LatheGeometry(prof, 64);
+    {
+      // hand-poured, not machined: gentle lumps, and the top slumps a touch toward the back
+      const pos = body.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i); const y = pos.getY(i); const z = pos.getZ(i);
+        const a = Math.atan2(x, z);
+        const k = 1 + 0.01 * Math.sin(a * 3 + y * 18) + 0.006 * Math.sin(a * 7 + 1.3) * (y / 0.24);
+        pos.setX(i, x * k); pos.setZ(i, z * k);
+        if (y > 0.2) pos.setY(i, y - Math.max(0, -Math.cos(a)) * 0.006 * ((y - 0.2) / 0.04));
+      }
+    }
+    const dish = new THREE.TorusGeometry(0.07, 0.011, 8, 48);
     dish.rotateX(-Math.PI / 2);
-    dish.scale(1, 0.6, 1);
-    dish.translate(0, 0.236, 0);
+    dish.scale(1, 0.55, 1);
+    dish.translate(0, 0.235, 0);
     const parts = [body, dish];
+    // lumpy melted rim
+    for (let i = 0; i < 11; i++) {
+      const a = (i / 11) * Math.PI * 2 + Math.sin(i * 2.1) * 0.2;
+      const r = 0.008 + 0.005 * Math.abs(Math.sin(i * 1.7));
+      const b = new THREE.SphereGeometry(r, 10, 8);
+      b.scale(1.6, 0.7, 1.1);
+      b.rotateY(a);
+      b.translate(Math.sin(a) * 0.073, 0.238 + Math.sin(i * 3.3) * 0.002, Math.cos(a) * 0.073);
+      parts.push(b);
+    }
     const drips = [[20, 0.009, 0.05], [95, 0.011, 0.07], [160, 0.008, 0.035], [230, 0.012, 0.06], [300, 0.01, 0.045]];
     for (const [deg, r, len] of drips) parts.push(this._dripGeo(deg, r, len));
-    const merged = mergeGeometries(parts.map((g) => g.toNonIndexed()), false);
+    const merged = mergeGeometries(parts.map((g) => { const n = g.toNonIndexed(); n.deleteAttribute('uv'); return n; }), false);
+    // cylindrical UVs so the drip streaks run down from the rim on every part
+    {
+      const pos = merged.attributes.position;
+      const uv = new Float32Array(pos.count * 2);
+      for (let i = 0; i < pos.count; i++) {
+        uv[i * 2] = Math.atan2(pos.getX(i), pos.getZ(i)) / (Math.PI * 2) + 0.5;
+        uv[i * 2 + 1] = pos.getY(i) / 0.245;
+      }
+      merged.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    }
     merged.computeVertexNormals();
     this.body = new THREE.Mesh(merged, wax);
     this.rig.add(this.body);
+    // molten pool in the dish: glossy, a little amber, lit from the wick
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(0.062, 40), new THREE.MeshStandardMaterial({
+      color: '#F4D9A8', roughness: 0.12, emissive: new THREE.Color('#FFB866'), emissiveIntensity: 0.35, transparent: true, opacity: 0.92,
+    }));
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.y = 0.2345;
+    this.rig.add(pool);
+    this.poolMat = pool.material;
 
     // Tally drips (sad reaction): grow one per sad moment, persistent
     this.tally = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.009, 0.04, 4, 8), wax, 12);
@@ -173,6 +218,25 @@ export class Cyril {
     this.flame.scale.set(0.75, 1.8, 0.75);
     this.flame.position.y = 0.046;
     this.flamePivot.add(this.flame);
+    // inner core: blue at the root, white-hot, smaller
+    this.coreUniforms = {
+      uTime: this.flameUniforms.uTime, uSway: this.flameUniforms.uSway, uBright: { value: 1.2 },
+      uBase: { value: new THREE.Color('#6F9BFF') }, uMid: { value: new THREE.Color('#FFF8E6') }, uTip: { value: new THREE.Color('#FFE2A0') },
+    };
+    this.core = new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 10), new THREE.ShaderMaterial({
+      uniforms: this.coreUniforms, vertexShader: flameVert, fragmentShader: flameFrag,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    }));
+    this.core.scale.set(0.42, 1.05, 0.42);
+    this.core.position.y = 0.03;
+    this.flamePivot.add(this.core);
+    this.glow = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialTexture({ size: 128, inner: 'rgba(255,200,120,0.9)', mid: 'rgba(255,160,80,0.22)', outer: 'rgba(255,140,60,0)' }),
+      blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.16,
+    }));
+    this.glow.scale.setScalar(0.62);
+    this.glow.position.y = 0.04;
+    this.flamePivot.add(this.glow);
     this.halo = new THREE.Sprite(new THREE.SpriteMaterial({
       map: radialTexture({ size: 64, inner: 'rgba(255,214,140,1)', mid: 'rgba(255,184,102,0.35)', outer: 'rgba(255,170,90,0)' }),
       blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.35,
@@ -190,22 +254,26 @@ export class Cyril {
     this.rig.add(this.face);
     const white = new THREE.MeshBasicMaterial({ color: '#FFFDF7' });
     const pupilMat = new THREE.MeshBasicMaterial({ color: '#2A1A17' });
-    const eyeGeo = new THREE.SphereGeometry(0.014, 16, 12);
-    const pupilGeo = new THREE.SphereGeometry(0.007, 12, 8);
+    const eyeGeo = new THREE.SphereGeometry(0.0152, 20, 14);
+    const pupilGeo = new THREE.SphereGeometry(0.0084, 16, 10);
+    const glintGeo = new THREE.SphereGeometry(0.0024, 8, 6);
     this.eyes = [-1, 1].map((side) => {
       const g = new THREE.Group();
       g.position.set(0.026 * side, 0.17, 0.072);
       const w = new THREE.Mesh(eyeGeo, white);
       w.scale.set(1, 1.1, 0.6);
       const p = new THREE.Mesh(pupilGeo, pupilMat);
-      p.position.z = 0.0095;
+      p.position.z = 0.0098;
       p.scale.z = 0.5;
+      const glint = new THREE.Mesh(glintGeo, white);
+      glint.position.set(-0.0028, 0.003, 0.009);
+      p.add(glint);
       g.add(w, p);
       this.face.add(g);
       return { g, pupil: p, side };
     });
     const browMat = new THREE.MeshStandardMaterial({ color: TOFFEE, roughness: 0.7 });
-    const browGeo = new THREE.CapsuleGeometry(0.003, 0.018, 4, 6);
+    const browGeo = new THREE.CapsuleGeometry(0.0036, 0.02, 4, 8);
     browGeo.rotateZ(Math.PI / 2);
     this.brows = [-1, 1].map((side) => {
       const m = new THREE.Mesh(browGeo, browMat);
@@ -213,6 +281,17 @@ export class Cyril {
       this.face.add(m);
       return { m, side };
     });
+    // rosy cheeks, sitting on the curved wax
+    const blushMat = new THREE.MeshBasicMaterial({ map: radialTexture({ size: 64, inner: 'rgba(226,85,59,0.55)', mid: 'rgba(226,85,59,0.22)', outer: 'rgba(226,85,59,0)' }), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+    this.blush = [-1, 1].map((side) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(0.034, 0.022), blushMat);
+      const x = 0.047 * side; const R = 0.0822;
+      m.position.set(x, 0.142, Math.sqrt(R * R - x * x) + 0.0012);
+      m.rotation.y = Math.asin(x / R);
+      this.face.add(m);
+      return m;
+    });
+    this.blushMat = blushMat;
     this.mouthGeo = mouthShapes();
     this.mouthMat = new THREE.MeshBasicMaterial({ color: CLARET, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 });
     this.mouth = new THREE.Mesh(this.mouthGeo.D, this.mouthMat);
@@ -393,6 +472,10 @@ export class Cyril {
     this.flameUniforms.uTip.value.copy(this.tip);
     this.light.intensity = 1.6 * bright * this.flicker * this.flamePivot.scale.x;
     this.halo.material.opacity = 0.35 * bright * this.flicker;
+    this.glow.material.opacity = 0.16 * bright * this.flicker;
+    this.coreUniforms.uBright.value = 1.1 * bright * this.flicker;
+    this.poolMat.emissiveIntensity = 0.3 + 0.15 * this.flicker * bright;
+    this.blushMat.opacity = R && (R.name === 'delight' || R.name === 'smug') ? 1 : R && R.name === 'shock' ? 0.4 : 0.75;
     this.waxMat.emissiveIntensity = (0.16 + 0.1 * clamp01((this.flicker - 0.85) / 0.3)) * bright;
 
     // eyes + pupils

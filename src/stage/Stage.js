@@ -5,20 +5,24 @@ import { Cyril } from './Cyril.js';
 import { buildRoom, buildProps, buildCake, buildThrowables, seatPosition, seatAngle, TABLE_Y } from './props.js';
 import { buildAvatar, animateAvatar, renderAvatarThumbnails } from './avatars.js';
 import { radialTexture } from './textures.js';
+import { contentRects, freeBands } from './framing.js';
 
 // Camera shots: [position], [target]. fov 40 portrait (DESIGN 3.6).
 export const SHOTS = {
+  // subject: what the content-aware framer keeps in the free part of the show layer.
+  //   'cyril' = whole candle, 'head' = face + flame (input strip), 'podium' = cake + winners,
+  //   undefined = classic framing (whole region; the screen's layout is built around it).
   title: { pos: [0, 0.55, 1.1], target: [0, 0.22, 0], orbit: 6 },
-  create: { pos: [0, 0.42, 0.75], target: [0.12, 0.2, 0] },
-  join: { pos: [0, 0.42, 0.75], target: [0.12, 0.2, 0] },
+  create: { pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
+  join: { pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   lobby: { pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { pos: [0, 0.4, 0.8], target: [0, 0.1, 0] },
-  write: { pos: [0, 0.205, 0.42], target: [0, 0.2, 0] },
-  vote: { pos: [0, 0.7, 1.0], target: [0, 0.18, 0] },
-  reveal: { pos: [0, 0.42, 0.95], target: [0, 0.12, 0] },
-  scores: { pos: [0, 0.55, 1.15], target: [0, 0.45, 0] },
-  podiumStart: { pos: [0, 0.75, 1.7], target: [0, 0.2, -0.2] },
-  podium: { pos: [0, 0.5, 1.25], target: [0, 0.2, -0.22] },
+  intro: { pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
+  write: { pos: [0, 0.24, 0.55], target: [0, 0.2, 0], subject: 'head' },
+  vote: { pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
+  reveal: { pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
+  scores: { pos: [0, 0.4, 1.0], target: [0, 0.16, 0], subject: 'cyril' },
+  podiumStart: { pos: [0, 0.75, 1.7], target: [0, 0.2, -0.2], subject: 'podium' },
+  podium: { pos: [0, 0.42, 1.2], target: [0, 0.16, -0.2], subject: 'podium' },
   end: { pos: [0, 0.6, 1.15], target: [0, 0.15, 0] },
 };
 
@@ -79,13 +83,13 @@ export class Stage {
     this.shakeAmp = 0;
 
     // Lights (DESIGN 3.6): key = Cyril's candle; fill hemisphere; cool rim
-    this.hemi = new THREE.HemisphereLight('#FFD9A8', '#3B1F18', 0.35);
+    this.hemi = new THREE.HemisphereLight('#FFD9A8', '#3B1F18', 0.3);
     this.scene.add(this.hemi);
     this.rim = new THREE.DirectionalLight('#9FB6D9', 0.25);
     this.rim.position.set(1.5, 2, -2.5);
     this.scene.add(this.rim);
     // a soft warm room glow so the table edge doesn't fall to black on small screens
-    this.warm = new THREE.PointLight('#FFB070', 2.4, 5, 2);
+    this.warm = new THREE.PointLight('#FFB070', 1.9, 5, 2);
     this.warm.position.set(-0.5, 0.9, 1.3);
     this.scene.add(this.warm);
 
@@ -135,9 +139,17 @@ export class Stage {
     }
 
     // Layout framing: the camera centre sits in the visible show region.
-    this.frame = { h: 1, goal: 1, x: 0, xGoal: 0 }; // fraction of canvas height used as the "full frame"
+    // View frame in CSS px: the camera frustum maps to screen rows [fy, fy+fh], centre column
+    // shifted by xs. Smoothed toward a goal set by the content-aware framer (framing.js).
+    this.view = { fh: 1, fy: 0, xs: 0 };
+    this.viewGoal = null; // {mode:'region', fh, fy, xs} | {mode:'subject', S, Yc, Xc}
+    this.subject = null;
     this.stripPx = 132;
     this.layout = 'show';
+    this._measureAt = 0;
+    this._snapView = true;
+    this._tmpV = new THREE.Vector3();
+    this._viewM = new THREE.Matrix4();
 
     this.frameFns = new Set();
     this._last = performance.now();
@@ -177,6 +189,8 @@ export class Stage {
     this.renderer.setSize(w, h, false);
     this.canvas.style.width = `${w}px`;
     this.canvas.style.height = `${h}px`;
+    if (this.view.fh <= 1) this.view.fh = h;
+    this._measureAt = 0;
     this._applyFrame();
   }
 
@@ -188,6 +202,9 @@ export class Stage {
     if (!s) return;
     this.shotName = name;
     this.orbit = s.orbit || 0;
+    this.subject = s.subject || null;
+    this.shotMaxS = s.maxS || null;
+    this._measureAt = 0;
     const to = { pos: new THREE.Vector3(...s.pos), target: new THREE.Vector3(...s.target) };
     if (instant || this.reduced) {
       this.camPos.copy(to.pos);
@@ -208,17 +225,143 @@ export class Stage {
   setLayout(layout, { stripPx, instant = false } = {}) {
     this.layout = layout;
     if (stripPx) this.stripPx = stripPx;
-    this.frame.goal = layout === 'split' ? 0.4 : layout === 'input' ? this.stripPx / Math.max(1, this.h) : 1;
-    // input strip: Cyril's head sits in the left slot (centre ~56 px from the left edge)
-    this.frame.xGoal = layout === 'input' ? (this.w / 2 - 58) / Math.max(1, this.w) : 0;
-    if (instant) { this.frame.h = this.frame.goal; this.frame.x = this.frame.xGoal; this._applyFrame(); }
+    this._measureAt = 0; // re-measure the free space on the next frame
+    if (instant) this._snapView = true;
+  }
+
+  _safeTop() {
+    if (!this._probe) {
+      this._probe = document.createElement('div');
+      this._probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+      document.body.append(this._probe);
+    }
+    return this._probe.offsetHeight || 0;
+  }
+
+  /** Height of the visible show region for the current layout (CSS px). */
+  _showBottom() {
+    const H = this.h;
+    if (this.layout === 'split') return H * 0.4;
+    if (this.layout === 'input') return this.stripPx + this._safeTop();
+    const rail = document.getElementById('rail');
+    const rr = rail?.getBoundingClientRect();
+    return rr && rr.height > 0 && rr.top > H * 0.5 ? rr.top : H - 72;
+  }
+
+  /** Decide where the subject should sit, from where the HTML content actually is. */
+  _measure() {
+    const W = this.w; const H = this.h;
+    const bottom = this._showBottom();
+    if (this.layout === 'input') {
+      const slot = document.querySelector('#strip .cyril-slot');
+      const r = slot?.getBoundingClientRect();
+      const top = this._safeTop();
+      const sh = bottom - top;
+      if (r && r.width > 4) {
+        const S = Math.min(r.height + 18, sh * 0.92, 124);
+        return { mode: 'subject', subject: 'head', S, Yc: r.top + r.height / 2 + 2, Xc: r.left + r.width / 2 };
+      }
+      return { mode: 'subject', subject: 'head', S: sh * 0.85, Yc: top + sh / 2, Xc: 58 };
+    }
+    if (!this.subject) return { mode: 'region', fh: bottom, fy: 0, xs: 0 };
+    const top = this._safeTop() + 8;
+    let rects = [];
+    try {
+      rects = contentRects([document.getElementById('show'), document.getElementById('topbar')]);
+    } catch (e) { rects = []; }
+    const maxS = (this.shotMaxS || (this.layout === 'split' ? 0.27 : 0.36)) * H;
+    const minS = this.layout === 'split' ? 104 : 128;
+    const tryCol = (cx, half) => freeBands(rects, top, bottom, cx - half, cx + half)[0];
+    const fitIn = (band, Xc) => {
+      // Tall band: Cyril sits low, leaving headroom for his speech bubble above.
+      if (band.h > maxS + 110) return { S: maxS, Yc: band.bottom - maxS / 2 - 6, Xc };
+      const S = Math.min(maxS, band.h - 10);
+      return { S, Yc: band.top + band.h / 2, Xc };
+    };
+    const centre = tryCol(W / 2, 70);
+    let g;
+    if (centre && centre.h >= minS) g = fitIn(centre, W / 2);
+    else {
+      const left = tryCol(W * 0.25, 58);
+      if (left && left.h >= minS) g = fitIn(left, W * 0.25);
+      else {
+        // No room anywhere: peek over the content (flame and eyes in the gap, body behind cards).
+        const b = centre || { top, bottom, h: bottom - top };
+        const S = minS * 1.1;
+        g = { S, Yc: b.top + S / 2 + 2, Xc: W / 2 };
+      }
+    }
+    return { mode: 'subject', subject: this.subject, ...g };
+  }
+
+  /** World points that bound a subject. */
+  _subjectPoints(subject) {
+    const pts = [];
+    const c = this.cyril.group;
+    const add = (obj, x, y, z) => pts.push(obj.localToWorld(this._tmpV.set(x, y, z)).clone());
+    if (subject === 'head') {
+      for (const x of [-0.075, 0.075]) add(c, x, 0.09, 0.08);
+      add(c, 0, 0.4, 0);
+    } else if (subject === 'podium') {
+      const k = this.cake;
+      for (const x of [-0.22, 0.24]) for (const z of [-0.2, 0.2]) add(k, x, 0, z);
+      add(k, 0, 0.36, 0);
+      add(c, -0.09, 0.0, 0.09); add(c, 0, 0.37, 0);
+    } else {
+      for (const x of [-0.095, 0.095]) { add(c, x, 0.0, 0.09); add(c, x, 0.24, 0.0); }
+      add(c, 0, 0.42, 0); // flame tip with room for a ballooning reaction
+    }
+    return pts;
+  }
+
+  /** Turn a subject goal (screen size/centre) into view-frame params for the current camera. */
+  _subjectView(goal) {
+    this._viewM.lookAt(this.camPos, this.camTarget, THREE.Object3D.DEFAULT_UP);
+    this._viewM.setPosition(this.camPos);
+    const inv = this._viewM.clone().invert();
+    let ax0 = Infinity; let ax1 = -Infinity; let ay0 = Infinity; let ay1 = -Infinity;
+    for (const p of this._subjectPoints(goal.subject)) {
+      p.applyMatrix4(inv);
+      const d = Math.max(0.02, -p.z);
+      const ax = p.x / d; const ay = p.y / d;
+      ax0 = Math.min(ax0, ax); ax1 = Math.max(ax1, ax); ay0 = Math.min(ay0, ay); ay1 = Math.max(ay1, ay);
+    }
+    const tanH = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    const f0 = this.h / (2 * tanH);
+    const f = THREE.MathUtils.clamp(goal.S / Math.max(1e-4, ay1 - ay0), f0 * 0.3, f0 * 4);
+    const fh = 2 * f * tanH;
+    const ayc = (ay0 + ay1) / 2; const axc = (ax0 + ax1) / 2;
+    const fy = goal.Yc - fh / 2 + ayc * f;
+    const xs = this.w / 2 - (goal.Xc - axc * f);
+    return { fh, fy, xs };
+  }
+
+  _updateView(dtReal) {
+    const now = performance.now();
+    if (now > this._measureAt) {
+      const g = this._measure();
+      const old = this.viewGoal;
+      const moved = !old || old.mode !== g.mode || old.subject !== g.subject
+        || (g.mode === 'subject' ? Math.abs(g.S - old.S) > 10 || Math.abs(g.Yc - old.Yc) > 10 || Math.abs(g.Xc - old.Xc) > 10
+          : Math.abs(g.fh - old.fh) > 4);
+      if (moved) this.viewGoal = g;
+      this._measureAt = now + 250;
+    }
+    const g = this.viewGoal;
+    if (!g) return;
+    const t = g.mode === 'subject' ? this._subjectView(g) : g;
+    const v = this.view;
+    const k = this._snapView || this.reduced ? 1 : 1 - Math.exp(-dtReal * 6);
+    this._snapView = false;
+    v.fh += (t.fh - v.fh) * k; v.fy += (t.fy - v.fy) * k; v.xs += (t.xs - v.xs) * k;
+    this._applyFrame();
   }
 
   _applyFrame() {
     const W = this.w; const H = this.h;
-    const fh = Math.max(0.05, this.frame.h) * H;
+    const fh = Math.max(20, this.view.fh);
     this.camera.aspect = W / fh;
-    this.camera.setViewOffset(W, fh, this.frame.x * W, 0, W, H);
+    this.camera.setViewOffset(W, fh, this.view.xs, -this.view.fy, W, H);
     this.camera.updateProjectionMatrix();
   }
 
@@ -229,6 +372,21 @@ export class Stage {
   }
 
   cyrilHeadScreen() { return this.project(this.cyril.headWorld()); }
+
+  /** Screen rects of Cyril's face (eyes to mouth), whole body and flame, plus tail anchors. */
+  cyrilScreen() {
+    const g = this.cyril.group;
+    const P = (x, y, z) => this.project(g.localToWorld(new THREE.Vector3(x, y, z)));
+    const box = (pts) => {
+      const xs = pts.map((p) => p.x); const ys = pts.map((p) => p.y);
+      const x = Math.min(...xs); const y = Math.min(...ys);
+      return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+    };
+    const face = box([P(-0.07, 0.1, 0.08), P(0.07, 0.1, 0.08), P(-0.07, 0.215, 0.08), P(0.07, 0.215, 0.08)]);
+    const body = box([P(-0.12, -0.02, 0.1), P(0.12, -0.02, 0.1), P(-0.09, 0.245, 0), P(0.09, 0.245, 0)]);
+    const flame = box([P(-0.03, 0.25, 0), P(0.03, 0.25, 0), P(0, 0.4, 0)]);
+    return { face, body, flame, sideR: P(0.088, 0.17, 0.03), sideL: P(-0.088, 0.17, 0.03), top: P(0, 0.4, 0) };
+  }
 
   // ---------- avatars ----------
 
@@ -342,14 +500,7 @@ export class Stage {
     this.time += dt;
     this.lastRender = now;
 
-    // framing
     const fk = 1 - Math.exp(-dt * 7);
-    if (Math.abs(this.frame.h - this.frame.goal) > 0.0005 || Math.abs(this.frame.x - this.frame.xGoal) > 0.0005) {
-      this.frame.h += (this.frame.goal - this.frame.h) * fk;
-      this.frame.x += (this.frame.xGoal - this.frame.x) * fk;
-      this._applyFrame();
-    }
-
     // camera tween
     if (this.tween) {
       const k = Math.min(1, (now - this.tween.t0) / this.tween.dur);
@@ -371,6 +522,8 @@ export class Stage {
       cam.position.y += (Math.random() - 0.5) * 2 * this.shakeAmp;
     }
     cam.lookAt(this.camTarget);
+    this._updateView(Math.min(0.5, (now - (this._lastView || now)) / 1000));
+    this._lastView = now;
 
     // Cyril
     this.cyril.group.position.lerp(this.cyrilGoal, 1 - Math.exp(-dt * 4));
