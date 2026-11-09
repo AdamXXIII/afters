@@ -24,7 +24,7 @@ export default {
     btn.replaceChildren(btnLabel, btnLeft);
 
     const prompt = h('div.r3w-prompt',
-      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Up to four · go!')),
+      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Sends itself at 0s')),
       h(`div.r3w-prompt-t${p.prompt.length > 60 ? '.long' : ''}`, p.prompt));
 
     const tally = h('span.r3w-tally');

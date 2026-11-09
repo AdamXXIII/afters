@@ -35,7 +35,8 @@ export default {
     const fill = h('i');
     const secs = h('b', '');
     const soon = h('div.r3i-soon', h('span.r3i-soon-t', 'First orders in ', secs), h('span.r3i-soon-bar', fill));
-    const wrap = h('div.r3i-wrap', card, soon);
+    card.append(soon);
+    const wrap = h('div.r3i-wrap', card);
     show.append(wrap);
 
     // host skip (after 3 s), copied from common.hostSkip so it can be styled for this card

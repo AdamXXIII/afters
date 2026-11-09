@@ -124,12 +124,13 @@ export default {
         h(`div.r3s-text${card.text.length > 28 ? '.long' : ''}`, card.text),
         mine ? h('div.r3s-skip', 'Modesty, please. Skipping this one.') : null,
         h('div.r3s-fuse', fuse),
-        mine ? null : h('div.r3s-sides', h('span', '‹ pass'), h('span', 'cheers ›')),
+        mine || i > 1 ? null : h('div.r3s-sides', h('span', '‹ pass'), h('span', 'cheers ›')),
         h('span.r3s-stamp.yes', 'Cheers!'),
         h('span.r3s-stamp.no', 'Pass'),
       );
-      const ghosts = [h('div.r3s-ghost.g2'), h('div.r3s-ghost.g1')];
-      area.replaceChildren(...(i < deck.length - 1 ? ghosts : ghosts.slice(1)), cardEl);
+      const rest = deck.length - 1 - i;
+      const ghosts = [h('div.r3s-ghost.g3'), h('div.r3s-ghost.g2'), h('div.r3s-ghost.g1')].slice(3 - Math.min(3, rest));
+      area.replaceChildren(...ghosts, cardEl);
       if (mine) quip('mine', 'Yours. I\'ll look away.');
       if (decided !== undefined) {
         cardEl.remove();
@@ -176,7 +177,7 @@ export default {
       if (i !== idx) showCard(i);
       const k = Math.min(1, (e % p.perCard) / p.perCard);
       fuse.style.width = `${(1 - k) * 100}%`;
-      cardEl?.classList.toggle('hurry', k > 0.7);
+      cardEl?.classList.toggle('hurry', k > 0.75);
     };
     frame(ctx);
     return { frame, update: () => renderGlasses(), unmount: cancel };

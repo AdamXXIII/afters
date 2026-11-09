@@ -5,7 +5,7 @@ import './r3.css';
 import { h, chip } from '../ui/components.js';
 import { glassSvg, clinkSvg, r3Timeline, sayIfFresh, countTo } from './r3-art.js';
 
-const TOAST_LINE = ['Splendid. Raise them high.'];
+
 const DRY_LINE = ['Not a single glass raised. A dry table. How very sober.'];
 
 export default {
@@ -30,7 +30,7 @@ export default {
     const heroSlot = h('div.r3r-hero');
     const ladder = h('div.r3r-ladder');
     const stage = h('div.r3r-stage', heroSlot, ladder);
-    show.append(header, stage);
+    show.append(h('div.r3r-scrim'), header, stage);
 
     if (!top.length) {
       heroSlot.append(h('div.r3r-card.r3r-emptycard', h('div.r3r-text', 'Nobody ordered anything.'), h('div.r3r-sub', 'The bar is closed. Cyril is relieved.')));
@@ -168,20 +168,25 @@ export default {
         if (meWon) ctx.haptic('win');
       }
       if (!reduced) show.append(confetti(late));
-      cleanups.push(sayIfFresh(ctx, TOAST_LINE, { at: p.toastAt + 700, window: 2600, hold: 1800, placement: 'side' }));
+      const names = top.filter((c) => toastSet.has(c.id)).map((c) => author(c)?.name).filter(Boolean);
+      const uniq = [...new Set(names)];
+      const toastLine = uniq.length > 1
+        ? [`${uniq.slice(0, -1).join(', ')} and ${uniq.at(-1)}! Insufferable, both.`]
+        : [`${uniq[0] || 'The chef'}! Frankly, deserved.`];
+      cleanups.push(sayIfFresh(ctx, toastLine, { at: p.toastAt + 700, window: 2600, hold: 1800, placement: 'side' }));
     } });
 
     function jointHero(cards, late) {
       const shown = cards.slice(0, 4);
-      const minis = shown.map((c) => {
+      const minis = shown.map((c, mi) => {
         const who = author(c);
         const pts = h('span.r3r-pts', `+${200 * c.glasses.length}`);
         cleanups.push(countTo(pts, 200 * c.glasses.length, 200 * c.glasses.length + 1000, 700, { instant: frozen || late > 900, prefix: '+' }));
-        return h('div.r3r-mini',
+        return h('div.r3r-mini', { style: { translate: `0 ${mi % 2 ? 6 : 0}px`, rotate: `${mi % 2 ? 1 : -1}deg` } },
           h(`div.r3r-text.mini${c.text.length > 18 ? '.long' : ''}`, c.text),
           h('div.r3r-mini-g', { html: glassSvg(1) }, h('b', `× ${c.glasses.length}`)),
           h('div.r3r-mini-by', who ? chip(who, { compact: false }) : null),
-          h('span.r3r-stamp', pts));
+          h('span.r3r-stamp', { style: { rotate: `${shown.indexOf(c) % 2 ? 5 : -3}deg` } }, pts));
       });
       const el = h('div.r3r-card.hero.is-toast.joint',
         h('div.r3r-ribbon', h('span.r3r-ribbon-i', { html: clinkSvg() }), h('span', 'Joint toast of the table')),
@@ -197,14 +202,15 @@ export default {
 
     function confetti(late) {
       // tiny folded napkins + gold foil, seeded so every phone throws the same handful
-      const bits = Array.from({ length: 28 }, (_, i) => {
+      const bits = Array.from({ length: 56 }, (_, i) => {
         const napkin = i % 3 === 0;
         const x = (i * 37 + 11) % 100;
         const drift = ((i * 53) % 60) - 30;
         const delay = ((i * 7) % 12) * 0.06;
         const dur = 3.2 + ((i * 13) % 10) / 10;
         const spin = (i % 2 ? 1 : -1) * (360 + ((i * 29) % 360));
-        return h(`i.${napkin ? 'nap' : 'foil'}`, { style: {
+        const kind = napkin ? 'nap' : ['foil', 'foil', 'claret', 'willow', 'mustard'][i % 5];
+        return h(`i.${kind}`, { style: {
           left: `${x}%`, '--dx': `${drift}px`, '--spin': `${spin}deg`, '--s': `${0.7 + ((i * 17) % 6) / 10}`,
           animationDuration: `${dur}s`, animationDelay: `${delay - late / 1000}s`,
         } });
