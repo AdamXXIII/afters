@@ -5,7 +5,7 @@ import { store } from '../util/storage.js';
 import { sanitiseCode } from '../net/roomCode.js';
 import { params } from '../util/params.js';
 import { sayLater } from './common.js';
-import { sheetHead } from './create-namecard.js';
+import { sheetHead, nameCard } from './create-namecard.js';
 
 const LINK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>';
 
@@ -57,10 +57,9 @@ export default {
     const invited = !!params.room;
     if (params.room) params.room.split('').forEach((ch, i) => { if (boxes[i]) boxes[i].value = ch; });
     mark();
+    if (!ctx.frozen) setTimeout(() => (invited ? name.input : boxes.find((b) => !b.value) || name.input).focus({ preventScroll: true }), 650);
 
     const name = textField({ max: 10, placeholder: 'Your name', value: params.name || store.get('name', ''), onSubmit: () => go(), e2e: 'name-input', enterkeyhint: 'go' });
-    name.input.autocapitalize = 'words';
-    name.input.spellcheck = false;
     const seat = button('Take a seat', { onClick: () => go(), e2e: 'take-seat' });
     const shake = () => { row.classList.remove('error'); void row.offsetWidth; row.classList.add('error'); };
     async function go() {
@@ -83,10 +82,9 @@ export default {
     sheet.append(h('div.fd-page.stagger',
       sheetHead(invited ? 'You\'re invited' : 'Join a table', 'What\'s the table code?', () => ctx.go('title')),
       h('div.code-group', row,
-        h('p.code-caption', invited ? 'Filled in from your invite. Just add your name.' : 'Four letters on the host\'s phone. No vowels, so nothing rude.')),
-      name,
-      invited ? null : h('p.fd-hint.fd-hint-mid', h('span.fd-hint-icon', { html: LINK }),
-        h('span', 'Got a link from the host? Tap it and the code ', h('b', 'fills itself in'), '.')),
+        h('p.fd-hint.code-caption', h('span.fd-hint-icon', { html: LINK }),
+          h('span', invited ? 'Filled in from your invite. Just add your name.' : h('span', 'Four letters on the host\'s phone. ', h('b', 'No vowels'), ', so nothing rude.')))),
+      nameCard(name, { kicker: 'Reserved for', tilt: 1.2, compact: true }),
       h('div.fd-actions', seat),
     ));
     return { unmount: sayLater(ctx, ['Mind the step. Code on the door?'], { delay: 500 }) };

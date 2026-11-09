@@ -40,6 +40,6 @@ export default {
       h('p.title-meta', h('span', '3–8 players'), h('i', { 'aria-hidden': 'true' }), h('span', '20 minutes'), h('i', { 'aria-hidden': 'true' }), h('span', 'no TV needed')),
     );
     show.append(h('div.title-scrim', { 'aria-hidden': 'true' }), top, actions);
-    return { unmount: sayLater(ctx, ctx.line('title'), { delay: 1400, hold: 3200 }) };
+    return { unmount: sayLater(ctx, ctx.line('title'), { delay: 1400, hold: 3200, placement: 'side' }) };
   },
 };

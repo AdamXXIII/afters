@@ -6,9 +6,9 @@
 }
 .title-presents {
   margin: 0 0 14px; font-family: var(--f-display); font-style: italic; font-weight: 500;
-  font-size: 17px; line-height: 20px; letter-spacing: .01em; color: var(--c-candle);
+  font-size: 19px; line-height: 22px; letter-spacing: .01em; color: #FFE2AE;
   font-variation-settings: "SOFT" 100, "WONK" 1;
-  text-shadow: 0 1px 10px rgba(42,26,23,.7);
+  text-shadow: 0 1px 2px rgba(42,22,17,.9), 0 2px 14px rgba(42,22,17,.8);
   animation: titleFade 600ms 150ms var(--ease-out-quint) both;
 }
 .title-logo {
@@ -53,7 +53,7 @@
 }
 .title-actions {
   /* the show layer stops above the (hidden) rail; reach past it into the real thumb zone */
-  position: absolute; left: 0; right: 0; bottom: calc(22px - var(--rail-h));
+  position: absolute; left: 0; right: 0; bottom: calc(30px - var(--rail-h));
   display: flex; flex-direction: column; gap: 14px;
   padding: 0 calc(var(--gutter) + 8px + var(--safe-r)) 0 calc(var(--gutter) + 8px + var(--safe-l));
 }
@@ -86,3 +86,10 @@
   .title-flame, .title-halo { animation-duration: 3.4s; }
 }
 :root[data-reduced-motion="1"] .title-flame, :root[data-reduced-motion="1"] .title-halo { animation-duration: 3.4s; }
+
+/* a thin curl of smoke drifting off the logo flame */
+.title-a::after {
+  content: ""; position: absolute; left: 50%; bottom: 128%; width: 10px; height: 34px; margin-left: -3px; border-radius: 50%;
+  border-left: 2px solid rgba(251,244,234,.22); filter: blur(1.2px); animation: titleSmoke 3.4s ease-in-out infinite; pointer-events: none;
+}
+@keyframes titleSmoke { 0% { opacity: 0; transform: translateY(6px) skewX(0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-16px) skewX(-18deg) scaleY(1.3); } }

@@ -22,27 +22,31 @@ export function sheetHead(eyebrow, title, onBack) {
 }
 
 /**
- * A tented place card that mirrors a name field. `field` is a textField() wrap.
- * kicker: the small line above the name ("Reserved for").
+ * A tented place card that IS the name field: you write straight onto it in the players' hand.
+ * `field` is a textField() wrap; its <input> moves inside the card (data-e2e etc. are kept).
  */
-export function nameCard(field, { kicker = 'Reserved for', tilt = -2 } = {}) {
-  const name = h('div.fd-card-name');
-  const card = h('div.fd-card', { style: { '--tilt': `${tilt}deg` }, 'aria-hidden': 'true' },
-    h('div.fd-card-kicker', h('i'), kicker, h('i')),
-    name,
-    h('span.fd-pen', { html: PEN }),
+export function nameCard(field, { kicker = 'Reserved for', tilt = -2, compact = false } = {}) {
+  const input = field.input;
+  input.classList.remove('input');
+  input.classList.add('fd-card-input');
+  input.placeholder = 'Your name';
+  input.autocapitalize = 'words';
+  input.spellcheck = false;
+  const count = field.querySelector('.count');
+  const card = h(`label.fd-card${compact ? '.compact' : ''}`, { style: { '--tilt': `${tilt}deg` } },
+    h('span.fd-card-kicker', { 'aria-hidden': 'true' }, h('i'), kicker, h('i')),
+    input,
+    h('span.fd-pen', { html: PEN, 'aria-hidden': 'true' }),
+    count,
   );
-  const sync = (bump) => {
-    const v = field.input.value.trim();
-    name.textContent = v || 'your name here';
-    name.classList.toggle('empty', !v);
-    if (bump) {
-      card.classList.remove('bump');
-      void card.offsetWidth;
-      card.classList.add('bump');
-    }
-  };
-  field.input.addEventListener('input', () => sync(true));
-  sync(false);
+  input.addEventListener('input', () => {
+    card.classList.remove('bump');
+    void card.offsetWidth;
+    card.classList.add('bump');
+  });
+  card.error = field.error;
+  card.input = input;
+  // field.error() shakes the input; shake the whole card instead
+  field.error = () => { card.classList.remove('error'); void card.offsetWidth; card.classList.add('error'); card.error(); input.classList.remove('error'); };
   return card;
 }

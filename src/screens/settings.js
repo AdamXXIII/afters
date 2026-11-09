@@ -39,7 +39,7 @@ export default {
     const sizes = [1, 1.15, 1.3];
     const seg = h('div.st-seg', { role: 'group', 'aria-label': 'Text size' }, sizes.map((s) => {
       const b = h('button', { type: 'button', 'aria-pressed': String((app.settings.textSize || 1) === s), 'aria-label': `${Math.round(s * 100)}%` },
-        h('span.st-aa', { style: { fontSize: `${[16, 19, 22][sizes.indexOf(s)]}px` } }, 'Aa'));
+        h('span.st-aa', { style: { fontSize: `${[15, 20, 25][sizes.indexOf(s)]}px` } }, 'Aa'));
       onTap(b, () => {
         app.saveSettings({ textSize: s });
         seg.querySelectorAll('button').forEach((x, i) => x.setAttribute('aria-pressed', String(sizes[i] === s)));
@@ -56,8 +56,8 @@ export default {
     }
     const sheet = h('div.settings-sheet.st-sheet', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Settings' },
       h('div.st-grab', { 'aria-hidden': 'true' }),
-      h('div.st-head', h('div', h('div.t-eyebrow', 'House rules'), h('h2.st-title', 'Settings')), close),
-      h('p.st-cyril', h('span.st-cyril-flame', { html: ICON.flame }), h('span', '“Adjust to taste. I’ll be here, quietly melting.”')),
+      h('div.st-head', h('div', h('div.t-eyebrow', 'Settings'), h('h2.st-title', 'House rules')), close),
+      h('div.st-cyril', h('span.st-cyril-flame', { html: ICON.flame }), h('p', 'Adjust to taste. I’ll be here, melting.', h('small', '— Cyril'))),
       h('div.st-group',
         h('div.st-label', 'Sound'),
         h('div.st-card',
@@ -72,7 +72,6 @@ export default {
           h('div.st-row.st-size', h('span.st-ico', { html: ICON.text }), h('span.st-text', h('b', 'Text size'), h('small', 'Bigger words')), seg),
         )),
       leave,
-      h('p.st-foot', h('span.st-foot-flame', { html: ICON.flame }), h('span', 'AFTERS'), h('i'), h('em', 'made for the table')),
     );
     const dim = h('div.dim.dim-light', sheet);
     dim.addEventListener('click', (e) => { if (e.target === dim) ctx.actions.closeOverlay(); });

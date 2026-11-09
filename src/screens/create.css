@@ -21,7 +21,7 @@
 /* the live place card */
 .fd-card {
   --tilt: -2deg;
-  align-self: center; position: relative; width: min(280px, 80%); margin: auto 0;
+  align-self: center; position: relative; width: min(300px, 86%); margin: 6px 0;
   padding: 18px 18px 14px; text-align: center; color: var(--c-ink);
   background-color: var(--c-linen);
   background-image:
@@ -41,15 +41,25 @@
 }
 .fd-card-kicker {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 14px; line-height: 18px; color: var(--c-toffee);
+  font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 16px; line-height: 20px; color: var(--c-toffee);
   font-variation-settings: "SOFT" 100, "WONK" 1;
 }
 .fd-card-kicker i { width: 18px; height: 1px; background: var(--c-brass); }
-.fd-card-name {
-  margin-top: 2px; font-family: var(--f-hand); font-weight: 650; font-size: calc(42px * var(--ts)); line-height: 1.05; color: var(--c-ink);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.05em;
+.fd-card { display: block; cursor: text; }
+.fd-card-input {
+  display: block; width: 100%; margin: 4px 0 0; padding: 0 28px; border: 0; outline: none; background: transparent;
+  text-align: center; font-family: var(--f-hand); font-weight: 650; font-size: calc(44px * var(--ts)); line-height: 1.15; height: 1.2em;
+  color: var(--c-ink); caret-color: var(--c-claret); -webkit-appearance: none; appearance: none;
 }
-.fd-card-name.empty { color: rgba(122,74,42,.62); }
+.fd-card-input::placeholder { color: rgba(122,74,42,.6); }
+.fd-card .count { position: absolute; left: 14px; bottom: 9px; font-size: 13px; font-weight: 700; color: var(--c-toffee); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity var(--d-small); }
+.fd-card:focus-within .count, .fd-card .count.hot { opacity: .9; }
+.fd-card .count.hot { color: var(--c-tomato); }
+.fd-card:focus-within { box-shadow: 0 1px 0 rgba(42,26,23,.10), 0 14px 24px -6px rgba(59,31,24,.36), 0 0 0 4px rgba(224,165,38,.28), inset 0 0 0 1px rgba(122,74,42,.14); }
+.fd-card.error { animation: shake 300ms linear; }
+.fd-card.error::before { border-color: var(--c-tomato); }
+.fd-card.compact { padding: 14px 16px 10px; }
+.fd-card.compact .fd-card-input { font-size: calc(38px * var(--ts)); }
 .fd-card.bump { animation: fdBump 220ms var(--ease-out-back); }
 @keyframes fdBump { 0% { transform: rotate(var(--tilt)) scale(1); } 45% { transform: rotate(calc(var(--tilt) + .8deg)) scale(1.025); } 100% { transform: rotate(var(--tilt)) scale(1); } }
 
@@ -65,21 +75,23 @@
 
 /* small phones and big text: drop the decoration before anything useful */
 @media (max-height: 780px) {
-  .fd-card { padding: 14px 16px 10px; margin: 0; }
-  .fd-card-name { font-size: calc(36px * var(--ts)); }
+  .fd-card { padding: 14px 16px 10px; }
+  .fd-card-input { font-size: calc(36px * var(--ts)); }
 }
 @media (max-height: 700px) { .fd-hint { display: none; } }
 body.kb-open .fd-hint { display: none; }
 
-/* stronger field text for arm's length (scoped to the front door) */
+/* (legacy) stronger field text for arm's length (scoped to the front door) */
 .fd-page .input::placeholder { color: rgba(122,74,42,.82); }
 .fd-page .field .count { font-size: 14px; font-weight: 600; opacity: 0; transition: opacity var(--d-small); }
 .fd-page .field:focus-within .count, .fd-page .field .count.hot { opacity: 1; }
 /* pen nib on the card, writing while the field is focused */
 .fd-pen { position: absolute; right: 14px; bottom: 12px; width: 22px; height: 22px; color: var(--c-claret); opacity: .75; transform: rotate(8deg); }
 .fd-pen svg { width: 100%; height: 100%; }
-.fd-page:focus-within .fd-pen { animation: fdWrite 900ms ease-in-out infinite; }
-.fd-page:focus-within .fd-card::before { border-color: rgba(224,165,38,.9); box-shadow: 0 0 0 3px rgba(224,165,38,.12); }
+.fd-card:focus-within .fd-pen { animation: fdWrite 900ms ease-in-out infinite; }
+.fd-card:focus-within::before { border-color: rgba(224,165,38,.9); box-shadow: 0 0 0 3px rgba(224,165,38,.12); }
 @keyframes fdWrite { 0%,100% { transform: rotate(8deg) translate(0,0); } 50% { transform: rotate(-4deg) translate(-4px,-2px); } }
 .fd-hint { font-size: calc(16px * var(--ts)); }
 .fd-hint-mid { margin: auto 0; }
+.fd-mid { margin: auto 0; display: flex; flex-direction: column; gap: 22px; }
+.fd-mid .fd-card { padding-top: 24px; padding-bottom: 20px; }
