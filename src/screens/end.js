@@ -72,6 +72,7 @@ export default {
         h('h2.end-title', 'Another round?'),
         quote,
         stub,
+        h('p.end-hint', h('b', 'Same again'), ': same seats, fresh questions.'),
         h('div.end-actions',
           button('Same again', { onClick: () => ctx.client.again(), e2e: 'again' }),
           button('New table', { kind: 'secondary', onClick: () => ctx.client.newTable(), e2e: 'new-table' }),
@@ -85,10 +86,11 @@ export default {
         h('div.end-actions',
           h('div.end-wait', h('span.end-glass', { html: glassSvg }),
             h('div.end-wait-text', h('div.t-heading', `${host?.name || 'The host'} is deciding`, h('span.end-dots', h('i'), h('i'), h('i'))),
-              h('div.end-wait-sub', 'Hold your glass.'))),
-          h('div.end-throw', h('span.end-throw-label', 'While you wait, heckle'),
+              h('div.end-wait-sub', 'Same again or new table. Hold your glass.'))),
+          h('div.end-throw', h('span.end-throw-label', 'Heckle while you wait (every phone sees it)'),
             h('div.end-throw-row', ...[['roll', 'Throw a bread roll'], ['rose', 'Throw a rose'], ['applause', 'Applaud'], ['groan', 'Groan']].map(([kind, label]) => {
-              const b = h('button.end-throw-btn.rail-btn', { type: 'button', 'aria-label': label, 'data-e2e': `end-react-${kind}`, html: ICONS[kind] || '' });
+              const b = h('button.end-throw-btn', { type: 'button', 'aria-label': label, 'data-e2e': `end-react-${kind}` },
+                h('span.end-throw-ic.rail-btn', { html: ICONS[kind] || '' }), h('span.end-throw-name', { roll: 'Roll', rose: 'Rose', applause: 'Clap', groan: 'Groan' }[kind]));
               let last = 0;
               onTap(b, () => { const now = Date.now(); if (now - last < 400) return; last = now; ctx.client.react(kind); }, { sound: null });
               return b;

@@ -71,7 +71,7 @@ export default {
           winner?.award ? h('span.fin-award', winner.award.title) : null)));
 
     // --- place cards under 2nd and 3rd
-    const tags = rows.slice(1, 3).map((r, i) => h(`div.fin-tag.r${i + 2}`,
+    const tags = rows.slice(0, 3).map((r, i) => h(`div.fin-tag.r${i + 1}`,
       h('div.fin-tag-name', name(r.id)),
       h('div.fin-tag-score', fmt(r.score))));
 
@@ -93,7 +93,7 @@ export default {
         h('div.fin-foot-line', h('span', 'Tip for Cyril'), h('span.fin-row-dots'), h('span', 'Applause')),
         h('div.fin-foot-line.muted', h('span', 'Wax drips'), h('span.fin-row-dots'), h('span', drips ? String(drips) : 'None, miraculously'))));
 
-    const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
+    const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-dim'), h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
     show.append(root);
 
     // --- beats (fire once, in order; frozen screenshots fire them all at once)
@@ -145,7 +145,7 @@ export default {
       // pin the place cards under their cakes
       const an = set.anchors();
       tags.forEach((el, i) => {
-        const a = an[i + 1]?.foot;
+        const a = an[i]?.foot;
         if (a) el.style.transform = `translate(${a.x.toFixed(1)}px, ${(a.y + 4).toFixed(1)}px) translate(-50%, 0)`;
       });
     };
