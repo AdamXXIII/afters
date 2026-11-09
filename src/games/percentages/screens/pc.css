@@ -685,3 +685,30 @@
 .pc-scores2 { justify-content: flex-end; }
 .pc-scores2-head { margin-bottom: auto; }
 .pc-card-tags { white-space: nowrap; font-size: 22px; }
+
+/* ---------- round 6 (blind A/B): let the room breathe, flat bold colour ---------- */
+.pc-dim { background: linear-gradient(180deg, rgba(10,5,3,.92) 0, rgba(10,5,3,.85) 50%, rgba(10,5,3,0) 72%), radial-gradient(70% 40% at 50% 30%, rgba(255,184,102,.25), transparent); }
+.pc-cardwrap { padding-top: calc(var(--safe-t) + 40px); }
+.pc-card-art .pc-pie { width: 170px !important; height: 170px !important; }
+.pc-card-title { font-size: 66px; }
+/* reveal: only lanes people bet on, full colour */
+.pc-lanes { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+.pc-stamp-s { font-size: 18px; font-weight: 800; }
+/* poll: waiting players stay readable */
+.pc-pollp { opacity: .8; }
+.pc-pollp:not(.in) .pc-av { filter: grayscale(.4); }
+/* bet + sweat: the cut number leads, the bets step back a size */
+.pc-board .pc-bet { min-height: 82px; }
+.pc-board .pc-betlb { font-size: 23px; }
+.pc-cuthero { margin: 4px 0; }
+.pc-cuthero-n { font-size: 84px; text-shadow: 0 3px 0 rgba(122,30,44,.2); }
+.pc-cuthero-l { font-size: 15px; }
+/* standings: flat bold plates on a dark scrim, podium sits low */
+.pc-scores2::before { content: ""; position: absolute; left: -16px; right: -16px; top: 38%; bottom: -10px; background: linear-gradient(180deg, transparent, rgba(10,5,3,.85) 30%); z-index: -1; }
+.pc-pod-col.p1 .pc-pod-block { background: #C0303F; }
+.pc-pod-col.p2 .pc-pod-block { background: #E0A526; }
+.pc-pod-col.p3 .pc-pod-block { background: #6F8B63; }
+.pc-pod-block { box-shadow: inset 0 0 0 3px rgba(255,255,255,.25), 0 8px 0 rgba(0,0,0,.35), 0 18px 30px rgba(0,0,0,.5) !important; }
+.pc-pod-col.p2 .pc-pod-sc, .pc-pod-col.p2 .pc-pod-rank { color: #2A1A17; }
+.pc-pod-sc { color: #fff; }
+.pc-pod-col.p1 .pc-pod-sc { color: #FFD27A; }

@@ -83,7 +83,7 @@ export default {
 function buildLanes(ctx) {
   const p = ctx.payload;
   const kinds = ['mlower', 'lower', 'higher', 'mhigher'];
-  const lanes = kinds.map((k) => {
+  const lanes = kinds.filter((k) => Object.values(p.bets).some((b) => b.bet === k)).map((k) => {
     const ids = Object.keys(p.bets).filter((id) => p.bets[id].bet === k);
     const much = k[0] === 'm'; const down = k.includes('lower');
     const won = ids.length && p.bets[ids[0]].pts > 0;
