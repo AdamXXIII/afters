@@ -23,8 +23,9 @@ export default {
     btn.classList.add('r3w-btn');
     btn.replaceChildren(btnLabel, btnLeft);
 
+    const tag = h('span.r3w-tag', 'Sends when time\'s up');
     const prompt = h('div.r3w-prompt',
-      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), h('span.r3w-tag', 'Sends when time\'s up')),
+      h('div.r3w-prompt-top', h('span.r3w-eyebrow', 'Last orders'), tag),
       h(`div.r3w-prompt-t${p.prompt.length > 60 ? '.long' : ''}`, p.prompt));
 
     const tally = h('span.r3w-tally');
@@ -35,7 +36,8 @@ export default {
       h('span.r3w-nextup', 'Next up'),
     ));
     const pad = h('div.r3w-pad', slots);
-    const done = h('div.r3w-done', h('span.r3w-done-stamp', 'Order in'), h('span.r3w-done-s', 'That\'s your four. Lovely.'));
+    const doneS = h('span.r3w-done-s', 'That\'s your four. Lovely.');
+    const done = h('div.r3w-done', h('span.r3w-done-stamp', 'Order in'), doneS);
     const padWrap = h('div.r3w-pad-wrap',
       h('div.r3w-pad-head', h('span.r3w-pad-title', 'Your order pad'), tally),
       pad, done);
@@ -53,11 +55,23 @@ export default {
     }
     // keep the keyboard up: never let the button steal focus
     btn.addEventListener('pointerdown', (e) => e.preventDefault());
-    sheet.append(prompt, h('div.r3w-entry', field, btn), padWrap, h('div.r3w-tip', h('b', 'Tip: '), 'short and silly beats clever.'));
+    // "That's my lot": done with fewer than four. Never steals focus, so you can still add more.
+    const lot = button('That\'s my lot', { kind: 'secondary', e2e: 'lot', onClick: () => {
+      if (!ctx.client.state.mine.r3.length || ctx.client.state.mine.game?.lot) return;
+      ctx.client.act('lot', {}, { lot: true });
+      ctx.audio.sfx('stamp');
+      ctx.haptic('stamp');
+    } });
+    lot.classList.add('r3w-lot');
+    lot.addEventListener('pointerdown', (e) => e.preventDefault());
+    const tip = h('div.r3w-tip', h('b', 'Tip: '), 'short and silly beats clever.');
+    const wait = h('div.r3w-wait');
+    sheet.append(prompt, h('div.r3w-entry', field, btn), padWrap, lot, wait, tip);
     const syncBtn = () => { btn.disabled = !field.input.value.trim() || ctx.client.state.mine.r3.length >= maxN; };
     field.input.addEventListener('input', syncBtn);
 
     let shown = -1;
+    let saidStrag = false;
     const update = (c) => {
       const mine = c.mine.r3;
       const n = Math.min(maxN, mine.length);
@@ -82,8 +96,34 @@ export default {
       btnLabel.textContent = left === 0 ? 'All four served' : n === 0 ? 'Order it!' : 'Another!';
       btn.disabled = left === 0 || !field.input.value.trim();
       field.input.disabled = left === 0;
-      padWrap.classList.toggle('complete', left === 0);
+      const isLot = !!c.mine.game?.lot && n > 0;
+      const finished = left === 0 || isLot;
+      padWrap.classList.toggle('complete', finished);
+      padWrap.classList.toggle('lot', isLot && left > 0);
+      padWrap.classList.toggle('started', n > 0);
+      doneS.textContent = left === 0 ? 'That\'s your four. Lovely.' : `${n} sent. Thought of another? Add it.`;
       field.classList.toggle('gone', left === 0);
+      lot.hidden = n === 0 || finished;
+      tip.hidden = n > 0;
+      // the straggler: everyone else is done, the clock drops to 10 s
+      const strag = c.progress?.straggler;
+      if (strag && strag === c.meId && !finished) {
+        wait.textContent = '';
+        wait.className = 'r3w-wait';
+        tag.textContent = 'All waiting on you!';
+        tag.classList.add('hurry');
+        if (!saidStrag && !c.frozen) { saidStrag = true; c.say(`${c.me?.name || 'You'}, the kitchen's closing!`, { compact: true, hold: 1600 }); }
+      }
+      if (!(strag && strag === c.meId && !finished) && tag.classList.contains('hurry')) { tag.textContent = 'Sends when time\'s up'; tag.classList.remove('hurry'); }
+      if (strag && strag === c.meId && !finished) {
+        // handled above
+      } else if (strag && strag !== c.meId && finished) {
+        wait.textContent = `Waiting on ${c.player(strag)?.name || 'someone'}…`;
+        wait.className = 'r3w-wait';
+      } else {
+        wait.textContent = '';
+        wait.className = 'r3w-wait';
+      }
     };
     update(ctx);
     if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);

@@ -141,7 +141,7 @@ export { ICONS };
 
 /** Extra Round 1 lines in Cyril's voice; picked by seed so every phone says the same thing. */
 export const R1_LINES = {
-  intro: ['Course one. Two of you, one question, no mercy.', 'Best answer wins. Worst answer gets my sympathy.'],
+  intro: ['Course one. Two of you, one question, no mercy.'],
   normal: [
     'Splendid. The table has spoken.',
     'A clear winner. The loser may sulk into the gravy.',

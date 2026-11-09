@@ -1,5 +1,6 @@
-// r2-write: the fact on a menu card; your porky writes itself into the gap as you type.
-// Field (max 40), a Cyril tip, the price of a good lie, and "Tell a porky". Too-honest => shake + note.
+// r2-write: one bright linen menu card on the claret sheet. The fact sits on top with its blank,
+// and you write your porky straight onto the card underneath (one place, never twice).
+// Cyril's tip, the prices as two tiles, and a gold "Tell a porky". Too-honest => shake + note.
 import { h, button, textField } from '../../../ui/components.js';
 import { factText, tilt } from './r2-kit.js';
 
@@ -19,11 +20,13 @@ export default {
   shot: 'write',
   mount({ sheet }, ctx) {
     const p = ctx.payload;
+    const max = p.max || 40;
     const fact = factText(p.fact.text);
-    const field = textField({ max: p.max || 40, placeholder: 'Type your lie here', onSubmit: () => tell() });
+    const field = textField({ max, placeholder: 'Write your lie here', onSubmit: () => tell() });
     const btn = button('Tell a porky', { onClick: () => tell(), e2e: 'submit' });
     const note = h('div.r2-honest', { role: 'status' });
-    field.input.addEventListener('input', () => { fact.setFill(field.input.value.trim()); note.classList.remove('on'); });
+    const hurry = h('div.r2-hurry', { role: 'status' });
+    field.input.addEventListener('input', () => { note.classList.remove('on'); fact.gap.classList.toggle('typing', !!field.input.value.trim()); });
 
     function tell() {
       const t = field.input.value.trim();
@@ -34,33 +37,58 @@ export default {
     }
 
     const tip = TIPS[Math.abs(Math.round(tilt(ctx.phase?.seed || 1, `tip${p.index}`, 1000))) % TIPS.length];
-    const card = h('div.card.r2-factcard',
+    const card = h(`div.card.r2-factcard${p.fact.text.length > 90 ? '.long' : ''}`,
       h('div.r2-fc-head',
         h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`),
         h('span.r2-fc-true', 'True, bar the gap')),
       fact,
+      h('div.r2-fc-pen',
+        h('span.r2-fc-lbl', 'Your porky'),
+        h('div.r2-field', field)),
+      note,
     );
     sheet.append(
+      hurry,
       card,
-      h('div.r2-field', field, note),
       h('div.r2-tip', h('span.q', '“'), h('span.tx', p.index === 0 ? 'Write a porky so convincing your own nan would believe it.' : tip), h('span.by', 'Cyril')),
-      h('div.sheet-actions.r2-actions',
-        h('div.r2-pay', h('span', 'Spot the truth'), h('b', '+1000'), h('span.sep'), h('span', 'Every fool'), h('b', '+500')),
-        btn),
+      h('div.r2-pay',
+        h('div.r2-pay-i', h('b', '+500'), h('span', 'per friend fooled')),
+        h('div.r2-pay-i.gold', h('b', '+1000'), h('span', 'if you spot the truth'))),
+      h('div.sheet-actions.r2-actions', btn),
     );
     if (ctx.frozen && ctx.demo) {
-      // screenshot: show the live gap-fill mid-typing
+      // screenshot: mid-typing
       field.input.value = 'slightly fizzy';
       field.input.dispatchEvent(new Event('input'));
     }
     const offReject = ctx.client.on('reject', (m) => {
       field.error();
       if (m?.reason === 'too-honest') {
-        note.textContent = 'Too honest. That’s the real answer. Lie better.';
+        note.replaceChildren(h('b', 'That’s the truth!'), ' Now lie to them.');
         note.classList.add('on');
       }
     });
     if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
-    return { unmount() { offReject(); } };
+
+    let hurried = false; let autoSent = false;
+    const setHurry = (c) => {
+      if (hurried || !c.progress?.straggler || c.progress.straggler !== c.meId) return;
+      hurried = true;
+      hurry.textContent = 'Everyone’s waiting on you. Lie faster!';
+      hurry.classList.add('on');
+      c.haptic?.('tick');
+    };
+    setHurry(ctx);
+    return {
+      update: setHurry,
+      frame(c) {
+        // last half-second: send a half-typed porky rather than lose it
+        if (autoSent || c.frozen || !c.duration || c.remaining() > 500) return;
+        autoSent = true;
+        const t = field.input.value.trim().slice(0, max);
+        if (t) c.client.submit(t);
+      },
+      unmount() { offReject(); },
+    };
   },
 };

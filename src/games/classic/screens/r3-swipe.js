@@ -5,6 +5,7 @@ import './r3.css';
 import { h, button } from '../../../ui/components.js';
 import { glassSvg, clinkSvg, passSvg, sayIfFresh } from './r3-art.js';
 
+const SPARE = 'Plenty left. Pour freely.';
 const HINTS = ['Dry. Pass the rest.', 'Last one. Make it count.', 'Two left. Be choosy.', 'Three left. Steady.', 'Four left. Easy now.', 'Spend them wisely.'];
 
 export default {
@@ -31,7 +32,10 @@ export default {
     const left = h('span.r3s-left');
     const tray = h('div.r3s-tray', h('div.r3s-tray-g', glassEls), left);
     const hintEl = h('span.r3s-hint');
-    const head = h('div.r3s-head', h('div.r3s-head-l', h('span.r3s-q', 'Raise a glass?'), hintEl), tray);
+    // "Card 7 of 12" counts only the cards you can vote on (your own are skipped)
+    const others = deck.filter((c) => !own.has(c.id));
+    const nth = h('span.r3s-nth');
+    const head = h('div.r3s-head', h('div.r3s-head-l', nth, h('span.r3s-q', 'Raise a glass?'), hintEl), tray);
 
     const area = h('div.r3s-area');
     const fuse = h('i');
@@ -42,7 +46,7 @@ export default {
     const cheers = button('', { onClick: () => decide(true), e2e: 'cheers' });
     cheers.classList.add('r3s-btn', 'r3s-cheers');
     cheers.append(h('span.r3s-bi', { html: clinkSvg() }), cheersLabel);
-    sheet.append(head, area, h('div.r3s-actions', pass, cheers));
+    sheet.append(head, h('div.r3s-mat', area), h('div.r3s-actions', pass, cheers));
 
     let idx = -1;
     let cardEl = null;
@@ -59,7 +63,11 @@ export default {
         }
       });
       left.textContent = remaining === 1 ? '1 left' : `${remaining} left`;
-      hintEl.textContent = HINTS[Math.max(0, Math.min(HINTS.length - 1, remaining))];
+      // gentle nudge when you are sitting on more glasses than half the cards still to come
+      const cardsLeft = others.filter((c) => deck.indexOf(c) >= idx && ctx.client.state.mine.swipes[c.id] === undefined).length;
+      const spare = remaining > 0 && cardsLeft > 0 && remaining > cardsLeft / 2;
+      hintEl.textContent = spare ? SPARE : HINTS[Math.max(0, Math.min(HINTS.length - 1, remaining))];
+      hintEl.classList.toggle('spare', spare);
       tray.classList.toggle('empty', remaining <= 0);
       if (lastLeft !== null && remaining !== lastLeft) refreshButtons();
       lastLeft = remaining;
@@ -108,8 +116,11 @@ export default {
     function showCard(i) {
       idx = i;
       pips.forEach((d, k) => { d.className = k < i ? 'past' : k === i ? 'now' : ''; });
-      counter.textContent = i < deck.length ? `Card ${i + 1} of ${deck.length}` : `${deck.length} of ${deck.length}`;
+      counter.textContent = i < deck.length ? `${i + 1} / ${deck.length}` : `${deck.length} / ${deck.length}`;
       const card = deck[i];
+      const k = others.filter((c) => deck.indexOf(c) <= i).length;
+      nth.textContent = !card ? `All ${others.length} done` : own.has(card.id) ? 'Your card' : `Card ${k} of ${others.length}`;
+      nth.classList.toggle('own', !!card && own.has(card.id));
       if (!card) {
         area.replaceChildren(h('div.r3s-end', h('span.r3s-end-t', 'That\'s the lot.'), h('span.r3s-end-s', 'Cyril is counting the glasses…')));
         cardEl = null;
@@ -124,7 +135,6 @@ export default {
         h(`div.r3s-text${card.text.length > 28 ? '.long' : ''}`, card.text),
         mine ? h('div.r3s-skip', 'Modesty, please. Skipping this one.') : null,
         h('div.r3s-fuse', fuse),
-        mine || i > 1 ? null : h('div.r3s-sides', h('span', '‹ pass'), h('span', 'cheers ›')),
         h('span.r3s-stamp.yes', 'Cheers!'),
         h('span.r3s-stamp.no', 'Pass'),
       );
@@ -140,6 +150,7 @@ export default {
         if (!ctx.frozen && !ctx.reduced) cardEl.classList.add('deal');
       }
       refreshButtons();
+      renderGlasses();
     }
     function attachDrag(el) {
       let x0 = null;
