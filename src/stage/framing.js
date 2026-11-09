@@ -52,7 +52,9 @@ export function contentRects(roots, { skip = '.bubble', maxFrac = 0.6 } = {}) {
       let weight = 1.5;
       if (el.matches('.timer, .timer *')) weight = 5;
       else if (el.matches('button, input, textarea, .btn, [role="button"]')) weight = 3;
-      else if (el.closest('.chip, .chips')) weight = 1;
+      else if (el.closest('.chip, .chips')) weight = 2.5;
+      const fs = parseFloat(cs.fontSize) || 16;
+      if (weight === 1.5 && fs > 20) weight = 1.5 * Math.min(4, fs / 20); // headlines matter most
       out.push({ x: r.left, y: r.top, w: r.width, h: r.height, weight, el });
     }
   }

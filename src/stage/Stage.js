@@ -12,18 +12,18 @@ export const SHOTS = {
   // subject: what the content-aware framer keeps in the free part of the show layer.
   //   'cyril' = whole candle, 'head' = face + flame (input strip), 'podium' = cake + winners,
   //   undefined = classic framing (whole region; the screen's layout is built around it).
-  title: { pos: [0, 0.55, 1.1], target: [0, 0.22, 0], orbit: 6 },
-  create: { pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
-  join: { pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
-  lobby: { pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
-  write: { pos: [0, 0.24, 0.55], target: [0, 0.2, 0], subject: 'head' },
-  vote: { pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
-  reveal: { pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
-  scores: { pos: [0, 0.4, 1.0], target: [0, 0.16, 0], subject: 'cyril' },
-  podiumStart: { pos: [0, 0.75, 1.7], target: [0, 0.2, -0.2], subject: 'podium' },
-  podium: { pos: [0, 0.42, 1.2], target: [0, 0.16, -0.2], subject: 'podium' },
-  end: { pos: [0, 0.6, 1.15], target: [0, 0.15, 0] },
+  title: { expr: 'welcome', pos: [0, 0.55, 1.1], target: [0, 0.22, 0], orbit: 6 },
+  create: { expr: 'welcome', pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
+  join: { expr: 'welcome', pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
+  lobby: { expr: 'welcome', pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
+  intro: { expr: 'proud', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
+  write: { expr: 'attentive', pos: [0, 0.24, 0.55], target: [0, 0.2, 0], subject: 'head' },
+  vote: { expr: 'sly', pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
+  reveal: { expr: 'eager', pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
+  scores: { expr: 'sly', pos: [0, 0.4, 1.0], target: [0, 0.16, 0], subject: 'cyril' },
+  podiumStart: { expr: 'proud', pos: [0, 0.75, 1.7], target: [0, 0.2, -0.2], subject: 'podium' },
+  podium: { expr: 'proud', pos: [0, 0.42, 1.2], target: [0, 0.16, -0.2], subject: 'podium' },
+  end: { expr: 'warm', pos: [0, 0.6, 1.15], target: [0, 0.15, 0] },
 };
 
 const easeInOutQuint = (t) => (t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2);
@@ -203,6 +203,7 @@ export class Stage {
     this.shotName = name;
     this.orbit = s.orbit || 0;
     this.subject = s.subject || null;
+    this.cyril.setExpression(s.expr || 'neutral');
     this.shotMaxS = s.maxS || null;
     this._measureAt = 0;
     const to = { pos: new THREE.Vector3(...s.pos), target: new THREE.Vector3(...s.target) };
@@ -251,15 +252,15 @@ export class Stage {
   /** Decide where the subject should sit, from where the HTML content actually is. */
   _measure() {
     const W = this.w; const H = this.h;
-    const bottom = this._showBottom();
+    const bottom = this._showBottom() - (this.layout === 'show' ? 10 : 0);
     if (this.layout === 'input') {
       const slot = document.querySelector('#strip .cyril-slot');
       const r = slot?.getBoundingClientRect();
       const top = this._safeTop();
       const sh = bottom - top;
       if (r && r.width > 4) {
-        const S = Math.min(r.height + 18, sh * 0.92, 124);
-        return { mode: 'subject', subject: 'head', S, Yc: r.top + r.height / 2 + 2, Xc: r.left + r.width / 2 };
+        const S = Math.min(r.height + 6, sh * 0.86, 112);
+        return { mode: 'subject', subject: 'head', S, Yc: r.top + r.height / 2 + 5, Xc: r.left + r.width / 2 };
       }
       return { mode: 'subject', subject: 'head', S: sh * 0.85, Yc: top + sh / 2, Xc: 58 };
     }
@@ -273,23 +274,26 @@ export class Stage {
     const minS = this.layout === 'split' ? 104 : 128;
     const tryCol = (cx, half) => freeBands(rects, top, bottom, cx - half, cx + half)[0];
     const fitIn = (band, Xc) => {
+      if (this.subject === 'podium') { // leave a strip above the cake for Cyril's line
+        const S = Math.min(maxS, band.h - 96);
+        return { S, Yc: band.bottom - S / 2 - 4, Xc };
+      }
       // Tall band: Cyril sits low, leaving headroom for his speech bubble above.
       if (band.h > maxS + 110) return { S: maxS, Yc: band.bottom - maxS / 2 - 6, Xc };
       const S = Math.min(maxS, band.h - 10);
       return { S, Yc: band.top + band.h / 2, Xc };
     };
     const centre = tryCol(W / 2, 70);
+    const left = tryCol(W * 0.27, 62);
     let g;
-    if (centre && centre.h >= minS) g = fitIn(centre, W / 2);
+    if (centre && centre.h > maxS + 110) g = fitIn(centre, W / 2); // room for Cyril and a bubble above him
+    else if (left && left.h >= minS && this.subject === 'cyril') g = fitIn(left, W * 0.27); // bubble goes beside him
+    else if (centre && centre.h >= minS) g = fitIn(centre, W / 2);
     else {
-      const left = tryCol(W * 0.25, 58);
-      if (left && left.h >= minS) g = fitIn(left, W * 0.25);
-      else {
-        // No room anywhere: peek over the content (flame and eyes in the gap, body behind cards).
-        const b = centre || { top, bottom, h: bottom - top };
-        const S = minS * 1.1;
-        g = { S, Yc: b.top + S / 2 + 2, Xc: W / 2 };
-      }
+      // No room anywhere: peek over the content (flame and eyes in the gap, body behind cards).
+      const b = centre || { top, bottom, h: bottom - top };
+      const S = minS * 1.1;
+      g = { S, Yc: b.top + S / 2 + 2, Xc: W / 2 };
     }
     return { mode: 'subject', subject: this.subject, ...g };
   }
@@ -305,11 +309,10 @@ export class Stage {
     } else if (subject === 'podium') {
       const k = this.cake;
       for (const x of [-0.22, 0.24]) for (const z of [-0.2, 0.2]) add(k, x, 0, z);
-      add(k, 0, 0.36, 0);
-      add(c, -0.09, 0.0, 0.09); add(c, 0, 0.37, 0);
+      add(k, 0, 0.4, 0);
     } else {
-      for (const x of [-0.095, 0.095]) { add(c, x, 0.0, 0.09); add(c, x, 0.24, 0.0); }
-      add(c, 0, 0.42, 0); // flame tip with room for a ballooning reaction
+      for (const x of [-0.1, 0.1]) { add(c, x, -0.02, 0.1); add(c, x, 0.24, 0.0); }
+      add(c, 0, 0.4, 0); // flame tip with room for a ballooning reaction
     }
     return pts;
   }
@@ -328,7 +331,8 @@ export class Stage {
     }
     const tanH = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const f0 = this.h / (2 * tanH);
-    const f = THREE.MathUtils.clamp(goal.S / Math.max(1e-4, ay1 - ay0), f0 * 0.3, f0 * 4);
+    const fw = (this.w - 20) / Math.max(1e-4, ax1 - ax0); // never wider than the phone
+    const f = THREE.MathUtils.clamp(Math.min(goal.S / Math.max(1e-4, ay1 - ay0), fw), f0 * 0.3, f0 * 4);
     const fh = 2 * f * tanH;
     const ayc = (ay0 + ay1) / 2; const axc = (ax0 + ax1) / 2;
     const fy = goal.Yc - fh / 2 + ayc * f;
@@ -373,6 +377,17 @@ export class Stage {
 
   cyrilHeadScreen() { return this.project(this.cyril.headWorld()); }
 
+  /** Screen rect of what the camera is framing when it isn't just Cyril (podium cake + winners). */
+  subjectScreen() {
+    if (this.subject !== 'podium' || !this.cake.visible) return null;
+    const pts = [];
+    const k = this.cake;
+    for (const x of [-0.24, 0.26]) for (const y of [0, 0.36]) pts.push(this.project(k.localToWorld(new THREE.Vector3(x, y, 0.15))));
+    const xs = pts.map((p) => p.x); const ys = pts.map((p) => p.y);
+    const x = Math.min(...xs); const y = Math.min(...ys);
+    return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
+  }
+
   /** Screen rects of Cyril's face (eyes to mouth), whole body and flame, plus tail anchors. */
   cyrilScreen() {
     const g = this.cyril.group;
@@ -384,8 +399,8 @@ export class Stage {
     };
     const face = box([P(-0.07, 0.1, 0.08), P(0.07, 0.1, 0.08), P(-0.07, 0.215, 0.08), P(0.07, 0.215, 0.08)]);
     const body = box([P(-0.12, -0.02, 0.1), P(0.12, -0.02, 0.1), P(-0.09, 0.245, 0), P(0.09, 0.245, 0)]);
-    const flame = box([P(-0.03, 0.25, 0), P(0.03, 0.25, 0), P(0, 0.4, 0)]);
-    return { face, body, flame, sideR: P(0.088, 0.17, 0.03), sideL: P(-0.088, 0.17, 0.03), top: P(0, 0.4, 0) };
+    const flame = box([P(-0.03, 0.25, 0), P(0.03, 0.25, 0), P(0, 0.37, 0)]);
+    return { face, body, flame, sideR: P(0.088, 0.17, 0.03), sideL: P(-0.088, 0.17, 0.03), top: P(0, 0.365, 0) };
   }
 
   // ---------- avatars ----------
@@ -402,7 +417,7 @@ export class Stage {
       if (!s) {
         const group = new THREE.Group();
         const avatar = buildAvatar(p.avatar);
-        avatar.scale.setScalar(1.25);
+        avatar.scale.setScalar(1.5);
         group.add(avatar);
         const blob = new THREE.Mesh(this.blobGeo, this.blobMat);
         blob.position.y = 0.001;
@@ -417,7 +432,7 @@ export class Stage {
       if (!this.podiumIds) {
         s.group.position.x = s.home.x;
         s.group.position.z = s.home.z;
-        s.group.rotation.y = -seatAngle(i);
+        s.group.rotation.y = -seatAngle(i) * 0.45; // half-turned to the table, half to us
       }
     });
   }
@@ -446,9 +461,9 @@ export class Stage {
     this.podiumIds = top3;
     this.cake.visible = !!top3;
     this.cakeRise = 0;
-    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.19, TABLE_Y + 0.02, -0.12) : this.cyrilHome);
+    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.25, TABLE_Y + 0.02, -0.3) : this.cyrilHome);
     if (!top3) {
-      for (const s of this.seats.values()) { s.group.position.set(s.home.x, TABLE_Y, s.home.z); s.group.rotation.y = -seatAngle(s.seat); }
+      for (const s of this.seats.values()) { s.group.position.set(s.home.x, TABLE_Y, s.home.z); s.group.rotation.y = -seatAngle(s.seat) * 0.45; s.avatar.scale.setScalar(1.5); }
     }
   }
 
@@ -547,13 +562,15 @@ export class Stage {
         const rank = this.podiumIds.indexOf(id);
         if (rank >= 0) {
           const tier = this.cake.userData.tiers[2 - rank] || this.cake.userData.tiers[0];
-          const off = rank === 0 ? new THREE.Vector3(0, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.1, 0, 0.08) : new THREE.Vector3(0.14, 0, 0.13);
+          const off = rank === 0 ? new THREE.Vector3(0, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.15, 0, 0.1) : new THREE.Vector3(0.18, 0, 0.13);
           const goal = this.cake.position.clone().add(off);
           goal.y = TABLE_Y + tier.top * this.cakeRise;
           s.group.position.x += (goal.x - s.group.position.x) * fk;
           s.group.position.z += (goal.z - s.group.position.z) * fk;
           s.group.position.y = goal.y + Math.max(0, d.y);
           s.group.rotation.y += (0 - s.group.rotation.y) * fk;
+          const sc = rank === 0 ? 1.9 : 1.6;
+          s.avatar.scale.setScalar(s.avatar.scale.x + (sc - s.avatar.scale.x) * fk);
         } else {
           s.group.visible = false;
         }

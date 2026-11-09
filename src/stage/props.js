@@ -84,7 +84,7 @@ export function seatAngle(i) {
   return (order[i] / 4) * THREE.MathUtils.degToRad(105);
 }
 
-export function seatPosition(i, r = 0.86) {
+export function seatPosition(i, r = 0.74) {
   const a = seatAngle(i);
   return new THREE.Vector3(Math.sin(a) * r, TABLE_Y, -Math.cos(a) * r);
 }
@@ -121,25 +121,43 @@ export function buildProps() {
   plateTop.position.set(0.26, TABLE_Y + 0.0085, 0.26);
   group.add(plateTop);
 
-  // Cheese board with 3 wedges
-  const board = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.018, 0.18), new THREE.MeshStandardMaterial({ color: '#8C5A3C', roughness: 0.6, map: woodTexture(128) }));
-  board.position.set(-0.36, TABLE_Y + 0.009, -0.28);
-  board.rotation.y = 0.5;
-  group.add(board);
-  const cheeseMat = new THREE.MeshStandardMaterial({ color: '#F2C14E', roughness: 0.55 });
+  // Cheese board: rounded oak paddle with a handle, three proper wedges and a bunch of grapes
+  const cheeseGroup = new THREE.Group();
+  const paddle = new THREE.Shape();
+  const bw = 0.15; const bd = 0.09; const rr = 0.03;
+  paddle.moveTo(-bw + rr, -bd); paddle.lineTo(bw - rr, -bd); paddle.quadraticCurveTo(bw, -bd, bw, -bd + rr);
+  paddle.lineTo(bw, -0.022); paddle.lineTo(bw + 0.07, -0.016); paddle.quadraticCurveTo(bw + 0.09, 0, bw + 0.07, 0.016); paddle.lineTo(bw, 0.022);
+  paddle.lineTo(bw, bd - rr); paddle.quadraticCurveTo(bw, bd, bw - rr, bd); paddle.lineTo(-bw + rr, bd);
+  paddle.quadraticCurveTo(-bw, bd, -bw, bd - rr); paddle.lineTo(-bw, -bd + rr); paddle.quadraticCurveTo(-bw, -bd, -bw + rr, -bd);
+  const hole = new THREE.Path(); hole.absarc(bw + 0.06, 0, 0.007, 0, Math.PI * 2, true); paddle.holes.push(hole);
+  const boardGeo = new THREE.ExtrudeGeometry(paddle, { depth: 0.014, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.003, bevelSegments: 3, curveSegments: 16 });
+  boardGeo.rotateX(-Math.PI / 2);
+  const board = new THREE.Mesh(boardGeo, new THREE.MeshStandardMaterial({ color: '#9A6542', roughness: 0.5, map: woodTexture(128) }));
+  board.position.y = 0.003;
+  cheeseGroup.add(board);
+  const cheeseMat = new THREE.MeshStandardMaterial({ color: '#F4C95D', roughness: 0.5 });
+  const rindMat = new THREE.MeshStandardMaterial({ color: '#E3A93B', roughness: 0.7 });
   const wedge = new THREE.Shape();
-  wedge.moveTo(0, 0); wedge.lineTo(0.07, 0); wedge.lineTo(0.0, 0.035); wedge.closePath();
-  const wedgeGeo = new THREE.ExtrudeGeometry(wedge, { depth: 0.04, bevelEnabled: false });
-  const wedges = new THREE.InstancedMesh(wedgeGeo, cheeseMat, 3);
-  for (let i = 0; i < 3; i++) {
-    const m = new THREE.Matrix4().compose(
-      new THREE.Vector3(-0.44 + i * 0.07, TABLE_Y + 0.018, -0.26 + (i % 2) * 0.04),
-      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0.5 + i * 0.8, 0)),
-      new THREE.Vector3(1, 1, 1),
-    );
-    wedges.setMatrixAt(i, m);
+  wedge.moveTo(0, 0); wedge.lineTo(0.075, 0); wedge.quadraticCurveTo(0.07, 0.03, 0.004, 0.045); wedge.closePath();
+  const wedgeGeo = new THREE.ExtrudeGeometry(wedge, { depth: 0.04, bevelEnabled: true, bevelSize: 0.0025, bevelThickness: 0.0025, bevelSegments: 2 });
+  wedgeGeo.rotateX(-Math.PI / 2);
+  for (const [x, z, ry, sc] of [[-0.1, 0.03, 0.4, 1], [-0.01, -0.035, 2.3, 0.85], [0.07, 0.04, -0.6, 0.75]]) {
+    const w = new THREE.Mesh(wedgeGeo, cheeseMat);
+    w.position.set(x, 0.021, z); w.rotation.y = ry; w.scale.setScalar(sc);
+    cheeseGroup.add(w);
   }
-  group.add(wedges);
+  const brie = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.022, 28), new THREE.MeshStandardMaterial({ color: '#F7F0E2', roughness: 0.85 }));
+  brie.position.set(0.09, 0.032, -0.04);
+  cheeseGroup.add(brie);
+  const grapeMat = new THREE.MeshStandardMaterial({ color: '#5B2A4A', roughness: 0.25 });
+  const grapes = new THREE.InstancedMesh(new THREE.SphereGeometry(0.011, 10, 8), grapeMat, 9);
+  [[0, 0, 0], [0.02, 0, 0.004], [-0.02, 0, 0.006], [0.01, 0, 0.02], [-0.01, 0, 0.022], [0, 0, -0.02], [0.012, 0.016, 0.008], [-0.01, 0.016, 0.006], [0, 0.016, -0.008]].forEach(([x, y, z], i) => {
+    grapes.setMatrixAt(i, new THREE.Matrix4().makeTranslation(x - 0.04, 0.033 + y, z + 0.06));
+  });
+  cheeseGroup.add(grapes);
+  cheeseGroup.position.set(-0.42, TABLE_Y, -0.2);
+  cheeseGroup.rotation.y = 0.55;
+  group.add(cheeseGroup);
 
   // Cutlery (merged fork + knife), silver
   const silver = new THREE.MeshStandardMaterial({ color: '#D9D4CC', metalness: 0.9, roughness: 0.25 });
@@ -148,11 +166,12 @@ export function buildProps() {
   const cut = new THREE.Mesh(knife, silver); group.add(cut);
   const cut2 = new THREE.Mesh(fork, silver); group.add(cut2);
 
-  // Napkin (folded plane)
-  const nap = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.12, 4, 1), new THREE.MeshStandardMaterial({ color: '#7A1E2C', roughness: 0.9, map: paperTexture(64, '#7A1E2C'), side: THREE.DoubleSide }));
-  nap.rotation.x = -Math.PI / 2;
-  nap.rotation.z = 0.4;
-  nap.position.set(-0.12, TABLE_Y + 0.003, 0.42);
+  // Napkin: a folded claret square with a soft crease
+  const napGeo = new THREE.BoxGeometry(0.15, 0.006, 0.1, 6, 1, 1);
+  { const p = napGeo.attributes.position; for (let i = 0; i < p.count; i++) p.setY(i, p.getY(i) + Math.cos(p.getX(i) / 0.075 * Math.PI * 0.5) * 0.004); napGeo.computeVertexNormals(); }
+  const nap = new THREE.Mesh(napGeo, new THREE.MeshStandardMaterial({ color: '#7A1E2C', roughness: 0.85, map: paperTexture(64, '#8A2836') }));
+  nap.rotation.y = 0.4;
+  nap.position.set(-0.16, TABLE_Y + 0.004, 0.44);
   group.add(nap);
 
   // Crumbs (one InstancedMesh)
@@ -171,7 +190,7 @@ export function buildProps() {
   // Blob shadows (instanced, one radial texture)
   const blobMat = new THREE.MeshBasicMaterial({ map: radialTexture({ size: 64, inner: 'rgba(40,20,14,0.55)', outer: 'rgba(40,20,14,0)' }), transparent: true, depthWrite: false });
   const blobs = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), blobMat, 6);
-  const blobAt = [[-0.34, 0.18, 0.12], [0.42, -0.12, 0.12], [0.26, 0.26, 0.36], [-0.36, -0.28, 0.4], [0, 0, 0.34]];
+  const blobAt = [[-0.34, 0.18, 0.12], [0.42, -0.12, 0.12], [0.26, 0.26, 0.36], [-0.42, -0.2, 0.42], [0, 0, 0.34]];
   blobAt.forEach(([x, z, s], i) => blobs.setMatrixAt(i, new THREE.Matrix4().compose(new THREE.Vector3(x, TABLE_Y + 0.001, z), new THREE.Quaternion(), new THREE.Vector3(s, 1, s))));
   blobs.count = blobAt.length;
   group.add(blobs);

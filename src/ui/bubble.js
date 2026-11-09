@@ -14,7 +14,10 @@ const MARGIN = 8;
 const CSS = `
 #bubbles .bubble { box-shadow: none; filter: drop-shadow(0 2px 0 rgba(42,26,23,.10)) drop-shadow(0 9px 16px rgba(30,14,10,.34));
   box-sizing: border-box; text-wrap: pretty; overflow: hidden; border: 1px solid rgba(122,74,42,.10); }
-#bubbles .bubble::after { border: 0; }
+#bubbles .bubble::after { border: 0; width: 26px; height: 18px; bottom: -15px; clip-path: path('M0 0 L26 0 C 18 4, 10 10, 4 18 C 6 10, 5 5, 0 0 Z'); }
+#bubbles .bubble.side::after { width: 18px; height: 26px; left: -15px; bottom: auto; clip-path: path('M18 0 L18 26 C 14 18, 8 10, 0 4 C 8 6, 13 5, 18 0 Z'); }
+#bubbles .bubble.side.side-left::after { left: auto; right: -15px; clip-path: path('M0 0 L0 26 C 4 18, 10 10, 18 4 C 10 6, 5 5, 0 0 Z'); }
+#bubbles .bubble.below::after { top: -15px; bottom: auto; clip-path: path('M0 18 L26 18 C 18 14, 10 8, 4 0 C 6 8, 5 13, 0 18 Z'); }
 #bubbles .bubble.tail-hidden::after { display: none; }
 #bubbles .bubble .k { font-family: var(--f-display); font-style: italic; font-weight: 600; font-variation-settings: "SOFT" 100; color: var(--c-claret); }
 #bubbles .bubble.compact { font-size: calc(15px * var(--ts, 1)); line-height: 20px; }
@@ -82,6 +85,7 @@ export class Bubbles {
   /** Remove the bubble now. */
   clear() {
     this.token++;
+    this.stage.cyril.leanTo(0);
     this.stage.cyril.setTalking(false);
     if (this.el) {
       const old = this.el;
@@ -231,7 +235,11 @@ export class Bubbles {
     const r = { x: c.x, y: c.y, w: c.bw, h: c.bh };
     let s = (c.pen + c.si * 25) * 60; // penalties in px² terms; prefer the larger, more readable size
     for (const o of rects) s += overlap(r, o) * o.weight;
-    s += overlap(r, cy.face) * 6 + overlap(r, cy.flame) * 0.8 + overlap(r, cy.body) * 0.25;
+    if (cy.subject) s += overlap(r, cy.subject) * 3;
+    if (document.body.dataset.layout === 'input') s += c.kind === 'free' ? -4000 : 16000; // the strip is full: prefer free sheet space
+    const fc = cy.face; const gw = Math.max(0, 70 - fc.w) / 2; const gh = Math.max(0, 70 - fc.h) / 2;
+    const face = { x: fc.x - gw, y: fc.y - gh, w: fc.w + gw * 2, h: fc.h + gh * 2 }; // tiny Cyril still needs his face seen
+    s += overlap(r, face) * 6 + overlap(r, cy.flame) * 2.5 + overlap(r, cy.body) * 0.4;
     return s;
   }
 
@@ -242,7 +250,6 @@ export class Bubbles {
     const fx = cy.face.x + cy.face.w / 2; const fy = cy.face.y + cy.face.h / 2;
     const out = [];
     for (const [si, s] of this.sizes.entries()) {
-      if (si > 2) break;
       const bw = s.w + 22; const bh = s.h; // room for the flame badge
       for (let y = top0; y <= H - bh - MARGIN; y += 22) {
         for (let x = MARGIN; x <= W - bw - MARGIN + 0.5; x += 22) {
@@ -276,6 +283,7 @@ export class Bubbles {
     const el = this.el;
     if (!el || !this.sizes) return;
     const cy = this.stage.cyrilScreen();
+    cy.subject = this.stage.subjectScreen?.() || null;
     const now = performance.now();
     if (!this.place || now > this._evalAt) {
       this._evaluate(cy);
@@ -296,7 +304,7 @@ export class Bubbles {
       el.classList.add('tail-hidden');
       el.style.transformOrigin = '0% 0%';
     } else if (c.kind === 'above' || c.kind === 'below') {
-      const tx = Math.max(16, Math.min(c.bw - 36, cy.top.x - c.x - 11));
+      const tx = Math.max(16, Math.min(c.bw - 40, cy.top.x - c.x - 6));
       el.style.setProperty('--tail-x', `${tx}px`);
       el.style.transformOrigin = `${tx + 11}px ${c.kind === 'above' ? '100%' : '0%'}`;
       // tail only when it can reach the flame (not when the bubble was pushed far away)
@@ -309,6 +317,7 @@ export class Bubbles {
       const gap = c.kind === 'right' ? c.x - a.x : a.x - (c.x + c.bw);
       el.classList.toggle('tail-hidden', gap > 140);
     }
+    this.stage.cyril.leanTo(c.kind === 'right' ? 1 : c.kind === 'left' ? -1 : 0);
     el.style.left = `${Math.round(c.x)}px`;
     el.style.top = `${Math.round(c.y)}px`;
   }

@@ -202,10 +202,9 @@ export function waxTexture(w = 256, h = 256) {
   const c = canvas(w, h);
   const g = c.getContext('2d');
   const grd = g.createLinearGradient(0, h, 0, 0);
-  grd.addColorStop(0, '#E9D6B8');
-  grd.addColorStop(0.55, '#F3E6CF');
-  grd.addColorStop(0.9, '#F7EBD6');
-  grd.addColorStop(1, '#FBEFD9');
+  grd.addColorStop(0, '#EFE2C8');
+  grd.addColorStop(0.5, '#F5EAD5');
+  grd.addColorStop(1, '#F8EEDC');
   g.fillStyle = grd;
   g.fillRect(0, 0, w, h);
   // drip streaks from the top edge
