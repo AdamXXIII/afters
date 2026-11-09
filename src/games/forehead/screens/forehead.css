@@ -554,3 +554,75 @@ body[data-screen="forehead-intro"] #show, body[data-screen="forehead-pick"] #sho
   .fh-rc-right { padding-bottom: 6px; }
   .fh-rc-plate { min-height: 0; }
 }
+
+/* ================================================================== round 6: one hero per screen */
+.btn.btn-loud { --fill: var(--c-ink); --text: var(--c-candle); --lip: #000; background-color: var(--c-ink); color: var(--c-candle); height: 72px; font: 900 30px/1 var(--f-display); letter-spacing: -.01em;
+  box-shadow: 0 0 0 4px var(--c-candle), 0 7px 0 4px #7A1E2C, 0 18px 30px rgba(42,26,23,.45); }
+/* intro */
+.fh-po-title { font-size: 132px; line-height: .86; order: 0; margin-top: 18px; }
+.fh-po-rule { order: 3; display: block; font-size: 24px; line-height: 30px; margin: 4px 0 14px; }
+.fh-po-corner { position: absolute; left: calc(var(--safe-l) + 12px); top: calc(var(--safe-t) + 12px); z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: 300px; }
+.fh-po-change { align-self: flex-start; height: 36px; font-size: 13px; }
+.fh-po-opts { background: rgba(42,26,23,.6); padding: 6px; border-radius: 20px; }
+.fh-po-opts .fh-pill { height: 36px; font-size: 13px; padding: 0 10px; }
+.fh-poster { padding-top: calc(var(--safe-t) + 52px); }
+/* pick: cards fill the height, names are the content */
+.fh-pk-fan { align-items: stretch; padding: 22px 0 26px; }
+.fh-pk-fan .fh-pk-tile { height: auto; justify-content: center; gap: 18px; }
+.fh-pk-fan .fh-pk-face { gap: 18px; }
+.fh-pk-fan .fh-pk-icon { width: 92px; height: 92px; }
+.fh-pk-fan .fh-pk-icon svg { width: 64px; height: 64px; }
+.fh-pk-fan .fh-pk-txt b { font-size: 27px; line-height: 29px; }
+.fh-pk-fan .fh-pk-votes .fh-disc { --sz: 40px; }
+.fh-pk-fan .fh-pk-votes { bottom: -20px; }
+.fh-pk-title { font-size: 44px; line-height: 46px; }
+/* recap */
+.fh-rc-tile.miss { background: #E9DFCF; box-shadow: 0 3px 0 rgba(42,26,23,.3); filter: saturate(.4); opacity: 0; }
+.fh-rc-tile.miss.in { opacity: .82; }
+.fh-rc-tile.miss .fh-rc-txt { font: 800 17px/19px var(--f-display); color: rgba(42,26,23,.6); text-decoration: line-through; text-decoration-thickness: 2px; }
+.fh-rc-tile.miss .fh-rc-ic { background: #8C7B6B; }
+.fh-rc-tile.miss.time .fh-rc-ic { background: var(--c-claret); }
+.fh-rc-pile .fh-rc-tile { margin: 4px; transform: rotate(calc(var(--rot) * .45)); max-width: 150px; padding: 8px 10px 8px 7px; border-radius: 14px; }
+.fh-rc-misses { display: none !important; }
+.fh-rc-lead b { font-size: 16px; }
+.fh-hero-n { font-size: 150px; }
+.fh-hero-quip span { font-size: 18px; line-height: 23px; }
+/* guesser: the deck's own wallpaper + Cyril standing in the corner */
+.fh-guess { background: var(--dc); }
+.fh-g-wall { position: absolute; inset: -40px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 34px; padding: 10px; transform: rotate(-12deg); opacity: .16; color: var(--c-linen); pointer-events: none; }
+.fh-g-wall svg { width: 100%; height: auto; }
+.fh-guess::before { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 90% at 50% 45%, transparent 40%, rgba(42,26,23,.45)); pointer-events: none; }
+.fh-g-cyril { left: auto; right: 6px; bottom: 2px; width: 118px; height: 156px; transform: rotate(-6deg); }
+.fh-g-cyril svg { width: 118px; height: 156px; }
+.fh-g-foot { padding-left: 0; padding-right: 120px; }
+.fh-g-half { align-items: flex-start !important; padding-top: 86px !important; }
+.fh-g-side { height: 130px; }
+.fh-g-mid { padding-right: 120px; padding-left: 92px; }
+.fh-g-half.right { padding-right: 18px !important; }
+.fh-g-half.right .fh-g-side { margin-top: -10px; }
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .fh-poster { padding-top: calc(var(--safe-t) + 10px); }
+  .fh-po-title { font-size: 128px; margin-top: 0; }
+  .fh-po-rule { font-size: 22px; margin: 4px 0 12px; }
+  .fh-po-corner { left: auto; right: calc(var(--safe-r) + 64px); top: calc(var(--safe-t) + 10px); align-items: flex-end; }
+  .fh-po-copy { padding-right: 0; }
+  .fh-po-bar .btn { height: 64px; }
+  .fh-pk-fan { padding: 10px 0 14px; }
+  .fh-pk-fan .fh-pk-tile { width: 160px; max-width: 160px; }
+  .fh-pk-fan .fh-pk-txt b { font-size: 30px; line-height: 31px; }
+  .fh-pk-fan .fh-pk-icon { width: 84px; height: 84px; }
+  .fh-hero-n { font-size: 120px; }
+  .fh-plate { width: auto; height: min(100%, 340px); }
+}
+.fh-pk-fan { align-items: center; }
+.fh-pk-fan .fh-pk-tile { height: min(400px, 100%); }
+@media (orientation: landscape) and (max-height: 600px) {
+  .fh-pk-fan { padding: 34px 54px 18px 0; }
+  .fh-pk-fan .fh-pk-tile { width: 150px; max-width: 150px; height: 100%; }
+  .fh-rc-right { padding-right: 52px; padding-top: 4px; }
+  .fh-rc-pile { width: 100%; max-width: 470px; }
+  .fh-rc-pile .fh-rc-tile { max-width: 150px; padding: 5px 8px 5px 5px; }
+  .fh-rc-pile .fh-rc-tile .fh-rc-txt { font-size: 15px !important; line-height: 17px !important; }
+  .fh-plate { height: min(100%, 330px); }
+}

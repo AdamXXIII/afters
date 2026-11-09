@@ -176,7 +176,8 @@ function mountGuesser(show, ctx0) {
   const peek = h('i.fh-g-cyril', { html: CYRIL_BONCE_SVG });
   const inner = h('div.fh-g-inner', peek, status, h('div.fh-g-mid', h('div.fh-g-card', word)), h('div.fh-g-foot', crowd, h('div.fh-g-bar', bar)), count, flash, hintL, hintR);
   status.insertBefore(h('span.fh-g-clockwrap', clock), status.lastChild);
-  const root = h('div.fh-guess.fh-burst', { style: { '--dc': p.deck.colour } }, inner);
+  const wall = h('div.fh-g-wall', { html: Array.from({ length: 28 }, () => deckIcon(p.deck.icon)).join('') });
+  const root = h('div.fh-guess', { style: { '--dc': p.deck.colour } }, wall, inner);
   show.append(root);
   document.body.classList.add('fh-guessing');
 

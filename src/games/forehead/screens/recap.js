@@ -43,11 +43,10 @@ export default {
         return h('div.fh-rc-tile.hit', { style: { '--rot': `${(rnd(seed, i) - 0.5) * 16}deg`, '--dy': `${(rnd(seed, `y${i}`) - 0.5) * 10}px`, '--dc': p.deck.colour } },
           h('span.fh-rc-ic', { html: ICONS.tick }), h('span.fh-rc-txt', r.text), r.bonus ? h('span.fh-rc-bonus', `+${r.bonus}`) : null);
       }
-      const m = h(`span.fh-rc-miss.${r.r}`, h('i', { html: r.r === 'time' ? CLOCK : r.r === 'foul' ? '!' : CROSS }), r.text);
-      misses.append(m);
-      return m;
+      return h(`div.fh-rc-tile.miss.${r.r}`, { style: { '--rot': `${(rnd(seed, i) - 0.5) * 16}deg`, '--dy': '0px' } },
+        h('span.fh-rc-ic', { html: r.r === 'time' ? CLOCK : r.r === 'foul' ? '!' : CROSS }), h('span.fh-rc-txt', r.text));
     });
-    const pile = h(`div.fh-rc-pile${hitsN > 8 ? '.dense' : ''}`, tiles.filter((t) => t.classList.contains('fh-rc-tile')), hitsN === 0 ? h('div.fh-rc-none', 'Not a', h('br'), 'sausage.') : null);
+    const pile = h(`div.fh-rc-pile${hitsN > 8 ? '.dense' : ''}`, tiles, hitsN === 0 && !tiles.length ? h('div.fh-rc-none', 'Not a', h('br'), 'sausage.') : null);
     const grid = h('div.fh-rc-plate', h('i.fh-plate', { html: PLATE_SVG }), pile);
     const shout = h('div.fh-rc-shout');
     const lead = h('div.fh-rc-lead');
@@ -76,7 +75,7 @@ export default {
             return b;
           })));
       } else if (p.shoutable.length) {
-        shout.append(h('div.fh-shout-wait', `${g?.name || 'They'}'s picking the top shouter. Look helpful.`));
+        /* the stamp lands when the guesser picks */
       }
     };
     const paintLead = () => {
@@ -85,7 +84,7 @@ export default {
       if (sc.teams) txt = `Gravy ${sc.teams.gravy.toLocaleString('en-GB')} · Custard ${sc.teams.custard.toLocaleString('en-GB')}`;
       else { const top = sc.players[0]; txt = top && top.score > 0 ? `Top of the table: ${ctx.player(top.id)?.name} ${top.score.toLocaleString('en-GB')}` : ''; }
       const next = p.nextId ? `Next bonce: ${ctx.player(p.nextId)?.name || '?'}` : p.last ? 'Last bonce of the night' : '';
-      lead.replaceChildren(h('span', txt), next ? h('b', next) : null);
+      lead.replaceChildren(next ? h('b', next) : null); void txt;
     };
 
     let shown = 0;

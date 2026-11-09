@@ -27,27 +27,30 @@ export default {
     const p = ctx.payload;
     const head = h('i.fh-po-head', { html: CYRIL_BONCE_SVG });
     const title = h('div.fh-po-title', 'Bonce');
-    const rules = h('div.fh-po-rule', h('span', 'Phone on your head.'), h('span', h('em', 'The sofa shouts.')), h('span', 'Nod = got it. Tip back = pass.'));
+    const rules = h('div.fh-po-rule', 'Phone on your head. ', h('em', 'The sofa shouts.'));
     const setup = () => ({ ...(ctx.progress.setup || { mode: 'ffa', goes: 1 }), ...(ctx.mine.game.setup || {}) });
     const bar = h('div.fh-po-bar');
+    const root0 = h('div.fh-poster.fh-burst');
     let modeP = null; let goesP = null; let summary = null;
     if (ctx.isHost) {
       const send = (patch) => { const next = { ...setup(), ...patch }; ctx.client.act('fh-setup', next, { setup: next }); ctx.haptic('select'); ctx.audio.sfx('select'); paint(); };
       modeP = pills([{ value: 'ffa', label: 'Every bonce for itself' }, { value: 'teams', label: p.canTeams ? 'Gravy v Custard' : 'Teams (4+)', disabled: !p.canTeams }], setup().mode, (v) => send({ mode: v }), 'fh-mode');
       goesP = pills([{ value: 1, label: '1 go each' }, { value: 2, label: '2 goes each' }], setup().goes, (v) => send({ goes: v }), 'fh-goes');
-      const go = button('Bonces up!', { kind: 'candle', e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
+      const go = button('Bonces up!', { kind: 'loud', e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
       summary = h('span');
       const opts = h('div.fh-po-opts', modeP, goesP);
       const open = h('button.fh-po-change', { type: 'button', 'data-e2e': 'fh-setup-open' }, summary, h('b', 'Change'));
       open.addEventListener('click', () => { opts.classList.toggle('open'); ctx.haptic('tap'); });
-      bar.append(opts, open, go);
+      bar.append(go);
+      root0.append(h('div.fh-po-corner', open, opts));
     } else {
       const host = ctx.players.find((x) => x.isHost);
       summary = h('div.fh-po-summary');
-      bar.append(h('div.fh-po-table', ctx.players.map((x) => disc(x, { size: 38 }))), summary,
+      bar.append(h('div.fh-po-table', ctx.players.map((x) => disc(x, { size: 38 }))),
         h('div.fh-po-wait', h('i', { html: CYRIL_BADGE }), h('span', `${host?.name || 'The host'} is pouring the jelly`, h('span.fh-dots', h('i'), h('i'), h('i')))));
     }
-    const root = h('div.fh-poster.fh-burst', h('div.fh-po-stage', head, h('span.fh-po-shout.s1', 'Gravy!'), h('span.fh-po-shout.s2', 'Hum it!'), h('span.fh-po-shout.s3', 'Ooh ooh!')), h('div.fh-po-copy', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, rules, bar));
+    const root = root0;
+    root.append( h('div.fh-po-stage', head, h('span.fh-po-shout.s1', 'Gravy!'), h('span.fh-po-shout.s2', 'Hum it!'), h('span.fh-po-shout.s3', 'Ooh ooh!')), h('div.fh-po-copy', title, rules, bar));
     show.append(root);
     if (!ctx.frozen) {
       title.animate([{ transform: 'scale(.4) rotate(-12deg)', opacity: 0 }, { transform: 'rotate(-4deg)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });

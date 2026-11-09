@@ -86,7 +86,11 @@ export default {
       me: 'idle', bots: 'idle', t: (ph) => ph.payload.countdown + 21000,
     },
     'forehead-recap': {
-      match: (e) => { if (e.phase.id === 'forehead-turn') { fill(e); return false; } return e.phase.id === 'forehead-recap'; },
+      match: (e, me) => { if (e.phase.id === 'forehead-turn') { fill(e); return false; } return e.phase.id === 'forehead-recap' && !isGuesser(e, me); },
+      me: 'idle', bots: 'idle', t: 7600,
+    },
+    'forehead-recap-guesser': {
+      match: (e, me) => { if (e.phase.id === 'forehead-turn') { fill(e); return false; } return e.phase.id === 'forehead-recap' && isGuesser(e, me); },
       me: 'idle', bots: 'idle', t: 7600,
     },
   },

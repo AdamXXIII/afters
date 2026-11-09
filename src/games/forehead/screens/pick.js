@@ -28,7 +28,7 @@ export default {
     const tiles = p.decks.map((d, i) => {
       const votes = h('span.fh-pk-votes');
       const tile = h(`${canVote ? 'button' : 'div'}.fh-pk-tile`, { type: canVote ? 'button' : undefined, 'data-e2e': canVote ? 'fh-deck' : undefined, style: { '--dc': d.colour, '--i': i } },
-        h('span.fh-pk-face', h('i.fh-pk-icon', { html: deckIcon(d.icon) }), h('span.fh-pk-txt', h('b', d.name), h('small', d.blurb))),
+        h('span.fh-pk-face', h('i.fh-pk-icon', { html: deckIcon(d.icon) }), h('span.fh-pk-txt', h('b', d.name))),
         h('span.fh-pk-back', h('b', '?'), h('small', 'Bonce')),
         votes);
       tile.votes = votes;

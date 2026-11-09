@@ -21,7 +21,7 @@ const SHOTS = [
   ['forehead-pick', 390, 844, ''], ['forehead-pick-guesser', 390, 844, ''],
   ['forehead-countdown', 390, 844, ''], ['forehead-turn', 390, 844, ''], ['forehead-turn-teams', 390, 844, ''],
   ['forehead-turn-adult', 390, 844, ''], ['forehead-turn-guesser', 844, 390, '', 'forehead-turn-guesser'],
-  ['forehead-recap', 390, 844, ''],
+  ['forehead-recap', 390, 844, ''], ['forehead-recap-guesser', 390, 844, ''],
 ].filter((s) => !only || only.split(',').includes(s[0]));
 const srv = await serve(path.join(root, 'dist'));
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
