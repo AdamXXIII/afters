@@ -86,7 +86,7 @@ function buildSwing(ctx, rows) {
   });
   const moved = els.some((e) => e.climb !== 0);
   const list = h('div.fin-sw-list', { style: { height: `${n * rowH}px`, '--rh': `${rowH}px` } }, els.map((e) => e.el));
-  const el = h('div.fin-sw', h('div.fin-sw-head', h('span.fin-sw-eyebrow', 'Last Orders swing'), h('span.fin-sw-sub', 'Glasses into points')), list);
+  const el = h('div.fin-sw', h('div.fin-sw-head', h('span.fin-sw-eyebrow', 'Last Orders swing'), h('span.fin-sw-sub', 'Round 3')), list);
   // delta ticks happen in the OLD order, top of the old board first
   const byOld = els.slice().sort((a, b) => a.from - b.from);
   let last = -1;

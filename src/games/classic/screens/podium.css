@@ -257,9 +257,9 @@ body.end-nohandle #sheet-body { background-image: radial-gradient(120% 60% at 50
 .fin-sw-head { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 8px 10px; }
 .fin-sw-eyebrow {
   font-family: var(--f-display); font-weight: 900; font-size: 26px; line-height: 28px; letter-spacing: -.01em;
-  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; color: #FFE7A8;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; color: #FFE7A8; white-space: nowrap;
 }
-.fin-sw-sub { font-size: 14px; line-height: 16px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: rgba(251,244,234,.75); }
+.fin-sw-sub { white-space: nowrap; font-size: 14px; line-height: 16px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: rgba(251,244,234,.75); }
 .fin-sw-list { position: relative; }
 .fin-sw-row {
   position: absolute; left: 0; right: 0; top: 0; height: calc(var(--rh) - 6px);
