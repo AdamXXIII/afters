@@ -96,7 +96,7 @@ export function willowPlate({ spin = false } = {}) {
   const rimDots = Array.from({ length: 24 }, (_, i) => {
     const a = (i / 24) * Math.PI * 2;
     const r = i % 2 ? 49 : 50.5;
-    return `<circle cx="${(60 + Math.cos(a) * r).toFixed(2)}" cy="${(60 + Math.sin(a) * r).toFixed(2)}" r="${i % 2 ? 1.6 : 2.6}" fill="#2F5D7C"/>`;
+    return `<circle cx="${(60 + Math.cos(a) * r).toFixed(2)}" cy="${(60 + Math.sin(a) * r).toFixed(2)}" r="${i % 2 ? 1.6 : 2.6}" fill="#F7EFE2"/>`;
   }).join('');
   const scallops = Array.from({ length: 12 }, (_, i) => {
     const a0 = (i / 12) * Math.PI * 2;
@@ -108,19 +108,19 @@ export function willowPlate({ spin = false } = {}) {
   return `<svg viewBox="0 0 120 120" aria-hidden="true" class="${spin ? 'spinme' : ''}">
   <defs><radialGradient id="r1china" cx="45%" cy="40%" r="70%"><stop offset="0" stop-color="#FFFDF8"/><stop offset=".75" stop-color="#F7EFE2"/><stop offset="1" stop-color="#E9DCC8"/></radialGradient></defs>
   <circle cx="60" cy="60" r="58" fill="url(#r1china)" stroke="#D9C6A8" stroke-width="1.2"/>
-  <circle cx="60" cy="60" r="54.5" fill="none" stroke="#2F5D7C" stroke-width="2.2"/>
+  <circle cx="60" cy="60" r="51" fill="none" stroke="#2F5D7C" stroke-width="9"/><circle cx="60" cy="60" r="56" fill="none" stroke="#2F5D7C" stroke-width="1.4"/>
   ${rimDots}${scallops}
-  <circle cx="60" cy="60" r="38" fill="none" stroke="#2F5D7C" stroke-width=".9" opacity=".7"/>
-  <g stroke="#2F5D7C" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M30 74h60" stroke-width="1.4"/>
-    <path d="M44 74c4-7 12-7 16 0" stroke-width="1.8"/>
-    <path d="M44 74v3M60 74v3M52 70.6v6.4" stroke-width="1.2"/>
-    <path d="M70 74V58M66 58h8l-4-5z" stroke-width="1.6"/>
-    <path d="M70 53l0-3" stroke-width="1.2"/>
-    <path d="M36 74c-1-9 2-15 8-19M40 62c-3-1-6 0-8 2M41 58c2-4 6-6 10-5" stroke-width="1.6"/>
-    <path d="M77 74c2-10 6-14 11-14" stroke-width="1.4"/>
-    <path d="M47 40q3-3 6 0q3-3 6 0M63 35q3-3 6 0q3-3 6 0" stroke-width="1.5"/>
-    <path d="M38 82c8 3 36 3 44 0" stroke-width="1" opacity=".7"/>
+  <circle cx="60" cy="60" r="38" fill="#EAF0F4" stroke="#2F5D7C" stroke-width="1.6"/>
+  <g stroke="#2F5D7C" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(60 60) scale(1.08) translate(-60 -62)">
+    <path d="M30 74h60"/>
+    <path d="M44 74c4-7 12-7 16 0"/>
+    <path d="M44 74v3M60 74v3M52 70.6v6.4"/>
+    <path d="M70 74V58M66 58h8l-4-5z"/>
+    <path d="M70 53l0-3"/>
+    <path d="M36 74c-1-9 2-15 8-19M40 62c-3-1-6 0-8 2M41 58c2-4 6-6 10-5"/>
+    <path d="M77 74c2-10 6-14 11-14"/>
+    <path d="M47 40q3-3 6 0q3-3 6 0M63 35q3-3 6 0q3-3 6 0"/>
+    <path d="M38 82c8 3 36 3 44 0" opacity=".7"/>
   </g>
   <ellipse cx="44" cy="40" rx="18" ry="8" fill="#fff" opacity=".35" transform="rotate(-28 44 40)"/>
 </svg>`;

@@ -14,17 +14,18 @@ export default {
   id: 'r1-intro',
   layout: 'show',
   shot: 'intro',
+  rail: false, // nothing to react to on a rules card; gives Cyril's face room above the menu
   mount({ show }, ctx) {
     const card = h('div.r1-menu',
       h('div.r1-menu-band', h('span', 'Course One'), coursePips(1, 3)),
       h('div.r1-menu-title', 'Plate Up'),
-      h('div.r1-menu-sub', 'Write the funniest answer. Win the table.'),
+      h('div.r1-menu-sub', 'Funniest answer wins the table.'),
       h('ul.r1-menu-items', MENU.map((m) => h('li',
         h('span.ic', { html: R1_ICONS[m.icon] }),
         h('span.dish', m.dish),
         h('span.lead'),
         h('span.price', m.price)))),
-      h('div.r1-menu-foot', h('span.r1-menu-seal', 'Clean plate'), h('span', 'Win every vote: ', h('b', '+250 pts'))),
+      h('div.r1-menu-foot', h('span.r1-menu-seal', 'Clean plate'), h('span', 'Every vote: ', h('b', '+250'))),
     );
     const wrap = h('div.r1-intro-wrap', card);
     show.append(wrap);

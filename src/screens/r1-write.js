@@ -3,7 +3,7 @@
 // sheet so nothing ever covers the strip's timer and chips.
 import './r1.css';
 import { h, button, textField } from '../ui/components.js';
-import { cyrilNote, fitText, R1_ICONS } from './r1-kit.js';
+import { cyrilNote, fitText, R1_ICONS, willowPlate } from './r1-kit.js';
 
 const TIPS = [
   'Short and daft beats long and clever. Sixty characters, tops.',
@@ -41,7 +41,7 @@ export default {
       serveBtn.insertAdjacentHTML('afterbegin', `<span class="r1-btn-ic">${R1_ICONS.cloche}</span>`);
       const promptText = h('div.r1-prompt-text', cur.prompt);
       const card = h('div.r1-prompt-card',
-        h('div.r1-prompt-head', h('span.t-eyebrow', `Plate ${idx + 1} of ${prompts.length}`), pips(cur)),
+        h('div.r1-prompt-head', h('span.t-eyebrow', 'Your question'), pips(cur)),
         promptText,
         h('div.r1-rival', h('span.r1-rival-ic', { html: R1_ICONS.rival }), h('span', 'A secret rival is answering this too.')));
       function serve() {
@@ -54,7 +54,13 @@ export default {
         setTimeout(() => ctx.client.submit(text, cur.matchupId), 220);
       }
       note = cyrilNote(TIPS[idx % TIPS.length]);
-      body.replaceChildren(card, field, note, h('div.r1-actions', serveBtn));
+      const rack = h('div.r1-rack', prompts.map((pp, i) => {
+        const done = c.mine.submitted[pp.matchupId] !== undefined;
+        return h(`div.r1-rack-slot${pp === cur ? '.cur' : ''}${done ? '.done' : ''}`,
+          h('span.r1-rack-plate', { html: willowPlate() }),
+          h('span.r1-rack-lbl', h('b', `Plate ${i + 1}`), h('span', done ? 'Served' : pp === cur ? 'Cooking now' : 'Up next')));
+      }));
+      body.replaceChildren(card, field, note, rack, h('div.r1-actions', serveBtn));
       fitText(promptText, { max: 32, min: 23, maxH: 150 });
       body.classList.remove('r1-in'); void body.offsetWidth; body.classList.add('r1-in');
       if (!c.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);

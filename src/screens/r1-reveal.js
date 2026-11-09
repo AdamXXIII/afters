@@ -26,9 +26,10 @@ export default {
       return card;
     });
     const promptText = h('div.r1-rv-prompt', p.prompt);
+    const wrapCards = h('div.r1-rv-cards', cards);
     show.append(h('div.r1-rv',
       h('div.r1-rv-top', h('span.t-eyebrow', `Head to head · ${p.index + 1} of ${p.count}`), promptText),
-      h('div.r1-rv-cards', cards)));
+      wrapCards));
     fitText(promptText, { max: 22, min: 17, maxH: 84 });
     cards.forEach((c) => fitText(c.txt, { max: 30, min: 22, maxH: 76 }));
 
@@ -42,7 +43,7 @@ export default {
       { at: S(600), fn: () => {
         p.answers.forEach((a, i) => {
           const list = a.votes.map((vid) => avatarDisc(ctx.player(vid), { size: 32, cls: '.r1-tok' }));
-          if (a.house) list.push(h('span.r1-av.r1-tok.house', { title: 'House vote (half)', html: ICONS.flame }));
+          if (a.house) list.push(h('span.r1-av.r1-tok.house', { title: 'Cyril’s house vote (half)', html: ICONS.flame }, h('span.half', '½')));
           list.forEach((t, k) => {
             t.style.setProperty('--d', `${quiet ? 0 : k * 90 + i * 45}ms`);
             t.style.setProperty('--fx', `${(i ? -1 : 1) * (30 + k * 12)}px`);
@@ -50,7 +51,7 @@ export default {
           });
           if (!list.length) cards[i].votes.append(h('span.r1-novote', 'No votes'));
           const n = a.votes.length;
-          cards[i].append(h('div.r1-rc-count', a.house ? `${n} vote${n === 1 ? '' : 's'} + Cyril’s half` : `${n} vote${n === 1 ? '' : 's'}`));
+          cards[i].append(h('div.r1-rc-count', a.house ? (n ? `${n} vote${n === 1 ? '' : 's'} + Cyril’s ½` : 'Cyril’s ½ vote') : `${n} vote${n === 1 ? '' : 's'}`));
         });
       } },
       { at: S(2200), fn: () => {
@@ -78,6 +79,7 @@ export default {
           if (a.bonus) cards[i].append(h('div.r1-rc-clean', h('span', 'Clean plate'), h('b', `+${a.bonus}`)));
           if (win && a.authorId === ctx.meId) ctx.haptic('win');
         });
+        if (p.outcome === 'tie') wrapCards.append(h('div.r1-heat', h('span', 'Dead heat'), h('b', 'Points shared')));
         sfx('countup');
       } },
       { at: S(3600), fn: () => {
