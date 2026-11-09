@@ -489,3 +489,70 @@
 .pc-bar.p1 .pc-place { font-size: 18px; }
 .pc-finalsheet .pc-opts { flex: 1; grid-auto-rows: 1fr; }
 .pc-opt { min-height: 78px; font-size: 17px; line-height: 20px; }
+
+/* ---------- round 3 (blind A/B): contrast, one loud hero ---------- */
+/* intro + final-intro: a dark menu card, candle-yellow title, the pie lit like an object */
+.pc-card, .pc-card.final {
+  background: radial-gradient(120% 70% at 50% 42%, #4A2A1F 0, #2A1A17 55%, #1C110E 100%);
+  box-shadow: inset 0 0 0 10px #2A1A17, inset 0 0 0 11.5px rgba(255,200,107,.55), 0 4px 0 #120A08, 0 24px 50px rgba(0,0,0,.6);
+}
+.pc-card-eye { color: var(--c-candle); }
+.pc-card-title { color: #FFD27A; text-shadow: 0 3px 0 #7A1E2C, 0 0 30px rgba(255,200,107,.35); font-size: 64px; }
+.pc-card.final .pc-card-title { font-size: 54px; }
+.pc-card-art { position: relative; }
+.pc-card-art::before { content: ""; position: absolute; inset: -18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,200,107,.45), transparent); }
+.pc-card-art .pc-pie { position: relative; }
+.pc-card-lede { color: #FBF4EA; font-size: 20px; line-height: 25px; }
+.pc-card.final .pc-card-lede { color: #FBF4EA; font-size: 24px; line-height: 28px; }
+.pc-card-tags { display: block; margin-top: 12px; font: 800 15px var(--f-ui); color: var(--c-candle); letter-spacing: .02em; }
+
+/* poll: high-contrast buttons that fill the sheet */
+.pc-pollsheet .pc-pollrow { max-height: none; }
+.pc-pollbtn.yes { --lip: #8A5A10; background: linear-gradient(180deg, #FFD27A, #F0B33E); color: #2A1A17; }
+.pc-pollbtn.yes .ic { background: rgba(42,26,23,.12); }
+.pc-pollbtn.yes .ic svg { color: #2A1A17; }
+.pc-pollbtn.no { --lip: #000; background: linear-gradient(180deg, #3B2620, #22140F); color: #FFD27A; }
+.pc-pollbtn { font-size: 32px; }
+
+/* bet: the knife-holder's face next to the number; bettors light up in the show layer */
+.pc-cuthero-face { position: relative; }
+.pc-cuthero-face .pc-pie { position: absolute; right: -14px; bottom: -8px; width: 34px !important; height: 34px !important; }
+.pc-cuthero-n { font-size: 64px; }
+.pc-bettors { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 10px; padding: 0 10px; z-index: 2; }
+.pc-bettor { display: flex; flex-direction: column; align-items: center; gap: 2px; font: 800 12px var(--f-ui); color: var(--c-linen); text-shadow: var(--shadow-on-dark); opacity: .55; filter: grayscale(.7); transition: all 260ms var(--ease-out-back); }
+.pc-bettor.in { opacity: 1; filter: none; transform: translateY(-4px); }
+.pc-bettor.in .pc-av { box-shadow: 0 0 0 3px var(--c-candle), 0 0 14px rgba(255,200,107,.7); }
+
+/* reveal: the number is the hero */
+.pc-rv .pc-qcard.compact .pc-q { font-size: 19px; }
+.pc-rv-pie .pc-pie { width: 300px !important; height: 300px !important; --pc-size: 300px; }
+.pc-rv-pie .pc-cream { width: 50%; height: 50%; }
+.pc-rv-pie .pc-num { font-size: 66px; }
+.pc-rv-pie .pc-num-lbl { font-size: 12px; }
+.pc-lanes.resolved .pc-lane.lost:not(.empty) { filter: none; opacity: 1; }
+.pc-lanes.resolved .pc-lane.lost:not(.empty) .pc-lane-pts { color: #fff; background: var(--c-tomato); border-radius: 8px; padding: 2px 8px; text-decoration: none; transform: rotate(-6deg); }
+.pc-lane.empty { opacity: .35; }
+
+/* final pick: cream tiles, big centred ink type; claret when picked */
+.pc-opt, .pc-opt:nth-child(n) { --lip: #E2CFB3; background: #FFFBF4; background-image: var(--paper); color: var(--c-ink); text-shadow: none; align-items: center; justify-content: center; text-align: center; font: 800 18px/21px var(--f-ui); border: 2px solid var(--c-crumb); }
+.pc-opt-t { padding: 0 10px; }
+.pc-opt-n { border-color: var(--c-crumb); }
+.pc-opt[aria-pressed="true"] { background: var(--c-claret); color: #fff; border-color: var(--c-claret); outline: none; --lip: var(--c-claret-lip); }
+.pc-opt[aria-pressed="true"] .pc-opt-n { background: #FFD27A; color: var(--c-ink); }
+
+/* final reveal: also-rans shrink, No. 1 takes the screen */
+.pc-bars { flex: 0 1 auto; }
+.pc-bar { height: 30px; }
+.pc-bar .pc-bar-t { font-size: 13px; }
+.pc-bar.top { height: 44px; }
+.pc-hero1 {
+  border-radius: 22px; padding: 14px 18px 16px; text-align: center; color: #fff; margin-top: 4px;
+  background: radial-gradient(120% 120% at 50% 0%, #C73C49, #7A1E2C); box-shadow: 0 0 0 4px #FFD27A, 0 0 40px rgba(255,200,107,.55), 0 18px 34px rgba(20,8,5,.55);
+  opacity: 0; transform: scale(.7) rotate(-3deg); transition: all 420ms var(--ease-out-back);
+}
+.pc-hero1.in { opacity: 1; transform: none; }
+.pc-hero1-eye { font: 800 13px var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #FFD27A; }
+.pc-hero1-t { font: 900 30px/1.05 var(--f-display); margin-top: 4px; text-wrap: balance; }
+.pc-hero1-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 4px; }
+.pc-hero1-n { font: 900 54px/1 var(--f-display); color: #FFD27A; font-variant-numeric: tabular-nums; }
+.pc-frv .pc-final-pts { margin-top: auto; }

@@ -68,8 +68,8 @@ const poll = {
       count.textContent = `${n}/${discs.size} in`;
     };
     update(ctx);
-    const cancel = say(ctx, ctx.line('pcPoll'), { hold: 3000 });
-    return { update, frame(c) { card.timer.set(c.remaining(), c.duration); }, unmount: cancel };
+    ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1400 });
+    return { update, frame(c) { card.timer.set(c.remaining(), c.duration); } };
   },
 };
 
@@ -223,6 +223,15 @@ const BETS_UI = {
   mlower: { label: 'Much lower', pay: '1000 · 15+ below', much: true, down: true },
 };
 
+/** Show-layer strip: everyone betting, lighting up as their bet lands. */
+function bettors(ctx) {
+  const ids = ctx.players.filter((x) => x.id !== ctx.payload.knife);
+  const discs = new Map(ids.map((pl) => [pl.id, h('div.pc-bettor', disc(pl, { size: 40 }), h('span', pl.name))]));
+  const el = h('div.pc-bettors', [...discs.values()]);
+  el.sync = (c) => { for (const [id, d] of discs) d.classList.toggle('in', !!(c.progress.bets || {})[id]); };
+  return el;
+}
+
 function betBoard(ctx, { interactive }) {
   const p = ctx.payload;
   const rows = {};
@@ -241,7 +250,7 @@ function betBoard(ctx, { interactive }) {
   };
   const mini = pie({ size: 92, number: false, ticks: false });
   mini.slice(p.cut); mini.knife(p.cut);
-  const hero = h('div.pc-cuthero', mini,
+  const hero = h('div.pc-cuthero', h('div.pc-cuthero-face', disc(ctx.player(p.knife), { size: 50 }), mini),
     h('div.pc-cuthero-t', h('div.pc-cuthero-l', `${knifeName(ctx)}’s cut`), h('div.pc-cuthero-n', `${p.cut}%`)));
   const el = h(`div.pc-board${interactive ? '' : '.view'}`,
     h('div.pc-board-row', mk('higher'), mk('mhigher')),
@@ -268,11 +277,13 @@ const bet = {
     const p = ctx.payload;
     const card = questionCard(p);
     show.append(topWrap(card));
+    const strip = bettors(ctx);
+    show.append(strip);
     const board = betBoard(ctx, { interactive: true });
     sheet.append(h('div.pc-sheet.pc-betsheet.pc-in', h('div.pc-ask-q.center', 'The real answer is...'), board));
-    board.sync(ctx);
-    const cancel = say(ctx, ctx.line('pcBet', { name: knifeName(ctx) }), {}, 400);
-    return { update: (c) => board.sync(c), frame(c) { card.timer.set(c.remaining(), c.duration); }, unmount: cancel };
+    const update = (c) => { board.sync(c); strip.sync(c); };
+    update(ctx);
+    return { update, frame(c) { card.timer.set(c.remaining(), c.duration); } };
   },
 };
 

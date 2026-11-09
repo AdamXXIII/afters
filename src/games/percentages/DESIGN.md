@@ -12,7 +12,7 @@ Why it's fun after dinner (Adam: first version was "kind of boring"):
 - **Fast**: nothing waits longer than 25 s, every phase ends early when everyone's done, no typing at all.
 
 ## 2. Flow, phases, timers
-Players 3-8. Rounds = number of players, minimum 4, maximum 8 (with 3 players one person cuts twice). One round in the middle is a **Table poll** (two with 7-8 players). Knife order: shuffled, everyone cuts once before anyone cuts twice.
+Players 3-8. Rounds = number of players, minimum 4, maximum 8 (with 3 players one person cuts twice). **Every round has a knife-holder, Table polls included**, so everyone cuts at least once. One round in the middle is a **Table poll** (two with 7-8 players): everyone first answers the question secretly (Yes/No), then it plays exactly like a normal round, except the real number is *this table's* % of yeses. Knife order: shuffled, everyone cuts once before anyone cuts twice.
 
 | Phase id | Layout | Timer | Ends early when |
 |---|---|---|---|
@@ -20,14 +20,14 @@ Players 3-8. Rounds = number of players, minimum 4, maximum 8 (with 3 players on
 | `percentages-poll` (Table poll rounds only) | split | 12 s | everyone answered |
 | `percentages-dial` | split | 25 s | the knife-holder locks in |
 | `percentages-bet` | split | 12 s | every non-knife player bet |
-| `percentages-reveal` | show | 8.5 s | - |
+| `percentages-reveal` | show | 10.5 s (Cyril's aside lands at 5.4 s, leaving ~5 s for the table to confess) | - |
 | `percentages-scores` (once, before the finale) | show | 6 s | - |
 | `percentages-final-intro` | show | 5 s (skippable) | - |
 | `percentages-final` | input | 25 s | everyone picked 3 |
 | `percentages-final-reveal` | show | 11 s | - |
 | -> `results` (box) via `api.finish` | | | |
 
-Budget (6 players): 6 + 12 + 6 x ~40 + 6 + 5 + 20 + 11 = **~5 min**. Short and punchy on purpose: it's one dish on the trolley, and "Same again" is one tap.
+Budget (6 players): 6 + 12 + 6 x ~42 + 6 + 5 + 20 + 11 = **~5.5 min**. Short and punchy on purpose: it's one dish on the trolley, and "Same again" is one tap.
 
 If the knife-holder never locks in, their last live position counts (or 50 if they never touched it). Phones that never bet just score nothing.
 
@@ -77,3 +77,7 @@ If the knife-holder never locks in, their last live position counts (or 50 if th
 
 ## 8. Messages (phone -> host)
 `pc-dial {v}` (live, throttled ~8/s), `pc-lock {v}`, `pc-heckle {dir: 'up'|'down'}` (rate limited 300 ms), `pc-bet {bet: 'mlower'|'lower'|'higher'|'mhigher'}`, `pc-poll {yes}`, `pc-top3 {ids}`. Progress extras: `dial`, `locked`, `heckles: [{n, id, dir}]` (last 12), `bets: {id: bet}`.
+
+## 9. Changes from the critic loop
+- Round 1 paper play-test: Table poll rules spelled out (answer secretly, then cut + bet on the table's own %); reveal 8.5 -> 10.5 s so the "...I have, actually" moment gets air. Kept the separate bet phase and "Much" bets: they're what makes the knife-holder sweat.
+- Round 1 blind A/B (reveal won, 10 lost): every screen now has one hero (the question on top, the number in the sheet); Cyril's bubble no longer repeats the sheet copy; heckles fly beside Cyril, never over the number; a tug-of-war meter shows which way the table is shouting; bets are four chunky coloured tiles around a giant cut number; standings are a podium; the finale options are colour tiles; the final reveal makes No. 1 the biggest thing on screen.

@@ -24,7 +24,7 @@ function menuCard({ eyebrow, title, lede, tags, slice = 37 }) {
     h('div.pc-card-title', title),
     h('div.pc-card-art', art),
     h('div.pc-card-lede', lede),
-    h('div.pc-card-tags', tags.map(([big, small]) => h('div.pc-tag', h('b', big), h('span', small)))));
+    h('div.pc-card-tags', tags));
 }
 
 const intro = {
@@ -36,7 +36,7 @@ const intro = {
       eyebrow: ctx.adult ? 'Today’s pie · after dark' : 'Today’s pie',
       title: 'Pie Chart',
       lede: 'Cut the pie to guess the percent. Everyone else bets on your cut.',
-      tags: [['2000', 'spot-on cut'], ['1000', 'brave bet']],
+      tags: 'Up to 2000 for a clean cut',
     });
     show.append(h('div.pc-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -87,7 +87,7 @@ const finalIntro = {
       title: 'The Last Slice',
       slice: 88,
       lede: ctx.payload.q,
-      tags: [['Pick 3', 'of nine'], ['1000', 'a hit'], ['+500', 'for No. 1']],
+      tags: 'Pick 3 \u00b7 1000 a hit \u00b7 +500 for No. 1',
     });
     card.classList.add('final');
     show.append(h('div.pc-cardwrap', card));
@@ -167,9 +167,15 @@ const finalReveal = {
     const myPts = p.deltas[ctx.meId] || 0;
     const served = !!p.picks[ctx.meId];
     const banner = h('div.pc-final-pts', myPts ? `+${myPts} for you` : served ? 'None in the top three. Oh dear.' : 'You didn\u2019t serve three. Bold.');
+    const no1 = p.bars.find((b) => b.place === 1);
+    const hero = h('div.pc-hero1',
+      h('div.pc-hero1-eye', 'The nation\u2019s No. 1'),
+      h('div.pc-hero1-t', no1.t),
+      h('div.pc-hero1-row', h('span.pc-hero1-n', `${no1.pct}%`), h('span.pc-bar-who', pickers(no1.id).map((id) => disc(ctx.player(id), { size: 30 })))));
     show.append(h('div.pc-frv',
-      h('div.pc-frv-head', h('div.t-eyebrow', 'The last slice · roughly, from surveys'), h('div.pc-frv-q', p.q)),
-      h('div.pc-bars', rows.map((r) => r.el)),
+      h('div.pc-frv-head', h('div.t-eyebrow', 'The last slice \u00b7 roughly, from surveys'), h('div.pc-frv-q', p.q)),
+      h('div.pc-bars', rows.filter((r) => r.b.place !== 1).map((r) => r.el)),
+      hero,
       banner));
     const quiet = ctx.frozen;
     const fired = new Set();
@@ -185,7 +191,7 @@ const finalReveal = {
           fired.add(r.b.id);
           r.el.classList.add('in');
           if (!quiet) { if (r.b.place) { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); } else ctx.audio.sfx('pop'); }
-          if (r.b.place === 1) ctx.cyril.react('delight', { duration: quiet ? 60000 : 1400 });
+          if (r.b.place === 1) { hero.classList.add('in'); ctx.cyril.react('delight', { duration: quiet ? 60000 : 1400 }); if (!quiet) { ctx.audio.sfx('fanfare'); ctx.stage.shake?.(); } }
         }
       }
       if (t >= p.pointsAt && !fired.has('pts')) {
