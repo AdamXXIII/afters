@@ -5,7 +5,7 @@ import './tp.css';
 import { drawingView } from '../../../shared/drawing.js';
 import { h, av, who, tilt, cordSvg, kindLabel, TP_ICONS, fitText } from './kit.js';
 
-const TYPE_MS = 34; // per character
+const TYPE_MS = 26; // per character
 
 export default {
   id: 'telephone-reveal',
@@ -56,10 +56,12 @@ export default {
       card.txt = txt;
       return card;
     };
-    const drawCard = (st, i) => {
+    const drawCard = (st, i, { guess = null } = {}) => {
       const pl = ctx.player(st.authorId);
       const view = drawingView(st.drawing, { className: 'tp-rv-view' });
-      const card = h('div.tp-card.tp-card-draw', { style: { '--tilt': `${tilt(seed, `d${i}`, 1.8)}deg`, '--pc': pl?.colour } },
+      const asked = flip ? steps[0].text : steps[i - 1]?.text;
+      const card = h(`div.tp-card.tp-card-draw${guess ? '.with-guess' : ''}`, { style: { '--tilt': `${tilt(seed, `d${i}`, 1.8)}deg`, '--pc': pl?.colour } },
+        !guess && asked ? h('div.tp-asked', h('span', flip ? 'Animate' : 'Draw'), h('b', asked)) : null,
         view.el,
         h('div.tp-stamp.on-paper', av(pl, { size: 20 }), h('span', `${pl?.name || '?'} drew`), st.auto ? h('em', '(Cyril\'s doodle)') : null),
         st.drawing?.strokes?.length ? null : h('div.tp-blank', 'Not a single line.'));
@@ -105,7 +107,19 @@ export default {
       }
       if (bi < p.beats.length) {
         const st = steps[bi];
-        if (bi > 0) prevSlot.replaceChildren(mini(steps[bi - 1], bi - 1));
+        if (st.kind === 'guess' && steps[bi - 1]?.kind === 'draw') {
+          const dc = drawCard(steps[bi - 1], bi - 1, { guess: true });
+          const gc = textCard(st, bi);
+          gc.classList.add('as-caption');
+          const combo = h('div.tp-combo', dc, gc);
+          stageSlot.replaceChildren(combo); enter(gc);
+          requestAnimationFrame(() => dc.view.frame());
+          dc.classList.add('done');
+          live = { kind: 'text', card: gc, st, beat: p.beats[bi], verdictShown: false, still: dc };
+          sfx('page', { up: false });
+          setTrack(bi);
+          return;
+        }
         if (st.kind === 'draw') {
           const card = drawCard(st, bi);
           stageSlot.replaceChildren(card); enter(card);
@@ -127,8 +141,10 @@ export default {
         const frames = steps.filter((s) => s.kind === 'draw');
         const views = frames.map((f) => drawingView(f.drawing, { className: 'tp-rv-view' }));
         const holder = h('div.tp-flip', ...views.map((v) => v.el));
+        const strip = h('div.tp-flip-strip', frames.map((f, k) => h('span.tp-flip-fr', av(ctx.player(f.authorId), { size: 24 }), h('i', String(k + 1)))));
         const card = h('div.tp-card.tp-card-draw.tp-card-flip', { style: { '--tilt': '0deg' } }, h('div.tp-film', { html: TP_ICONS.film }, h('span', 'Roll film')), holder,
           h('div.tp-flip-cap', `“${steps[0].text}”`));
+        card.append(strip);
         stageSlot.replaceChildren(card); enter(card);
         live = { kind: 'flip', views, at: p.end.flipAt };
         c.cyril.react('delight');
@@ -137,25 +153,22 @@ export default {
         setTrack(steps.length);
         return;
       }
-      // end beat: first vs last, stamped
+      // end beat: first vs last on one card, verdict stamped above it
       const lastStep = steps[p.end.lastStep] || steps[steps.length - 1];
-      const first = textCard(steps[0], 0, { big: false });
-      first.txt.textContent = steps[0].text;
-      let last;
-      if (flip) {
-        const v = drawingView(lastStep.drawing, { className: 'tp-mini-view' });
-        last = h('div.tp-card.tp-card-draw.mini', v.el);
-        requestAnimationFrame(() => v.frame());
-      } else {
-        last = textCard(lastStep, p.end.lastStep, { big: false });
-        last.txt.textContent = lastStep.text;
-        last.querySelector('.tp-card-eyebrow').textContent = 'It ended as';
-      }
       const verdict = p.end.verdict;
-      const stamp = h(`div.tp-verdict.${verdict}`, verdict === 'straight' ? ['Straight', h('br'), 'through'] : verdict === 'flip' ? ['That\'s', h('br'), 'a wrap'] : ['Crossed', h('br'), 'wires']);
+      const owner0 = ctx.player(steps[0].authorId);
+      const lastBy = ctx.player(lastStep.authorId);
+      const lastEl = flip ? (() => { const v = drawingView(lastStep.drawing, { className: 'tp-mini-view' }); requestAnimationFrame(() => v.frame()); return v.el; })() : h('div.tp-fl-txt.last', lastStep.text);
+      const stamp = h(`div.tp-verdict.${verdict}`, verdict === 'straight' ? 'Straight through!' : verdict === 'flip' ? 'That\'s a wrap' : 'Crossed wires!');
       const crosser = p.end.crossedAt > 0 ? ctx.player(steps[p.end.crossedAt].authorId) : null;
       const cap = verdict === 'crossed' && crosser ? h('div.tp-end-cap', 'Lost at step ', h('b', String(p.end.crossedAt + 1)), ' by ', who(crosser, { size: 18 })) : verdict === 'straight' ? h('div.tp-end-cap', h('b', '+300'), ' to everyone on this line') : null;
-      const pair = h('div.tp-end', first, stamp, last, cap);
+      const card = h('div.tp-card.tp-fl', { style: { '--tilt': '-1deg' } },
+        h('div.tp-fl-k', h('span', 'It started as'), who(owner0, { size: 18 })),
+        h('div.tp-fl-txt', steps[0].text),
+        h('div.tp-fl-cord', { html: cordSvg(300, 22, { loops: 12, stroke: 2.6 }) }),
+        h('div.tp-fl-k', h('span', 'It ended as'), who(lastBy, { size: 18 })),
+        lastEl);
+      const pair = h('div.tp-end', stamp, card, cap);
       stageSlot.replaceChildren(pair);
       if (!quiet) pair.animate([{ opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' });
       setTrack(steps.length);
@@ -183,6 +196,7 @@ export default {
         live.card.view.frame(Math.max(0, bt - 150));
         live.card.classList.toggle('done', bt >= live.beat.replay);
       } else if (live.kind === 'text') {
+        live.still?.view.frame();
         const bt = t - live.beat.at - 260;
         const s = live.st.text || '';
         const n = Math.max(0, Math.min(s.length, Math.floor(bt / TYPE_MS)));
@@ -207,6 +221,7 @@ export default {
         const bt = Math.max(0, t - live.at);
         const k = Math.floor(bt / 260) % live.views.length;
         live.views.forEach((v, i) => { v.el.style.opacity = i === k ? '1' : '0'; if (i === k) v.frame(); });
+        stageSlot.querySelectorAll('.tp-flip-fr').forEach((f, i) => f.classList.toggle('on', i === k));
       }
     };
     frame(ctx);

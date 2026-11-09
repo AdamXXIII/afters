@@ -7,11 +7,11 @@ import { doodle, DOODLE_KEYS } from './doodles.js';
 import { MODES, TIMERS, LIMITS, holder, kindOf, kept } from './logic.js';
 
 const INTRO = 12000;
-const VOTE = 12000;
+const VOTE = 9000;
 const AWARDS = 9500;
 const PTS = { vote: 500, kept: 250, straight: 300, flipBest: 250 };
 // reveal beats (ms at speed 1)
-const BEAT = { title: 1500, text: 2700, guess: 3000, drawHold: 1300, drawMax: 4200, blank: 1700, flipFrame: 600, flipMax: 2600, flipbook: 4200, end: 3600 };
+const BEAT = { title: 1300, text: 2300, guess: 2700, drawHold: 1000, drawMax: 3400, blank: 1700, flipFrame: 600, flipMax: 2600, flipbook: 4200, end: 3200 };
 
 export class TelephoneHost {
   constructor(api) {

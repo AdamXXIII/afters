@@ -170,3 +170,18 @@ export function doodle(key, seed = 1) {
 export function nudgeDrawing(d, dx, dy) {
   return { v: 1, strokes: (d?.strokes || []).map((s) => ({ ...s, p: [s.p[0] + dx, s.p[1] + dy, ...s.p.slice(2)] })) };
 }
+
+// which doodle a bot draws for a sentence (keyword -> doodle), else a seeded random one
+const DOODLE_WORDS = [
+  ['cat', /\b(cat|kitten|puss|lion|tiger)/], ['fish', /\b(fish|shark|whale|goldfish|mermaid|octopus|crab|lobster|jellyfish|seagull)/],
+  ['ghost', /\b(ghost|haunted|mummy|vampire|spooky)/], ['house', /\b(house|castle|shed|lighthouse|caravan|church|steeple|home)/],
+  ['rocket', /\b(rocket|alien|astronaut|moon|space)/], ['cake', /\b(cake|birthday|bun|pudding|candle|wedding)/],
+  ['snail', /\b(snail|tortoise|worm|slug)/], ['sun', /\b(sun|beach|holiday|sunbed|summer)/],
+  ['pig', /\b(pig|sausage|bacon|cow|sheep|llama|horse|goat)/], ['person', /\b(man|vicar|grandad|granny|nan|mum|dad|king|queen|knight|wizard|pirate|cowboy|nun|postman|milkman|plumber|santa)/],
+];
+/** Which doodle fits a sentence (keyword match, else a seeded random one). */
+export function doodleFor(text, rng = Math.random) {
+  const t = String(text || '').toLowerCase();
+  const hit = DOODLE_WORDS.find(([, re]) => re.test(t));
+  return hit ? hit[0] : DOODLE_KEYS[Math.floor(rng() * DOODLE_KEYS.length)];
+}

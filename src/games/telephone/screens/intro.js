@@ -3,7 +3,7 @@ import './tp.css';
 import { h, button, TP_ICONS, cordSvg } from './kit.js';
 
 const MODES = [
-  { id: 'classic', name: 'Classic', icon: 'pencil', sub: 'Draw, guess, draw, guess', t: '60 s to draw' },
+  { id: 'classic', name: 'Classic', icon: 'pencil', sub: 'Draw, guess, draw, guess', t: '50 s to draw' },
   { id: 'speedy', name: 'Speedy', icon: 'bolt', sub: 'Half the time, twice the mess', t: '30 s to draw' },
   { id: 'flip', name: 'Flipbook', icon: 'film', sub: 'Everyone draws the next frame', t: '45 s a frame' },
 ];

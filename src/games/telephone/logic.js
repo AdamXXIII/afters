@@ -3,9 +3,9 @@
 export const MODES = ['classic', 'speedy', 'flip'];
 
 export const TIMERS = {
-  classic: { write: 40000, draw: 60000, guess: 25000 },
+  classic: { write: 30000, draw: 50000, guess: 22000 },
   speedy: { write: 25000, draw: 30000, guess: 15000 },
-  flip: { write: 40000, draw: 45000, guess: 25000 },
+  flip: { write: 30000, draw: 45000, guess: 25000 },
 };
 
 export const LIMITS = { text: 70, points: 2200 };
@@ -19,7 +19,7 @@ export const kindOf = (s, mode) => (s === 0 ? 'write' : mode === 'flip' ? 'draw'
 const STOP = new Set(('a an the and or of in on at to for with by from up down is are was were be been it its it\'s this that these those '
   + 'his her their our your my me you he she they we i him them us very really just some any no not too so as into out over under '
   + 'than then there here who what which when where why how all one two being has have had do does did doing very big small little '
-  + 'giant tiny huge s').split(/\s+/));
+  + 'giant tiny huge having getting going doing trying being make making s').split(/\s+/));
 
 /** Content words, lowercased, plurals folded ("cats" -> "cat", "boxes" -> "box"). */
 export function keyWords(text) {

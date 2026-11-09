@@ -3,7 +3,7 @@ import './tp.css';
 import { textField } from '../../../ui/components.js';
 import { drawPad, drawingView, encodeDrawing } from '../../../shared/drawing.js';
 import { STARTERS } from '../content/starters.js';
-import { doodle } from '../doodles.js';
+import { doodle, doodleFor } from '../doodles.js';
 import { mulberry32 } from '../../../util/rng.js';
 import { h, button, av, who, fitText, cyrilNote, iconBtn, stepPips, nudgeWatcher, TP_ICONS, cordSvg, tilt } from './kit.js';
 
@@ -94,8 +94,8 @@ const draw = {
     });
     // demo/screenshot: a half-finished doodle so the board isn't empty
     if (ctx.demo && ctx.frozen) {
-      const dd = doodle('cat', 3);
-      dd.strokes = dd.strokes.slice(0, 6);
+      const dd = doodle(doodleFor(pv.text, () => 0.4), 3);
+      dd.strokes = dd.strokes.slice(0, Math.max(3, dd.strokes.length - 3));
       pad.drawing = dd;
     }
     let onion = null;

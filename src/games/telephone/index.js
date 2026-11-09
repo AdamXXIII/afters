@@ -3,31 +3,17 @@
 import { TelephoneHost } from './host.js';
 import { STARTERS } from './content/starters.js';
 import { TP_LINES } from './content/lines.js';
-import { doodle, nudgeDrawing, DOODLE_KEYS } from './doodles.js';
+import { doodle, nudgeDrawing, doodleFor } from './doodles.js';
 import { encodeDrawing } from '../../shared/drawing-data.js';
 
 const STEP_PHASES = new Set(['telephone-write', 'telephone-draw', 'telephone-guess']);
 
-// which doodle a bot draws for a sentence (keyword -> doodle), else a seeded random one
-const DOODLE_WORDS = [
-  ['cat', /\b(cat|kitten|puss|lion|tiger)/], ['fish', /\b(fish|shark|whale|goldfish|mermaid|octopus|crab|lobster|jellyfish|seagull)/],
-  ['ghost', /\b(ghost|haunted|mummy|vampire|spooky)/], ['house', /\b(house|castle|shed|lighthouse|caravan|church|steeple|home)/],
-  ['rocket', /\b(rocket|alien|astronaut|moon|space)/], ['cake', /\b(cake|birthday|bun|pudding|candle|wedding)/],
-  ['snail', /\b(snail|tortoise|worm|slug)/], ['sun', /\b(sun|beach|holiday|sunbed|summer)/],
-  ['pig', /\b(pig|sausage|bacon|cow|sheep|llama|horse|goat)/], ['person', /\b(man|vicar|grandad|granny|nan|mum|dad|king|queen|knight|wizard|pirate|cowboy|nun|postman|milkman|plumber|santa)/],
-];
 const GUESS_FOR = {
   cat: ['A cat with a grudge', 'Angry cat', 'A cat at a party'], fish: ['A fish in trouble', 'Big fish', 'A fish going to work'],
   ghost: ['A ghost doing karaoke', 'Scared ghost', 'Ghost at a bus stop'], house: ['A house on fire', 'Haunted house', 'A tiny house'],
   rocket: ['A rocket to Wigan', 'Rocket with feelings', 'Space rocket'], cake: ['A birthday cake', 'Cake on fire', 'Wedding cake disaster'],
   snail: ['A snail in a hurry', 'Speedy snail', 'Snail on holiday'], sun: ['The sun with a hangover', 'Happy sun', 'Sun at the beach'],
   pig: ['A pig in love', 'Pig with ears', 'A posh pig'], person: ['A man waving', 'Bloke with a balloon', 'A person having a moment'],
-};
-
-const doodleFor = (text, rng) => {
-  const t = String(text || '').toLowerCase();
-  const hit = DOODLE_WORDS.find(([, re]) => re.test(t));
-  return hit ? hit[0] : DOODLE_KEYS[Math.floor(rng() * DOODLE_KEYS.length)];
 };
 
 function bot({ ph, client, later, rng, rand, still, answer }) {
@@ -44,7 +30,7 @@ function bot({ ph, client, later, rng, rand, still, answer }) {
     case 'telephone-draw': {
       let key = doodleFor(pv.text, rng);
       let d = doodle(key, Math.floor(rng() * 1e6));
-      if (ph.payload.mode === 'flip' && pv.prev?.strokes?.length) { d = nudgeDrawing(pv.prev, Math.round(rand(20, 70)), Math.round(rand(-30, 10))); key = null; }
+      if (ph.payload.mode === 'flip' && pv.prev?.strokes?.length) { d = nudgeDrawing(pv.prev, Math.round(rand(50, 110)), Math.round(rand(-60, 20))); key = null; }
       later(rand(3000, 12000), () => send('draw', { d: encodeDrawing(d), final: true, doodle: key }, { sent: true }));
       return true;
     }
