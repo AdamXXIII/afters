@@ -3,7 +3,7 @@
 > AI-generated (Claude, Percentages team, 2026-11-09). Game module `src/games/percentages/`. Read the box `DESIGN.md` (art bible) and `ARCHITECTURE.md` ("How to add a game") first. Genre: percentage guessing with higher/lower side bets. Everything visible (name, pie, copy, questions) is ours.
 
 ## 1. The pitch (one breath)
-"Of 100 British adults asked, how many said they've weed in the sea?" One player holds the **cake knife** and cuts the pie to their guess while the whole table shouts "HIGHER!" at them from their phones. Then everyone else bets on the cut: **Much lower, Lower, Higher, Much higher**. Cyril cuts the real slice with a drumroll. Halfway through, a **Table poll** asks the table about *itself* ("What % of this table has been sick in a taxi?"), answered anonymously on the phones. It ends on **The Last Slice**: pick the top 3 of nine.
+"Of 100 British adults asked, how many said they've weed in the sea?" One player holds the **cake knife** and cuts the pie to their guess while the whole table shouts "HIGHER!" at them from their phones. Then everyone else bets on the cut: **Way lower, Lower, Higher, Way higher**. Cyril cuts the real slice with a drumroll. Halfway through, a **Table poll** asks the table about *itself* ("What % of this table has been sick in a taxi?"), answered anonymously on the phones. It ends on **The Last Slice**: pick the top 3 of nine.
 
 Why it's fun after dinner (Adam: first version was "kind of boring"):
 - **Loud by design**: heckle buttons make the room shout at the knife-holder; their phone buzzes with every heckle and the heckles fly across every phone with names on them.
@@ -35,7 +35,7 @@ If the knife-holder never locks in, their last live position counts (or 50 if th
 - **Knife-holder** (diff = |cut - real|): diff <= 2 is a **Bullseye**: 2000. Otherwise `max(0, 1500 - 75 x diff)`, rounded to 50 (10 off = 750, 20+ off = 0).
 - **Bets** (compare the real number with the cut):
   - Higher / Lower right: **500**.
-  - Much higher / Much lower right *and* the real number is 15+ away from the cut: **1000**. Right way but less than 15 away: **250** ("right direction, wrong confidence").
+  - Way higher / Way lower right *and* the real number is 15+ away from the cut: **1000**. Right way but less than 15 away: **250** ("right direction, wrong confidence").
   - Wrong way: 0. A Bullseye burns every bet (nobody's right).
 - **Last Slice**: each pick in the real top 3: **1000**, plus **500** if you picked the number one.
 - Game score -> `api.finish` -> tonight's cherries (5/3/2/1).

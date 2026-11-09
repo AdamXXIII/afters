@@ -35,8 +35,8 @@ const intro = {
     const card = menuCard({
       eyebrow: ctx.adult ? 'Today’s pie · after dark' : 'Today’s pie',
       title: 'Pie Chart',
-      lede: 'Cut the pie to guess the percent. Everyone else bets on your cut.',
-      tags: 'Up to 2000 for a clean cut',
+      lede: 'Guess the percent. Bet on your mates.',
+      tags: '2000 for a clean cut',
     });
     show.append(h('div.pc-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -87,7 +87,7 @@ const finalIntro = {
       title: 'The Last Slice',
       slice: 88,
       lede: ctx.payload.q,
-      tags: 'Pick 3 \u00b7 1000 a hit \u00b7 +500 for No. 1',
+      tags: 'Pick 3 \u00b7 1000 each',
     });
     card.classList.add('final');
     show.append(h('div.pc-cardwrap', card));

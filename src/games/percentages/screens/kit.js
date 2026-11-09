@@ -119,22 +119,19 @@ export function pie({ size = 260, number = true, ticks = true } = {}) {
 }
 
 /** The question card on the show layer: eyebrow, framing line, the question, "roughly" tag. */
-export function questionCard(p, { timer = true, compact = false, tag = null } = {}) {
+export function questionCard(p, { timer = true, compact = false } = {}) {
+  // One big line. "Say they" keeps it honest: these are poll answers, not facts.
   const poll = p.kind === 'poll';
   const t = timer ? timerRing() : null;
-  const lead = poll ? 'What % of this table' : 'Of 100 Brits asked, how many said they…';
-  const q = h('div.pc-q', `${p.q}?`);
+  const q = h('div.pc-q', poll ? h('span.pc-qpre', 'What % of this table ') : h('span.pc-qpre', 'What % of Brits say they '), `${p.q}?`);
   const card = h(`div.pc-qcard${poll ? '.poll' : ''}${compact ? '.compact' : ''}`,
     h('div.pc-qhead', t,
-      h('div.pc-qmeta',
-        h('span.t-eyebrow', poll ? `Table poll · ${p.index + 1} of ${p.count}` : `Slice ${p.index + 1} of ${p.count}`),
-        tag || h('span.pc-src', poll ? 'Asked live, anonymously' : 'Roughly, from surveys'))),
-    h('div.pc-lead', lead),
+      h('div.pc-qmeta', h('span.t-eyebrow', poll ? `Table poll · ${p.index + 1} of ${p.count}` : `Slice ${p.index + 1} of ${p.count}`))),
     q);
   card.timer = t;
-  const len = p.q.length;
-  if (len > 52) card.classList.add('long');
-  if (len > 64) card.classList.add('xlong');
+  const len = p.q.length + 26;
+  if (len > 62) card.classList.add('long');
+  if (len > 80) card.classList.add('xlong');
   return card;
 }
 
@@ -144,10 +141,10 @@ export function disc(player, { size = 30, cls = '' } = {}) {
 }
 
 export const BET_INFO = {
-  mhigher: { label: 'Much higher', short: 'Much higher', pay: '1000 if 15+ above', arrow: '⇈' },
+  mhigher: { label: 'Way higher', short: 'Way higher', pay: '1000 if 15+ above', arrow: '⇈' },
   higher: { label: 'Higher', short: 'Higher', pay: '500', arrow: '↑' },
   lower: { label: 'Lower', short: 'Lower', pay: '500', arrow: '↓' },
-  mlower: { label: 'Much lower', short: 'Much lower', pay: '1000 if 15+ below', arrow: '⇊' },
+  mlower: { label: 'Way lower', short: 'Way lower', pay: '1000 if 15+ below', arrow: '⇊' },
 };
 
 export const ARROW_UP = '<svg viewBox="0 0 24 24"><path d="M12 20V5M5 11.5l7-7 7 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -180,7 +177,8 @@ export function heckleFeed(ctx) {
       const r = srand(ctx.phase.seed, `hx${hk.n}`);
       const x = r < 0.5 ? 2 + r * 24 : 58 + (r - 0.5) * 12;
       const tilt = (srand(ctx.phase.seed, `ht${hk.n}`) - 0.5) * 14;
-      const tag = h(`div.pc-heckle.${hk.dir}`, { style: { left: `${x}%`, '--tilt': `${tilt}deg`, '--pc': AVATARS[pl?.avatar]?.colour || '#7A4A2A' } },
+      const side = r < 0.5 ? { left: `${x}%` } : { right: `${(r - 0.5) * 16 + 2}%` };
+      const tag = h(`div.pc-heckle.${hk.dir}`, { style: { ...side, '--tilt': `${tilt}deg`, '--pc': AVATARS[pl?.avatar]?.colour || '#7A4A2A' } },
         disc(pl, { size: 26 }), h('span.nm', pl?.name || '?'), h('b', hk.dir === 'up' ? 'Higher!' : 'Lower!'));
       el.append(tag);
       if (quiet) tag.classList.add('still');

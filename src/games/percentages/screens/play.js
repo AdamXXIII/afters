@@ -53,7 +53,7 @@ const poll = {
     const count = h('span.pc-count');
     const note = h('div.pc-hint');
     sheet.append(h('div.pc-sheet.pc-pollsheet.pc-in',
-      h('div.pc-ask', h('div.pc-ask-q', 'You? Honestly?'), h('div.pc-ask-hint', 'Secret answer. Then someone guesses what % of you said yes.')),
+      h('div.pc-pollhint', 'Secret. Then someone guesses the % of yeses.'),
       h('div.pc-pollrow', yesB, noB),
       note,
       h('div.pc-tally.big', h('div.pc-discs', [...discs.values()]), count)));
@@ -217,16 +217,16 @@ const watch = {
 
 // ---------- bet board (shared by bet + sweat): the cut is the hero, four bets around it ----------
 const BETS_UI = {
-  higher: { label: 'Higher', pay: '500', much: false, down: false },
-  mhigher: { label: 'Much higher', pay: '1000 · 15+ above', much: true, down: false },
-  lower: { label: 'Lower', pay: '500', much: false, down: true },
-  mlower: { label: 'Much lower', pay: '1000 · 15+ below', much: true, down: true },
+  higher: { label: 'Higher', pay: '', much: false, down: false },
+  mhigher: { label: 'Way higher', pay: '15+ above \u00b7 double', much: true, down: false },
+  lower: { label: 'Lower', pay: '', much: false, down: true },
+  mlower: { label: 'Way lower', pay: '15+ below \u00b7 double', much: true, down: true },
 };
 
 /** Show-layer strip: everyone betting, lighting up as their bet lands. */
 function bettors(ctx) {
   const ids = ctx.players.filter((x) => x.id !== ctx.payload.knife);
-  const discs = new Map(ids.map((pl) => [pl.id, h('div.pc-bettor', disc(pl, { size: 40 }), h('span', pl.name))]));
+  const discs = new Map(ids.map((pl) => [pl.id, h('div.pc-bettor', disc(pl, { size: 52 }), h('span', pl.name))]));
   const el = h('div.pc-bettors', [...discs.values()]);
   el.sync = (c) => { for (const [id, d] of discs) d.classList.toggle('in', !!(c.progress.bets || {})[id]); };
   return el;
@@ -280,7 +280,7 @@ const bet = {
     const strip = bettors(ctx);
     show.append(strip);
     const board = betBoard(ctx, { interactive: true });
-    sheet.append(h('div.pc-sheet.pc-betsheet.pc-in', h('div.pc-ask-q.center', 'The real answer is...'), board));
+    sheet.append(h('div.pc-sheet.pc-betsheet.pc-in', board));
     const update = (c) => { board.sync(c); strip.sync(c); };
     update(ctx);
     return { update, frame(c) { card.timer.set(c.remaining(), c.duration); } };
@@ -295,14 +295,15 @@ const sweat = {
     const p = ctx.payload;
     const card = questionCard(p);
     show.append(topWrap(card));
+    const strip = bettors(ctx);
+    show.append(strip);
     const board = betBoard(ctx, { interactive: false });
     const others = ctx.players.filter((x) => x.id !== p.knife).length;
     const count = h('span.pc-sweatn');
     sheet.append(h('div.pc-sheet.pc-betsheet.pc-in', h('div.pc-ask-q.center', 'The table bets on your cut ', count), board));
-    const update = (c) => { board.sync(c); count.textContent = `${Object.keys(c.progress.bets || {}).length}/${others}`; };
+    const update = (c) => { board.sync(c); strip.sync(c); count.textContent = `${Object.keys(c.progress.bets || {}).length}/${others}`; };
     update(ctx);
-    const cancel = say(ctx, ctx.line('pcSweat'), {}, 400);
-    return { update, frame(c) { card.timer.set(c.remaining(), c.duration); }, unmount: cancel };
+    return { update, frame(c) { card.timer.set(c.remaining(), c.duration); } };
   },
 };
 

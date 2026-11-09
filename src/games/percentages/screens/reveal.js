@@ -24,15 +24,14 @@ export default {
     const kpts = p.deltas[p.knife] || 0;
     const stamp = h(`div.pc-stamp.${p.outcome}`,
       h('div.pc-stamp-t', STAMP[p.outcome]),
-      h('div.pc-stamp-s', p.diff === 0 ? 'Not a crumb off' : `${knife?.name || '?'} was ${p.diff} off`));
-    const kchip = h('div.pc-kchip', disc(knife, { size: 30 }), h('span.nm', knife?.name || '?'), h('span.pt', kpts ? `+${kpts}` : '+0'));
+      h('div.pc-stamp-s', disc(knife, { size: 26 }), h('span', p.diff === 0 ? `${knife?.name || '?'}: not a crumb off` : `${knife?.name || '?'} was ${p.diff} off`), h('b', `+${kpts}`)));
     const pollNote = p.poll ? h('div.pc-pollnote', `${p.poll.yes} of ${p.poll.n} of you said yes`) : null;
     const lanes = buildLanes(ctx);
     const note = h('div.pc-note', h('span.pc-note-f', { html: FLAME }), h('span.pc-note-t'));
     const setNote = (lines) => { note.querySelector('.pc-note-t').textContent = (lines || []).join(' '); note.classList.add('on'); };
     show.append(h('div.pc-rv',
       card,
-      h('div.pc-rv-mid', h('div.pc-rv-pie', pieEl, stamp), kchip, pollNote),
+      h('div.pc-rv-mid', h('div.pc-rv-pie', pieEl), stamp, pollNote),
       note,
       lanes.el));
 

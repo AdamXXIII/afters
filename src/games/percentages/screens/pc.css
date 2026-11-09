@@ -556,3 +556,67 @@
 .pc-hero1-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 4px; }
 .pc-hero1-n { font: 900 54px/1 var(--f-display); color: #FFD27A; font-variant-numeric: tabular-nums; }
 .pc-frv .pc-final-pts { margin-top: auto; }
+
+/* ---------- round 4 (blind A/B): cut the small print, one loud line ---------- */
+.pc-qhead { min-height: 0; }
+.pc-qhead .timer { width: 44px; height: 44px; }
+.pc-q { margin-top: 4px; font-size: 31px; line-height: 1.04; }
+.pc-qpre { color: #55704B; }
+.pc-qcard.poll .pc-qpre { color: var(--c-claret); }
+.pc-qcard.long .pc-q { font-size: 27px; }
+.pc-qcard.xlong .pc-q { font-size: 24px; }
+.pc-qcard.compact .pc-q { font-size: 22px; }
+.pc-rv .pc-qcard.compact .pc-q { font-size: 20px; }
+.pc-pie .lbls text { font-size: 15px; font-weight: 800; }
+.pc-tug { font-size: 22px; }
+.pc-tug-bar { width: 64px; height: 14px; }
+
+/* poll: no header, the buttons are the screen */
+.pc-pollhint { text-align: center; font: 700 16px var(--f-ui); color: var(--c-toffee); }
+.pc-pollsheet .pc-pollrow { flex: 1; }
+
+/* bet: no header, bigger bettors */
+.pc-bettor span { font-size: 14px; }
+.pc-bettors { bottom: 6px; }
+.pc-board .pc-betpay:empty { display: none; }
+.pc-board .pc-betlb { font-size: 26px; }
+
+/* reveal: the stamp sits under the pie and carries the knife-holder's points */
+.pc-stamp { position: relative; left: auto; bottom: auto; transform: rotate(-4deg) scale(2); margin-top: -40px; z-index: 2; }
+.pc-landed .pc-stamp { transform: rotate(-4deg); }
+.pc-stamp-s { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; }
+.pc-stamp-s b { color: var(--st); font: 900 20px var(--f-display); }
+.pc-stamp-t { font-size: 36px; }
+
+/* intro cards: one loud scoring line */
+.pc-card-tags { font: 900 26px var(--f-display); color: #FFD27A; margin-top: 10px; }
+.pc-card-lede { font-size: 22px; line-height: 27px; font-weight: 700; }
+
+/* final pick: dark tiles, candle-yellow when picked; no dashed placeholders */
+.pc-opt, .pc-opt:nth-child(n) { --lip: #000; background: linear-gradient(180deg, #3B2620, #22140F); color: #FBF4EA; border: 0; font-size: 18px; }
+.pc-opt-n { display: none; }
+.pc-opt[aria-pressed="true"] { background: linear-gradient(180deg, #FFD27A, #F0B33E); color: var(--c-ink); --lip: #8A5A10; }
+.pc-opt[aria-pressed="true"] .pc-opt-n { display: flex; background: var(--c-ink); color: #FFD27A; border: 0; }
+.pc-opt:disabled[aria-pressed="false"] { opacity: .35; }
+
+/* final reveal: also-rans become a faint strip, No. 1 is huge */
+.pc-bar:not(.top) { height: 24px; opacity: .45; box-shadow: none; }
+.pc-bar:not(.top).in { opacity: .6; }
+.pc-bar:not(.top) .pc-bar-t { font-size: 12px; }
+.pc-bar:not(.top) .pc-bar-n { font-size: 13px; }
+.pc-bar:not(.top) .pc-bar-who { display: none; }
+.pc-hero1 { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.pc-hero1-t { font-size: 38px; }
+.pc-hero1-n { font-size: 76px; }
+
+/* standings: in-world podium (oak boards, brass plates, big serif scores) */
+.pc-pod-block, .pc-pod-col.p1 .pc-pod-block, .pc-pod-col.p3 .pc-pod-block {
+  background: linear-gradient(180deg, #7A4A2A, #5A3424 60%, #3B1F18); border-radius: 10px 10px 4px 4px;
+  box-shadow: inset 0 2px 0 rgba(255,220,170,.25), inset 0 -6px 12px rgba(0,0,0,.3), 0 10px 24px rgba(10,4,2,.6);
+}
+.pc-pod-rank { display: inline-block; padding: 2px 12px; border-radius: 8px; background: linear-gradient(180deg, #E8C26A, #B8892E); color: #3B1F18; font-size: 22px; text-shadow: 0 1px 0 rgba(255,255,255,.4); box-shadow: 0 2px 0 #7A5A1A; }
+.pc-pod-col.p1 .pc-pod-rank { font-size: 28px; }
+.pc-pod-sc { font: 900 30px var(--f-display); color: #FFD27A; margin-top: 8px; }
+.pc-pod-col.p1 .pc-pod-sc { font-size: 38px; }
+.pc-pod-nm { font-size: 20px; }
+.pc-rest-row { font-size: 17px; padding: 6px 12px 6px 6px; }
