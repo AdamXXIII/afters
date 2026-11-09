@@ -19,7 +19,7 @@ export default {
     const at = p.at;
     const knife = ctx.player(p.knife);
     const card = questionCard(p, { timer: false, compact: true });
-    const pieEl = pie({ size: 250 });
+    const pieEl = pie({ size: 250, ticks: false });
     pieEl.classList.add('reveal');
     const kpts = p.deltas[p.knife] || 0;
     const stamp = h(`div.pc-stamp.${p.outcome}`,
@@ -58,7 +58,7 @@ export default {
       [at.land, () => {
         if (!quiet) { ctx.audio.sfx('stamp'); ctx.stage.shake?.(); ctx.haptic('stamp'); if (p.outcome === 'bullseye') ctx.audio.sfx('fanfare'); }
         ctx.cyril.react(p.outcome === 'bullseye' ? 'delight' : p.outcome === 'miles' ? 'shock' : p.outcome === 'close' ? 'smug' : 'sad', { duration: quiet ? 60000 : 1300 });
-        setNote(ctx.line(LINE[p.outcome], { name: knife?.name || '' }));
+
         if (p.knife === ctx.meId && kpts && !quiet) ctx.haptic('win');
       }],
       [at.bets, () => {

@@ -38,7 +38,7 @@ const intro = {
       lede: 'Guess the percent. Bet on your mates.',
       tags: '2000 for a clean cut',
     });
-    show.append(h('div.pc-cardwrap', card));
+    show.append(h('div.pc-dim'), h('div.pc-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
     const cancel = say(ctx, ctx.line(ctx.payload.plays > 1 ? 'pcIntroAgain' : 'pcIntro'), { hold: 2800 }, 800);
@@ -59,7 +59,8 @@ const scores = {
       const i = rows.indexOf(r);
       const pl = ctx.player(r.id);
       return h(`div.pc-pod-col.p${i + 1}`, { style: { animationDelay: `${(2 - i) * 140}ms` } },
-        disc(pl, { size: i === 0 ? 76 : 58 }),
+        i === 0 ? h('div.pc-crown', { html: '<svg viewBox="0 0 48 32"><path d="M4 28 2 6l12 10L24 2l10 14L46 6l-2 22z" fill="#FFD27A" stroke="#8A5A10" stroke-width="2" stroke-linejoin="round"/></svg>' }) : null,
+        disc(pl, { size: i === 0 ? 84 : 60 }),
         h('div.pc-pod-nm', pl?.name || '?'),
         h('div.pc-pod-block', h('div.pc-pod-rank', PODIUM[i]), h('div.pc-pod-sc', String(r.score))));
     }));
@@ -90,7 +91,7 @@ const finalIntro = {
       tags: 'Pick 3 \u00b7 1000 each',
     });
     card.classList.add('final');
-    show.append(h('div.pc-cardwrap', card));
+    show.append(h('div.pc-dim'), h('div.pc-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     ctx.audio.sfx('bell');
     const sk = skipBtn(ctx, show);
@@ -174,7 +175,7 @@ const finalReveal = {
       h('div.pc-hero1-row', h('span.pc-hero1-n', `${no1.pct}%`), h('span.pc-bar-who', pickers(no1.id).map((id) => disc(ctx.player(id), { size: 30 })))));
     show.append(h('div.pc-frv',
       h('div.pc-frv-head', h('div.t-eyebrow', 'The last slice \u00b7 roughly, from surveys'), h('div.pc-frv-q', p.q)),
-      h('div.pc-bars', rows.filter((r) => r.b.place !== 1).map((r) => r.el)),
+      h('div.pc-bars', rows.filter((r) => r.b.place !== 1).slice(-5).map((r) => r.el)),
       hero,
       banner));
     const quiet = ctx.frozen;

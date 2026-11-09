@@ -620,3 +620,68 @@
 .pc-pod-col.p1 .pc-pod-sc { font-size: 38px; }
 .pc-pod-nm { font-size: 20px; }
 .pc-rest-row { font-size: 17px; padding: 6px 12px 6px 6px; }
+
+/* ---------- round 5 (blind A/B): kill the mud, show the players ---------- */
+/* intro cards: full dark stage behind, the card glows */
+.pc-dim { position: absolute; inset: 0; background: radial-gradient(70% 45% at 50% 38%, rgba(255,184,102,.28), rgba(10,5,3,.9) 70%); }
+.pc-card, .pc-card.final { background: transparent; box-shadow: none; }
+.pc-card-title { font-size: 72px; line-height: .95; color: #FFD27A; text-shadow: 0 4px 0 #7A1E2C, 0 0 40px rgba(255,200,107,.5); }
+.pc-card.final .pc-card-title { font-size: 62px; }
+.pc-card-eye { font-size: 15px; }
+.pc-card-art::before { inset: -26%; background: radial-gradient(closest-side, rgba(255,200,107,.6), transparent); }
+.pc-card-lede { font-size: 24px; line-height: 29px; color: #fff; }
+.pc-card-tags { display: inline-block; margin-top: 14px; padding: 6px 18px; border-radius: 999px; background: #FFD27A; color: #2A1A17; font: 900 24px var(--f-display); box-shadow: 0 4px 0 #8A5A10; transform: rotate(-2deg); }
+
+/* poll: the players are the show */
+.pc-tally.big .pc-discs { gap: 10px; flex-wrap: wrap; justify-content: center; }
+.pc-pollp { display: flex; flex-direction: column; align-items: center; gap: 3px; font: 800 14px var(--f-ui); color: var(--c-ink); opacity: .45; transition: all 260ms var(--ease-out-back); }
+.pc-pollp.in { opacity: 1; transform: translateY(-4px); }
+.pc-pollp.in .pc-av { box-shadow: 0 0 0 3px #FFFBF4, 0 0 0 6px #F0B33E; }
+.pc-tally.big { flex-direction: column; gap: 6px; margin-top: 0; }
+
+/* bettors (bet + sweat): names on solid pills, not greyed to mush */
+.pc-bettor { opacity: .8; filter: none; }
+.pc-bettor span { background: rgba(20,10,7,.85); padding: 1px 8px; border-radius: 999px; color: #FBF4EA; text-shadow: none; }
+.pc-bettor:not(.in) .pc-av { filter: grayscale(.6) brightness(.85); }
+.pc-bettor.in span { background: #F0B33E; color: #2A1A17; }
+
+/* heckles: bigger, louder */
+.pc-heckle { padding: 6px 16px 6px 6px; }
+.pc-heckle b { font-size: 26px; }
+.pc-heckle .nm { font-size: 15px; font-weight: 800; color: var(--c-ink); }
+.pc-heckle .pc-av { width: 32px !important; height: 32px !important; }
+
+/* reveal: the number, then the verdict; no tick labels */
+.pc-rv-pie .pc-cream { width: 56%; height: 56%; }
+.pc-rv-pie .pc-num { font-size: 82px; }
+.pc-betsin .pc-stamp { transform: rotate(-4deg) scale(.82); }
+.pc-lanes.resolved .pc-lane.lost:not(.empty) { background-color: #F3E6D3; }
+.pc-lane.empty { opacity: .25; }
+
+/* final pick: toy tiles */
+.pc-opt, .pc-opt:nth-child(n) { --lip: #8A5A10; background: linear-gradient(180deg, #FFD27A, #F0B33E); color: var(--c-ink); font: 850 19px/22px var(--f-ui); border-radius: 18px; }
+.pc-opt:nth-child(odd) { transform: rotate(-1.2deg); }
+.pc-opt:nth-child(even) { transform: rotate(1.2deg); }
+.pc-opt[aria-pressed="true"] { background: linear-gradient(180deg, #C73C49, #8E2433); color: #fff; --lip: #5A0F1B; transform: scale(1.04); }
+.pc-opt[aria-pressed="true"] .pc-opt-n { background: #FFD27A; color: var(--c-ink); }
+.pc-finalsheet .pc-ask-q { font-size: 28px; line-height: 31px; }
+.pc-finalsheet .pc-ask-hint, .pc-finalsheet .t-eyebrow { display: none; }
+
+/* final reveal: only the last five also-rans, readable; No. 1 huge */
+.pc-bar:not(.top) { height: 32px; opacity: .75; }
+.pc-bar:not(.top) .pc-bar-t { font-size: 15px; }
+.pc-bar:not(.top) .pc-bar-n { font-size: 16px; }
+.pc-bar.top { height: 54px; }
+.pc-bar.top .pc-bar-t { font-size: 20px; }
+.pc-frv-q { font-size: 28px; }
+
+/* standings: winner glow, saturated plates, readable names */
+.pc-pod-nm { background: rgba(20,10,7,.85); padding: 2px 10px; border-radius: 999px; text-shadow: none; }
+.pc-pod-col.p1 .pc-pod-nm { background: #FFD27A; color: var(--c-ink); }
+.pc-pod-col.p1 .pc-av { box-shadow: 0 0 0 4px #FFD27A, 0 0 36px rgba(255,200,107,.8); }
+.pc-pod-col.p1 .pc-pod-block { background: linear-gradient(180deg, #C73C49, #8E2433 60%, #5A0F1B); }
+.pc-crown { width: 56px; height: 38px; margin-bottom: -10px; animation: pcPop 500ms 400ms var(--ease-out-back) both; filter: drop-shadow(0 0 10px rgba(255,200,107,.8)); }
+.pc-crown svg { width: 100%; height: 100%; }
+.pc-scores2 { justify-content: flex-end; }
+.pc-scores2-head { margin-bottom: auto; }
+.pc-card-tags { white-space: nowrap; font-size: 22px; }

@@ -2,7 +2,7 @@
 export const TABLE_POLLS = {
   family: [
     { id: "tf01", q: "has cried at a film on a plane", yes: "Sobbed", no: "Dry-eyed" },
-    { id: "tf02", q: "has eaten someone else's food from the work fridge", yes: "Guilty", no: "Innocent" },
+    { id: "tf02", q: "has worn pyjama bottoms on a work video call", yes: "Comfy", no: "Smart" },
     { id: "tf03", q: "has pulled a sickie when perfectly well", yes: "Cough cough", no: "Saint" },
     { id: "tf04", q: "secretly has a favourite pet, child or sibling", yes: "Obviously", no: "Never" },
     { id: "tf05", q: "would leave a wedding early for a better offer", yes: "In a flash", no: "Loyal" },

@@ -49,11 +49,11 @@ const poll = {
     const noB = h('button.pc-pollbtn.no', { type: 'button', 'data-e2e': 'pc-no' }, h('span.ic', { html: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>' }), h('span.lb', p.no || 'No'));
     onTap(yesB, () => pick(true), { sound: 'select', buzz: 'select' });
     onTap(noB, () => pick(false), { sound: 'select', buzz: 'select' });
-    const discs = new Map(ctx.players.map((pl) => [pl.id, disc(pl, { size: 38 })]));
+    const discs = new Map(ctx.players.map((pl) => [pl.id, h('div.pc-pollp', disc(pl, { size: 46 }), h('span', pl.name))]));
     const count = h('span.pc-count');
     const note = h('div.pc-hint');
     sheet.append(h('div.pc-sheet.pc-pollsheet.pc-in',
-      h('div.pc-pollhint', 'Secret. Then someone guesses the % of yeses.'),
+
       h('div.pc-pollrow', yesB, noB),
       note,
       h('div.pc-tally.big', h('div.pc-discs', [...discs.values()]), count)));
