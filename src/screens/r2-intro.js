@@ -33,7 +33,7 @@ export default {
       setTimeout(() => { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); ctx.stage.shake?.(); }, 900);
     }
     const skip = hostSkip(ctx, show);
-    const cancel = sayLater(ctx, ctx.line('r2Intro'), { delay: 1200, hold: 2400 });
+    const cancel = sayLater(ctx, ['Course two: Porkies. Every fact you\'ll see is true.', 'Every answer\'s a porky. Bar one.'], { delay: 1200, hold: 2400 });
     return { frame: (c) => skip?.frame(c), unmount: cancel };
   },
 };

@@ -31,7 +31,7 @@ export default {
     setWaiting(ctx);
 
     const snout = h('button.r2-boop', { type: 'button', 'aria-label': 'Boop the snout', html: snoutSvg({ ring: false }) });
-    const boopTxt = h('div.r2-boop-txt', 'Boop the snout. Go on.');
+    const boopTxt = h('div.r2-boop-txt', 'Boop the snout while you wait');
     let n = 0;
     snout.addEventListener('pointerdown', () => {
       n += 1;

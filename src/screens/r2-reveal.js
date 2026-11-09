@@ -43,7 +43,7 @@ export default {
             h('div.r2-dud-by', o.kind === 'house' ? 'house porky' : `by ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}`));
         });
         stageEl.replaceChildren(h('div.r2-nobody',
-          h('div.r2-nobody-head', h('span.r2-nobody-big', 'Nobody fell for these'), h('span.r2-nobody-sub', 'Zero fooled. Back to the kitchen.')),
+          h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for this one'), h('span.r2-nobody-sub', 'Zero fooled. Sent back to the kitchen.')),
           h('div.r2-duds', cards)));
         sfx('groan');
         ctx.cyril.react('smug', { duration: quiet ? 60000 : 1600 });
