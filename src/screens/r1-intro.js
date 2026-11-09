@@ -25,7 +25,7 @@ export default {
         h('span.dish', m.dish),
         h('span.lead'),
         h('span.price', m.price)))),
-      h('div.r1-menu-foot', h('span.r1-menu-seal', 'Clean plate'), h('span', 'Every vote: ', h('b', '+250'))),
+      h('div.r1-menu-foot', h('span', 'Win ', h('i', 'every'), ' vote?'), h('span.r1-menu-seal', 'Bonus ', h('b', '+250'))),
     );
     const wrap = h('div.r1-intro-wrap', card);
     show.append(wrap);

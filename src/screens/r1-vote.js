@@ -49,7 +49,7 @@ export default {
         cyrilNote('I’ve seen poker faces at funerals. *Hold it.*')));
     } else {
       sheet.append(h('div.r1-vote-sheet.r1-in',
-        h('div.r1-vote-ask', h('div.r1-vote-q', 'Which plate goes down better?'), h('div.r1-vote-hint', 'Tap one. Change your mind until the candle burns down.')),
+        h('div.r1-vote-ask', h('div.r1-vote-q', 'Which plate goes down better?'), h('div.r1-vote-hint', 'Tap to vote. You can switch until time’s up.')),
         optA, or, optB,
         cyrilNote(ctx.line('r1Vote'))));
     }
