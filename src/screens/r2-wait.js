@@ -26,7 +26,7 @@ export default {
     const setWaiting = (c) => {
       const list = waiting(c);
       label.textContent = list.length ? `Still fibbing (${list.length})` : 'Everyone’s lied. Here we go.';
-      chipsWrap.replaceChildren(...list.map((p, i) => h('div.r2-fibber', { style: { '--i': i } }, avatarDisc(p, '.lg'), h('span.nm', p.name), h('span.r2-dots', h('i'), h('i'), h('i')))));
+      chipsWrap.replaceChildren(...list.map((p, i) => h('div.r2-fibber', { style: { '--i': i } }, h('span.r2-ring', avatarDisc(p, '.lg')), h('span.nm', p.name))));
     };
     setWaiting(ctx);
 

@@ -32,7 +32,7 @@ export default {
     const fact = factText(p.fact.text);
     show.append(h('div.r2-pick-top',
       h(`div.card.r2-pick-fact${p.fact.text.length > 80 ? '.long' : ''}`,
-        h('div.r2-pick-meta', h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`), h('span.r2-pick-count', `${p.options.length} answers · 1 true`)),
+        h('div.r2-pick-meta', h('span.t-eyebrow', `Fact ${p.index + 1} of ${p.count}`)),
         fact),
       h('div.r2-pick-timer', timer)));
 
@@ -46,10 +46,9 @@ export default {
       onPick: () => ctx.client.pick(o.id),
     }));
     const hint = h('div.r2-pick-hint');
-    const order = btns.map((b, i) => [b, p.options[i].id === own]).sort((a, b) => a[1] - b[1]).map(([b]) => b);
     sheet.append(
-      h('div.r2-pick-head', h('div.r2-pick-q', 'Which one is true?'), hint),
-      h(`div.r2-opts${n > 6 ? '.many' : ''}`, { style: { '--rows': n } }, order),
+      h('div.r2-pick-head', h('div.r2-pick-row', h('div.r2-pick-q', 'Which one is true?'), h('span.r2-pick-count', `1 of ${n} is real`)), hint),
+      h(`div.r2-opts${n > 6 ? '.many' : ''}`, { style: { '--rows': n } }, btns),
       n > 6 ? h('div.r2-more', 'More below') : null,
     );
 

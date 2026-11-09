@@ -40,10 +40,11 @@ export default {
           return h('div.r2-dud', { style: { '--tilt': `${tilt(seed, id, 4)}deg` } },
             h('span.r2-dud-l', letterOf.get(id)),
             h('div.r2-dud-txt', o.text),
-            h('div.r2-dud-by', o.kind === 'house' ? 'house porky' : `by ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}`));
+            h('div.r2-dud-by', o.kind === 'house' ? 'house porky' : `by ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}`),
+            h('div.r2-sentback', 'Sent back'));
         });
         stageEl.replaceChildren(h('div.r2-nobody',
-          h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for this one'), h('span.r2-nobody-sub', 'Zero fooled. Sent back to the kitchen.')),
+          h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for it'), h('span.r2-nobody-sub', 'Zero fooled. Sent back to the kitchen.')),
           h('div.r2-duds', cards)));
         sfx('groan');
         ctx.cyril.react('smug', { duration: quiet ? 60000 : 1600 });
@@ -82,10 +83,10 @@ export default {
           h('div.r2-card-top', h('span.r2-card-l', letterOf.get(o.id)), h('span.t-eyebrow', 'Honest to goodness')),
           h('div.r2-card-txt', o.text),
           o.pickers.length
-            ? h('div.r2-fooled', h('span.lbl', 'Spotted by'), h('span.list', found))
+            ? h('div.r2-fooled', h('span.lbl', o.pickers.length > 1 ? 'Spotted by' : 'Spotted by'), h('span.list', found))
             : h('div.r2-fooled.none', h('span.lbl', 'Found by nobody. Not one of you.')),
-          o.pickers.length ? h('div.r2-pts-row', pts, h('span.each', o.pickers.length > 1 ? 'each for spotting it' : `to ${pl(o.pickers[0])?.name || '?'} for spotting it`)) : null,
-          h('div.r2-sparkle', Array.from({ length: 9 }, (_, i) => h('i', { style: { '--i': i, '--x': `${(tilt(seed, `s${i}`, 1) * 0.5 + 0.5) * 100}%`, '--y': `${(tilt(seed, `y${i}`, 1) * 0.5 + 0.5) * 100}%` } }))),
+          o.pickers.length ? h('div.r2-pts-row', pts, o.pickers.length > 1 ? h('span.each', 'each') : null) : null,
+          h('div.r2-sparkle', Array.from({ length: 9 }, (_, i) => h('i', { style: { '--i': i, '--x': `${(tilt(seed, `s${i}`, 1) * 0.5 + 0.5) * 100}%`, '--y': `${(tilt(seed, `y${i}`, 1) * 0.5 + 0.5) * 38}%` } }))),
         );
         stageEl.replaceChildren(card);
         if (o.pickers.length) countTo(pts, 1000, { prefix: '+', frozen: quiet, ms: 700 });

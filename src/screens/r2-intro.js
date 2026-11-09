@@ -23,7 +23,7 @@ export default {
       h('ol.r2-steps', STEPS.map(([a], i) => h('li', h('span.n', String(i + 1)), h('span.tx', h('b', a))))),
       h('div.r2-prices',
         h('div.r2-price', h('span.l', 'Find the truth'), h('span.dots'), h('span.v', '1000')),
-        h('div.r2-price', h('span.l', 'Each person you fool'), h('span.dots'), h('span.v', '500'))),
+        h('div.r2-price', h('span.l', 'Every fool'), h('span.dots'), h('span.v', '500'))),
     );
     show.append(h('div.r2-intro-wrap', card));
     if (!ctx.frozen) {
@@ -33,7 +33,7 @@ export default {
       setTimeout(() => { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); ctx.stage.shake?.(); }, 900);
     }
     const skip = hostSkip(ctx, show);
-    const cancel = sayLater(ctx, ['Course two: Porkies. Every fact you\'ll see is true.', 'Every answer\'s a porky. Bar one.'], { delay: 1200, hold: 2400 });
+    const cancel = sayLater(ctx, ['Course two: Porkies. Every fact you\'ll see is true.', 'Every answer\'s a lie. Bar one.'], { delay: 1200, hold: 2400 });
     return { frame: (c) => skip?.frame(c), unmount: cancel };
   },
 };
