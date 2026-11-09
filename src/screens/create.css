@@ -111,3 +111,17 @@ body.kb-open .fd-hint { display: none; }
 .fd-codeprev b { color: var(--c-ink); font-weight: 700; }
 .fd-mid .fd-card { margin-top: 4px; }
 .fd-codeprev b { white-space: nowrap; }
+
+/* ===== Landscape (844x390): the sheet is the right column, ~350 px of room. Shrink the
+   place card and code tiles so the primary button always sits on screen. ===== */
+@media (orientation: landscape) and (max-height: 600px) {
+  .fd-page { gap: 10px; }
+  .fd-head { gap: 2px; }
+  .fd-head-row { min-height: 30px; }
+  .fd-title { font-size: calc(24px * var(--ts)); }
+  .fd-mid { gap: 12px; }
+  .fd-mid .fd-card, .fd-card { padding: 12px 16px 10px; margin: 2px 0; width: min(320px, 80%); }
+  .fd-card-input { font-size: calc(34px * var(--ts)); }
+  .fd-actions { padding-top: 0; }
+  .fd-actions .btn { height: 56px; }
+}

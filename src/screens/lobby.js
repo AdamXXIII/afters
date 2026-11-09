@@ -231,6 +231,13 @@ export default {
       // row hangs on a longer cocktail stick), and any leftover overlap is nudged a few px apart.
       const crowded = items.length > 3;
       const rowEnd = [-1e9, -1e9];
+      // landscape: the table sits at the very bottom of the left column, so lift the whole row of
+      // cards just enough that the lowest one stays on screen (portrait is unchanged)
+      let lift = 0;
+      if (document.body.classList.contains('land') && items.length) {
+        const low = Math.max(...items.map((it, rank) => it.y + (crowded ? (rank % 2) * 28 : 0)));
+        lift = Math.min(0, showH - 34 - low);
+      }
       items.forEach((it, rank) => {
         const row = crowded ? rank % 2 : 0;
         if (it.x - it.w / 2 < rowEnd[row] + 3) it.x = rowEnd[row] + 3 + it.w / 2;
@@ -239,7 +246,7 @@ export default {
         it.el.style.opacity = '';
         it.el.style.zIndex = String(20 - row);
         it.el.style.setProperty('--stick', `${dy + 2}px`);
-        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 2 + dy).toFixed(1)}px) translate(-50%, 0) rotate(var(--tilt, 0deg))`;
+        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 2 + dy + lift).toFixed(1)}px) translate(-50%, 0) rotate(var(--tilt, 0deg))`;
       });
       const n = c.players.length;
       emptyEls.forEach((el, i) => {

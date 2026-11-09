@@ -45,3 +45,13 @@
 @keyframes tileStamp { 0% { transform: rotate(0) scale(1.25); box-shadow: 0 14px 24px rgba(59,31,24,.30); } 55% { transform: rotate(var(--tilt)) translateY(-2px) scale(.94); } 100% { transform: rotate(var(--tilt)) translateY(-2px) scale(1); } }
 @keyframes caretBlink { 0%, 45% { opacity: 1; } 55%, 100% { opacity: .2; } }
 @media (max-width: 370px) { .code-boxes { gap: 9px; } .code-slot { width: 58px; height: 68px; } .code-box { font-size: 40px; } }
+
+/* ===== Landscape (844x390): smaller code tiles so the name card and "Take a seat" fit the right column ===== */
+@media (orientation: landscape) and (max-height: 600px) {
+  .code-group { margin: 0; gap: 6px; }
+  .code-boxes { gap: 10px; }
+  .code-slot { width: 54px; height: 60px; border-radius: 12px; }
+  .code-box { font-size: 38px; }
+  .code-slot::after { bottom: 10px; }
+  .code-slot.current::after { height: 28px; bottom: 16px; }
+}
