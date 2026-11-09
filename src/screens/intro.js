@@ -14,12 +14,17 @@ SHOTS['intro-host'] ||= { pos: [0, 0.4, 2.3], target: [0, 0.6, 0] };
 const COURSES = [
   { n: 'I', name: 'Plate Up', what: 'Two answers enter. One leaves.', round: 1 },
   { n: 'II', name: 'Porkies', what: 'Lie beautifully about a true fact.', round: 2 },
-  { n: 'III', name: 'Last Orders', what: 'Fast answers. Faster judgement.', round: 3 },
+  { n: 'III', name: 'Last Orders', what: 'Quickfire, then swipe to judge.', round: 3 },
 ];
 
-function listNames(names) {
-  if (names.length <= 1) return names.join('');
-  return `${names.slice(0, -1).join(', ')}\u00a0&\u00a0${names[names.length - 1]}`;
+/** "Alex, Sam & Gus" as nodes, with this phone's own name circled in red ink. */
+function listNames(players, meId) {
+  const out = [];
+  players.forEach((p, i) => {
+    if (i > 0) out.push(i === players.length - 1 ? '\u00a0&\u00a0' : ', ');
+    out.push(p.id === meId ? h('span.in-me', p.name) : p.name);
+  });
+  return out;
 }
 
 /** Start a CSS animation at the right point of the shared timeline (negative delay = already playing). */
@@ -51,7 +56,7 @@ export default {
       h('div.in-eyebrow', h('i'), 'Three courses of comedy', h('i')),
       h('div.in-title', 'Tonight\'s menu'),
       h('ol.in-courses', courses),
-      beat(h('div.in-table', h('span.in-table-k', 'Tonight\'s table'), faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(names))), 1750, e),
+      beat(h('div.in-table', h('span.in-table-k', 'Tonight\'s table'), faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1750, e),
       h('div.in-progress', { 'aria-hidden': 'true' }, progress),
     ), 650, e);
 

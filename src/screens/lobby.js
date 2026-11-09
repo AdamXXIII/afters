@@ -13,7 +13,7 @@ import { TABLE_Y, seatAngle } from '../stage/props.js';
 
 // Own camera: lower and further back than the shared 'lobby' shot, so the far arc of chairs sits
 // in the middle of the show strip under the code placard instead of hiding behind it.
-SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.425, -0.6] };
+SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.53, -0.6] };
 
 const LOBBY_SCALE = 1.75;
 
@@ -31,7 +31,8 @@ function lobbySlots(n) {
 const FULL = lobbySlots(8);
 const FREE_SLOTS = [FULL[3], FULL[4], FULL[2], FULL[5], FULL[1], FULL[6], FULL[0], FULL[7]];
 const AVATAR_NAMES = ['Jelly', 'Sprout', 'Teacup', 'Cheese', 'Pepper', 'Pudding', 'Egg', 'Bourbon'];
-const CYRIL_SCALE = 1.15;
+const CYRIL_SCALE = 1.5;
+const CYRIL_FWD = 0.3;
 
 // Cyril greets each new arrival by name (his voice: short, dry, never mean to a player).
 const JOIN_LINES = [
@@ -74,7 +75,7 @@ export default {
       } catch { /* cancelled */ }
     });
     const placard = h('div.lc-placard',
-      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Type it in to join')),
+      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Tap to copy')),
       h('div.lc-row', tiles, invite),
     );
     const tagsLayer = h('div.lc-tags', { 'aria-hidden': 'true' });
@@ -89,7 +90,6 @@ export default {
       const b = h('button.lb-cell', { type: 'button', role: 'radio', 'aria-label': AVATAR_NAMES[i], style: { '--pc': a.colour }, 'data-e2e': `avatar-${i}` },
         h('span.lb-plate'),
         thumbs[i] ? h('img', { src: thumbs[i], alt: '', draggable: false }) : h('span.lb-glyph', { html: avatarIcon(i) }),
-        h('span.lb-label', AVATAR_NAMES[i]),
         owner,
         h('span.lb-tick', { html: ICONS.tick }));
       b.owner = owner;
@@ -134,7 +134,8 @@ export default {
       h('span.lb-pill-txt', h('span.lb-pill-k', 'Adult table'), h('span.lb-pill-s', 'Clean words')), h('span.lb-switch', h('i')));
     onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
     const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
-      h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')));
+      h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music'), h('span.lb-pill-v')),
+      h('span.lb-chev', { html: '<svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' }));
     onTap(speakerPill, () => {
       const ps = ctx.app.client.state.players;
       const i = ps.findIndex((p) => p.id === ctx.app.client.state.settings.speakerId);
@@ -144,29 +145,35 @@ export default {
 
     const startBtn = button('Start the show', { onClick: () => ctx.client.start(), e2e: 'start-show' });
     startBtn.classList.add('lb-start');
+    const BELL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a1.3 1.3 0 0 1 1.3 1.3v.6a6 6 0 0 1 4.7 5.9v4.2l1.6 2.3H4.4L6 15.2V11a6 6 0 0 1 4.7-5.9v-.6A1.3 1.3 0 0 1 12 3.2z" fill="currentColor"/><circle cx="12" cy="20" r="1.9" fill="currentColor"/></svg>';
+    const setStart = (label, bell) => { startBtn.innerHTML = ''; if (bell) startBtn.append(h('span.lb-bell', { html: BELL })); startBtn.append(h('span', label)); };
+    const guestInfo = h('div.lb-info');
     const waitAv = h('span.lb-wait-av');
     const waitCard = h('div.lb-wait', waitAv,
       h('span.lb-wait-col', h('span.lb-wait-txt'), h('span.lb-wait-sub')),
       h('span.lb-dots', h('i'), h('i'), h('i')));
     const leave = h('button.lb-leave', { type: 'button' }, 'Leave');
-    onTap(leave, () => ctx.actions.leave());
+    let leaveArmed = 0;
+    onTap(leave, () => {
+      if (Date.now() - leaveArmed < 3000) { ctx.actions.leave(); return; }
+      leaveArmed = Date.now();
+      leave.textContent = 'Sure?';
+      leave.classList.add('armed');
+      setTimeout(() => { leave.textContent = 'Leave'; leave.classList.remove('armed'); }, 3000);
+    });
 
     sheet.classList.add('lb-sheet');
     sheet.append(...[
       h('div.lb-top', h('span.lb-title', 'Pick your seat'), seatsCount, h('span.lb-gap'), leave),
       grid,
       nameCard,
-      ctx.isHost ? hostRow : null,
+      ctx.isHost ? hostRow : guestInfo,
       h('div.lb-action', ctx.isHost ? startBtn : waitCard),
     ].filter(Boolean));
 
     // ---------- place cards over the 3D avatars ----------
     const tagEls = new Map();
-    const emptyEls = Array.from({ length: MAX_PLAYERS }, () => {
-      const e = h('span.lc-empty', h('i'));
-      tagsLayer.append(e);
-      return e;
-    });
+    const emptyEls = [];
     const tmp = new THREE.Vector3();
     let shown = false;
     const placeTags = (c, dt = 0.016) => {
@@ -189,6 +196,9 @@ export default {
       });
       const cs = c.cyril?.group?.scale;
       if (cs) cs.setScalar(cs.x + (CYRIL_SCALE - cs.x) * k);
+      // Cyril steps forward into the gap in the row, so the host of the evening is among his guests
+      if (st.cyrilGoal && st.cyrilHome && !st.podiumIds) st.cyrilGoal.set(st.cyrilHome.x, st.cyrilHome.y, st.cyrilHome.z + CYRIL_FWD);
+      if (c.frozen && c.cyril?.group) c.cyril.group.position.copy(st.cyrilGoal);
       const showH = show.clientHeight || 0;
       const showW = show.clientWidth || 390;
       // Place cards stand on the cloth in front of their guest. Greedy row packing: each card takes
@@ -208,15 +218,15 @@ export default {
       const rowEnd = [];
       for (const it of items) {
         // two rows; if both are blocked, nudge the card along the row with the most room
-        let row = [0, 1].find((r) => rowEnd[r] == null || it.x - it.w / 2 >= rowEnd[r] + 4);
+        let row = [0, 1, 2].find((r) => rowEnd[r] == null || it.x - it.w / 2 >= rowEnd[r] + 4);
         if (row == null) {
-          row = rowEnd[0] <= rowEnd[1] ? 0 : 1;
+          row = [0, 1, 2].reduce((a, r) => (rowEnd[r] < rowEnd[a] ? r : a), 0);
           it.x = Math.min(showW - it.w / 2 - 4, rowEnd[row] + 4 + it.w / 2);
         }
         rowEnd[row] = it.x + it.w / 2;
         it.el.style.opacity = '';
         it.el.style.zIndex = String(20 - row);
-        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 6 + row * 23).toFixed(1)}px) translate(-50%, 0)`;
+        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 4 + row * 26).toFixed(1)}px) translate(-50%, 0) rotate(var(--tilt, 0deg))`;
       }
       const n = c.players.length;
       emptyEls.forEach((el, i) => {
@@ -244,7 +254,7 @@ export default {
         cell.classList.toggle('taken', !!owner && !mine);
         cell.setAttribute('aria-checked', String(mine));
         cell.disabled = !!owner && !mine;
-        cell.owner.textContent = owner && !mine ? (owner.name.length > 5 ? owner.name : `${owner.name}\u2019s`) : '';
+        cell.owner.textContent = owner && !mine ? owner.name : '';
       });
 
       // place-card tags
@@ -256,6 +266,9 @@ export default {
         const key = `${p.name}|${p.avatar}|${p.id === hostId}|${p.id === meId}|${p.connected !== false}`;
         if (!el) {
           el = h('span.lc-tag');
+          let hh = 0;
+          for (const ch of String(p.id)) hh = (hh * 33 + ch.charCodeAt(0)) >>> 0;
+          el.style.setProperty('--tilt', `${((hh % 7) - 3) * 0.9}deg`);
           tagsLayer.append(el);
           tagEls.set(p.id, el);
           if (lastIds.size && !lastIds.has(p.id) && !c.frozen) el.classList.add('arrive');
@@ -291,10 +304,14 @@ export default {
       adultPill.setAttribute('aria-checked', String(!!st.adult));
       adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Filter off' : 'Clean words';
       const spk = ps.find((p) => p.id === st.speakerId);
-      speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : (spk?.name || 'Nobody');
+      guestInfo.replaceChildren(
+        h('span.lb-info-i', h('span.lb-info-k', 'Words'), h('span.lb-info-v', st.adult ? 'Anything goes' : 'Clean')),
+        h('span.lb-info-i', h('span.lb-info-k', 'Music'), h('span.lb-info-v', spk ? (spk.id === meId ? 'Your phone' : `${spk.name}\u2019s phone`) : 'Off')));
+      speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'This phone' : spk ? `${spk.name}’s` : 'Off';
 
       startBtn.disabled = n < MIN_PLAYERS;
-      startBtn.textContent = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : `Ring the bell \u00b7 ${n} at the table`;
+      const want = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : 'Ring the bell';
+      if (startBtn.dataset.lbl !== want) { startBtn.dataset.lbl = want; setStart(want, n >= MIN_PLAYERS); }
       const host = ps.find((p) => p.id === hostId);
       waitCard.querySelector('.lb-wait-txt').textContent = n < MIN_PLAYERS
         ? `${MIN_PLAYERS - n} more guest${MIN_PLAYERS - n > 1 ? 's' : ''} needed`
@@ -315,7 +332,7 @@ export default {
         const line = n >= MAX_PLAYERS ? c.line('lobbyFull')
           : arrived && arrived.id !== meId ? [joinLine(arrived)]
             : n < MIN_PLAYERS ? c.line('lobbyWaiting')
-              : c.isHost ? ['A proper table at last. Ring the bell when you\'re ready.']
+              : c.isHost ? [n === 3 ? 'Three. Intimate. Someone will have to laugh at everything.' : 'A proper table at last. Ring the bell when you\'re ready.']
                 : [`We're waiting on ${host?.name || 'the host'}. No pressure. Some pressure.`];
         c.say(line, { hold: 4000, placement: 'above', compact: true });
       }
@@ -326,6 +343,7 @@ export default {
       frame: (c, dt) => placeTags(c, dt),
       unmount: () => {
         ctx.cyril?.group?.scale.setScalar(1);
+        if (ctx.stage.cyrilGoal && ctx.stage.cyrilHome && !ctx.stage.podiumIds) ctx.stage.cyrilGoal.copy(ctx.stage.cyrilHome);
         for (const s of ctx.stage.seats?.values?.() || []) {
           s.group.scale.setScalar(1);
           if (s.home) { s.group.position.x = s.home.x; s.group.position.z = s.home.z; }

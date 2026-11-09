@@ -3,7 +3,7 @@
 // reconnect window), one primary retry and a quiet way out.
 import './overlays.css';
 import './reconnect.css';
-import { h, button } from '../ui/components.js';
+import { h, button, onTap } from '../ui/components.js';
 import { AVATARS } from '../game/constants.js';
 
 const HOLD_MS = 90000;
@@ -22,8 +22,8 @@ function candleSvg() {
     <path d="M17 34q15-4 30 0v42H17z" fill="url(#rcWax)"/>
     <path d="M22 34v9a2.5 2.5 0 0 0 5 0v-9M38 34v14a2.5 2.5 0 0 0 5 0V34" fill="#FBF1DE"/>
     <g class="rc-eyes"><circle cx="26.5" cy="52" r="4.2" fill="#FFFDF7"/><circle cx="37.5" cy="52" r="4.2" fill="#FFFDF7"/><circle class="rc-pupil" cx="25.5" cy="52.6" r="2.1" fill="#2A1A17"/><circle class="rc-pupil" cx="36.5" cy="52.6" r="2.1" fill="#2A1A17"/></g>
-    <path d="M23 46l5.5 1.4M41 46l-5.5 1.4" stroke="#7A4A2A" stroke-width="2" stroke-linecap="round"/>
-    <path d="M29.5 61q2.5-1.6 5 0" stroke="#7A1E2C" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M22.5 47.5q3-2.6 6.5-3M41.5 47.5q-3-2.6-6.5-3" stroke="#7A4A2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M28.5 60q3.5 2.6 7 0" stroke="#7A1E2C" stroke-width="2.2" fill="none" stroke-linecap="round"/>
     <path d="M26 66l6 3 6-3-6 3z M26 66v6l6-3zM38 66v6l-6-3z" fill="#7A1E2C"/>
     <ellipse cx="32" cy="80" rx="22" ry="5" fill="url(#rcBrass)"/>
     <rect x="10" y="76" width="44" height="6" rx="3" fill="url(#rcBrass)"/>
@@ -50,29 +50,29 @@ export default {
     const title = h('h2.rc-title', 'Hold that thought.');
     const body = h('p.rc-body');
     const clock = h('span.rc-clock');
-    const bar = h('div.rc-bar', h('i'));
+    const bar = h('div.rc-bar', h('i'), h('b.rc-wick', { html: '<svg viewBox="0 0 12 16"><path d="M6 1c1.6 3 4 4.6 4 8a4 4 0 0 1-8 0c0-3 2.4-5 4-8z" fill="#FFC86B"/><path d="M6 7c.8 1.4 1.8 2.2 1.8 3.6a1.8 1.8 0 0 1-3.6 0C4.2 9.2 5.2 8.4 6 7z" fill="#FFF4D6"/></svg>' }));
     const held = h('div.rc-held', h('span.rc-held-k', 'Seat held for'), clock);
-    const knock = h('div.rc-knock');
     const retry = button('Try again now', { onClick: () => { retry.setLoading(true); ctx.client?.retry(); setTimeout(() => retry.setLoading(false), 1600); }, e2e: 'retry' });
+    const retryNote = h('div.rc-note', 'We knock again every couple of seconds on our own.');
     // leaving is the destructive way out: it asks once, in Cyril's voice
     let armed = 0;
-    const leave = button('Leave the table', { kind: 'ghost', onClick: () => {
+    const leave = h('button.rc-leave', { type: 'button' }, 'Leave the table');
+    onTap(leave, () => {
       if (Date.now() - armed < 3000) { ctx.actions.closeOverlay(); ctx.actions.leave(); return; }
       armed = Date.now();
       leave.textContent = 'Tap again to leave. Cyril will sulk.';
       leave.classList.add('armed');
       setTimeout(() => { if (Date.now() - armed >= 2900) { leave.textContent = 'Leave the table'; leave.classList.remove('armed'); } }, 3000);
-    } });
-    leave.classList.add('rc-leave');
+    });
     const art = h('div.rc-art',
       h('div.rc-candle', { html: candleSvg() }),
       h('div.rc-card', { style: { '--pc': colour } }, h('span.rc-card-k', 'Reserved'), h('span.rc-card-v', me?.name || 'You')),
     );
     const quote = h('p.rc-quote', '“I’ve kept your seat warm. Literally.”', h('span', '— Cyril'));
     const box = h('div.rc-box', { role: 'alertdialog', 'aria-live': 'assertive', 'aria-labelledby': 'rc-title' },
-      art, eyebrow, title, body, h('div.rc-hold', held, bar, knock), quote, h('div.rc-actions', retry, leave));
+      h('span.rc-fold'), leave, eyebrow, title, body, h('div.rc-hold', held, bar), quote, h('div.rc-actions', retry, retryNote));
     title.id = 'rc-title';
-    overlay.append(h('div.dim.rc-dim', box));
+    overlay.append(h('div.dim.rc-dim', h('div.rc-stagearea', art), box));
 
     let lastState = '';
     const paint = (c) => {
@@ -83,8 +83,7 @@ export default {
       clock.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
       bar.firstChild.style.transform = `scaleX(${(left / HOLD_MS).toFixed(4)})`;
       bar.classList.toggle('hurry', s <= 15);
-      const kn = 2 - Math.floor((elapsed() / 1000) % 2);
-      knock.textContent = `Knocking again in ${kn}s`;
+      bar.style.setProperty('--k', (left / HOLD_MS).toFixed(4));
       const key = `${lost}`;
       if (key === lastState) return;
       lastState = key;
@@ -94,7 +93,8 @@ export default {
       body.textContent = lost
         ? 'Check your Wi-Fi or signal, then try again. If the host has left, the table may have closed.'
         : 'Finding the table again. Your seat and your score are safe.';
-      retry.textContent = lost ? 'Try again' : 'Try again now';
+      if (!retry.disabled) retry.textContent = lost ? 'Try again' : 'Try again now';
+      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : 'We knock again every couple of seconds on our own.';
     };
     paint(ctx);
     const tick = setInterval(() => paint(ctx), 250);

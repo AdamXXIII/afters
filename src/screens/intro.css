@@ -8,19 +8,19 @@
   background-color: var(--c-linen); background-image: var(--paper);
   border-radius: 6px 6px 18px 18px;
   box-shadow: var(--sh-3), 0 30px 60px rgba(20,10,8,.35), inset 0 0 0 1px rgba(122,74,42,.12);
-  transform-origin: 50% 0; transform: rotate(-.8deg);
+  transform-origin: 50% 0; transform: rotate(-1.4deg);
   animation: inMenu 760ms var(--ease-out-quint) both;
 }
 .in-menu::before { /* double menu-card hairline */
   content: ""; position: absolute; inset: 8px; border-radius: 3px 3px 12px 12px; pointer-events: none;
   border: 1px solid rgba(122,30,44,.35); box-shadow: inset 0 0 0 3px var(--c-linen), inset 0 0 0 4px rgba(122,30,44,.18);
 }
-@keyframes inMenu { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: rotate(-.8deg); } }
+@keyframes inMenu { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: rotate(-1.4deg); } }
 
 .in-eyebrow {
   text-wrap: nowrap;
   display: flex; align-items: center; gap: 10px; justify-content: center;
-  font: 700 12px/14px var(--f-ui); letter-spacing: .2em; text-transform: uppercase; color: var(--c-claret);
+  font: 800 13px/15px var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--c-claret);
 }
 .in-eyebrow i { flex: 1; max-width: 46px; height: 1px; background: currentColor; opacity: .45; }
 .in-title {
@@ -41,7 +41,7 @@
 }
 .in-cbody { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .in-cname { font: 700 22px/26px var(--f-display); font-variation-settings: "opsz" 48, "SOFT" 60; color: var(--c-ink); }
-.in-cwhat { font: 450 16px/20px var(--f-ui); color: var(--c-toffee); }
+.in-cwhat { font: 500 16px/20px var(--f-ui); color: var(--c-ink); opacity: .82; }
 @keyframes inCourse { from { opacity: 0; transform: translateX(-14px); } }
 
 .in-table {
@@ -49,7 +49,7 @@
   display: flex; flex-direction: column; align-items: center; text-align: center;
   animation: inCourse 520ms var(--ease-out-quint) both;
 }
-.in-table-k { font: 700 11px/13px var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--c-toffee); }
+.in-table-k { font: 800 13px/15px var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--c-toffee); }
 .in-table-v { font: 700 24px/25px var(--f-hand); color: var(--c-claret); text-wrap: balance; }
 
 /* engraved brass nameplate on Cyril's holder */
@@ -66,7 +66,7 @@
   background: radial-gradient(circle at 35% 35%, #FFF1C4, #8A6420); box-shadow: 0 0 0 1px rgba(74,50,16,.35);
 }
 .in-plate::before { left: 6px; } .in-plate::after { right: 6px; }
-.in-plate-k { font: 700 10px/12px var(--f-ui); letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
+.in-plate-k { font: 800 11px/13px var(--f-ui); letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
 .in-plate-v { font: 800 18px/21px var(--f-display); font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0; letter-spacing: .04em; font-variant: small-caps; }
 @keyframes inPlate { from { opacity: 0; transform: translate(-50%, 16px) scale(.9); } }
 
@@ -81,15 +81,15 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
 
 .in-faces { display: flex; justify-content: center; margin: 4px 0 1px; }
 .in-face {
-  width: 34px; height: 34px; margin: 0 -3px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  width: 36px; height: 36px; margin: 0 -1px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
   background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--pc) 45%, #FFFBF4), #FFFBF4 75%);
   box-shadow: 0 0 0 2px var(--c-linen), 0 0 0 3.5px var(--pc), 0 3px 6px rgba(59,31,24,.25);
   animation: inFace 420ms var(--ease-out-back) both;
 }
-.in-face img { width: 112%; height: 112%; object-fit: contain; margin-top: 4px; }
+.in-face img { width: 100%; height: 100%; object-fit: contain; margin-top: 3px; }
 @keyframes inFace { from { opacity: 0; transform: translateY(8px) scale(.5); } }
-.in-progress { position: absolute; left: 22px; right: 22px; bottom: 4px; height: 3px; border-radius: 3px; background: rgba(200,155,60,.25); overflow: hidden; }
-.in-progress i { display: block; height: 100%; background: linear-gradient(90deg, #E9C779, var(--c-brass)); transform-origin: 0 50%; }
+.in-progress { position: absolute; left: 20px; right: 20px; bottom: 3px; height: 4px; border-radius: 3px; background: rgba(200,155,60,.25); overflow: hidden; }
+.in-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #E9C779, var(--c-brass)); transform-origin: 0 50%; box-shadow: 0 0 8px rgba(255,200,107,.6); }
 .in-skip {
   position: absolute; left: calc(var(--safe-l) + 14px); top: calc(var(--safe-t) + 14px); z-index: 4;
   appearance: none; border: 0; cursor: pointer; height: 44px; padding: 0 12px 0 16px; border-radius: 999px;
@@ -101,3 +101,9 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
 .in-skip.on { opacity: 1; pointer-events: auto; transform: none; }
 .in-skip span { width: 16px; height: 16px; display: block; }
 .in-skip svg { width: 100%; height: 100%; display: block; }
+
+.in-me { position: relative; white-space: nowrap; }
+.in-me::after { /* a red-ink ring drawn round your own name */
+  content: ""; position: absolute; left: -7px; right: -7px; top: -2px; bottom: -3px;
+  border: 2px solid var(--c-tomato); border-radius: 50% 46% 52% 48% / 60% 55% 48% 52%; transform: rotate(-3deg); opacity: .85;
+}
