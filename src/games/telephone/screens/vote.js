@@ -14,23 +14,34 @@ const vote = {
     show.append(h('div.tp-vote-top',
       h('div.t-eyebrow', `Line ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s rumour`),
       h('div.tp-vote-q', 'Best bit?'),
-      h('div.tp-vote-sub', h('b', '+500'), ' a vote. Not your own.')));
+      h('div.tp-vote-sub', `Swipe through ${p.moments.length}. `, h('b', '+500'), ' a vote.')));
     const views = [];
-    const tiles = p.moments.map((m, i) => {
+    const list = [...p.moments].sort((a, b) => (a.authorId === ctx.meId) - (b.authorId === ctx.meId));
+    const tiles = list.map((m, i) => {
       const pl = ctx.player(m.authorId);
       const mine = m.authorId === ctx.meId;
       let inner;
-      if (m.kind === 'draw') { const v = drawingView(m.drawing, { className: 'tp-tile-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-tile-txt', { style: { '--fs': `${m.text.length > 44 ? 20 : m.text.length > 26 ? 23 : 27}px` } }, m.text);
-      const b = h(`button.tp-tile.k-${m.kind}${mine ? '.mine' : ''}`, { type: 'button', 'aria-pressed': 'false', disabled: mine, 'data-e2e': mine ? 'moment-mine' : 'moment', style: { '--tilt': `${tilt(ctx.phase.seed, m.key, 1.6)}deg`, '--pc': pl?.colour, '--i': i } },
-        h('span.tp-tile-n', String(m.step + 1)),
-        inner,
-        h('span.tp-tile-by', av(pl, { size: 18 }), h('span', mine ? 'Yours' : `${pl?.name || '?'} ${kindLabel(m.kind)}`)),
-        h('span.tp-tile-tick', { html: TP_ICONS.star }));
-      if (!mine) onTap(b, () => ctx.client.act('vote', { key: m.key }, { vote: m.key }), { sound: 'select', buzz: 'select' });
-      return b;
+      if (m.kind === 'draw') { const v = drawingView(m.drawing, { className: 'tp-vc-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-vc-txt', { style: { '--fs': `${m.text.length > 44 ? 30 : m.text.length > 24 ? 36 : 44}px` } }, m.text);
+      const btn = h('button.tp-vc-btn', { type: 'button', disabled: mine, 'data-e2e': mine ? 'moment-mine' : 'moment' },
+        h('span', { html: TP_ICONS.star }), mine ? 'That\'s yours' : 'Best bit!');
+      const card = h(`div.tp-vc.k-${m.kind}${mine ? '.mine' : ''}`, { style: { '--pc': pl?.colour, '--tilt': `${tilt(ctx.phase.seed, m.key, 1.2)}deg` } },
+        h('div.tp-vc-top', h('span.tp-vc-n', `${m.step + 1}/${p.moments.length}`), h('span.tp-vc-by', av(pl, { size: 22 }), h('b', pl?.name || '?'), ` ${kindLabel(m.kind)}`)),
+        h('div.tp-vc-body', inner),
+        btn);
+      if (!mine) onTap(btn, () => { ctx.client.act('vote', { key: m.key }, { vote: m.key }); }, { sound: 'select', buzz: 'select' });
+      card.btn = btn;
+      return card;
     });
-    sheet.append(h('div.tp-sheet.tp-vote', h('div.tp-grid', tiles)));
-    const sync = (c) => { const v = c.mine.game.vote; tiles.forEach((t, i) => t.setAttribute('aria-pressed', String(p.moments[i].key === v))); };
+    const row = h('div.tp-vc-row', tiles);
+    const dots = h('div.tp-vc-dots', p.moments.map(() => h('i')));
+    sheet.append(h('div.tp-sheet.tp-vote', row, dots));
+    const syncDots = () => {
+      const i = Math.round(row.scrollLeft / Math.max(1, (tiles[0]?.offsetWidth || 1) + 12));
+      [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+    };
+    row.addEventListener('scroll', syncDots, { passive: true });
+    requestAnimationFrame(syncDots);
+    const sync = (c) => { const v = c.mine.game.vote; tiles.forEach((t, i) => { const on = list[i].key === v; t.classList.toggle('picked', on); t.btn.setAttribute('aria-pressed', String(on)); if (!t.classList.contains('mine')) t.btn.lastChild.textContent = on ? 'Your pick' : 'Best bit!'; }); };
     sync(ctx);
     const said = setTimeout(() => ctx.say(ctx.line('tpVote'), { hold: 1800, compact: true }), ctx.frozen ? 0 : 300);
     return { update: sync, frame() { views.forEach((v) => v.frame()); }, unmount() { clearTimeout(said); } };

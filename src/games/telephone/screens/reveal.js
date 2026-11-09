@@ -111,6 +111,9 @@ export default {
           const dc = drawCard(steps[bi - 1], bi - 1, { guess: true });
           const gc = textCard(st, bi);
           gc.classList.add('as-caption');
+          const drawer = ctx.player(steps[bi - 1].authorId);
+          gc.querySelector('.tp-card-eyebrow').textContent = `${drawer?.name || 'Someone'}'s drawing, guessed as`;
+          dc.querySelector('.tp-stamp')?.remove();
           const combo = h('div.tp-combo', dc, gc);
           stageSlot.replaceChildren(combo); enter(gc);
           requestAnimationFrame(() => dc.view.frame());

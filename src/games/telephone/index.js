@@ -83,7 +83,7 @@ export default {
     'telephone-draw': { match: at('telephone-draw'), me: 'idle', bots: 'some', t: 21000 },
     'telephone-guess': { match: at('telephone-guess'), me: 'idle', bots: 'some', t: 9000 },
     'telephone-wait': { match: at('telephone-draw'), me: 'act', bots: 'some', t: 26000 },
-    'telephone-reveal': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => { const b = ph.payload.beats[1]; return b.at + b.replay * 0.7; } },
+    'telephone-reveal': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => { const b = ph.payload.beats[1]; return b.at + b.replay + 400; } },
     'telephone-reveal-guess': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => { const b = ph.payload.beats[2]; return b.at + b.dur * 0.8; } },
     'telephone-reveal-end': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => ph.payload.end.at + 2400 },
     'telephone-vote': { match: at('telephone-vote'), me: 'idle', bots: 'some', t: 4000 },
