@@ -63,7 +63,7 @@ export default {
     onTap(adu, () => setRating('adult'));
 
     const head = h('header.mn-head',
-      h('div.mn-eyebrow', h('span', 'Tonight\'s menu'), h('span.mn-dot', '·'), h('span.mn-code', c.room || '')),
+      h('div.mn-eyebrow', h('span.mn-code', `Room ${c.room || ''}`)),
       h('h1.mn-title', 'What\'s for', h('br'), h('em', 'afters'), '?'),
       ratingSeg);
     const nightBox = h('div.mn-night');
@@ -79,7 +79,7 @@ export default {
         style: { '--gc': g.colour || '#C89B3C', '--i': i },
       },
       h('div.mn-plate', { html: dishSvg(g.dish) + (g.comingSoon ? DOME_SVG : '') }),
-      g.comingSoon ? h('span.mn-stamp', 'In the oven') : null,
+      g.comingSoon ? h('span.mn-stamp', 'Coming soon') : null,
       h('div.mn-tag', h('span.mn-tag-t', g.title), h('span.mn-tag-c', g.tagline)),
       fans);
       onTap(btn, () => tapDish(g));
@@ -156,7 +156,7 @@ export default {
         const fancied = myFancy() === g.id;
         action = g.comingSoon
           ? button('Coming soon', { kind: 'secondary', disabled: true })
-          : button(fancied ? 'You fancy this one' : 'I fancy this', { kind: fancied ? 'primary' : 'secondary', e2e: 'fancy', onClick: () => tapDish(g) });
+          : button(fancied ? 'Told Cyril \u2713 (tap to take it back)' : 'I fancy this one', { kind: 'primary', e2e: 'fancy', onClick: () => tapDish(g) });
       }
       detail.append(h('div.mn-d-act', action));
     }
@@ -183,10 +183,12 @@ export default {
         const sig = who.map((p) => p.id).join(',');
         if (d.fans.dataset.sig !== sig) {
           d.fans.dataset.sig = sig;
-          d.fans.replaceChildren(...who.map((p, k) => h('span.mn-fan', { style: { '--pc': AVATARS[p.avatar]?.colour, '--k': k }, title: p.name, html: avatarIcon(p.avatar) })));
+          d.fans.replaceChildren(...who.slice(0, 3).map((p, k) => h('span.mn-fan', { style: { '--pc': AVATARS[p.avatar]?.colour, '--k': k }, title: p.name, html: avatarIcon(p.avatar) })),
+            ...(who.length ? [h('span.mn-fans-n', `${who.length} fancy this`)] : []));
           d.btn.classList.toggle('fancied', who.length > 0);
         }
       }
+      trolley.classList.toggle('has-focus', !!fid);
       fam.setAttribute('aria-checked', String(c.rating !== 'adult'));
       adu.setAttribute('aria-checked', String(c.rating === 'adult'));
       ratingSeg.classList.toggle('locked', !c.isHost);

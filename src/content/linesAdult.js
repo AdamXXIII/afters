@@ -1,6 +1,10 @@
 // Cyril's adult (18+) line bank. Same rules as LINES: max 90 chars per bubble, max 2 bubbles.
 // A key maps to bubbles (strings) or to variants (arrays of bubbles); one variant is picked at random.
 export const LINES_ADULT = {
+  introAgain: [
+    ['The classic again? Same positions as last time, then.'],
+    ['Three courses, no foreplay. Pens out.'],
+  ],
   title: [
     ['Good evening. Do sit. On a chair, for now.'],
     ['Evening, darlings. I\'m lit, and so, I suspect, are you.'],

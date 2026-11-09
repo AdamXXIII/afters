@@ -385,6 +385,43 @@ export class App {
     if (p.id !== 'podium' && p.id !== 'end') this.stage.setPodium(null);
     const m = audio.music;
     if (m) m.setIntensity(/write/.test(p.id) ? 'write' : 'normal');
+    this._banter = { seq: p.seq, done: false, slow: false };
+    clearTimeout(this._banterT);
+    // Cyril heckles the standings: a dig at the leader, then (sometimes) the one at the bottom.
+    if (/-scores$/.test(p.id) && !this.frozen) {
+      const rows = p.payload?.rows || [];
+      const lead = this.client?.player(rows[0]?.id);
+      const last = this.client?.player(rows[rows.length - 1]?.id);
+      this._banterT = setTimeout(() => {
+        if (this.client?.state.phase?.seq !== p.seq) return;
+        const c = this.ctx();
+        const useLast = last && rows.length > 2 && (p.seed % 2);
+        this.say(useLast ? c.line('scoresLast', { name: last.name }) : c.line('scoresLeader', { name: lead?.name || 'Someone' }), { hold: 1800, placement: 'side' });
+      }, Math.round(4300 / (p.speed || 1)));
+    }
+  }
+
+  /** Banter that reacts to the table while a phase runs (everyone done early, one slowpoke). */
+  _banterTick() {
+    const s = this.client?.state;
+    const ph = s?.phase;
+    const b = this._banter;
+    if (!ph || !b || b.seq !== ph.seq || this.frozen || this._suppress) return;
+    if (!/write|vote|pick/.test(ph.id) || !ph.endsAt) return;
+    const done = s.progress?.done || {};
+    const active = s.players.filter((p) => p.connected !== false);
+    const left = active.filter((p) => !done[p.id]);
+    const c = this.ctx();
+    if (!b.done && active.length && !left.length && ph.endsAt - c.now() > 3000) {
+      b.done = true;
+      if (ph.seed % 3 === 0) this.say(c.line('everyoneDone'), { hold: 1400, compact: true });
+      return;
+    }
+    const rem = ph.endsAt - c.now();
+    if (!b.slow && left.length === 1 && active.length >= 3 && rem < 12000 && rem > 4000 && /write/.test(ph.id)) {
+      b.slow = true;
+      this.say(c.line('slowpoke', { name: left[0].name }), { hold: 1800, compact: true });
+    }
   }
 
   _onReact(m) {
@@ -427,6 +464,7 @@ export class App {
   }
 
   _frame() {
+    this._banterTick();
     const c = this.client;
     const ph = c?.state.phase;
     if (!ph || !ph.endsAt || this.frozen) return;

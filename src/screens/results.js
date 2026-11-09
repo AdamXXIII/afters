@@ -21,12 +21,13 @@ export default {
     const g = ctx.games.find((x) => x.id === ctx.payload.gameId) || {};
     const rows = ctx.payload.rows || [];
     const winners = rows.filter((r) => r.rank === 1).map((r) => ctx.player(r.id)).filter(Boolean);
-    show.append(h('div.rs-show',
+    const headEl = (h('div.rs-show',
       h('div.rs-dish', { html: dishSvg(g.dish) }),
       h('div.rs-eyebrow', `${g.title || ctx.payload.title || 'That game'} · the bill`),
       h('div.rs-win', winners.length ? h('span', h('b', winners.map((p) => p.name).join(' & ')), winners.length > 1 ? ' share it' : ' takes it') : 'Nobody won. Somehow.')));
+    void show;
 
-    const list = h('ol.rs-list');
+    const list = h(`ol.rs-list${rows.length > 5 ? '.many' : ''}`);
     rows.forEach((r, i) => {
       const p = ctx.player(r.id);
       if (!p) return;
@@ -42,7 +43,7 @@ export default {
         button('Back to the menu', { e2e: 'to-menu', onClick: () => ctx.client.toMenu() }),
         button('Same again', { kind: 'secondary', e2e: 'again', onClick: () => ctx.client.again() }))
       : h('div.rs-wait', `${ctx.player(ctx.state?.hostId)?.name || 'The host'} is picking the next dish.`);
-    sheet.append(h('div.rs-sheet', list, nightStrip(ctx, ctx.payload.night || [], { big: true }), actions));
+    sheet.append(h('div.rs-sheet', headEl, list, nightStrip(ctx, ctx.payload.night || [], { big: true }), actions));
 
     const last = rows[rows.length - 1];
     const lines = winners[0] ? ctx.line('resultsWin', { name: winners[0].name }) : ctx.line('everyoneDone');

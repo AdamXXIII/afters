@@ -78,9 +78,9 @@ export async function runDemo(app, id) {
       const ps = engine.players;
       engine.menu.focus = 'classic';
       if (ps[1]) engine.menu.fancy[ps[1].id] = 'classic';
-      if (ps[2]) engine.menu.fancy[ps[2].id] = 'telephone';
+      if (ps[2]) engine.menu.fancy[ps[2].id] = 'classic';
       if (ps[3]) engine.menu.fancy[ps[3].id] = 'classic';
-      if (ps[4]) engine.menu.fancy[ps[4].id] = 'forehead';
+      
       engine._progress();
     } else if (spec.box === 'results') {
       reached = true;

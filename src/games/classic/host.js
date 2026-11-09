@@ -23,7 +23,7 @@ export class ClassicHost {
   start() {
     for (const p of this.players) p.stats = newStats();
     this._newGame();
-    this.api.enter('intro', DUR.intro, {});
+    this.api.enter('intro', DUR.intro, { first: !this.api.history.length, plays: this.api.plays });
   }
 
   advance(id) {

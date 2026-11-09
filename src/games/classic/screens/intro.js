@@ -115,7 +115,7 @@ export default {
       plate.style.top = `${y.toFixed(1)}px`;
     };
     place(ctx);
-    const cancel = sayLater(ctx, ctx.line('intro'), { delay: 250, hold: 2000, placement: 'above' });
+    const cancel = sayLater(ctx, ctx.line(ctx.payload.first === false ? 'introAgain' : 'intro'), { delay: 250, hold: 2000, placement: 'above' });
     const frame = (c, dt = 0.016) => {
       place(c);
       seatGuests(c, dt);

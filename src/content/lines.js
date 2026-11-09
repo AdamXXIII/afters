@@ -12,6 +12,10 @@ export const LINES = {
   lobbyFull: ['Eight. Splendid. Someone\'s going to get the wobbly chair.'],
   tableFull: ['Table\'s full. Pull up a pouffe and wait for the next game.'],
   intro: ['Good evening, the table. I\'m Cyril, your host for tonight.', 'Eleven thousand dinner parties. I\'ve survived them all, barring the birthday incident.'],
+  introAgain: [
+    ['Afters Classic, coming right up. Three courses, no dawdling.'],
+    ['Back for the classic. Napkins up. Pens out.'],
+  ],
   r1Intro: ['Course one: Plate Up. Two of you answer the same question.', 'The table decides who served it better.'],
   r1Write: ['Write something funny. Or something true. Ideally both.'],
   timer10: ['Ten seconds. Type like the oven\'s on fire.'],

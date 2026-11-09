@@ -72,7 +72,7 @@ export default {
         sfx('oink'); sfx('stamp');
         if (!quiet) { ctx.stage.shake(); ctx.haptic('stamp'); }
         if (o.authors.includes(ctx.meId) && o.pickers.length) ctx.haptic('fooled');
-        if (o.pickers.length >= 3) ctx.say(ctx.line('r2FooledMany', { n: o.pickers.length }), { hold: 1400, placement: 'side' });
+        if (o.pickers.length >= 2) ctx.say(ctx.line('r2FooledMany', { n: o.pickers.length }), { hold: 1400, placement: 'side' });
         ctx.cyril.react(o.pickers.length >= 2 ? 'guffaw' : 'smug', { duration: quiet ? 60000 : 1400 });
       },
       truth(s) {
@@ -101,6 +101,7 @@ export default {
         ctx.cyril.setMood?.(o.pickers.length ? 'celebrate' : 'calm');
         if (o.pickers.includes(ctx.meId)) ctx.haptic('win');
         if (!o.pickers.length) ctx.say(ctx.line('r2Nobody'), { hold: 1600, placement: 'side' });
+        else if (o.pickers.length >= Math.max(2, Math.ceil(ctx.players.length * 0.6))) ctx.say(ctx.line('r2TruthFound'), { hold: 1600, placement: 'side' });
       },
       aside() {
         ctx.say(p.aside, { hold: 2200, placement: 'side' });

@@ -91,7 +91,9 @@ export default {
         if (o === 'clean') sfx('fanfare');
         const key = { clean: 'r1Clean', tie: 'r1Tie', empty: 'r1Empty', novotes: 'r1NoVotes' }[o];
         const houseWin = p.answers.some((a) => a.house && a.points > 0);
-        ctx.say(key ? ctx.line(key) : houseWin ? R1_LINES.house : [pickLine(R1_LINES.normal, seed, p.index)], { hold: 1500, placement: 'side' });
+        const [va, vb] = p.answers.map((x) => x.votes.length);
+        const close = o === 'normal' && !houseWin && Math.abs(va - vb) === 1 && va + vb >= 3;
+        ctx.say(key ? ctx.line(key) : houseWin ? R1_LINES.house : close ? ctx.line('r1Close') : [pickLine(R1_LINES.normal, seed, p.index)], { hold: 1500, placement: 'side' });
       } },
       { at: S(5600), fn: () => { if (!quiet) cards.forEach((c) => c.classList.add('out')); } },
     ]);

@@ -226,6 +226,8 @@ export class HostEngine {
       get seq() { return eng.seq; },
       get hostPlayer() { return eng.hostPlayer; },
       get plays() { return eng.game?.plays || 1; },
+      /** Games finished tonight: [{gameId, winnerIds}] */
+      get history() { return eng.history; },
       now: () => eng.now(),
       dur: (ms) => eng.dur(ms),
       send: (msg, toPlayerId) => {
