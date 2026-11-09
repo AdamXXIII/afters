@@ -2,7 +2,7 @@
 // three big rules, and a compact host control bar; guests see who's at the table.
 import './forehead.css';
 import { h, button } from '../../../ui/components.js';
-import { HEAD_SVG, disc, CYRIL_BADGE } from './kit.js';
+import { CYRIL_BONCE_SVG, disc, CYRIL_BADGE } from './kit.js';
 
 function pills(options, value, onPick, e2e) {
   const row = h('div.fh-pills', { role: 'radiogroup' });
@@ -25,12 +25,9 @@ export default {
   mount({ show }, ctx0) {
     let ctx = ctx0;
     const p = ctx.payload;
-    const head = h('i.fh-po-head', { html: HEAD_SVG });
+    const head = h('i.fh-po-head', { html: CYRIL_BONCE_SVG });
     const title = h('div.fh-po-title', 'Bonce');
-    const rules = h('ol.fh-po-rules',
-      h('li', h('b', '1'), h('span', 'Phone on your head, screen out')),
-      h('li', h('b', '2'), h('span', 'Everyone else shouts, acts, hums')),
-      h('li', h('b', '3'), h('span', h('em', 'Nod'), ' = got it. ', h('em', 'Tip back'), ' = pass')));
+    const rules = h('div.fh-po-rule', 'Phone on your head. ', h('em', 'Everyone shouts.'), h('br'), 'Nod = got it. Tip back = pass.');
     const setup = () => ({ ...(ctx.progress.setup || { mode: 'ffa', goes: 1 }), ...(ctx.mine.game.setup || {}) });
     const bar = h('div.fh-po-bar');
     let modeP = null; let goesP = null; let summary = null;
@@ -39,7 +36,11 @@ export default {
       modeP = pills([{ value: 'ffa', label: 'Every bonce for itself' }, { value: 'teams', label: p.canTeams ? 'Gravy v Custard' : 'Teams (4+)', disabled: !p.canTeams }], setup().mode, (v) => send({ mode: v }), 'fh-mode');
       goesP = pills([{ value: 1, label: '1 go each' }, { value: 2, label: '2 goes each' }], setup().goes, (v) => send({ goes: v }), 'fh-goes');
       const go = button('Bonces up!', { kind: 'candle', e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
-      bar.append(modeP, goesP, go);
+      summary = h('span');
+      const opts = h('div.fh-po-opts', modeP, goesP);
+      const open = h('button.fh-po-change', { type: 'button', 'data-e2e': 'fh-setup-open' }, summary, h('b', 'Change'));
+      open.addEventListener('click', () => { opts.classList.toggle('open'); ctx.haptic('tap'); });
+      bar.append(opts, open, go);
     } else {
       const host = ctx.players.find((x) => x.isHost);
       summary = h('div.fh-po-summary');
@@ -50,11 +51,11 @@ export default {
     show.append(root);
     if (!ctx.frozen) {
       title.animate([{ transform: 'scale(.4) rotate(-12deg)', opacity: 0 }, { transform: 'rotate(-4deg)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
-      [...rules.children].forEach((li, i) => li.animate([{ transform: 'translateX(-40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, delay: 350 + i * 120, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' }));
+      head.animate([{ transform: 'translateY(80px) scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, delay: 200, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' });
     }
     const paint = () => {
       const s = setup();
-      if (summary) summary.textContent = `${s.mode === 'teams' ? 'Gravy v Custard' : 'Every bonce for itself'} · ${s.goes} go${s.goes > 1 ? 'es' : ''} each`;
+      if (summary) summary.textContent = `${s.mode === 'teams' ? 'Gravy v Custard' : 'Every bonce for itself'} · ${s.goes} go${s.goes > 1 ? 'es' : ''}`;
       modeP?.set(s.mode); goesP?.set(s.goes);
     };
     paint();

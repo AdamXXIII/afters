@@ -100,3 +100,31 @@ export function cyrilCard(lines) {
   const text = (Array.isArray(lines) ? lines : [lines]).join(' ');
   return h('div.fh-cy', h('i', { html: CYRIL_BADGE }), h('div', h('small', 'Cyril'), h('span', text)));
 }
+
+/** Cyril the candle with a phone stuck on his forehead, eyes rolled up at it (Bonce's mascot). */
+export const CYRIL_BONCE_SVG = `<svg viewBox="0 0 220 290" aria-hidden="true">
+<defs><radialGradient id="fhFl" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#FFF4D6"/><stop offset=".5" stop-color="#FFC86B"/><stop offset="1" stop-color="#E2553B"/></radialGradient>
+<radialGradient id="fhGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE7A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE7A8" stop-opacity="0"/></radialGradient></defs>
+<circle cx="110" cy="40" r="44" fill="url(#fhGlow)"/>
+<path d="M110 6c8 16 22 24 22 44a22 22 0 0 1-44 0c0-12 7-20 11-28 2 8 6 12 11 12-4-10-4-18 0-28z" fill="url(#fhFl)"/>
+<path d="M110 74v-12" stroke="#2A1A17" stroke-width="4" stroke-linecap="round"/>
+<path d="M58 84c0-8 24-12 52-12s52 4 52 12v150H58z" fill="#F3E6CF" stroke="#2A1A17" stroke-width="5" stroke-linejoin="round"/>
+<path d="M58 84c8 8 20 6 26 0 3 16 12 18 15 2 6 10 18 8 22-2 4 20 16 22 18 2 6 8 16 6 23-2" fill="none" stroke="#2A1A17" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M150 90c4 16 4 30 0 40" stroke="#E6D3B8" stroke-width="7" stroke-linecap="round"/>
+<g transform="rotate(-6 110 112)"><rect x="40" y="88" width="140" height="62" rx="12" fill="#E2553B" stroke="#2A1A17" stroke-width="5"/><rect x="50" y="97" width="120" height="44" rx="5" fill="#FBF4EA"/>
+<text x="110" y="129" text-anchor="middle" font-family="Fraunces Variable, Georgia, serif" font-weight="900" font-size="30" fill="#2A1A17">???</text></g>
+<ellipse cx="88" cy="176" rx="15" ry="17" fill="#FFFDF7" stroke="#2A1A17" stroke-width="4"/><ellipse cx="132" cy="176" rx="15" ry="17" fill="#FFFDF7" stroke="#2A1A17" stroke-width="4"/>
+<circle cx="90" cy="166" r="6.5" fill="#2A1A17"/><circle cx="134" cy="166" r="6.5" fill="#2A1A17"/>
+<path d="M72 152c6-6 16-8 24-4M124 148c8-4 18-2 24 4" stroke="#7A4A2A" stroke-width="5" stroke-linecap="round" fill="none"/>
+<ellipse cx="110" cy="206" rx="11" ry="13" fill="#7A1E2C" stroke="#2A1A17" stroke-width="4"/>
+<path d="M96 228l-14-9v18zM124 228l14-9v18z" fill="#7A1E2C" stroke="#2A1A17" stroke-width="3.5" stroke-linejoin="round"/><circle cx="110" cy="228" r="6" fill="#7A1E2C" stroke="#2A1A17" stroke-width="3.5"/>
+<ellipse cx="110" cy="246" rx="74" ry="16" fill="#C89B3C" stroke="#2A1A17" stroke-width="5"/><path d="M36 246v12c0 9 33 16 74 16s74-7 74-16v-12" fill="#A87E2C" stroke="#2A1A17" stroke-width="5"/>
+<path d="M184 250c16 0 20 18 4 22" stroke="#2A1A17" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M30 124l-14-8M28 140H10M32 156l-14 8M190 124l14-8M192 140h18M188 156l14 8" stroke="#FBF4EA" stroke-width="5" stroke-linecap="round"/>
+</svg>`;
+
+/** A willow-pattern dinner plate (the recap piles the hits onto it). */
+export const PLATE_SVG = (() => {
+  const dots = Array.from({ length: 28 }, (_, i) => { const a = (i / 28) * Math.PI * 2; return `<circle cx="${200 + Math.cos(a) * 178}" cy="${200 + Math.sin(a) * 178}" r="5" fill="#2F5D7C"/>`; }).join('');
+  return `<svg viewBox="0 0 400 400" aria-hidden="true"><ellipse cx="200" cy="214" rx="196" ry="190" fill="rgba(42,26,23,.35)"/><circle cx="200" cy="200" r="196" fill="#FBF7EF" stroke="#E6D3B8" stroke-width="4"/><circle cx="200" cy="200" r="188" fill="none" stroke="#2F5D7C" stroke-width="6"/>${dots}<circle cx="200" cy="200" r="150" fill="none" stroke="#2F5D7C" stroke-width="2.5"/><circle cx="200" cy="200" r="140" fill="#FFFDF8"/></svg>`;
+})();

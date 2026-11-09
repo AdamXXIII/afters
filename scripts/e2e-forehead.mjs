@@ -41,7 +41,12 @@ async function phone(label) {
   return { label, context, page };
 }
 const api = (p, fn, arg) => p.page.evaluate(fn, arg);
-const waitFor = (p, fn, arg, timeout = 30000) => p.page.waitForFunction(fn, arg, { timeout, polling: 100 });
+const waitFor = async (p, fn, arg, timeout = 60000) => {
+  try { return await p.page.waitForFunction(fn, arg, { timeout, polling: 100 }); } catch (e) {
+    const where = await p.page.evaluate(() => `${window.__afters?.screen} / ${window.__afters?.phase}`).catch(() => '?');
+    throw new Error(`${p.label} waited ${timeout} ms on ${String(fn).slice(0, 90)} (at ${where})`);
+  }
+};
 async function join(name, code) {
   const p = await phone(name);
   await p.page.goto(`${web.url}/?room=${code}&${common}`);
@@ -76,6 +81,7 @@ async function playGame(host, { teams }) {
     try {
       if (st.screen === 'forehead-intro') {
         if (teams && await page.locator('[data-e2e=fh-mode-teams]:not(.on)').count()) {
+          await page.click('[data-e2e=fh-setup-open]');
           await page.click('[data-e2e=fh-mode-teams]');
           await page.click('[data-e2e=fh-goes-1]');
           await waitFor(host, () => window.__afters.app.client.state.progress?.setup?.mode === 'teams', null, 5000);

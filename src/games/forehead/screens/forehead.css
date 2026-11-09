@@ -362,3 +362,81 @@ body[data-screen="forehead-intro"] #show, body[data-screen="forehead-pick"] #sho
 .fh-rc-miss i svg { width: 12px; height: 12px; }
 .fh-rc-none { grid-column: 1 / -1; text-align: center; font: 900 44px/1 var(--f-display); color: var(--c-linen); transform: rotate(-4deg); text-shadow: 0 4px 0 #7A1E2C; }
 .fh-pk-tiles { position: relative; z-index: 2; }
+
+/* ------------------------------------------------------------------ round 4: pick = a fanned hand */
+.fh-pk-fan { flex: 1; display: flex; justify-content: center; align-items: center; padding: 26px 0 10px; position: relative; z-index: 2; }
+.fh-pk-fan .fh-pk-tile {
+  flex: none; width: 150px; min-height: 0; height: 236px; margin: 0 -22px; padding: 14px 10px 16px; border-radius: 20px;
+  flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; text-align: center;
+  transform-origin: 50% 120%;
+  box-shadow: inset 0 0 0 3px rgba(251,244,234,.9), inset 0 0 0 7px var(--dc), inset 0 0 0 8px rgba(251,244,234,.4), 0 8px 0 rgba(42,26,23,.45), 0 22px 34px rgba(20,8,6,.5);
+}
+.fh-pk-fan .fh-pk-tile:nth-child(1) { transform: rotate(-13deg) translateY(10px); }
+.fh-pk-fan .fh-pk-tile:nth-child(2) { transform: translateY(-14px); z-index: 1; }
+.fh-pk-fan .fh-pk-tile:nth-child(3) { transform: rotate(13deg) translateY(10px); }
+.fh-pk-fan .fh-pk-tile.lead { scale: 1.08; z-index: 3; }
+.fh-pk-fan .fh-pk-tile.on { z-index: 4; }
+.fh-pk-fan .fh-pk-tile.on:nth-child(1) { transform: rotate(-13deg) translateY(-18px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(2) { transform: translateY(-40px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(3) { transform: rotate(13deg) translateY(-18px); }
+.fh-pk-face { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.fh-pk-fan .fh-pk-icon { width: 84px; height: 84px; border-radius: 50%; transform: none; box-shadow: 0 4px 0 rgba(42,26,23,.3); margin-top: 6px; }
+.fh-pk-fan .fh-pk-icon svg { width: 60px; height: 60px; }
+.fh-pk-fan .fh-pk-txt { align-items: center; }
+.fh-pk-fan .fh-pk-txt b { font-size: 23px; line-height: 24px; }
+.fh-pk-fan .fh-pk-txt small { font-size: 13px; line-height: 16px; }
+.fh-pk-fan .fh-pk-votes { top: auto; bottom: -16px; right: auto; left: 50%; transform: translateX(-50%); }
+.fh-pk-back { display: none; }
+.fh-pick.blind .fh-pk-face { display: none; }
+.fh-pick.blind .fh-pk-back { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; width: 100%; border-radius: 12px;
+  background: repeating-linear-gradient(45deg, rgba(251,244,234,.18) 0 8px, transparent 8px 16px); }
+.fh-pk-back b { font: 900 110px/1 var(--f-display); color: var(--c-linen); text-shadow: 0 5px 0 rgba(42,26,23,.35); }
+.fh-pk-back small { font: 800 13px/1 var(--f-ui); letter-spacing: .2em; text-transform: uppercase; color: var(--c-linen); opacity: .85; }
+.fh-pk-title { max-width: none; font-size: 54px; }
+.fh-pk-fan .fh-pk-tile.on::after { left: 50%; transform: translateX(-50%); top: -12px; }
+
+/* ------------------------------------------------------------------ round 4: recap = the haul on a plate */
+.fh-rc-plate { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; }
+.fh-plate { position: absolute; width: min(370px, 94vw); aspect-ratio: 1; left: 50%; top: 50%; transform: translate(-50%, -50%) rotateX(0deg); display: grid; }
+.fh-plate svg { width: 100%; height: 100%; }
+.fh-rc-pile { position: relative; width: 300px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 0; }
+.fh-rc-pile .fh-rc-tile.hit { margin: -4px -6px; max-width: 168px; transform: rotate(var(--rot)) translateY(var(--dy)); background-color: var(--c-linen); }
+.fh-rc-pile .fh-rc-tile.hit .fh-rc-txt { font-size: 20px; line-height: 22px; }
+.fh-rc-pile.dense .fh-rc-tile.hit .fh-rc-txt { font-size: 15px; line-height: 17px; }
+.fh-rc-pile.dense .fh-rc-tile.hit { max-width: 130px; padding: 6px 8px 6px 6px; min-height: 40px; }
+.fh-rc-none { color: var(--c-willow); text-shadow: none; font-size: 50px; }
+.fh-hero-n { font-size: 120px; }
+.fh-hero-quip { margin-top: 4px; }
+/* ------------------------------------------------------------------ round 4: intro = Cyril wearing the phone */
+.fh-po-stage .fh-po-head { width: 236px; height: 310px; }
+.fh-po-stage .fh-po-head svg { width: 236px; height: 310px; }
+.fh-po-shout.s1 { left: 2%; top: 22%; }
+.fh-po-shout.s2 { right: 2%; top: 40%; }
+.fh-po-shout.s3 { left: 4%; bottom: 14%; }
+.fh-po-rule { text-align: center; font: 800 21px/27px var(--f-display); color: var(--c-linen); text-shadow: 0 2px 0 rgba(42,26,23,.4); margin: 4px 0 12px; }
+.fh-po-rule em { font-style: normal; color: var(--c-candle); }
+.fh-po-opts { display: none; flex-direction: column; gap: 6px; }
+.fh-po-opts.open { display: flex; }
+.fh-po-change { align-self: center; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px 0 16px; border: 0; border-radius: 99px; background: rgba(42,26,23,.38); color: var(--c-linen); font: 700 15px/1 var(--f-ui); }
+.fh-po-change b { background: var(--c-linen); color: var(--c-claret); padding: 7px 12px; border-radius: 99px; font-weight: 800; }
+.fh-pk-fan .fh-pk-tile { width: 128px; max-width: 128px; margin: 0 -12px; height: 226px; }
+.fh-pk-fan .fh-pk-txt b { font-size: 21px; line-height: 22px; }
+.fh-pk-fan .fh-pk-txt small { font-size: 12.5px; line-height: 15px; }
+.fh-pk-fan .fh-pk-icon { width: 74px; height: 74px; }
+.fh-pk-fan .fh-pk-icon svg { width: 52px; height: 52px; }
+.fh-pk-fan .fh-pk-txt { min-width: 0; width: 100%; overflow-wrap: anywhere; }
+.fh-rc-pile .fh-rc-tile.hit { max-width: 148px; flex: 0 1 auto; }
+.fh-rc-pile .fh-rc-tile.hit .fh-rc-txt { font-size: 18px; line-height: 20px; }
+.fh-rc-pile { width: 320px; }
+.fh-po-change { font-size: 14px; }
+.fh-pk-fan .fh-pk-tile { margin: 0 -16px; }
+.fh-pk-fan .fh-pk-tile:nth-child(1) { transform: rotate(-9deg) translateY(10px); }
+.fh-pk-fan .fh-pk-tile:nth-child(3) { transform: rotate(9deg) translateY(10px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(1) { transform: rotate(-9deg) translateY(-18px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(3) { transform: rotate(9deg) translateY(-18px); }
+.fh-pk-fan .fh-pk-txt { overflow-wrap: normal; }
+.fh-pk-fan .fh-pk-txt b { font-size: 19px; line-height: 21px; }
+.fh-rc-bonus { right: auto; left: -8px; top: -10px; transform: rotate(-8deg); }
+.fh-pk-fan .fh-pk-tile { width: 120px; max-width: 120px; margin: 0 -10px; }
+.fh-pk-fan .fh-pk-tile { transform-origin: 50% 50%; } .fh-pk-fan { padding-left: 6px; padding-right: 6px; } .fh-pk-fan .fh-pk-tile.lead { scale: 1.04; }
+.fh-pk-fan .fh-pk-tile { margin: 0 -3px; }

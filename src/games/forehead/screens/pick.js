@@ -23,13 +23,13 @@ export default {
         h('div.fh-pk-eyebrow', disc(g, { size: 30 }), `Bonce ${p.turn} of ${p.of}${p.team ? ` · ${TEAMS[p.team].name}` : ''}`),
         h('div.fh-pk-title', meG ? h('span', 'Your', h('br'), 'fate') : h('span', `Pick ${g?.name || '?'}'s`, h('br'), 'poison'))),
       h('div.fh-ring', ring));
-    const mascot = h('div.fh-pk-mascot', h('i', { html: HEAD_SVG }), disc(g, { size: 40, cls: '.badge' }));
+
 
     const tiles = p.decks.map((d, i) => {
       const votes = h('span.fh-pk-votes');
       const tile = h(`${canVote ? 'button' : 'div'}.fh-pk-tile`, { type: canVote ? 'button' : undefined, 'data-e2e': canVote ? 'fh-deck' : undefined, style: { '--dc': d.colour, '--i': i } },
-        h('i.fh-pk-icon', { html: deckIcon(d.icon) }),
-        h('span.fh-pk-txt', h('b', d.name), h('small', d.blurb)),
+        h('span.fh-pk-face', h('i.fh-pk-icon', { html: deckIcon(d.icon) }), h('span.fh-pk-txt', h('b', d.name), h('small', d.blurb))),
+        h('span.fh-pk-back', h('b', '?'), h('small', 'Bonce')),
         votes);
       tile.votes = votes;
       tile.deck = d.id;
@@ -55,9 +55,9 @@ export default {
     } else {
       foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', ctx.line('fhPick', { name: g?.name || 'them' }).join(' '))));
     }
-    const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}`, head, mascot, h('div.fh-pk-tiles', tiles), foot);
+    const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}${meG ? '.blind' : ''}`, head, h('div.fh-pk-fan', tiles), foot);
     show.append(root);
-    if (!ctx.frozen) tiles.forEach((t, i) => t.animate([{ transform: 'translateY(60px) rotate(6deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, delay: 80 + i * 90, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
+    if (!ctx.frozen) tiles.forEach((t, i) => t.animate([{ translate: '0 260px', rotate: '0deg', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 520, delay: 80 + i * 110, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
 
     const paint = () => {
       const votes = ctx.progress.votes || {};
