@@ -32,6 +32,8 @@ export default {
         h('span.r3i-price', h('b', '+1000'), ' the toast')),
     );
     card.prepend(bell);
+    const fuse = h('i');
+    card.append(h('div.r3i-fuse', { 'aria-hidden': 'true' }, fuse));
     const wrap = h('div.r3i-wrap', card);
     show.append(wrap);
 
@@ -64,6 +66,7 @@ export default {
     return {
       frame(c) {
         tl(c);
+        if (c.duration) fuse.style.width = `${Math.max(0, Math.min(100, (c.remaining() / c.duration) * 100))}%`;
         if (skip) skip.classList.toggle('on', c.elapsed() > 3000 / (c.phase?.speed || 1));
       },
       unmount() { cancel(); ctx.cyril.setMood('calm'); },

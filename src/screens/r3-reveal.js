@@ -3,6 +3,7 @@
 // #1 (or a joint #1) becomes TOAST OF THE TABLE: gold foil, +1000, napkin-and-foil confetti.
 import './r3.css';
 import { h, chip } from '../ui/components.js';
+import { avatarIcon } from '../ui/icons.js';
 import { glassSvg, clinkSvg, r3Timeline, sayIfFresh, countTo } from './r3-art.js';
 
 
@@ -99,7 +100,7 @@ export default {
         h('span.r3r-rk', rankOf(c).label),
         h('span.r3r-row-t', c.text),
         h('span.r3r-row-g', { html: glassSvg(1) }, h('b', String(c.glasses.length))),
-        h('span.r3r-row-by', { style: { '--pc': who?.colour || '#7A4A2A' } }, h('span.r3r-nm', who?.name || '?'), h('span.r3r-row-pts', `+${200 * c.glasses.length}`)),
+        h('span.r3r-row-by', { style: { '--pc': who?.colour || '#7A4A2A' } }, h('span.r3r-av', { html: who ? avatarIcon(who.avatar) : '' }), h('span.r3r-nm', who?.name || '?'), h('span.r3r-row-pts', `+${200 * c.glasses.length}`)),
       );
       row.c = c;
       return row;
@@ -178,15 +179,16 @@ export default {
 
     function jointHero(cards, late) {
       const shown = cards.slice(0, 4);
+      const anyLong = shown.some((c) => c.text.length > 18);
       const minis = shown.map((c, mi) => {
         const who = author(c);
         const pts = h('span.r3r-pts', `+${200 * c.glasses.length}`);
         cleanups.push(countTo(pts, 200 * c.glasses.length, 200 * c.glasses.length + 1000, 700, { instant: frozen || late > 900, prefix: '+' }));
-        return h('div.r3r-mini', { style: { translate: `0 ${mi % 2 ? 6 : 0}px`, rotate: `${mi % 2 ? 1 : -1}deg` } },
-          h(`div.r3r-text.mini${c.text.length > 18 ? '.long' : ''}`, c.text),
+        return h('div.r3r-mini',
+          h(`div.r3r-text.mini${anyLong ? '.long' : ''}`, c.text),
           h('div.r3r-mini-g', { html: glassSvg(1) }, h('b', `× ${c.glasses.length}`)),
           h('div.r3r-mini-by', who ? chip(who, { compact: false }) : null),
-          h('span.r3r-stamp', { style: { rotate: `${shown.indexOf(c) % 2 ? 5 : -3}deg` } }, pts));
+          h('span.r3r-stamp', pts));
       });
       const el = h('div.r3r-card.hero.is-toast.joint',
         h('div.r3r-ribbon', h('span.r3r-ribbon-i', { html: clinkSvg() }), h('span', 'Joint toast of the table')),
@@ -204,7 +206,8 @@ export default {
       // tiny folded napkins + gold foil, seeded so every phone throws the same handful
       const bits = Array.from({ length: 56 }, (_, i) => {
         const napkin = i % 3 === 0;
-        const x = (i * 37 + 11) % 100;
+        let x = (i * 37 + 11) % 100;
+        if (x > 32 && x < 68) x = x < 50 ? x - 26 : x + 26; // keep Cyril's face clear
         const drift = ((i * 53) % 60) - 30;
         const delay = ((i * 7) % 12) * 0.06;
         const dur = 3.2 + ((i * 13) % 10) / 10;
