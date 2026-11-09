@@ -160,3 +160,16 @@ Messages (client -> host): `hello, ping, profile, settings, start, skip, again, 
 ## Performance rules (DESIGN 3.6)
 
 Pixel ratio capped at 2 with auto step-down (2 -> 1.5 -> 1.25) when frames average > 20 ms (disabled under automation). Render loop stops when the tab is hidden, and runs at 30 fps in `input` layout. No shadow maps, no post-processing; glows are additive sprites, vignette and grain are CSS. Keep new meshes merged or instanced.
+
+## Known gaps (foundation v1, for the polish agents)
+
+- **Host migration** is not implemented. If the host phone drops, other phones show the `reconnect` overlay and retry for 90 s (token reconnect works when the host comes back). `engine.snapshot()` exists but no `state` broadcast or promotion yet.
+- **Late reconnect into a running phase** restores the phase and private data, but optimistic `mine` (what you already typed) is not restored.
+- **Bubbles** use simple placement (`above` in show layout, `side` elsewhere) and can briefly cover content; they clear after their hold.
+- **Podium** framing is rough: Cyril is large on the left and the cake/avatars sit behind the bill. Confetti is CSS, not 3D napkins.
+- **Avatar thumbnails** are rendered once offscreen (lobby); chips use flat SVG glyphs.
+- **High quality tier** (half-res bloom) is not implemented; auto step-down of pixel ratio is.
+- **Music** only plays on the speaker phone after the first tap (browser autoplay rules). The "Speaker" toggle in the lobby cycles through players.
+- **Keyboard handling** (`kb-open`, strip collapse to 76 px) is implemented from `visualViewport` but untested on real iOS/Android.
+- Bundle is ~830 kB JS (three + peerjs) before gzip (~226 kB gzip); no code splitting yet beyond `demo.js`.
+- Under headless SwiftShader the app renders at 4 fps (automation cap); real phones are uncapped.
