@@ -129,7 +129,7 @@ export default {
     input.addEventListener('input', updCount);
     updCount();
     const nameCard = h('label.lb-namecard',
-      h('span.lb-swatch.lb-seal'),
+      h('span.lb-swatch', thumbFor(ctx.me?.avatar ?? 0)),
       h('span.lb-namecol', h('span.lb-name-label', 'Your place card'), input),
       h('span.lb-pen', { html: '<svg viewBox="0 0 24 24"><path d="M4 20l1.2-4.6L15.8 4.8a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13.5 7l3.5 3.5" stroke="currentColor" stroke-width="1.8"/></svg>' }),
       nameCount);
@@ -139,7 +139,7 @@ export default {
 
     // host controls: two compact pills
     const adultPill = h('button.lb-pill.lb-switchpill', { type: 'button', role: 'switch', 'aria-checked': 'false' },
-      h('span.lb-pill-txt', h('span.lb-pill-k', 'Rude words'), h('span.lb-pill-s', 'Not allowed')), h('span.lb-switch', h('i')));
+      h('span.lb-pill-txt', h('span.lb-pill-k', 'Rude words'), h('span.lb-pill-s', 'Filtered')), h('span.lb-switch', h('i')));
     onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
     const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
       h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')),
@@ -176,7 +176,7 @@ export default {
 
     sheet.classList.add('lb-sheet');
     sheet.append(...[
-      h('div.lb-top', h('span.lb-title', ctx.isHost ? 'Your table' : 'You\u2019re in'), seatsCount, h('span.lb-gap'), leave),
+      h('div.lb-top', h('span.lb-title', 'Pick your seat'), seatsCount, h('span.lb-gap'), leave),
       grid,
       nameCard,
       ctx.isHost ? hostRow : guestInfo,
@@ -305,8 +305,7 @@ export default {
       if (me) {
         nameCard.style.setProperty('--pc', AVATARS[me.avatar]?.colour || '#7A4A2A');
         const sw = nameCard.querySelector('.lb-swatch');
-        const mono = (me.name || '?').trim().charAt(0).toUpperCase();
-        if (sw.textContent !== mono) sw.textContent = mono;
+        if (sw.dataset.av !== String(me.avatar)) { sw.dataset.av = String(me.avatar); sw.replaceChildren(thumbFor(me.avatar)); }
         if (document.activeElement !== input && input.value !== me.name) { input.value = me.name; updCount(); }
       }
 
@@ -317,10 +316,10 @@ export default {
       // host controls
       const st = c.settings || {};
       adultPill.setAttribute('aria-checked', String(!!st.adult));
-      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Allowed' : 'Not allowed';
+      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Allowed' : 'Filtered';
       const spk = ps.find((p) => p.id === st.speakerId);
       guestInfo.replaceChildren(
-        h('span.lb-info-i', h('span.lb-info-k', 'Rude words'), h('span.lb-info-v', st.adult ? 'Allowed' : 'Not allowed')),
+        h('span.lb-info-i', h('span.lb-info-k', 'Rude words'), h('span.lb-info-v', st.adult ? 'Allowed' : 'Filtered')),
         h('span.lb-info-i', h('span.lb-info-k', 'Music from'), h('span.lb-info-v', spk ? (spk.id === meId ? 'My phone' : spk.name) : 'Off')));
       speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : spk ? spk.name : 'Off';
 

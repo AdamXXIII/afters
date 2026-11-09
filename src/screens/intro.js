@@ -62,7 +62,7 @@ export default {
       beat(h('div.in-table', h('span.in-table-k', 'Tonight\'s table'), faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1750, e),
     ), 650, e);
 
-    const plate = beat(h('div.in-plate', h('span.in-plate-v', 'Cyril Waxley'), h('span.in-plate-k', 'Host')), 200, e);
+    const plate = beat(h('div.in-plate', h('span.in-plate-k', 'Your host'), h('span.in-plate-v', 'Cyril Waxley')), 200, e);
     show.append(h('div.in-wrap', menu), plate);
 
     // host can move things along once the menu has landed
@@ -110,7 +110,7 @@ export default {
       const g = c.cyril?.group;
       if (!g || !c.stage.project) return;
       const p = c.stage.project(g.localToWorld(tmp.set(0, 0.0, 0.13)));
-      const y = Math.min((show.clientHeight || 844) - 40, p.y - 10);
+      const y = Math.min((show.clientHeight || 844) - 52, p.y - 30);
       plate.style.left = `${p.x.toFixed(1)}px`;
       plate.style.top = `${y.toFixed(1)}px`;
     };
