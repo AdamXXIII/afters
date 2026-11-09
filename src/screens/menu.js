@@ -26,7 +26,8 @@ export function nightStrip(ctx, rows, { big = false } = {}) {
     return el;
   }
   const list = h('ol.night-list');
-  rows.slice(0, 8).forEach((r, i) => {
+  const max = 2;
+  rows.slice(0, max).forEach((r, i) => {
     const p = ctx.player(r.id);
     if (!p) return;
     const li = h(`li.night-row${r.rank === 1 ? '.lead' : ''}${r.id === ctx.meId ? '.me' : ''}`, { style: { '--pc': AVATARS[p.avatar]?.colour, '--i': i } },
@@ -36,6 +37,7 @@ export function nightStrip(ctx, rows, { big = false } = {}) {
       r.delta > 0 && big ? h('span.night-d', `+${r.delta}`) : null);
     list.append(li);
   });
+  if (rows.length > max) list.append(h('li.night-more', `+${rows.length - max}`));
   el.append(list);
   return el;
 }
@@ -63,7 +65,7 @@ export default {
     onTap(adu, () => setRating('adult'));
 
     const head = h('header.mn-head',
-      h('div.mn-eyebrow', h('span.mn-code', `Room ${c.room || ''}`)),
+      h('div.mn-eyebrow', h('span.mn-code', 'Room', h('b', c.room || ''))),
       h('h1.mn-title', 'What\'s for', h('br'), h('em', 'afters'), '?'),
       ratingSeg);
     const nightBox = h('div.mn-night');

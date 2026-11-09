@@ -3,9 +3,10 @@
 import './r1.css';
 import { h } from '../../../ui/components.js';
 import { sayLater, hostSkip, coursePips, R1_ICONS, R1_LINES } from './r1-kit.js';
+import { DUR } from '../../../game/constants.js';
 
 const MENU = [
-  { icon: 'pen', dish: 'Answer two questions', price: '80 sec' },
+  { icon: 'pen', dish: 'Answer two questions', price: `${Math.round(DUR['r1-write'] / 1000)} sec` },
   { icon: 'rival', dish: 'Each against a rival', price: '1 on 1' },
   { icon: 'fork', dish: 'The table votes', price: '1000 pts' },
 ];
