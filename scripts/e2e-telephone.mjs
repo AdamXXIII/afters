@@ -3,7 +3,7 @@
 // rumour (using the Stuck? card once), draws real pointer strokes on the canvas, guesses, nudges,
 // votes, then reaches the shared results screen and goes back to the menu. Players use autopilot.
 // Fails on any console error or page error.
-// usage: node scripts/e2e-telephone.mjs [--speed 4] [--headed] [--keep-shots <dir>] [--adult]
+// usage: node scripts/e2e-telephone.mjs [--speed 2] [--headed] [--keep-shots <dir>] [--adult] [--landscape]
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -39,7 +39,7 @@ const browser = await chromium.launch({
 
 const errors = [];
 async function phone(label) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+  const context = await browser.newContext({ viewport: argv.includes('--landscape') ? { width: 844, height: 390 } : { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const page = await context.newPage();
   page.on('console', (m) => { if (m.type() === 'error') errors.push(`${label}: ${m.text()}`); });
   page.on('pageerror', (e) => errors.push(`${label}: pageerror ${e.message}`));

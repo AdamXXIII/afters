@@ -512,3 +512,146 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
 .tp-vs-page .tp-vc-btn { position: absolute; right: 12px; bottom: 12px; z-index: 2; height: 54px; padding: 0 18px; white-space: nowrap; }
 .tp-vs-page .tp-vc-txt { padding: 0 20px 40px; }
 .tp-vs-page .tp-vc-txt { font-size: 42px !important; }
+
+/* =====================================================================================
+   LANDSCAPE (phones on their side, e.g. 844x390). Scoped to this game only.
+   Input screens: the strip becomes a left column (Cyril's head, timer, who's done) and
+   the sheet fills the right; each screen is two columns. Show screens: card on the right,
+   Cyril framed into the free space on the left.
+   ===================================================================================== */
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-game="telephone"] { --tp-col: 196px; }
+  body[data-game="telephone"][data-layout="input"] #strip { right: auto; width: var(--tp-col); height: 100%; padding: calc(var(--safe-t) + 8px) 10px 10px calc(var(--safe-l) + 10px); background: linear-gradient(90deg, rgba(28,16,12,.0), rgba(28,16,12,.0)); }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-inner { grid-template-columns: 1fr; grid-template-rows: 112px auto auto; align-content: start; row-gap: 8px; }
+  body[data-game="telephone"][data-layout="input"] #strip .cyril-slot { grid-row: 1; grid-column: 1; height: 112px; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-status { grid-row: 2; grid-column: 1; font-size: 12px; letter-spacing: .06em; justify-content: center; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-row { grid-row: 3; grid-column: 1; flex-direction: column; align-items: center; }
+  body[data-game="telephone"][data-layout="input"] #strip .chips { flex-wrap: wrap; justify-content: center; }
+  body[data-game="telephone"][data-layout="input"] #strip .chips.crowd .chip.compact { margin-left: 0; }
+  body[data-game="telephone"][data-layout="input"] #show { width: var(--tp-col); height: 132px; }
+  body[data-game="telephone"][data-layout="input"] #sheet { left: var(--tp-col); height: 100%; border-radius: var(--r-4) 0 0 var(--r-4); }
+  body[data-game="telephone"][data-layout="input"] #sheet::before { display: none; }
+
+  .tp-sheet { padding: 10px 14px 10px 16px; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 8px 14px; }
+  .tp-sheet > * { min-width: 0; }
+  .tp-head { grid-column: 1 / -1; }
+  .tp-head-top .t-eyebrow { font-size: 11px; }
+
+  /* write: rumour + field + button left; Stuck? card + route right */
+  .tp-write-card { grid-column: 1; padding: 12px 14px; }
+  .tp-write-title { font-size: 28px; }
+  .tp-write-sub { font-size: 14px; margin-top: 4px; }
+  .tp-sheet:not(.tp-draw):not(.tp-guess):not(.tp-wait):not(.tp-vote) > .field { grid-column: 1; }
+  .tp-sheet > .field .input { height: 52px; font-size: 19px; }
+  .tp-stuck { grid-column: 2; grid-row: 2 / span 2; padding: 10px 12px; }
+  .tp-stuck-txt { font-size: 28px; min-height: 0; margin: 8px 0; }
+  .tp-wroute { grid-column: 2; padding: 8px 10px; }
+  .tp-wroute .t-eyebrow { margin-bottom: 4px; font-size: 11px; }
+  .tp-grow { display: none; }
+  .tp-sheet:not(.tp-draw):not(.tp-guess):not(.tp-wait):not(.tp-vote) > .btn { grid-column: 1; grid-row: 4; align-self: end; }
+  .tp-sheet .btn { height: 52px; }
+
+  /* draw: big square board on the left, prompt + tools + done on the right */
+  .tp-draw { grid-template-columns: auto 1fr; grid-template-rows: auto auto 1fr auto; }
+  .tp-draw .tp-head { grid-column: 2; grid-row: 1; }
+  .tp-draw .tp-slip { grid-column: 2; grid-row: 2; padding: 10px 12px; }
+  .tp-draw .tp-slip-txt { font-size: 22px; }
+  .tp-draw .dp { display: contents; }
+  .tp-draw .dp-board { grid-column: 1; grid-row: 1 / span 4; width: calc(100vh - 20px); max-width: 370px; height: auto; transform: none; }
+  .tp-draw .dp-tools { grid-column: 2; grid-row: 3; align-self: center; justify-content: flex-start; }
+  .tp-draw .dp-swatches { flex-wrap: wrap; max-width: 168px; }
+  .tp-draw > .btn { grid-column: 2; grid-row: 4; }
+
+  /* guess: the drawing left, question + field + button right */
+  .tp-guess { grid-template-columns: auto 1fr; grid-template-rows: auto auto auto 1fr; }
+  .tp-guess .tp-head { grid-column: 2; grid-row: 1; }
+  .tp-guess .tp-paper { grid-column: 1; grid-row: 1 / span 4; width: calc(100vh - 66px); max-width: 330px; align-self: center; }
+  .tp-guess .tp-guess-q { grid-column: 2; grid-row: 2; font-size: 30px; }
+  .tp-guess > .field { grid-column: 2; grid-row: 3; }
+  .tp-guess > .btn { grid-column: 2; grid-row: 4; align-self: end; }
+
+  /* wait: route + party line left, slowcoaches + nudges right */
+  .tp-wait .tp-wait-card { grid-column: 1; padding: 12px; }
+  .tp-wait .tp-wait-title { font-size: 24px; }
+  .tp-wait .tp-route { margin-top: 6px; }
+  .tp-wait .tp-route .tp-av { --sz: 44px !important; }
+  .tp-wait .tp-slow-box { grid-column: 2; grid-row: 2 / span 2; }
+  .tp-wait .tp-party-box { grid-column: 1; padding: 10px; }
+  .tp-wait .tp-party { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 6px; }
+  .tp-wait .tp-party .tp-av { --sz: 34px !important; }
+
+  /* vote: the pair side by side */
+  .tp-vote { display: flex; flex-direction: column; padding: 8px 0 8px; gap: 4px; background: linear-gradient(90deg, var(--tp) 0 50%, var(--c-claret) 50% 100%); }
+  .tp-vote-head { padding: 0 16px; }
+  .tp-vote-head .tp-vote-q { font-size: 32px; }
+  .tp-vote-sub { padding: 4px 10px; }
+  .tp-vote-sub b { font-size: 18px; }
+  .tp-vs-page { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; gap: 22px; }
+  .tp-vs { right: auto; left: 50%; }
+
+  /* ------------------------------------------------------------- show screens */
+  .tp-intro { left: auto; right: 0; top: 0; bottom: 0; width: 470px; padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 14px) 10px 0; align-items: center; }
+  .tp-intro-card { padding: 14px 16px 12px; }
+  .tp-intro-title { font-size: 40px; margin: 4px 0 8px; }
+  .tp-intro-title br { display: none; }
+  .tp-how { display: none; }
+  .tp-modes { margin-bottom: 10px; }
+  .tp-mode small { min-height: 0; }
+  .tp-intro-card .btn, .tp-intro-foot { height: 50px; }
+
+  .tp-rv { display: block; padding: 0; }
+  .tp-rv::before { left: 40%; right: 0; top: 0; height: 100%; background: linear-gradient(90deg, rgba(28,16,12,0), rgba(28,16,12,.6) 30%); }
+  .tp-rv-head { position: absolute; left: calc(var(--safe-l) + 12px); top: calc(var(--safe-t) + 10px); width: 330px; margin: 0; }
+  .tp-rv-gap { display: none; }
+  .tp-track { position: absolute; left: calc(var(--safe-l) + 12px); top: calc(var(--safe-t) + 74px); padding: 6px 8px; }
+  .tp-track .tp-av { --sz: 24px !important; }
+  .tp-tr-cord { width: 16px; }
+  .tp-rv-stage { position: absolute; right: calc(var(--safe-r) + 12px); top: calc(var(--safe-t) + 8px); bottom: 6px; width: 50%; padding: 0; align-items: center; justify-content: center; }
+  .tp-card-draw { width: min(300px, calc(100vh - 110px)); padding: 6px 6px 36px; }
+  .tp-asked { margin-bottom: 4px; }
+  .tp-asked b { font-size: 17px; }
+  .tp-card-text { min-height: 0; max-width: 400px; padding: 12px 16px 44px; }
+  .tp-card-txt { font-size: 34px; }
+  .tp-card-title { padding: 14px 16px; gap: 4px; }
+  .tp-title-ic { width: 40px; height: 40px; }
+  .tp-title-k { font-size: 36px; }
+  .tp-combo { flex-direction: row; align-items: center; gap: 12px; max-width: 420px; }
+  .tp-combo::before { inset: -6px -8px; top: -6px; }
+  .tp-combo .tp-card-draw { width: min(200px, calc(100vh - 150px)); flex: none; }
+  .tp-combo .as-caption { padding: 12px 14px 44px; }
+  .tp-combo .as-caption .tp-card-txt { font-size: 34px; }
+  .tp-bigstamp { font-size: 28px; right: -18px; top: 8px; }
+  .tp-end { max-width: 400px; }
+  .tp-fl { padding: 10px 14px 12px; }
+  .tp-fl-txt { font-size: 24px; margin: 2px 0; }
+  .tp-fl-txt.last { font-size: 30px; }
+  .tp-fl-cord { height: 14px; margin: 4px -6px; }
+  .tp-verdict { font-size: 26px; padding: 6px 14px 5px; margin-bottom: -10px; }
+  .tp-end-cap { margin-top: 6px; padding: 6px 12px; font-size: 13px; }
+  .tp-card-flip { width: min(250px, calc(100vh - 140px)); }
+  .tp-flip-strip { margin-top: 6px; }
+  .tp-flip-cap { font-size: 16px; }
+  .tp-next { top: auto; bottom: 10px; right: auto; left: calc(var(--safe-l) + 12px); }
+
+  .tp-aw { top: 0; bottom: 0; flex-direction: row; align-items: center; justify-content: center; gap: 24px; padding: calc(var(--safe-t) + 8px) 20px 8px; }
+  .tp-aw-big { flex: none; width: 300px; text-align: left; }
+  .tp-aw-big span { font-size: 64px; }
+  .tp-aw-big b { font-size: 26px; }
+  .tp-aw-hero { width: 330px; padding: 12px 10px 10px; }
+  .tp-aw-hero .dp-view { width: calc(100vh - 210px); max-width: 220px; }
+  .tp-aw-prompt { font-size: 14px; margin-bottom: 2px; }
+  .tp-aw-name { font-size: 32px; }
+  .tp-aw-pts { font-size: 22px; padding: 7px 12px; }
+  .tp-aw-by { margin-top: 6px; }
+  .tp-aw-rays { left: 70%; top: 50%; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-row .chips { flex: none; width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-row .chip.compact { height: 34px; padding: 2px; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-row .chip .av { width: 30px; height: 30px; }
+  body[data-game="telephone"][data-layout="input"] #strip .strip-row .timer { width: 64px; height: 64px; }
+  .tp-card-draw { width: min(260px, calc(100vh - 140px)); }
+  .tp-card-flip { width: min(220px, calc(100vh - 170px)); }
+  .tp-rv-stage { top: calc(var(--safe-t) + 22px); bottom: 10px; }
+  .tp-aw-hero .dp-view { width: calc(100vh - 250px); max-width: 170px; }
+  .tp-aw-hero { padding-top: 8px; }
+  .tp-verdict { margin-bottom: 4px; }
+}
