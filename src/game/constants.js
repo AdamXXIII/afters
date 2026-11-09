@@ -25,6 +25,7 @@ export const DUR = {
   podium: 13000,
   'early-grace': 800,   // pause after everyone has acted before the phase ends
   'skip-after': 1500,   // host can skip intros after this
+  squeeze: 10000,       // all but one done writing: the clock drops to this
 };
 
 // Tonight's table: cherries per finishing place in each game (4th and below get 1 for turning up).
