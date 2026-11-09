@@ -2,8 +2,10 @@
 // under a drumroll spotlight), the winner drops on with a paper crown, sparklers and a burst of
 // napkin confetti; then the bill slides up with everyone's award. Every beat is driven by
 // ctx.elapsed(), so the whole table sees the same frame at the same time.
+// Before the cakes: the Last Orders swing (~3 s). The old leaderboard ticks up each player's
+// Last Orders points, then rows overtake into the final order. The cake timeline starts after it.
 import './podium.css';
-import { h } from '../../../ui/components.js';
+import { h, button } from '../../../ui/components.js';
 import { avatarIcon } from '../../../ui/icons.js';
 import { AVATARS } from '../../../game/constants.js';
 import { getPodiumSet } from '../../../stage/podium-set.js';
@@ -65,6 +67,53 @@ export function buildBill(ctx, rows) {
 
 }
 
+// ---------- the Last Orders swing ----------
+const SWING = 2900;                       // ms before the cake timeline starts
+const SW = { tick: 250, tickEach: 110, tickDur: 650, move: 1450, moveDur: 650, out: 2550 };
+const easeInOut = (x) => (x < 0.5 ? 16 * x ** 5 : 1 - (-2 * x + 2) ** 5 / 2);
+
+function buildSwing(ctx, rows) {
+  const n = rows.length;
+  const rowH = n > 6 ? 46 : 54;
+  const els = rows.map((r) => {
+    const p = ctx.player(r.id);
+    const rank = h('span.fin-sw-rank', String(r.prevRank));
+    const score = h('span.fin-sw-score', fmt(r.prev));
+    const flag = h('span.fin-sw-flag', r.delta > 0 ? `+${fmt(r.delta)}` : 'dry');
+    const el = h(`div.fin-sw-row${r.id === ctx.meId ? '.me' : ''}${r.delta <= 0 ? '.zero' : ''}`,
+      rank, glyph(p), h('span.fin-sw-name', p?.name || '?'), flag, score);
+    return { r, el, rank, score, flag, from: r.prevRank - 1, to: rows.indexOf(r), climb: r.prevRank - 1 - rows.indexOf(r) };
+  });
+  const moved = els.some((e) => e.climb !== 0);
+  const list = h('div.fin-sw-list', { style: { height: `${n * rowH}px`, '--rh': `${rowH}px` } }, els.map((e) => e.el));
+  const el = h('div.fin-sw', h('div.fin-sw-head', h('span.fin-sw-eyebrow', 'Last Orders swing'), h('span.fin-sw-sub', 'Glasses into points')), list);
+  // delta ticks happen in the OLD order, top of the old board first
+  const byOld = els.slice().sort((a, b) => a.from - b.from);
+  let last = -1;
+  return {
+    el, moved,
+    frame(t) {
+      const key = Math.round(t / 16);
+      if (key === last) return;
+      last = key;
+      const mk = easeInOut(clamp01((t - SW.move) / SW.moveDur));
+      byOld.forEach((e, i) => {
+        const tk = easeOut(clamp01((t - SW.tick - i * SW.tickEach) / SW.tickDur));
+        e.score.textContent = fmt(e.r.prev + e.r.delta * tk);
+        e.el.classList.toggle('ticked', tk > 0);
+        const y = (e.from + (e.to - e.from) * mk) * rowH;
+        // climbers lift and grow a touch as they pass
+        const lift = e.climb > 0 ? Math.sin(Math.PI * mk) : 0;
+        e.el.style.transform = `translateY(${y.toFixed(1)}px) scale(${(1 + 0.04 * lift).toFixed(3)})`;
+        e.el.style.zIndex = e.climb > 0 ? '2' : '1';
+        e.el.classList.toggle('up', e.climb > 0 && mk > 0.05);
+        e.el.classList.toggle('down', e.climb < 0 && mk > 0.05);
+        e.rank.textContent = mk >= 0.5 ? e.r.shownRank : String(e.r.prevRank);
+      });
+    },
+  };
+}
+
 export default {
   id: 'podium',
   layout: 'show',
@@ -73,9 +122,12 @@ export default {
     const rows = tieRanks(dedupeAwards(ctx.payload.rows || []));
     finaleMemo.rows = rows;
     const set = getPodiumSet(ctx.stage);
-    set.show({ rows, players: ctx.players, mode: 'podium', duration: ctx.duration || 14000, reduced: ctx.reduced });
-    set.setTime(ctx.elapsed());
-    const T = set.T;
+    const swing = rows.length > 1 && rows.every((r) => typeof r.prev === 'number' && r.prevRank) ? SWING : 0;
+    const dur = ctx.duration || 14000;
+    set.show({ rows, players: ctx.players, mode: 'podium', duration: Math.max(6000, dur - swing), reduced: ctx.reduced });
+    set.setTime(Math.max(0, ctx.elapsed() - swing));
+    // the cake timeline, shifted to start after the swing
+    const T = Object.fromEntries(Object.entries(set.T).map(([k, v]) => [k, k === 'scale' ? v : v + swing]));
     const name = (id) => ctx.player(id)?.name || 'Someone';
     const winner = rows[0];
 
@@ -99,13 +151,27 @@ export default {
     const dense = rows.length > 5;
     const bill = buildBill(ctx, rows);
 
-    const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-dim'), h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
+    // --- the Last Orders swing: old order, points tick on, then the overtakes
+    const sw = swing ? buildSwing(ctx, rows) : null;
+
+    const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0', sw: swing ? '1' : '0' } }, h('div.fin-dim'), h('div.fin-vignette'), sw?.el, head, h('div.fin-tags', tags), bill);
     show.append(root);
+
+    // --- host-only Skip once the cake has landed (host accepts it from 7 s)
+    let skip = null;
+    if (ctx.isHost) {
+      const b = button('Skip', { kind: 'ghost', block: false, e2e: 'podium-skip', onClick: () => ctx.client.skip() });
+      b.classList.add('on-dark');
+      skip = h('div.fin-skip', b);
+      show.append(skip);
+    }
 
     // --- beats (fire once, in order; frozen screenshots fire them all at once)
     const said = new Set();
     const beat = (key, at, fn) => ({ key, at, fn });
     const beats = [
+      beat('sw', 0, () => { if (swing && !ctx.frozen) ctx.audio.sfx('countup'); }),
+      beat('sw-move', SW.move, () => { if (swing && !ctx.frozen && sw.moved) { ctx.audio.sfx('swipe', { dir: 'right' }); ctx.haptic('select'); } }),
       beat('t3', T.t3, () => { if (!ctx.frozen) { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); } }),
       beat('t2', T.t2, () => { if (!ctx.frozen) { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); } }),
       beat('drum', T.cake1, () => {
@@ -127,6 +193,7 @@ export default {
     ];
     // Cyril compères the build-up from above his head (the winner's moment belongs to the header)
     const lines = [
+      ...(swing ? [{ at: 150, until: SW.out, lines: [sw.moved ? 'Last orders are in. Mind the overtaking.' : 'Last orders are in. Nobody budged.'] }] : []),
       { at: T.t3 + 250, until: T.t2, lines: ['Third place. Splendid effort. Mostly.'] },
       { at: T.t2 + 250, until: T.cake1, lines: ['Second place. Close enough to smell the icing.'] },
       { at: T.cake1 + 150, until: T.win, lines: ['And the cake goes to...'] },
@@ -136,7 +203,13 @@ export default {
     let shownStep = -1;
     const frame = () => {
       const t = ctx.elapsed();
-      set.setTime(t);
+      set.setTime(Math.max(0, t - swing));
+      if (sw) {
+        sw.frame(t);
+        const on = t < SW.out + 300;
+        if (root.dataset.sw !== (on ? '1' : '0')) root.dataset.sw = on ? '1' : '0';
+      }
+      if (skip) skip.classList.toggle('on', t > 7000 / (ctx.phase?.speed || 1));
       const step = t >= T.bill ? 5 : t >= T.win ? 4 : t >= T.cake1 ? 3 : t >= T.t2 ? 2 : t >= T.t3 ? 1 : 0;
       if (step !== shownStep) { shownStep = step; root.dataset.step = String(step); }
       if (ctx.frozen && t > T.win + 1600) ctx.cyril.setMood?.('calm');
@@ -161,7 +234,7 @@ export default {
     frame();
     return {
       frame,
-      unmount() { set.hide(); ctx.cyril.setMood?.('calm'); },
+      unmount() { set.hide(); skip?.remove(); ctx.cyril.setMood?.('calm'); },
     };
   },
 };

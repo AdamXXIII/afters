@@ -186,6 +186,9 @@ export class Stage {
   resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
+    // Landscape phone (matches src/ui/landscape.css): show on the left, input sheet on the right.
+    this.land = w > h && h <= 600;
+    document.body.classList.toggle('land', this.land);
     this.w = w; this.h = h;
     this.renderer.setSize(w, h, false);
     this.canvas.style.width = `${w}px`;
@@ -243,6 +246,7 @@ export class Stage {
   /** Height of the visible show region for the current layout (CSS px). */
   _showBottom() {
     const H = this.h;
+    if (this.land && this.layout !== 'show') return H;
     if (this.layout === 'split') return H * 0.4;
     if (this.layout === 'input') return this.stripPx + this._safeTop();
     const rail = document.getElementById('rail');
@@ -254,6 +258,12 @@ export class Stage {
   _measure() {
     const W = this.w; const H = this.h;
     const bottom = this._showBottom() - (this.layout === 'show' ? 22 : 0);
+    if (this.land && this.layout === 'split') {
+      // left column (width from landscape.css --land-l): Cyril low and big, bubble room above him
+      const colW = this._landCol();
+      const S = Math.min(H * 0.5, colW * 0.62);
+      return { mode: 'subject', subject: this.subject || 'cyril', S, Yc: H - S / 2 - 18, Xc: colW / 2 };
+    }
     if (this.layout === 'input') {
       const slot = document.querySelector('#strip .cyril-slot');
       const r = slot?.getBoundingClientRect();
@@ -273,8 +283,8 @@ export class Stage {
     try {
       rects = contentRects([document.getElementById('show'), document.getElementById('topbar')]);
     } catch (e) { rects = []; }
-    const maxS = (this.shotMaxS || (this.layout === 'split' ? 0.27 : 0.36)) * H;
-    const minS = this.layout === 'split' ? 104 : 128;
+    const maxS = (this.land ? 0.62 : (this.shotMaxS || (this.layout === 'split' ? 0.27 : 0.36))) * H;
+    const minS = this.land ? 110 : this.layout === 'split' ? 104 : 128;
     const tryCol = (cx, half) => freeBands(rects, top, bottom, cx - half, cx + half)[0];
     const fitIn = (band, Xc) => {
       if (this.subject === 'podium') { // leave a strip above the cake for Cyril's line
@@ -289,6 +299,16 @@ export class Stage {
     const centre = tryCol(W / 2, 70);
     const left = tryCol(W * 0.27, 62);
     let g;
+    if (this.land && this.subject !== 'podium') {
+      // landscape: Cyril takes whichever side column is free (screens put their cards on the other side)
+      const lc = tryCol(W * 0.2, 80); const rc = tryCol(W * 0.8, 80);
+      const best = [lc && { b: lc, x: W * 0.2 }, rc && { b: rc, x: W * 0.8 }, centre && { b: centre, x: W / 2 }]
+        .filter(Boolean).sort((a, b) => b.b.h - a.b.h)[0];
+      if (best && best.b.h >= minS) {
+        const S = Math.min(maxS, best.b.h - (best.b.h > maxS + 90 ? 90 : 10));
+        return { mode: 'subject', subject: this.subject, S, Yc: best.b.bottom - S / 2 - 6, Xc: best.x };
+      }
+    }
     if (centre && centre.h > maxS + 110) g = fitIn(centre, W / 2); // room for Cyril and a bubble above him
     else if (centre && centre.h >= minS + 100 && this.subject === 'cyril') {
       // centred, a little smaller, leaving a bubble-sized gap above his flame
@@ -303,6 +323,11 @@ export class Stage {
       g = { S, Yc: b.top + S / 2 + 2, Xc: W / 2 };
     }
     return { mode: 'subject', subject: this.subject, ...g };
+  }
+
+  _landCol() {
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--land-l')) || 42;
+    return this.w * v / 100;
   }
 
   /** World points that bound a subject. */

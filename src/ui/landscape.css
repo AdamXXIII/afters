@@ -1,0 +1,64 @@
+/* Landscape phones (Adam, 2026-11-09: "must play in landscape too").
+   Same media test as Stage.resize(): wider than tall and no taller than 600 px.
+   split / input: the SHOW layer is the left column (--land-l), the INPUT sheet is a full-height
+   card on the right. show: full width; screens lay their cards out beside Cyril (see each screen's
+   own @media block). Screen CSS can use the same query or `var(--land-l)`. */
+:root { --land-l: 42%; }
+
+@media (orientation: landscape) and (max-height: 600px) {
+  :root { --rail-h: 58px; --strip-h: 100%; --gutter: 18px; }
+  body[data-layout="input"] { --land-l: 34%; }
+
+  /* ---------- split + input: two columns ---------- */
+  body[data-layout="split"] #show,
+  body[data-layout="input"] #show { width: var(--land-l); right: auto; height: 100%; }
+
+  body[data-layout="split"] #sheet,
+  body[data-layout="input"] #sheet {
+    left: var(--land-l); right: 0; top: 0; bottom: 0; height: auto;
+    border-radius: var(--r-4) 0 0 var(--r-4);
+    transform: none;
+    box-shadow: -18px 0 40px rgba(30,14,10,.35), var(--sh-3);
+  }
+  body[data-layout="show"] #sheet { left: var(--land-l); right: 0; top: 0; height: auto; transform: translateX(105%); border-radius: var(--r-4) 0 0 var(--r-4); }
+  #sheet::after { border-radius: var(--r-4) 0 0 var(--r-4); height: 100%; box-shadow: inset 1px 0 0 rgba(255,255,255,.85); }
+  #sheet::before { margin-top: 6px; }
+  .sheet-page { padding-top: 8px; padding-left: 22px; padding-right: calc(18px + var(--safe-r)); gap: 10px; }
+
+  /* the writing strip becomes the whole left column: status, Cyril, then timer + chips */
+  body[data-layout="input"] #strip {
+    width: var(--land-l); right: auto; height: 100%;
+    padding: calc(var(--safe-t) + 10px) 12px calc(var(--safe-b) + 12px) calc(var(--safe-l) + 12px);
+  }
+  body[data-layout="input"] .strip-inner {
+    width: 100%; height: 100%;
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: center; align-items: center; row-gap: 6px;
+  }
+  body[data-layout="input"] .strip-inner .strip-status { grid-column: 1; grid-row: 1; justify-content: center; }
+  body[data-layout="input"] .strip-inner .cyril-slot { grid-column: 1; grid-row: 2; width: 100%; height: 100%; min-height: 0; }
+  body[data-layout="input"] .strip-inner .strip-row { grid-column: 1; grid-row: 3; flex-wrap: wrap; justify-content: center; width: 100%; }
+  body[data-layout="input"] .strip-inner .chips { flex: 0 1 auto; justify-content: center; flex-wrap: wrap; }
+  body[data-layout="input"] .strip-inner .timer { width: 60px; height: 60px; }
+  body.kb-open[data-layout="input"] .strip-inner { grid-template-rows: auto minmax(0, 1fr) auto; }
+  body.kb-open[data-layout="input"] .strip-inner .strip-status { display: flex; }
+  body.kb-open[data-layout="input"] .strip-inner .cyril-slot,
+  body.kb-open[data-layout="input"] .strip-inner .strip-row { grid-row: auto; }
+
+  /* Cyril's bubbles: in the left column, above him, never over the sheet */
+  body[data-layout="input"] #bubbles .bubble,
+  body.kb-open[data-layout="input"] #bubbles .bubble {
+    left: calc(var(--safe-l) + 10px) !important; right: auto !important; top: calc(var(--safe-t) + 34px) !important;
+    width: calc(var(--land-l) - 20px) !important; max-width: none;
+  }
+  body[data-layout="split"] #bubbles .bubble { max-width: calc(var(--land-l) - 20px); }
+  body[data-layout="split"] #topbar { right: auto; left: calc(var(--land-l) - 58px); }
+  body[data-layout="input"] #topbar { display: none; }
+
+  /* ---------- show: a slimmer rail ---------- */
+  #rail { padding: 4px 16px var(--safe-b); gap: 12px; }
+  #rail .rail-btn { width: 48px; height: 48px; }
+
+  /* toasts over the sheet column, not over Cyril */
+  #toasts { left: var(--land-l); }
+}
