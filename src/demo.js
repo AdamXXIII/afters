@@ -32,7 +32,7 @@ export const DEMOS = {
   'r2-reveal': { match: (e) => e.phase.id === 'r2-reveal', t: (p) => { const s = p.payload.steps.find((x) => x.kind === 'truth'); return s ? s.at + 1600 : 4000; } },
   'r2-scores': { match: (e) => e.phase.id === 'r2-scores', t: 2600 },
   'r3-intro': { match: (e) => e.phase.id === 'r3-intro', t: 3200 },
-  'r3-write': { match: (e) => e.phase.id === 'r3-write', me: 'idle', bots: 'act', t: 21000 },
+  'r3-write': { match: (e) => e.phase.id === 'r3-write', me: 'act', bots: 'act', t: 21000 },
   'r3-swipe': { match: (e) => e.phase.id === 'r3-swipe', me: 'idle', bots: 'act', t: (p) => Math.round(p.payload.perCard * 1.4) },
   'r3-reveal': { match: (e) => e.phase.id === 'r3-reveal', t: (p) => p.payload.toastAt + 1800 },
   podium: { match: (e) => e.phase.id === 'podium', t: 6500 },
