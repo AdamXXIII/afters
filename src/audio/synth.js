@@ -34,6 +34,21 @@ class AudioEngine {
       this.musicBus = this.ctx.createGain();
       this.musicBus.gain.value = 0;
       this.musicBus.connect(this.master);
+      // A small dining-room reverb (generated impulse, ~1.1 s): one ConvolverNode shared by every
+      // sound via two send buses, so dry SFX stay crisp but nothing sounds like it's in a cupboard.
+      try {
+        this.verb = this.ctx.createConvolver();
+        this.verb.buffer = this._roomImpulse(1.1);
+        const verbOut = this.ctx.createGain();
+        verbOut.gain.value = 0.9;
+        this.verb.connect(verbOut).connect(this.master);
+        this.sfxSend = this.ctx.createGain();
+        this.sfxSend.gain.value = 0.16;
+        this.sfxBus.connect(this.sfxSend).connect(this.verb);
+        this.musicSend = this.ctx.createGain();
+        this.musicSend.gain.value = 0.22;
+        this.musicBus.connect(this.musicSend).connect(this.verb);
+      } catch { this.verb = null; }
       this.music = new Music(this);
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) this.ctx.suspend(); else this.ctx.resume();
@@ -44,6 +59,24 @@ class AudioEngine {
   }
 
   get ready() { return !!this.ctx && this.ctx.state === 'running'; }
+
+  /** Exponentially decaying stereo noise, darker as it fades (wood-panelled room, not a cathedral). */
+  _roomImpulse(sec) {
+    const c = this.ctx;
+    const len = Math.floor(c.sampleRate * sec);
+    const b = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = b.getChannelData(ch);
+      let lp = 0;
+      for (let i = 0; i < len; i++) {
+        const k = i / len;
+        const a = 0.25 + 0.7 * k; // low-pass coefficient rises: highs die first
+        lp += (Math.random() * 2 - 1 - lp) * (1 - a);
+        d[i] = lp * (1 - k) ** 2.6 * (i < c.sampleRate * 0.008 ? i / (c.sampleRate * 0.008) : 1);
+      }
+    }
+    return b;
+  }
 
   set(key, value) {
     this.settings[key] = value;
@@ -125,10 +158,34 @@ class AudioEngine {
   }
 
   _tap() {
+    // DESIGN: sine 880 -> 660 over 40 ms + 2 kHz click, two pitch variants. A touch of body
+    // (a quiet octave-down) makes it a wooden "tock" rather than a beep.
     const k = Math.random() < 0.5 ? semis(2) : semis(-2);
-    this.tone(880 * k, { freqEnd: 660 * k, decay: 0.04, gain: 0.25 });
+    this.tone(880 * k, { freqEnd: 660 * k, decay: 0.04, gain: 0.22 });
+    this.tone(440 * k, { freqEnd: 330 * k, decay: 0.03, gain: 0.08 });
     this.noise({ dur: 0.005, freq: 2000, gain: 0.12 });
   }
+
+  /** Paper card sliding over linen: screen change. Up = sheet rising, down = settling. */
+  _page({ up = true } = {}) {
+    this.noise({ dur: 0.16, freq: up ? 900 : 2200, freqEnd: up ? 2600 : 800, q: 0.8, gain: 0.16, attack: 0.04 });
+    this.noise({ dur: 0.05, when: 0.13, type: 'lowpass', freq: 700, gain: 0.12 });
+  }
+
+  /** Course change: a soft EP swell under the lights dipping. */
+  _curtain() {
+    [53, 57, 60, 64, 67].forEach((m, i) => this._ep(440 * 2 ** ((m + 12 - 69) / 12), i * 0.03, 1.6, 0.03));
+    this.noise({ dur: 0.7, freq: 400, freqEnd: 1800, q: 0.6, gain: 0.035, attack: 0.3 });
+  }
+
+  /** Small upward pop (someone finished, chip lit). */
+  _pop() { this.tone(660, { freqEnd: 990, glide: 0.05, decay: 0.07, gain: 0.16 }); }
+
+  /** Reaction thrown: a short airy toss. */
+  _throw() { this.noise({ dur: 0.22, freq: 500, freqEnd: 1800, q: 1.4, gain: 0.2, attack: 0.05 }); }
+
+  /** Rate-limited / not allowed: a muted wooden knock. */
+  _nope() { this.tone(240, { freqEnd: 200, decay: 0.06, gain: 0.25, type: 'triangle' }); }
 
   _plated() {
     [[2093, 0.6], [3136, 0.4], [4186, 0.25]].forEach(([f, d]) => this.tone(f, { decay: d, gain: 0.14 }));
@@ -142,8 +199,10 @@ class AudioEngine {
       this.tone(600, { decay: 0.08, gain: 0.35 });
       this.noise({ dur: 0.25, type: 'highpass', freq: 6000, gain: 0.08 });
     } else {
-      this.noise({ dur: 0.05, freq: 1200, q: 8, gain: 0.5 });
-      this.tone(1200, { decay: 0.05, gain: 0.12 });
+      // woodblock: resonant knock, loud enough to cut through chatter (it is the countdown)
+      this.noise({ dur: 0.05, freq: 1200, q: 8, gain: 0.9 });
+      this.tone(1200, { decay: 0.05, gain: 0.3 });
+      this.tone(1800, { decay: 0.025, gain: 0.08 });
     }
   }
 
@@ -219,10 +278,10 @@ class AudioEngine {
 
   _swipe({ dir = 'right' } = {}) {
     const [a, b] = dir === 'right' ? [600, 2500] : [2500, 600];
-    this.noise({ dur: 0.18, freq: a, freqEnd: b, q: 1.2, gain: 0.25, attack: 0.03 });
+    this.noise({ dur: 0.18, freq: a, freqEnd: b, q: 1.2, gain: 0.6, attack: 0.03 });
   }
 
-  _fwump() { this.noise({ dur: 0.08, type: 'lowpass', freq: 400, gain: 0.5 }); }
+  _fwump() { this.noise({ dur: 0.08, type: 'lowpass', freq: 400, gain: 0.9 }); this.tone(110, { freqEnd: 70, decay: 0.08, gain: 0.25 }); }
 
   _flutter() {
     for (let i = 0; i < 6; i++) this.noise({ when: i / 30, dur: 0.02, freq: 3000, gain: 0.12 });
@@ -287,9 +346,12 @@ class AudioEngine {
     g.gain.exponentialRampToValueAtTime(0.22, t + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.04);
     const mix = c.createGain(); mix.gain.value = 1;
-    for (const [lo, hi, q] of [[600, 800, 6], [1000, 1600, 8]]) {
+    // vowel-ish formant pairs (F1 600-800, F2 1000-1600 as DESIGN 3.9) so the mumble has shape
+    const V = [[730, 1090], [660, 1600], [610, 1300], [700, 1220], [640, 1020]];
+    const [f1, f2] = V[Math.floor(Math.random() * V.length)];
+    for (const [fq, q] of [[f1 * (0.97 + Math.random() * 0.06), 6], [f2 * (0.97 + Math.random() * 0.06), 8]]) {
       const f = c.createBiquadFilter();
-      f.type = 'bandpass'; f.frequency.value = lo + Math.random() * (hi - lo); f.Q.value = q;
+      f.type = 'bandpass'; f.frequency.value = fq; f.Q.value = q;
       o.connect(f).connect(mix);
     }
     mix.connect(g).connect(this.master);

@@ -14,6 +14,20 @@ const CHORDS = [
   { v: [53, 57, 60, 62, 64], bass: [[38, 41, 45, 41], [38, 45, 44, 43]] }, // Dm9
 ];
 
+// A lazy little top line on the EP (2 bars per chord, 16 eighths). null = rest. MIDI notes.
+// Sits around F5, mostly chord tones with a blue note or two; plays every other time round so
+// the bed breathes instead of nagging.
+const MELODY = [
+  // Gm9
+  [74, null, 72, null, 70, null, null, 69, null, null, 70, null, 72, null, null, null],
+  // C13
+  [76, null, null, 74, null, 72, null, null, 70, null, 69, null, null, null, 67, null],
+  // Fmaj9
+  [69, null, null, 72, null, null, 76, null, null, 74, null, 72, null, null, null, null],
+  // Dm9
+  [74, null, 72, null, 69, null, 68, null, 69, null, null, null, null, null, null, null],
+];
+
 export class Music {
   constructor(engine) {
     this.e = engine;
@@ -23,6 +37,7 @@ export class Music {
     this.timer = null;
     this.intensityMode = 'normal'; // normal | write | hurry
     this.level = 0.32;
+    this.loops = 0;
   }
 
   start() {
@@ -63,6 +78,7 @@ export class Music {
       const swingOff = this.step % 2 === 0 ? eighth * 2 * SWING : eighth * 2 * (1 - SWING);
       this.nextTime += swingOff;
       this.step = (this.step + 1) % 64; // 8 bars x 8 eighths
+      if (this.step === 0) this.loops++;
     }
   }
 
@@ -73,11 +89,18 @@ export class Music {
     const chord = CHORDS[Math.floor(bar / 2) % 4];
     const beatInBar = Math.floor((step % 8) / 2);
     const onBeat = step % 2 === 0;
-    const when = t - e.ctx.currentTime;
+    // humanise: a few ms of drift and velocity so it never sounds like a sequencer
+    const when = t - e.ctx.currentTime + (Math.random() - 0.5) * 0.008;
+    const vel = 0.85 + Math.random() * 0.3;
 
     // EP comping: on beat 1 and the "and" of 2
     if ((step % 8 === 0) || (step % 8 === 3)) {
-      chord.v.forEach((m, i) => e._ep(mtof(m + 12), when + i * 0.008, step % 8 === 0 ? 1.4 : 0.6, 0.035, out));
+      chord.v.forEach((m, i) => e._ep(mtof(m + 12), when + i * 0.008, step % 8 === 0 ? 1.4 : 0.6, 0.032 * vel, out));
+    }
+    // melody every other loop (not while writing: it competes with thinking)
+    if (this.loops % 2 === 1 && this.intensityMode === 'normal') {
+      const m = MELODY[Math.floor(bar / 2) % 4][(bar % 2) * 8 + (step % 8)];
+      if (m) e._ep(mtof(m), when, 0.9, 0.045 * vel, out);
     }
     // walking bass on quarters (dominant pedal when hurrying)
     if (onBeat) {
