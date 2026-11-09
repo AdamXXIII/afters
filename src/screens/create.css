@@ -5,14 +5,14 @@
 .fd-head-row { display: flex; align-items: center; justify-content: space-between; min-height: 32px; margin-top: -4px; }
 .fd-title {
   margin: 0; font-family: var(--f-display); font-weight: 650; font-size: calc(26px * var(--ts)); line-height: 1.12;
-  letter-spacing: -0.01em; color: var(--c-ink); text-wrap: balance;
+  letter-spacing: -0.01em; color: var(--c-ink); text-wrap: balance; text-align: center;
   font-variation-settings: "SOFT" 60, "WONK" 0, "opsz" 48;
 }
 .fd-title em { font-style: italic; color: var(--c-claret); }
 .fd-back {
   appearance: none; border: 0; background: transparent; cursor: pointer;
   display: inline-flex; align-items: center; gap: 2px; height: 44px; margin: -6px -10px -6px 0; padding: 0 10px 0 6px;
-  font-family: var(--f-ui); font-weight: 700; font-size: 15px; color: var(--c-toffee); border-radius: 999px;
+  font-family: var(--f-ui); font-weight: 700; font-size: 16px; color: var(--c-toffee); border-radius: 999px; min-width: 44px;
 }
 .fd-back span, .fd-back svg { width: 20px; height: 20px; }
 .fd-back:active { background: rgba(122,74,42,.08); }
@@ -51,7 +51,7 @@
   text-align: center; font-family: var(--f-hand); font-weight: 650; font-size: calc(44px * var(--ts)); line-height: 1.15; height: 1.2em;
   color: var(--c-ink); caret-color: var(--c-claret); -webkit-appearance: none; appearance: none;
 }
-.fd-card-input::placeholder { color: rgba(122,74,42,.6); }
+.fd-card-input::placeholder { color: rgba(122,74,42,.78); }
 .fd-card .count { position: absolute; left: 14px; bottom: 9px; font-size: 13px; font-weight: 700; color: var(--c-toffee); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity var(--d-small); }
 .fd-card:focus-within .count, .fd-card .count.hot { opacity: .9; }
 .fd-card .count.hot { color: var(--c-tomato); }
@@ -68,7 +68,7 @@
   font-size: calc(15px * var(--ts)); line-height: 1.35; color: var(--c-toffee); font-weight: 500;
 }
 .fd-hint b { color: var(--c-ink); font-weight: 700; }
-.fd-hint-icon { flex: none; width: 22px; height: 22px; margin-top: -1px; color: var(--c-brass); }
+.fd-hint-icon { flex: none; width: 24px; height: 24px; margin-top: -2px; color: var(--c-claret); }
 .fd-hint-icon svg { width: 100%; height: 100%; }
 
 .fd-actions { margin-top: auto; display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
@@ -86,7 +86,8 @@ body.kb-open .fd-hint { display: none; }
 .fd-page .field .count { font-size: 14px; font-weight: 600; opacity: 0; transition: opacity var(--d-small); }
 .fd-page .field:focus-within .count, .fd-page .field .count.hot { opacity: 1; }
 /* pen nib on the card, writing while the field is focused */
-.fd-pen { position: absolute; right: 14px; bottom: 12px; width: 22px; height: 22px; color: var(--c-claret); opacity: .75; transform: rotate(8deg); }
+.fd-pen { position: absolute; right: 14px; bottom: 12px; width: 26px; height: 26px; color: var(--c-claret); opacity: .9; transform: rotate(8deg); animation: fdIdle 2.6s ease-in-out infinite; }
+@keyframes fdIdle { 0%,80%,100% { transform: rotate(8deg); } 88% { transform: rotate(-6deg) translate(-2px,-1px); } 94% { transform: rotate(10deg); } }
 .fd-pen svg { width: 100%; height: 100%; }
 .fd-card:focus-within .fd-pen { animation: fdWrite 900ms ease-in-out infinite; }
 .fd-card:focus-within::before { border-color: rgba(224,165,38,.9); box-shadow: 0 0 0 3px rgba(224,165,38,.12); }
@@ -95,3 +96,11 @@ body.kb-open .fd-hint { display: none; }
 .fd-hint-mid { margin: auto 0; }
 .fd-mid { margin: auto 0; display: flex; flex-direction: column; gap: 22px; }
 .fd-mid .fd-card { padding-top: 24px; padding-bottom: 20px; }
+.fd-head .t-eyebrow { font-size: 14px; }
+.fd-mid { gap: 26px; }
+.fd-mid .fd-card { width: min(320px, 90%); padding-top: 30px; padding-bottom: 26px; }
+.fd-mid .fd-card-input { font-size: calc(50px * var(--ts)); }
+.fd-mid .fd-hint { justify-content: center; text-align: left; }
+/* join: the name card waits its turn until the code is complete */
+.fd-page.code-pending .fd-card { opacity: .55; filter: saturate(.7); transform: rotate(var(--tilt)) scale(.97); transition: opacity var(--d-medium), transform var(--d-medium) var(--ease-out-back), filter var(--d-medium); }
+.fd-page.code-pending .fd-card:focus-within { opacity: 1; filter: none; transform: rotate(var(--tilt)); }

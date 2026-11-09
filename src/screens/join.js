@@ -22,6 +22,7 @@ export default {
   shot: 'join',
   rail: false,
   mount({ sheet }, ctx) {
+    let page = null;
     const boxes = [0, 1, 2, 3].map((i) => h('input.code-box', {
       type: 'text', inputMode: 'text', maxLength: 1, autocomplete: 'off', autocapitalize: 'characters', spellcheck: false,
       'aria-label': `Room code letter ${i + 1}`, 'data-e2e': `code-${i}`, enterkeyhint: 'next',
@@ -29,7 +30,10 @@ export default {
     const tiles = boxes.map((b, i) => h('div.code-slot', { style: { '--tilt': `${[-2, 1.5, -1, 2][i]}deg` } }, b));
     const mark = () => {
       boxes.forEach((b, i) => tiles[i].classList.toggle('filled', !!b.value));
-      row.classList.toggle('complete', boxes.every((b) => b.value));
+      const first = boxes.findIndex((b) => !b.value);
+      tiles.forEach((t, i) => t.classList.toggle('current', i === first));
+      row.classList.toggle('complete', first === -1);
+      page?.classList.toggle('code-pending', first !== -1);
     };
     const fill = (str, from = 0) => {
       const s = sanitiseCode(str);
@@ -79,14 +83,15 @@ export default {
         if (e.code === 'full') ctx.say(ctx.line('tableFull'));
       }
     }
-    sheet.append(h('div.fd-page.stagger',
+    sheet.append(page = h('div.fd-page.stagger',
       sheetHead(invited ? 'You\'re invited' : 'Join a table', 'What\'s the table code?', () => ctx.go('title')),
       h('div.code-group', row,
         h('p.fd-hint.code-caption', h('span.fd-hint-icon', { html: LINK }),
-          h('span', invited ? 'Filled in from your invite. Just add your name.' : h('span', 'Four letters on the host\'s phone. ', h('b', 'No vowels'), ', so nothing rude.')))),
+          h('span', invited ? 'Filled in from your invite. Just add your name.' : h('span', 'Four letters. ', h('b', 'No vowels'), ', so nothing rude.')))),
       nameCard(name, { kicker: 'Reserved for', tilt: 1.2, compact: true }),
       h('div.fd-actions', seat),
     ));
+    mark();
     return { unmount: sayLater(ctx, ['Mind the step. Code on the door?'], { delay: 500 }) };
   },
 };

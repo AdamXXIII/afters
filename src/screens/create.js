@@ -36,6 +36,7 @@ export default {
           h('span', 'You\'ll get a ', h('b', 'four-letter code'), '. Everyone else types it on their phone.'))),
       h('div.fd-actions', open),
     ));
+    if (!ctx.frozen && !field.input.value) setTimeout(() => field.input.focus({ preventScroll: true }), 650);
     return { unmount: sayLater(ctx, ctx.line('create'), { delay: 500 }) };
   },
 };

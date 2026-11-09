@@ -17,6 +17,9 @@
   background: rgba(122,74,42,.28); transition: opacity var(--d-small);
 }
 .code-slot:focus-within { background: var(--c-linen); box-shadow: inset 0 0 0 3px var(--c-claret), 0 0 0 5px rgba(122,30,44,.14); }
+.code-slot.current { background-color: var(--c-linen); box-shadow: inset 0 0 0 3px var(--c-claret), 0 0 0 5px rgba(122,30,44,.12), 0 6px 14px rgba(59,31,24,.16); }
+.code-slot.current::before { opacity: 0; }
+.code-slot.current::after { width: 4px; height: 40px; bottom: 21px; margin-left: -2px; background: var(--c-claret); animation: caretBlink 1s steps(2) infinite; }
 .code-slot:focus-within::after { background: var(--c-claret); animation: caretBlink 1s steps(2) infinite; }
 .code-slot.filled {
   background-color: var(--c-linen); background-image: var(--paper);
