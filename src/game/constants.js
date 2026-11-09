@@ -3,27 +3,32 @@
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 8;
 
+// Afters Classic durations, tightened 2026-11-09 after Adam's "kind of boring" playtest:
+// shorter writing windows, quicker votes, snappier scoreboards and intros.
 export const DUR = {
-  intro: 6000,
-  'r1-intro': 7000,
-  'r1-write': 80000,
-  'r1-vote': 15000,
-  'r1-reveal': 7000,
-  'r1-scores': 8000,
-  'r2-intro': 8000,
-  'r2-write': 45000,
-  'r2-pick': 20000,
-  'r2-scores': 8000,
-  'r3-intro': 8000,
-  'r3-write': 60000,
-  'r3-card': 4000,       // per swipe card
-  'r3-swipe-max': 80000,
-  'r3-reveal-card': 3200,
-  'r3-reveal-toast': 4000,
-  podium: 14000,
-  'early-grace': 1200,  // pause after everyone has acted before the phase ends
-  'skip-after': 3000,   // host can skip intros after this
+  intro: 4500,
+  'r1-intro': 5500,
+  'r1-write': 60000,
+  'r1-vote': 12000,
+  'r1-reveal': 6500,
+  'r1-scores': 6000,
+  'r2-intro': 6000,
+  'r2-write': 35000,
+  'r2-pick': 15000,
+  'r2-scores': 6000,
+  'r3-intro': 6000,
+  'r3-write': 45000,
+  'r3-card': 3500,       // per swipe card
+  'r3-swipe-max': 65000,
+  'r3-reveal-card': 2800,
+  'r3-reveal-toast': 3600,
+  podium: 13000,
+  'early-grace': 800,   // pause after everyone has acted before the phase ends
+  'skip-after': 1500,   // host can skip intros after this
 };
+
+// Tonight's table: cherries per finishing place in each game (4th and below get 1 for turning up).
+export const NIGHT_POINTS = [5, 3, 2];
 
 export const LIMITS = {
   name: 10,
@@ -63,16 +68,16 @@ export const REACTIONS = ['roll', 'rose', 'applause', 'groan'];
 
 // Engine phase ids, in show order.
 export const PHASES = [
-  'lobby', 'intro',
+  'lobby', 'menu', 'intro',
   'r1-intro', 'r1-write', 'r1-vote', 'r1-reveal', 'r1-scores',
   'r2-intro', 'r2-write', 'r2-pick', 'r2-reveal', 'r2-scores',
   'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal',
-  'podium', 'end',
+  'podium', 'end', 'results',
 ];
 
 // Every screen id (DESIGN section 4). Client screens are derived from phases + personal state.
 export const SCREEN_IDS = [
-  'title', 'create', 'join', 'lobby', 'intro',
+  'title', 'create', 'join', 'lobby', 'menu', 'results', 'intro',
   'r1-intro', 'r1-write', 'r1-wait', 'r1-vote', 'r1-reveal', 'r1-scores',
   'r2-intro', 'r2-write', 'r2-wait', 'r2-pick', 'r2-reveal', 'r2-scores',
   'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal',

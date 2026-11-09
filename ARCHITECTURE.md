@@ -1,5 +1,10 @@
 # AFTERS - Architecture and module ownership
 
+> **Game box update (2026-11-09, game-box team).** AFTERS is now a box of games. The engine is a
+> *box* (`src/game/HostEngine.js`: lobby, menu, tonight's table, settings, reactions, phase clock)
+> and every game is a module in `src/games/<id>/`. The original 3-round show is the first module,
+> **Afters Classic** (`src/games/classic/`). Read **How to add a game** below before touching a game.
+
 > AI-generated (Claude, lead engineer pass, 2026-11-09). Read `DESIGN.md` first: it is the source of truth for look, copy and rules. This file explains how the code is laid out so several agents can work in parallel without stepping on each other.
 
 ## Run it
@@ -11,7 +16,8 @@ npm run build               # icons + production build into dist/
 npm run preview             # serve dist/ on :4173
 npm run shoot -- --screens all --out shots          # PNG per screen (390x844 @2x), needs a build
 npm run e2e                 # 3 phones, real PeerJS over a local signalling server, full game
-node scripts/sim.mjs 5 50   # headless engine + 5 bots full game in Node (no browser)
+node scripts/sim.mjs 5 50 [game]   # headless engine + 5 bots: lobby -> menu -> full game (default classic)
+node scripts/test-shared.mjs       # shared draw pad + tilt helpers in a real browser
 ```
 
 ## The big idea
@@ -41,12 +47,20 @@ host phone                                   other phones
 | `src/net/PeerTransport.js` | PeerJS WebRTC; host id `afters-<CODE>-host`; `signal` option for a local server | net |
 | `src/net/roomCode.js` | 4 consonant codes, blocklist | net |
 | `src/game/constants.js` | durations, limits, palette, avatars, phase + screen ids | game |
-| `src/game/HostEngine.js` | pure state machine (inject `send`, `now`, `seed`, `speed`) | game |
-| `src/game/scoring.js` | pure scoring for R1/R2/R3 | game |
-| `src/game/awards.js` | bill awards | game |
+| `src/game/HostEngine.js` | the BOX: players, reconnects, rating, reactions, phase clock, menu, tonight's table, the `api` games use | box |
+| `src/games/index.js` | **the registry: one line per game** (menu order) | box (one line per game team) |
+| `src/games/<id>/` | one game: `index.js` (definition), host logic, `screens/`, css, `content/`, bot, demos | that game's team only |
+| `src/games/classic/` | Afters Classic (host.js, bot.js, demos.js, content/, screens/) | classic |
+| `src/games/example/` | "Call It", the smallest complete game (hidden from the menu). Copy it. | box |
+| `src/games/{forehead,telephone,percentages}/index.js` | placeholder menu tiles (Bonce, Crossed Wires, Pie Chart) until those teams land | those teams |
+| `src/shared/sensors.js` | tilt (forehead nod) with the iOS permission tap, vibrate + patterns, landscape lock | box |
+| `src/shared/drawing.js` (+ `drawing-data.js`, `drawing.css`) | draw pad (touch, colours, sizes, undo, clear), compact stroke data, synced replay | box |
+| `src/game/scoring.js`, `awards.js` | pure scoring + bill awards for Afters Classic | classic |
 | `src/game/GameClient.js` | client mirror, clock sync, reconnect by token, action helpers | game |
 | `src/game/hostRoom.js` | wires engine to transports + tick loop, retries taken codes | game |
-| `src/content/*.js` | prompts (48), facts (28), last orders (16), bot answers, Cyril's line bank | content |
+| `src/content/lines.js`, `linesAdult.js` | Cyril's box-wide line bank (family + Adults 18+), variants | content |
+| `src/content/botAnswers.js` | bot answers `{family, adult}` + names | content |
+| `src/games/classic/content/*.js` | prompts, facts, last orders, each `{family:[...], adult:[...]}` | classic |
 | `src/bots.js` | `attachBrain(client)` and `createBot()`; instant or realtime; `gate` for demos | game |
 | `src/stage/Stage.js` | renderer, camera shots + tweens, layout framing, avatars at seats, podium cake, thrown reactions, quality step-down, `snapshotStats()` | stage |
 | `src/stage/Cyril.js` | the host candle: build + `react()`, `setMood()`, `pulse()`, `setTalking()`, `lookAt()` | stage/Cyril |
@@ -61,9 +75,10 @@ host phone                                   other phones
 | `src/ui/router.js` | screen registry + transitions | lead |
 | `src/ui/strip.js`, `rail.js`, `haptics.js` | input-mode strip, reaction rail, haptics | design system |
 | `src/audio/synth.js`, `music.js` | WebAudio SFX + "Late Supper" music bed | audio |
-| `src/screens/<id>.js` (+ `<id>.css` or a shared round css) | **one file per screen** | one agent per screen |
+| `src/screens/<id>.js` | box screens: title, create, join, lobby, **menu** (dessert trolley), **results**, sandbox, overlays | box |
+| `src/screens/menu-art.js` | the SVG dishes on the trolley (`dish` key per game) | box |
 | `src/screens/common.js/.css` | small helpers used by first versions (intro/scores factories, timeline, wait card) | shared; screen owners may inline and diverge |
-| `src/screens/index.js` | registry: add your screen here | lead |
+| `src/screens/index.js` | box screen registry (game screens register through their module) | box |
 | `public/` | manifest, `sw.js`, icons (`icon.svg` -> PNGs by `scripts/make-icons.mjs`) | lead |
 | `scripts/` | `shoot.mjs`, `e2e.mjs`, `sim.mjs`, `serve.mjs`, `make-icons.mjs` | lead/QA |
 
@@ -108,13 +123,25 @@ export default {
 | `frozen`, `demo`, `reduced` | screenshot mode, demo id, reduced motion |
 | `go(id)`, `actions` | pre-game navigation; `createTable`, `joinTable`, `leave`, `openSettings`, `closeOverlay`, `addBot` |
 
+New ctx fields (game box): `game` (the current game's definition or null), `games` (all), `rating` (`'family'|'adult'`), `adult`, and `line(key, vars)` is rating-aware (adult bank first, then the game's `lines`, then the box bank; one variant picked by the phase seed so every phone shows the same one). `mine.game` is free per-phase scratch for a game's optimistic state (`client.act(type, data, mine)`).
+
 ### Which screen shows (App.resolveScreen)
 
-Pre-game: `title` / `create` / `join` (local navigation). Once joined, the screen is the phase id, except `r1-write` -> `r1-wait` when this phone has served both plates, and `r2-write` -> `r2-wait` after a porky is accepted. `reconnect` is an overlay driven by `client.state.status`.
+Pre-game: `title` / `create` / `join` (local navigation). Once joined: `lobby`, `menu`, `results` for box phases; otherwise the game's `resolveScreen(state)` if it returns an id, else the phase id (Afters Classic swaps `r1-write` -> `r1-wait` and `r2-write` -> `r2-wait`). `reconnect` is an overlay driven by `client.state.status`.
 
-## Engine phases and payloads
+## Box phases
 
-Phase ids (in order): `lobby, intro, r1-intro, r1-write, (r1-vote, r1-reveal) x N, r1-scores, r2-intro, (r2-write, r2-pick, r2-reveal) x facts, r2-scores, r3-intro, r3-write, r3-swipe, r3-reveal, podium, end`.
+`lobby` -> (host: Wheel in the menu) -> `menu` -> host serves a game -> the game's phases -> `results` (via `api.finish`) or the game's own final phase -> host: **Back to the menu** or **Same again**.
+
+- `menu` payload `{night, history, last}`; progress carries `{focus: gameId|null, fancy: {playerId: gameId}}` (host's finger, guests' votes). Messages: `focus`, `fancy`, `choose` (host).
+- `results` payload `{gameId, title, rows:[{id, score, rank, cherries}], night:[{id, night, prev, delta, rank, prevRank}]}`, `final: true`.
+- **Tonight's table**: each finished game gives cherries by place, `NIGHT_POINTS = [5, 3, 2]`, then 1 each (ties share a place). `players[].night` is the running total. `newTable` clears it.
+- New players can join during `lobby`, `menu` and `results`. Phase messages now carry `game` (id or null) and `final`.
+- Settings: `{rating: 'family'|'adult', adult: bool (mirror), speakerId}`. The host can switch rating in the lobby or on the menu.
+
+## Afters Classic phases and payloads
+
+Phase ids (in order): `intro, r1-intro, r1-write, (r1-vote, r1-reveal) x N, r1-scores, r2-intro, (r2-write, r2-pick, r2-reveal) x facts, r2-scores, r3-intro, r3-write, r3-swipe, r3-reveal, podium, end`.
 
 Every phase message: `{type:'phase', id, seq, startsAt, endsAt, duration, seed, speed, payload, players, private}`. Timeline offsets inside payloads (`steps[].at`, `perCard`, `toastAt`) are already divided by `speed`.
 
@@ -133,13 +160,95 @@ Every phase message: `{type:'phase', id, seq, startsAt, endsAt, duration, seed, 
 | `podium` | `{rows:[{id,score,rank,award:{title,blurb}}]}` | - |
 | `end` | `{rows, hostId}` | - |
 
-Messages (client -> host): `hello, ping, profile, settings, start, skip, again, newTable, kick, react, leave, submit, vote, pick, swipe`. Host -> client: `welcome, refuse, pong, lobby, phase, progress, ack, reject, react, kick`. `state` snapshots exist as `engine.snapshot()` (not yet broadcast; see gaps).
+Messages (client -> host): box: `hello, ping, profile, settings, start, choose, focus, fancy, skip, again, menu, newTable, kick, react, leave`; classic: `submit, vote, pick, swipe`. Host -> client: `welcome, refuse, pong, lobby, phase, progress, ack, reject, react, kick`. `state` snapshots exist as `engine.snapshot()` (not yet broadcast; see gaps).
+
+## How to add a game
+
+Three teams are adding games in parallel. Each team owns **only** `src/games/<id>/` (and the one line already in `src/games/index.js`). If you need a shared change, write it in your report.
+
+**1. The module** - `src/games/<id>/index.js` default-exports a definition:
+
+```js
+export default {
+  id: 'forehead',                  // folder name; prefix every phase + screen id with it ('forehead-turn')
+  title: 'Bonce', dish: 'jelly',   // menu name + dish art key (src/screens/menu-art.js; 'cloche' fallback)
+  course: 'A wobbly jelly...', tagline: '...', blurb: '...', tags: ['Acting'], colour: '#E2553B',
+  players: [3, 8], minutes: 10,
+  createHost: (api) => new MyHost(api),        // host logic (Node-safe: no DOM, no CSS imports)
+  screens: () => import('./screens/index.js'), // lazy: default export = array of screen defs
+  bot: (b) => { ... return true; },            // how bots/autopilot play a phase (return true if handled)
+  demos: { 'forehead-turn': { match: (e) => e.phase.id === 'forehead-turn', me: 'idle', bots: 'some', t: 4000 } },
+  lines: { family: { fhGo: [['Variant one'], ['Variant two']] }, adult: { fhGo: [['Ruder one']] } },
+  resolveScreen: (state) => null,              // optional: per-phone screen id for a phase
+  // comingSoon: true -> menu tile only (the current placeholders); hidden: true -> not on the menu
+};
+```
+
+**2. Host logic** - an object with `start()`, `advance(phaseId)` (the phase timer ran out, everyone finished, or the host skipped an `*-intro`), `handle(player, msg, {fresh, isHost})` (messages from phones), optional `activeFor(phaseId, connected)` (who must act before the phase ends early), `onLeave(p)`, `onRejoin(p)`, `dispose()`. It talks to phones only through `api`:
+
+| api | |
+|---|---|
+| `enter(id, ms, payload, {priv, progress, final, active})` | start a phase. `priv(player)` = that phone's private part; `progress()` -> `{done:{id:bool}, counts, ...extra}`; phase ends early once every active player is `done` |
+| `progress()`, `ack(p, extra)`, `reject(p, reason)` | re-send progress (+ early end check), acknowledge/refuse a phone's action |
+| `players`, `connected`, `player(id)`, `hostPlayer` | raw player objects (`p.score` is THIS game's score, reset at start) |
+| `addScores({id: n})` | add to game scores |
+| `take(deck, key, n, rng)`, `deck(deck)` | pick from a `{family, adult}` deck by the table's rating, no repeats tonight |
+| `clean(text, max)` | trims input; family-safe filter unless the table is Adults 18+ |
+| `rating`, `adult`, `settings`, `seed`, `rng`, `sub(salt)`, `dur(ms)`, `now()`, `speed`, `plays`, `history`, `phase`, `seq` | context. Use `dur()` for any timeline offsets you put in payloads |
+| `finish(rows)` | **end of game**: `rows=[{id, score}]` -> cherries on tonight's table + the shared `results` screen |
+| `record(rows)` + `enter(..., {final: true})` | end on your own final screen instead (Classic does this); give the host `client.toMenu()` / `client.again()` buttons |
+
+**3. Screens** - same contract as above (`id, layout, shot, mount`). Phones send actions with `ctx.client.act('type', {data}, optimisticMine)` (arrives as `handle(p, {type, ...data, seq})`; don't reuse box message names). Read optimistic state from `ctx.mine.game`. Use `ctx.line(key)` for Cyril, `ctx.adult` for copy changes, `ctx.elapsed()` for every timeline. Put CSS next to your screens and scope it (`.fh-...`). Give every tap target a `data-e2e`.
+
+**4. Shared helpers** (`src/shared/`):
+- `sensors.js`: `tiltSensor({onTilt})` -> `start()` (call from a tap; asks the iOS motion permission), `calibrate()` once the phone is on the forehead, `'down'` = nod forward (correct), `'up'` = tip back (pass), hysteresis built in; `live` tells you if real samples arrive (else show tap buttons). `vibrate(BUZZ.correct)`, `lockLandscape()` (best effort).
+- `drawing.js`: `drawPad({onChange, prompt})` (touch drawing, 8 colours incl. a rubber, 4 sizes, undo, clear) -> `.drawing`; `drawingView(d).frame(t)` replays stroke by stroke as a pure function of `t`. `encodeDrawing`/`decodeDrawing` (validates untrusted data, caps points) and `replayDuration` are in Node-safe `drawing-data.js` for host logic. Coordinates are a 1000x1000 board.
+- Try them at `?demo=sandbox`; `node scripts/test-shared.mjs` checks them.
+
+**5. Content** - `src/games/<id>/content/*.js` exporting `{family: [...], adult: [...]}` with stable ids (`api.take` remembers them all night). Adults 18+ = cheeky, rude, innuendo-heavy; no hate, no real people, nothing involving minors.
+
+**6. Tests** - `node scripts/sim.mjs 4 50 <id>` (Node, bots play your game through the menu), `node scripts/shoot.mjs --screens <demo ids>` and an e2e that clicks `[data-e2e=dish-<id>]` then `[data-e2e=serve-game]` on the menu (see `scripts/e2e.mjs`).
+
+### The example game (`src/games/example/`, ~70 lines)
+
+```js
+// host.js
+export class ExampleHost {
+  constructor(api) { this.api = api; this.round = 0; this.calls = {}; }
+  start() { this.round = 0; this._call(); }
+  advance(phaseId) {
+    if (phaseId === 'example-call') return this._reveal();
+    if (this.round + 1 < 3) { this.round += 1; return this._call(); }
+    this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
+  }
+  handle(p, msg, { fresh }) {
+    if (!fresh || msg.type !== 'call' || this.api.phase.id !== 'example-call') return;
+    this.calls[p.id] = msg.side;
+    this.api.progress();
+  }
+  _call() {
+    this.calls = {};
+    this.api.enter('example-call', 8000, { round: this.round + 1 }, {
+      progress: () => ({ done: Object.fromEntries(this.api.players.map((p) => [p.id, !!this.calls[p.id]])), counts: {} }),
+    });
+  }
+  _reveal() {
+    const side = this.api.sub('coin')() < 0.5 ? 'heads' : 'tails';
+    const deltas = Object.fromEntries(this.api.players.map((p) => [p.id, this.calls[p.id] === side ? 100 : 0]));
+    this.api.addScores(deltas);
+    this.api.enter('example-reveal', 3000, { side, deltas });
+  }
+}
+// screens/index.js: example-call shows Heads/Tails buttons -> ctx.client.act('call', { side }, { side })
+```
 
 ## URL parameters
 
 | Param | Effect |
 |---|---|
-| `?demo=<screen-id>` | jump straight to that screen with bots and seeded content |
+| `?demo=<screen-id>` | jump straight to that screen with bots and seeded content (`menu`, `menu-first`, `menu-adult`, `results`, `sandbox`, every game's `demos`) |
+| `&adult=1` | demo table on the Adults 18+ rating |
+| `&game=<id>` | which game the autopilot host serves from the menu (default `classic`) |
 | `&freeze=1` | pause the engine and pin `ctx.elapsed()` at a good moment (per-screen default in `DEMOS`), or `&t=<ms>` |
 | `&seed=<n>` | deterministic content/shuffles |
 | `&players=3..8`, `&me=host|guest` | demo table size and whether this phone is the host |

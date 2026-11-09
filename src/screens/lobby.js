@@ -139,8 +139,8 @@ export default {
 
     // host controls: two compact pills
     const adultPill = h('button.lb-pill.lb-switchpill', { type: 'button', role: 'switch', 'aria-checked': 'false' },
-      h('span.lb-pill-txt', h('span.lb-pill-k', 'Rude words'), h('span.lb-pill-s', 'Filtered')), h('span.lb-switch', h('i')));
-    onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
+      h('span.lb-pill-txt', h('span.lb-pill-k', 'Content'), h('span.lb-pill-s', 'Family')), h('span.lb-switch', h('i')));
+    onTap(adultPill, () => ctx.client.setSettings({ rating: ctx.app.client.state.settings.rating === 'adult' ? 'family' : 'adult' }));
     const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
       h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')),
       h('span.lb-chev', { html: '<svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' }));
@@ -151,7 +151,7 @@ export default {
     });
     const hostRow = h('div.lb-hostrow', adultPill, speakerPill);
 
-    const startBtn = button('Start the show', { onClick: () => ctx.client.start(), e2e: 'start-show' });
+    const startBtn = button('Wheel in the menu', { onClick: () => ctx.client.start(), e2e: 'start-show' });
     startBtn.classList.add('lb-start');
     const BELL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2a1.3 1.3 0 0 1 1.3 1.3v.6a6 6 0 0 1 4.7 5.9v4.2l1.6 2.3H4.4L6 15.2V11a6 6 0 0 1 4.7-5.9v-.6A1.3 1.3 0 0 1 12 3.2z" fill="currentColor"/><circle cx="12" cy="20" r="1.9" fill="currentColor"/></svg>';
     const setStart = (label, bell) => { startBtn.innerHTML = ''; if (bell) startBtn.append(h('span.lb-bell', { html: BELL })); startBtn.append(h('span', label)); };
@@ -315,11 +315,11 @@ export default {
 
       // host controls
       const st = c.settings || {};
-      adultPill.setAttribute('aria-checked', String(!!st.adult));
-      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Allowed' : 'Filtered';
+      adultPill.setAttribute('aria-checked', String(st.rating === 'adult'));
+      adultPill.querySelector('.lb-pill-s').textContent = st.rating === 'adult' ? 'Adults 18+' : 'Family';
       const spk = ps.find((p) => p.id === st.speakerId);
       guestInfo.replaceChildren(
-        h('span.lb-info-i', h('span.lb-info-k', 'Rude words'), h('span.lb-info-v', st.adult ? 'Allowed' : 'Filtered')),
+        h('span.lb-info-i', h('span.lb-info-k', 'Content'), h('span.lb-info-v', st.rating === 'adult' ? 'Adults 18+' : 'Family')),
         h('span.lb-info-i', h('span.lb-info-k', 'Music from'), h('span.lb-info-v', spk ? (spk.id === meId ? 'My phone' : spk.name) : 'Off')));
       speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : spk ? spk.name : 'Off';
 

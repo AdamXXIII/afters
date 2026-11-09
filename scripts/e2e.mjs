@@ -1,6 +1,7 @@
 // End-to-end: 1 host phone + 2 player phones (separate browser contexts) over the real PeerJS
 // transport against a local `peer` signalling server. The host plays through the UI (types, taps);
-// players use autopilot. Plays a full game to the podium + end, then "Same again". Fails on any
+// players use autopilot. Lobby -> menu -> Afters Classic to the podium + end -> back to the menu ->
+// serve again. Fails on any
 // console error or page error.
 // usage: node scripts/e2e.mjs [--speed 6] [--headed] [--keep-shots <dir>]
 import { createRequire } from 'node:module';
@@ -78,9 +79,15 @@ try {
   await waitFor(host, () => window.__afters.players.length === 3);
   for (const p of players) await api(p, () => window.__afters.autopilot(true));
 
-  // 4. host starts the show
+  // 4. host wheels in the menu, picks Afters Classic and serves it
   await host.page.click('[data-e2e=start-show]');
-  log('show started');
+  for (const p of [host, ...players]) await waitFor(p, () => window.__afters.screen === 'menu', null, 15000);
+  log('menu: all phones at the trolley');
+  await host.page.click('[data-e2e=dish-classic]');
+  await waitFor(players[0], () => document.querySelector('[data-e2e=dish-classic]')?.classList.contains('is-focus'), null, 5000);
+  log('menu: host focus synced to a guest');
+  await host.page.click('[data-e2e=serve-game]');
+  log('classic served');
 
   // 5. host plays through the UI until the end screen
   const seen = new Set();
@@ -119,7 +126,7 @@ try {
     } catch { /* screen changed under us; carry on */ }
     await sleep(250);
   }
-  const must = ['intro', 'r1-intro', 'r1-write', 'r1-vote', 'r1-reveal', 'r1-scores', 'r2-intro', 'r2-write', 'r2-pick', 'r2-reveal', 'r2-scores', 'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal', 'podium', 'end'];
+  const must = ['menu', 'intro', 'r1-intro', 'r1-write', 'r1-vote', 'r1-reveal', 'r1-scores', 'r2-intro', 'r2-write', 'r2-pick', 'r2-reveal', 'r2-scores', 'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal', 'podium', 'end'];
   const missing = must.filter((s) => !seen.has(s));
   if (missing.length) throw new Error(`host never showed: ${missing.join(', ')}`);
 
@@ -130,10 +137,16 @@ try {
   const total = await api(host, () => window.__afters.players.reduce((a, p) => a + p.score, 0));
   if (!(total > 0)) throw new Error('nobody scored anything');
 
-  // 7. "Same again" restarts with the same players
-  await host.page.click('[data-e2e=again]');
+  // 7. back to the menu: tonight's table carries the cherries; then serve again
+  await host.page.click('[data-e2e=to-menu]');
+  for (const p of [host, ...players]) await waitFor(p, () => window.__afters.phase === 'menu', null, 15000);
+  const night = await api(host, () => window.__afters.players.reduce((a, p) => a + (p.night || 0), 0));
+  if (!(night > 0)) throw new Error('tonight\'s table has no cherries after a game');
+  log('back at the menu, cherries on the table:', night);
+  await host.page.click('[data-e2e=dish-classic]');
+  await host.page.click('[data-e2e=serve-game]');
   for (const p of [host, ...players]) await waitFor(p, () => window.__afters.phase === 'intro', null, 15000);
-  log('same again: all phones back at intro');
+  log('second helping: all phones back at intro');
 
   if (errors.length) throw new Error(`console errors:\n  ${errors.join('\n  ')}`);
   ok = true;

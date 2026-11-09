@@ -1,0 +1,30 @@
+/* Shared drawing pad (src/shared/drawing.js). Paper board + chunky one-thumb toolbar. */
+.dp { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.dp-cap { font: 600 calc(20px * var(--ts, 1))/1.1 var(--f-hand); color: var(--c-claret); text-align: center; }
+.dp-board {
+  position: relative; width: 100%; aspect-ratio: 1; max-height: 52vh; margin: 0 auto;
+  border-radius: var(--r-2); overflow: hidden; background: #FFFDF8;
+  box-shadow: var(--sh-2), inset 0 0 0 1px rgba(122,74,42,.18);
+}
+.dp-board::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; box-shadow: inset 0 0 0 6px rgba(243,230,211,.55); }
+.dp-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.dp.disabled .dp-canvas { cursor: default; opacity: .85; }
+.dp-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.dp-swatches, .dp-sizes { display: flex; gap: 5px; padding: 4px; border-radius: var(--r-pill); background: var(--c-tablecloth); box-shadow: inset 0 0 0 1px rgba(122,74,42,.14); }
+.dp-sw, .dp-sz, .dp-btn {
+  appearance: none; border: 0; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; padding: 0;
+  display: grid; place-items: center; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--d-micro, 110ms) var(--ease-out-back, ease);
+}
+.dp-sw { background: var(--sw); box-shadow: inset 0 0 0 2px rgba(42,26,23,.25); }
+.dp-sw.rubber { background: repeating-linear-gradient(45deg, #FBF4EA 0 4px, #EADBC4 4px 8px); }
+.dp-sw[aria-checked="true"] { transform: scale(1.12); box-shadow: 0 0 0 3px var(--c-linen, #FBF4EA), 0 0 0 5px var(--c-ink, #2A1A17); }
+.dp-sz { background: #fff; }
+.dp-sz i { display: block; width: var(--d); height: var(--d); border-radius: 50%; background: var(--c-ink, #2A1A17); }
+.dp-sz[aria-checked="true"] { box-shadow: 0 0 0 2.5px var(--c-ink, #2A1A17); }
+.dp-btn { width: 40px; height: 40px; background: var(--c-linen, #FBF4EA); color: var(--c-ink, #2A1A17); box-shadow: var(--sh-1); }
+.dp-btn svg { width: 22px; height: 22px; }
+.dp-btn:disabled { opacity: .4; cursor: default; }
+.dp-sw:active, .dp-sz:active, .dp-btn:active { transform: scale(.92); }
+.dp-view { position: relative; aspect-ratio: 1; border-radius: var(--r-2); overflow: hidden; background: #FFFDF8; box-shadow: var(--sh-2); }
+.dp-view .dp-canvas { cursor: default; }
