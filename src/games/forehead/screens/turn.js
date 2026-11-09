@@ -168,9 +168,13 @@ function mountGuesser(show, ctx0) {
   const status = h('div.fh-g-status', h('span.fh-g-deck', { style: { '--dc': p.deck.colour } }, h('i', { html: deckIcon(p.deck.icon) }), p.deck.name), p.modifier ? h('span.fh-g-mod', p.modifier.name) : null, h('span.fh-g-hits', hits, h('small', 'got')));
   const flash = h('div.fh-g-flash');
   const count = h('div.fh-g-count', h('small', 'Phone on your forehead. Screen out.'), h('b', '3'));
-  const hintL = h('div.fh-g-half.left', { 'data-e2e': 'fh-g-pass' }, h('span', 'Tap: pass'));
-  const hintR = h('div.fh-g-half.right', { 'data-e2e': 'fh-g-hit' }, h('span', 'Tap: got it'));
-  const inner = h('div.fh-g-inner', status, h('div.fh-g-card', word), h('div.fh-g-bar', bar), count, flash, hintL, hintR);
+  const hintL = h('div.fh-g-half.left', { 'data-e2e': 'fh-g-pass' }, h('span.fh-g-side.pass', h('b', 'Pass'), h('small', 'tip back')));
+  const hintR = h('div.fh-g-half.right', { 'data-e2e': 'fh-g-hit' }, h('span.fh-g-side.hit', h('b', 'Got it'), h('small', 'nod')));
+  const clock = h('b.fh-g-clock', '60');
+  const shouters = ctx.players.filter((x) => x.id !== p.guesserId && (!p.team || (p.teams?.[p.team] || []).includes(x.id)));
+  const crowd = h('div.fh-g-crowd', h('small', 'Shouting:'), shouters.map((x) => disc(x, { size: 30 })), h('i', { html: CYRIL_BADGE }));
+  const inner = h('div.fh-g-inner', status, h('div.fh-g-mid', h('div.fh-g-card', word)), h('div.fh-g-foot', crowd, h('div.fh-g-bar', bar)), count, flash, hintL, hintR);
+  status.insertBefore(h('span.fh-g-clockwrap', clock), status.lastChild);
   const root = h('div.fh-guess.fh-burst', { style: { '--dc': p.deck.colour } }, inner);
   show.append(root);
   document.body.classList.add('fh-guessing');
@@ -210,6 +214,7 @@ function mountGuesser(show, ctx0) {
     root.classList.toggle('counting', s.counting);
     root.classList.toggle('over', s.left <= 0);
     bar.style.transform = `scaleX(${s.counting ? 1 : s.left / p.length})`;
+    clock.textContent = String(Math.ceil((s.counting ? p.length : s.left) / 1000));
     if (s.counting) {
       const n = Math.max(1, Math.ceil((p.countdown - 500 - s.el) / ((p.countdown - 500) / 3)));
       const label = s.el > p.countdown - 500 ? 'Go!' : String(n);
@@ -222,7 +227,7 @@ function mountGuesser(show, ctx0) {
       word.textContent = s.idx < p.cards.length ? p.cards[s.idx] : 'Out of cards!';
       const vw = Math.max(window.innerWidth, window.innerHeight);
       const vh = Math.min(window.innerWidth, window.innerHeight);
-      fit(word, { max: 120, min: 40, maxW: vw * 0.86, maxH: vh * 0.56 });
+      fit(word, { max: 110, min: 36, maxW: vw * 0.62, maxH: vh * 0.5 });
     }
     if (s.results.length > seen) { const r = s.results[s.results.length - 1]; if (r.by !== c.meId) showFlash(r.r); seen = s.results.length; }
     hits.textContent = String(s.results.filter((x) => x.r === 'hit').length);

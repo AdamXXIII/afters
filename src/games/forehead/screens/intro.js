@@ -38,7 +38,7 @@ export default {
       const send = (patch) => { const next = { ...setup(), ...patch }; ctx.client.act('fh-setup', next, { setup: next }); ctx.haptic('select'); ctx.audio.sfx('select'); paint(); };
       modeP = pills([{ value: 'ffa', label: 'Every bonce for itself' }, { value: 'teams', label: p.canTeams ? 'Gravy v Custard' : 'Teams (4+)', disabled: !p.canTeams }], setup().mode, (v) => send({ mode: v }), 'fh-mode');
       goesP = pills([{ value: 1, label: '1 go each' }, { value: 2, label: '2 goes each' }], setup().goes, (v) => send({ goes: v }), 'fh-goes');
-      const go = button('Bonces up!', { e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
+      const go = button('Bonces up!', { kind: 'candle', e2e: 'fh-go', onClick: () => { ctx.client.act('fh-go', {}, { go: true }); go.disabled = true; } });
       bar.append(modeP, goesP, go);
     } else {
       const host = ctx.players.find((x) => x.isHost);
@@ -46,7 +46,7 @@ export default {
       bar.append(h('div.fh-po-table', ctx.players.map((x) => disc(x, { size: 38 }))), summary,
         h('div.fh-po-wait', h('i', { html: CYRIL_BADGE }), h('span', `${host?.name || 'The host'} is pouring the jelly`, h('span.fh-dots', h('i'), h('i'), h('i')))));
     }
-    const root = h('div.fh-poster.fh-burst', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, head, rules, bar);
+    const root = h('div.fh-poster.fh-burst', h('div.fh-po-eyebrow', 'Tonight\'s wobbly jelly'), title, h('div.fh-po-stage', head, h('span.fh-po-shout.s1', 'Gravy!'), h('span.fh-po-shout.s2', 'Hum it!'), h('span.fh-po-shout.s3', 'Ooh ooh!')), rules, bar);
     show.append(root);
     if (!ctx.frozen) {
       title.animate([{ transform: 'scale(.4) rotate(-12deg)', opacity: 0 }, { transform: 'rotate(-4deg)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });

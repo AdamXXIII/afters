@@ -5,6 +5,7 @@ import { h, countUp } from '../../../ui/components.js';
 import { ICONS } from '../../../ui/icons.js';
 import { deckIcon, disc, S, TEAMS, releaseGuesser, rnd, CYRIL_BADGE } from './kit.js';
 
+
 const CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="2.4" fill="none"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>';
 const CROSS = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
 
@@ -34,14 +35,22 @@ export default {
       h('div.fh-hero-deck', h('i', { html: deckIcon(p.deck.icon) }), p.deck.name, p.team ? ` · ${TEAMS[p.team].name}` : ''),
       verdict);
 
-    const tiles = p.results.map((r, i) => h(`div.fh-rc-tile.${r.r}`, { style: { '--rot': `${(rnd(seed, i) - 0.5) * 4}deg` } },
-      h('span.fh-rc-ic', { html: r.r === 'hit' ? ICONS.tick : r.r === 'time' ? CLOCK : r.r === 'foul' ? '!' : CROSS }),
-      h('span.fh-rc-txt', r.text),
-      r.bonus ? h('span.fh-rc-bonus', `+${r.bonus}`) : null));
-    const grid = h(`div.fh-rc-grid${n > 12 ? '.dense' : ''}`, tiles);
+    // hits are big place cards; misses are a small struck-through line underneath
+    const hitsN = p.results.filter((r) => r.r === 'hit').length;
+    const misses = h('div.fh-rc-misses');
+    const tiles = p.results.map((r, i) => {
+      if (r.r === 'hit') {
+        return h('div.fh-rc-tile.hit', { style: { '--rot': `${(rnd(seed, i) - 0.5) * 5}deg`, '--dc': p.deck.colour } },
+          h('span.fh-rc-ic', { html: ICONS.tick }), h('span.fh-rc-txt', r.text), r.bonus ? h('span.fh-rc-bonus', `+${r.bonus}`) : null);
+      }
+      const m = h(`span.fh-rc-miss.${r.r}`, h('i', { html: r.r === 'time' ? CLOCK : r.r === 'foul' ? '!' : CROSS }), r.text);
+      misses.append(m);
+      return m;
+    });
+    const grid = h(`div.fh-rc-grid${hitsN > 8 ? '.dense' : ''}${hitsN === 0 ? '.empty' : ''}`, tiles.filter((t) => t.classList.contains('fh-rc-tile')), hitsN === 0 ? h('div.fh-rc-none', 'Not a sausage.') : null);
     const shout = h('div.fh-rc-shout');
     const lead = h('div.fh-rc-lead');
-    const root = h('div.fh-recap.fh-burst', hero, grid, shout, lead);
+    const root = h('div.fh-recap.fh-burst', hero, grid, misses, shout, lead);
     show.append(root);
 
     const paintShout = () => {
