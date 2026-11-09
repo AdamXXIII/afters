@@ -6,9 +6,10 @@ import join from './join.js';
 import lobby from './lobby.js';
 import menu from './menu.js';
 import results from './results.js';
+import sandbox from './sandbox.js';
 import reconnect from './reconnect.js';
 import settings from './settings.js';
 
-export const SCREENS = [title, create, join, lobby, menu, results];
+export const SCREENS = [title, create, join, lobby, menu, results, sandbox];
 
 export const OVERLAYS = [reconnect, settings];

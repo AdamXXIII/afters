@@ -4,12 +4,14 @@ import classic from './classic/index.js';
 import forehead from './forehead/index.js';
 import telephone from './telephone/index.js';
 import percentages from './percentages/index.js';
+import example from './example/index.js';
 
 export const GAMES = [
   classic,
   forehead,
   telephone,
   percentages,
+  example, // hidden: true - the documented example, not on the menu
 ];
 
 export const gameById = (id, list = GAMES) => list.find((g) => g.id === id) || null;

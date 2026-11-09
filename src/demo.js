@@ -35,7 +35,7 @@ for (const g of GAMES) {
 }
 
 export async function runDemo(app, id) {
-  if (id === 'title' || id === 'create' || id === 'join') {
+  if (id === 'title' || id === 'create' || id === 'join' || id === 'sandbox') {
     app.preScreen = id;
     return;
   }
