@@ -1,5 +1,5 @@
 // Screenshot harness: renders ?demo=<screen> at 390x844 @2x and writes PNGs.
-// usage: node scripts/shoot.mjs --screens title,lobby|all --out <dir> [--wait 2500] [--seed 7] [--players 5]
+// usage: node scripts/shoot.mjs --screens title,lobby|all --out <dir> [--wait 2500] [--seed 7] [--players 5] [--landscape (844x390)]
 //        [--me host|guest] [--no-freeze] [--extra "&t=4000"] [--base http://host:port] [--no-build-check]
 import { createRequire } from 'node:module';
 import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
@@ -19,7 +19,7 @@ function args() {
   for (let i = 0; i < a.length; i++) {
     const k = a[i];
     const v = a[i + 1];
-    if (k === '--screens') { o.screens = v; i++; } else if (k === '--out') { o.out = path.resolve(v); i++; } else if (k === '--wait') { o.wait = Number(v); i++; } else if (k === '--seed') { o.seed = Number(v); i++; } else if (k === '--players') { o.players = Number(v); i++; } else if (k === '--me') { o.me = v; i++; } else if (k === '--extra') { o.extra = v; i++; } else if (k === '--base') { o.base = v; i++; } else if (k === '--no-freeze') o.freeze = false;
+    if (k === '--screens') { o.screens = v; i++; } else if (k === '--out') { o.out = path.resolve(v); i++; } else if (k === '--wait') { o.wait = Number(v); i++; } else if (k === '--seed') { o.seed = Number(v); i++; } else if (k === '--players') { o.players = Number(v); i++; } else if (k === '--me') { o.me = v; i++; } else if (k === '--extra') { o.extra = v; i++; } else if (k === '--base') { o.base = v; i++; } else if (k === '--no-freeze') o.freeze = false; else if (k === '--landscape') o.landscape = true;
   }
   o.list = o.screens === 'all' ? ALL_SCREENS : o.screens.split(',').map((s) => s.trim()).filter(Boolean);
   return o;
@@ -41,7 +41,7 @@ const browser = await chromium.launch({ args: GL_ARGS });
 const results = [];
 let failed = 0;
 for (const id of o.list) {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1 AFTERS-shoot' });
+  const context = await browser.newContext({ viewport: o.landscape ? { width: 844, height: 390 } : { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1 AFTERS-shoot' });
   const page = await context.newPage();
   const errors = [];
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
