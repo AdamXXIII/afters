@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-export const ALL_SCREENS = ['title', 'create', 'join', 'lobby', 'intro', 'r1-intro', 'r1-write', 'r1-wait', 'r1-vote', 'r1-reveal', 'r1-scores', 'r2-intro', 'r2-write', 'r2-wait', 'r2-pick', 'r2-reveal', 'r2-scores', 'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal', 'podium', 'end', 'reconnect', 'settings'];
+export const ALL_SCREENS = ['title', 'create', 'join', 'lobby', 'menu', 'menu-first', 'menu-adult', 'results', 'intro', 'r1-intro', 'r1-write', 'r1-wait', 'r1-vote', 'r1-reveal', 'r1-scores', 'r2-intro', 'r2-write', 'r2-wait', 'r2-pick', 'r2-reveal', 'r2-scores', 'r3-intro', 'r3-write', 'r3-swipe', 'r3-reveal', 'podium', 'end', 'reconnect', 'settings'];
 
 function args() {
   const a = process.argv.slice(2);

@@ -3,7 +3,8 @@
 
 import { Emitter } from '../util/emitter.js';
 
-const freshMine = (seq) => ({ seq, submitted: {}, r3: [], vote: null, pick: null, swipes: {}, rejected: 0 });
+// `game` is free scratch space for a game's optimistic per-phase state (cleared every phase).
+const freshMine = (seq) => ({ seq, submitted: {}, r3: [], vote: null, pick: null, swipes: {}, rejected: 0, game: {} });
 
 export class GameClient extends Emitter {
   /**
@@ -22,7 +23,7 @@ export class GameClient extends Emitter {
       token: null,
       hostId: null,
       players: [],
-      settings: { adult: false, speakerId: null },
+      settings: { rating: 'family', adult: false, speakerId: null },
       phase: null,
       progress: { seq: 0, done: {}, counts: {} },
       offset: 0,
@@ -227,6 +228,21 @@ export class GameClient extends Emitter {
   start() { this.transport?.send({ type: 'start' }); }
   skip() { this.transport?.send({ type: 'skip' }); }
   again() { this.transport?.send({ type: 'again' }); }
+  /** Box menu: host picks / browses a game; anyone can say which one they fancy (null clears). */
+  chooseGame(gameId) { this.transport?.send({ type: 'choose', gameId }); }
+  focusGame(gameId) { this.transport?.send({ type: 'focus', gameId }); }
+  fancyGame(gameId) { this.transport?.send({ type: 'fancy', gameId }); }
+  toMenu() { this.transport?.send({ type: 'menu' }); }
+
+  /**
+   * Generic game action for game modules: sends {type, ...data, seq} to the host's game.
+   * Pass `mine` to merge optimistic local state into state.mine.game (cleared each phase).
+   */
+  act(type, data = {}, mine = null) {
+    if (mine) Object.assign(this.state.mine.game, mine);
+    this._send({ type, ...data });
+    if (mine) this._changed();
+  }
   newTable() { this.transport?.send({ type: 'newTable' }); }
   kick(playerId) { this.transport?.send({ type: 'kick', playerId }); }
   react(kind) { this.transport?.send({ type: 'react', kind }); }

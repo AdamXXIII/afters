@@ -33,4 +33,6 @@ export const params = {
   nosw: bool('nosw'),
   e2e: bool('e2e'),
   debug: bool('debug'),
+  adult: bool('adult'),                   // demo: start the table on the Adults 18+ rating
+  game: q.get('game') || null,             // autopilot host picks this game from the menu (default classic)
 };

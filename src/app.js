@@ -17,6 +17,7 @@ import { AVATARS, MIN_PLAYERS } from './game/constants.js';
 import { params } from './util/params.js';
 import { store } from './util/storage.js';
 import { SCREENS, OVERLAYS } from './screens/index.js';
+import { GAMES, gameById } from './games/index.js';
 
 const REDUCED = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -53,6 +54,13 @@ export class App {
       stripEl: document.getElementById('strip'),
     });
     for (const def of SCREENS) this.router.register(def);
+    // every game brings its own screens (lazy chunks); register them all before the first render
+    await Promise.all(GAMES.filter((g) => g.screens).map(async (g) => {
+      try {
+        const mod = await g.screens();
+        for (const def of mod.default || []) this.router.register({ ...def, game: g.id });
+      } catch (e) { console.error(`[games] ${g.id} screens failed to load`, e); }
+    }));
     this.bubbles = new Bubbles({ host: document.getElementById('bubbles'), stage: this.stage });
     mountRail(document.getElementById('rail'), (kind) => this.client?.react(kind));
     this._topbar();
@@ -182,7 +190,7 @@ export class App {
       client.on('change', () => this.render()),
       client.on('phase', (p) => this._onPhase(p)),
       client.on('react', (m) => this._onReact(m)),
-      client.on('reject', (m) => { if (m.reason === 'too-honest') this.say(line('r2TooHonest'), { compact: true }); }),
+      client.on('reject', (m) => { if (m.reason === 'too-honest') this.say(this.ctx().line('r2TooHonest'), { compact: true }); }),
       client.on('status', (s) => { if (s === 'joined') this._wakeLock(); }),
     ];
     if (params.autopilot) this.setAutopilot(true);
@@ -200,7 +208,7 @@ export class App {
   setAutopilot(on) {
     this.brain?.detach();
     this.brain = null;
-    if (on && this.client) this.brain = attachBrain(this.client, { mode: 'realtime', speed: params.speed, seed: (params.seed || 3) + 99 });
+    if (on && this.client) this.brain = attachBrain(this.client, { mode: 'realtime', speed: params.speed, seed: (params.seed || 3) + 99, chooser: true, game: params.game || 'classic' });
     if (on && this.client?.isHost) this._autoStart = true;
   }
 
@@ -259,18 +267,12 @@ export class App {
     const ph = c.state.phase;
     const me = c.state.me;
     const mine = c.state.mine;
-    switch (ph.id) {
-      case 'lobby': return 'lobby';
-      case 'r1-write': {
-        const mineSlots = ph.private?.prompts?.length ?? 2;
-        const n = Object.keys(mine.submitted).length;
-        return n >= mineSlots || c.state.progress.done[me] ? 'r1-wait' : 'r1-write';
-      }
-      case 'r2-write':
-        return mine.submitted.only !== undefined || c.state.progress.done[me] ? 'r2-wait' : 'r2-write';
-      default:
-        return ph.id;
-    }
+    void me; void mine;
+    if (ph.id === 'lobby' || ph.id === 'menu' || ph.id === 'results') return ph.id;
+    const def = gameById(ph.game);
+    let id = null;
+    try { id = def?.resolveScreen?.(c.state) || null; } catch (e) { console.error('[games] resolveScreen', e); }
+    return id || ph.id;
   }
 
   render() {
@@ -292,6 +294,8 @@ export class App {
     // avatars on the table follow the roster
     this.stage.setPlayers(this.client?.state.players || []);
     const inGame = !!this.client?.state.phase && this.client.state.phase.id !== 'lobby';
+    document.body.dataset.game = this.client?.state.phase?.game || '';
+    document.body.dataset.rating = this.client?.state.settings?.rating || 'family';
     const s = this.client?.state;
     audio.setSpeaker(!!s && s.me && s.settings?.speakerId === s.me);
     audio.wantMusic(inGame);
@@ -310,6 +314,8 @@ export class App {
     const phase = s?.phase || null;
     const players = s?.players || [];
     const meId = s?.me || null;
+    const game = gameById(phase?.game) || null;
+    const rating = s?.settings?.rating || (s?.settings?.adult ? 'adult' : 'family');
     const frozenT = this.frozen ? (this.frozenT ?? this._demoT?.[screenId] ?? (phase?.duration ? phase.duration * 0.3 : 0)) : null;
     return {
       app,
@@ -329,6 +335,10 @@ export class App {
       isSpeaker: !!s && s.settings?.speakerId === meId,
       room: s?.room || this.room?.code || null,
       settings: s?.settings || {},
+      game,
+      games: GAMES,
+      rating,
+      adult: rating === 'adult',
       duration: phase?.duration || 0,
       now: () => (c ? c.now() : Date.now()),
       elapsed: () => (frozenT !== null ? frozenT : phase ? Math.max(0, (c.now() - phase.startsAt)) : 0),
@@ -339,7 +349,8 @@ export class App {
       stage: this.stage,
       cyril: this.stage.cyril,
       say: (lines, o) => this.say(lines, o),
-      line,
+      // Cyril's line bank, rating-aware; the game's own banks (def.lines) win. seed: same variant on every phone.
+      line: (key, vars, o = {}) => line(key, vars, { rating, extra: game?.lines, seed: o.seed ?? phase?.seed, ...o }),
       audio,
       haptic,
       toast,
@@ -352,6 +363,10 @@ export class App {
         openSettings: () => this.openOverlay('settings'),
         closeOverlay: () => this.closeOverlay(),
         addBot: () => this.addBot(),
+        chooseGame: (id) => c?.chooseGame(id),
+        focusGame: (id) => c?.focusGame(id),
+        fancyGame: (id) => c?.fancyGame(id),
+        toMenu: () => c?.toMenu(),
       },
     };
   }
@@ -389,7 +404,7 @@ export class App {
       if (this._groans.length >= 5) {
         this._groans = [];
         this.stage.cyril.react('shock');
-        this.say(line('mindFlame'), { hold: 1200 });
+        this.say(this.ctx().line('mindFlame'), { hold: 1200 });
       }
     }
     if (m.from === this.client?.state.me) haptic('tap');
