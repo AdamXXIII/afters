@@ -56,9 +56,9 @@ export default {
 
     const countdown = h('div.in-count');
     const menu = beat(h('div.in-menu', { role: 'group', 'aria-label': 'Tonight\'s menu' },
-      h('div.in-head', h('div.in-title', 'Tonight\'s menu'), countdown),
+      h('div.in-head', countdown, h('div.in-title', 'Tonight\'s menu')),
       h('ol.in-courses', courses),
-      beat(h('div.in-table', faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1200, e),
+      beat(h(`div.in-table${ctx.players.length > 6 ? '.many' : ''}`, faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1200, e),
     ), 250, e);
 
     const plate = beat(h('div.in-plate', h('span.in-plate-k', 'Your host'), h('span.in-plate-v', 'Cyril Waxley')), 500, e);

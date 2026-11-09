@@ -1,9 +1,9 @@
 // menu: Cyril's dessert trolley. After the lobby (and after every game) the host wheels in the
 // trolley and picks tonight's next game. Every phone sees the same trolley: the host's finger
 // (focus) glows on every phone, guests tap the dish they fancy and their avatar pops onto it.
-// Layout: Cyril + title over the 3D table, then a deep claret "trolley bay" holding tonight's
-// table, the dishes (each live game in its own saturated colour; coming-soon ones sit back
-// under a dome) and the cream detail card with the one big action.
+// Layout: Cyril + title over the 3D table, then a candlelit linen "bay" holding tonight's table,
+// a compact row of coming-soon tiles and ONE hero card: the selected dish (big), its name,
+// blurb and the one big action, in the game's own colour.
 import './menu.css';
 import { h, button, onTap } from '../ui/components.js';
 import { avatarIcon } from '../ui/icons.js';
@@ -89,34 +89,40 @@ export default {
       ratingSeg);
     root.append(head);
 
-    // ---------- the trolley bay ----------
+    // ---------- the bay: tonight's table, coming soon, then ONE hero card ----------
+    // The hero is the selected dish: big plate, name, blurb and the one action in a single card.
+    // With one live game its dish button IS the hero plate; with more, the live dishes become a
+    // row of picks above the hero. Coming-soon games are a compact row of small tiles.
     const nightBox = h('div.mn-night');
     const dishes = new Map();
-    const live = games.filter((g) => !g.comingSoon).length;
-    const shelves = [h('div.mn-shelf.top'), h('div.mn-shelf.bottom')];
-    // shelves: with 1-2 live games they get the top shelf to themselves and the coming-soon
-    // dishes sit smaller underneath; otherwise split evenly (playables first)
-    const soonCount = games.length - live;
-    const split = live > 0 && live <= 2 && soonCount > 0 ? live : Math.ceil(games.length / 2);
+    const liveGames = games.filter((g) => !g.comingSoon);
+    const soonGames = games.filter((g) => g.comingSoon);
+    const live = liveGames.length;
+    const heroArt = h('div.mn-hero-art');
+    const picks = live > 1 ? h('div.mn-shelf.top.mn-picks', { role: 'group', 'aria-label': 'Tonight’s dishes' }) : null;
+    const soonList = soonGames.length ? h('div.mn-shelf.bottom.mn-soon-list') : null;
     games.forEach((g, i) => {
       const fans = h('div.mn-fans');
       const gc = g.colour || '#C89B3C';
-      const btn = h(`button.mn-dish${g.comingSoon ? '.soon' : '.live'}`, {
+      const hero = !g.comingSoon && live === 1;
+      const btn = h(`button.mn-dish${g.comingSoon ? '.soon' : '.live'}${hero ? '.hero' : ''}`, {
         type: 'button', 'data-e2e': `dish-${g.id}`, 'aria-label': `${g.title}${g.comingSoon ? ', coming soon' : ''}`,
         style: { '--gc': gc, '--gt': textOn(gc), '--i': i },
       },
       h('div.mn-plate', { html: dishSvg(g.dish) + (g.comingSoon ? DOME_SVG : '') }),
-      h('div.mn-tag', h('span.mn-tag-t', g.title), h('span.mn-tag-c', g.comingSoon ? 'Coming soon' : (g.hint || g.tagline))),
+      h('div.mn-tag', h('span.mn-tag-t', g.title), g.comingSoon ? null : h('span.mn-tag-c', g.hint || g.tagline)),
       fans);
-      onTap(btn, () => tapDish(g));
+      onTap(btn, () => tapDish(g, btn));
       dishes.set(g.id, { g, btn, fans });
-      shelves[i < split ? 0 : 1].append(btn);
+      if (g.comingSoon) soonList.append(btn);
+      else if (hero) heroArt.append(btn);
+      else picks.append(btn);
     });
-    const trolley = h(`div.mn-trolley.live-${Math.min(live, 4)}${split === live && soonCount > 0 ? '.tiered' : ''}`,
-      shelves[0], h('div.mn-rail'), shelves[1], h('div.mn-rail.low'),
-      h('div.mn-wheels', h('span.mn-wheel'), h('span.mn-wheel')));
+    const soonRow = soonList ? h('div.mn-soon', h('div.mn-soon-k', h('span', 'Coming soon'), h('span.mn-soon-n', 'still in the oven')), soonList) : null;
+    const trolley = h(`div.mn-trolley.live-${Math.min(live, 4)}`, picks, soonRow);
 
-    const detail = h('section.mn-detail', { 'aria-live': 'polite' });
+    const card = h('div.mn-d-card');
+    const detail = h('section.mn-detail', { 'aria-live': 'polite' }, card);
     const bay = h('div.mn-bay', nightBox, trolley, detail);
     root.append(bay);
 
@@ -124,25 +130,27 @@ export default {
     const myFancy = () => c.progress.fancy?.[c.meId] || null;
     const shown = () => {
       const id = c.isHost ? focusId() : (lastTapped || myFancy() || focusId());
-      return dishes.get(id)?.g || null;
+      const g = dishes.get(id)?.g;
+      return g && !g.comingSoon ? g : (liveGames[0] || null);
     };
 
-    function tapDish(g) {
+    function tapDish(g, btn) {
       c.haptic('tap');
       if (g.comingSoon) {
+        // not on tonight's menu yet: Cyril apologises, the tile wobbles, the hero stays put
         c.say(c.line('menuSoon'), { hold: 1600, compact: true });
         c.cyril.react('sad');
+        btn.classList.remove('nope'); void btn.offsetWidth; btn.classList.add('nope');
+        return;
       }
       if (c.isHost) {
         local = g.id;
         c.client.focusGame(g.id);
-        if (!g.comingSoon) c.cyril.react('delight');
+        c.cyril.react('delight');
       } else {
-        lastTapped = g.id; // the detail card follows this phone's finger, not the host's
-        if (!g.comingSoon) {
-          c.client.fancyGame(myFancy() === g.id ? null : g.id);
-          c.cyril.react('smug');
-        }
+        lastTapped = g.id; // the hero follows this phone's finger, not the host's
+        c.client.fancyGame(myFancy() === g.id ? null : g.id);
+        c.cyril.react('smug');
       }
       paint();
     }
@@ -155,6 +163,7 @@ export default {
     }
 
     let lastDetail = '';
+    let lastArt = '';
     function paintDetail() {
       const g = shown();
       const players = c.players.filter((p) => p.connected !== false);
@@ -164,11 +173,10 @@ export default {
       const key = `${g?.id}|${c.isHost}|${n}|${myFancy()}|${c.rating}|${fid}|${JSON.stringify(fancy)}`;
       if (key === lastDetail) return;
       lastDetail = key;
-      detail.replaceChildren();
       if (!g) {
-        detail.append(h('div.mn-hint', c.isHost
-          ? h('span', h('b', 'Pick a dish'), ' off the trolley. Everyone sees where you point.')
-          : h('span', h('b', `${c.player(c.state?.hostId)?.name || 'The host'} is choosing.`), ' Tap the dish you fancy to sway them.')));
+        card.replaceChildren(h('div.mn-hint', c.isHost
+          ? h('span', h('b', 'The trolley’s empty.'), ' New dishes are still in the oven.')
+          : h('span', h('b', `${c.player(c.state?.hostId)?.name || 'The host'} is choosing.`), ' Hang tight.')));
         return;
       }
       const [lo, hi] = gameRange(g);
@@ -177,51 +185,49 @@ export default {
       detail.style.setProperty('--gc', gc);
       detail.style.setProperty('--gt', textOn(gc));
       detail.classList.toggle('soon', !!g.comingSoon);
+      if (live > 1 && lastArt !== g.id) {
+        lastArt = g.id;
+        heroArt.replaceChildren(h('div.mn-hero-plate', { html: dishSvg(g.dish) }));
+      }
 
-      // the slim line above the card: who's pointing / what's fancied
-      let note = null;
+      // the slim line at the top of the card: who's pointing / what's fancied
+      let note;
+      const fanCount = Object.values(fancy).filter((x) => x === g.id).length;
       if (c.isHost) {
         const tally = {};
         Object.values(fancy).forEach((gid) => { if (gid) tally[gid] = (tally[gid] || 0) + 1; });
         const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
         const guests = Math.max(1, players.filter((p) => p.id !== c.meId).length);
         note = top && dishes.get(top[0])
-          ? h('div.mn-note', h('span.mn-note-k', 'Most fancied'), h('b', dishes.get(top[0]).g.title), h('span.mn-note-n', `${top[1]} of ${guests}`))
-          : h('div.mn-note', h('span.mn-note-k', 'Most fancied'), h('span', 'nobody’s said yet'));
+          ? h('div.mn-note', h('span.mn-note-k', 'Most fancied'), live > 1 || top[0] !== g.id ? h('b', dishes.get(top[0]).g.title) : null, h('span.mn-note-n', `${top[1]} of ${guests} guests`))
+          : h('div.mn-note', h('span.mn-note-k', 'Most fancied'), h('span.mn-note-v', 'nobody’s said yet'));
       } else {
         const fg = dishes.get(fid)?.g;
         const hostName = c.player(c.state?.hostId)?.name || 'Host';
         note = fg
-          ? h('div.mn-note', h('span.mn-note-k', `${hostName} is pointing at`), h('b', fg.title), fg.id === g.id ? h('span.mn-note-n', 'this one') : null)
+          ? h('div.mn-note', h('span.mn-note-k', `${hostName} is pointing at`), fg.id === g.id ? h('span.mn-note-n', 'this one') : h('b', fg.title))
           : h('div.mn-note', h('span.mn-note-k', `${hostName} is choosing`));
       }
 
-      const fanCount = Object.values(fancy).filter((x) => x === g.id).length;
-      detail.append(
-        note,
-        h('div.mn-d-card',
-          h('div.mn-d-top',
-            h('div.mn-d-plate', { html: dishSvg(g.dish) }),
-            h('div.mn-d-txt',
-              h('div.mn-d-course', g.comingSoon ? 'Still in the oven' : (g.course || '')),
-              h('h2.mn-d-title', g.title),
-              h('div.mn-d-meta', h('span', `${lo}–${hi} players`), h('span', `${g.minutes || 10} min`),
-                fanCount ? h('span.fan', `${fanCount} fancy it`) : null))),
-          h('p.mn-d-blurb', g.blurb || g.tagline || '')));
       let action;
       if (c.isHost) {
-        action = g.comingSoon
-          ? button('Still in the oven', { kind: 'secondary', disabled: true })
-          : !okCount
-            ? button(n < lo ? `Needs ${lo} players` : `Max ${hi} players`, { kind: 'secondary', disabled: true })
-            : button(`Serve ${g.title}`, { e2e: 'serve-game', onClick: () => serve(g) });
+        action = !okCount
+          ? button(n < lo ? `Needs ${lo} players` : `Max ${hi} players`, { kind: 'secondary', disabled: true })
+          : button(`Serve ${g.title}`, { e2e: 'serve-game', onClick: () => serve(g) });
       } else {
         const fancied = myFancy() === g.id;
-        action = g.comingSoon
-          ? button('Coming soon', { kind: 'secondary', disabled: true })
-          : button(fancied ? `You fancy ${g.title} ✓` : `I fancy ${g.title}`, { kind: fancied ? 'secondary' : 'primary', e2e: 'fancy', onClick: () => fancyBtn(g) });
+        action = button(fancied ? `You fancy ${g.title} ✓` : `I fancy ${g.title}`, { kind: fancied ? 'secondary' : 'primary', e2e: 'fancy', onClick: () => fancyBtn(g) });
       }
-      detail.querySelector('.mn-d-card').append(h('div.mn-d-act', action));
+      card.replaceChildren(
+        note,
+        heroArt,
+        h('div.mn-d-txt',
+          h('div.mn-d-course', g.course || ''),
+          h('h2.mn-d-title', g.title),
+          h('p.mn-d-blurb', g.blurb || g.tagline || ''),
+          h('div.mn-d-meta', h('span', `${lo}–${hi} players`), h('span', `${g.minutes || 10} min`),
+            !c.isHost && fanCount ? h('span.fan', `${fanCount} fancy it`) : null)),
+        h('div.mn-d-act', action));
     }
 
     let served = false;
@@ -253,7 +259,6 @@ export default {
           d.btn.classList.toggle('fancied', who.length > 0);
         }
       }
-      trolley.classList.toggle('has-focus', !!fid);
       fam.setAttribute('aria-checked', String(c.rating !== 'adult'));
       adu.setAttribute('aria-checked', String(c.rating === 'adult'));
       ratingSeg.classList.toggle('locked', !c.isHost);
@@ -267,8 +272,9 @@ export default {
       paintDetail();
     }
 
-    // host: nothing focused yet -> point at the first playable dish so Serve is ready at second 0
-    if (c.isHost && !c.progress.focus) {
+    // host: nothing (or a coming-soon dish) focused -> point at the first playable dish so Serve
+    // is ready at second 0
+    if (c.isHost && (!c.progress.focus || dishes.get(c.progress.focus)?.g.comingSoon)) {
       const first = games.find((g) => !g.comingSoon);
       if (first) { local = first.id; c.client.focusGame(first.id); }
     }

@@ -6,7 +6,7 @@ import { h, timerRing } from '../../../ui/components.js';
 import { SHOTS } from '../../../stage/Stage.js';
 import { avatarDisc, willowPlate, tiltFor } from './r1-kit.js';
 
-SHOTS['r1-wait'] ||= { expr: 'sly', pos: [0, 0.34, 0.98], target: [0, 0.16, 0], subject: 'cyril', maxS: 0.4 };
+SHOTS['r1-wait'] ||= { expr: 'sly', pos: [0, 0.34, 0.98], target: [0, 0.16, 0], subject: 'cyril', maxS: 0.3 };
 
 const SPIN_QUIPS = [
   [1, 'Lovely wrist.'],
@@ -23,9 +23,14 @@ export default {
   mount({ show }, ctx) {
     const prompts = ctx.priv.prompts || [];
     const seed = ctx.phase?.seed || 1;
-    const served = prompts.map((p, i) => h('div.r1-served', { style: { '--tilt': `${(i ? 1.6 : -1.8) + tiltFor(seed, p.matchupId, 0.6)}deg` } },
-      h('div.r1-served-q', p.prompt),
-      h('div.r1-served-a', ctx.mine.submitted[p.matchupId] || '…')));
+    // the answers are the payoff: big handwriting, one card per row, sized down only for long ones
+    const served = prompts.map((p, i) => {
+      const a = ctx.mine.submitted[p.matchupId] || '…';
+      const fit = a.length > 44 ? '.xl' : a.length > 26 ? '.l' : '';
+      return h('div.r1-served', { style: { '--tilt': `${(i ? 0.9 : -1.1) + tiltFor(seed, p.matchupId, 0.4)}deg` } },
+        h('div.r1-served-q', p.prompt),
+        h(`div.r1-served-a${fit}`, a));
+    });
 
     // spin-the-plate fidget
     const plate = h('button.r1-spin', { type: 'button', 'aria-label': 'Spin the plate', html: willowPlate() });
@@ -83,7 +88,7 @@ export default {
       h('div.r1-wt-pass.r1-in',
         h('div.r1-wt-head',
           h('div.r1-wt-spin', plate, count),
-          h('div.r1-wt-titles', h('div.r1-wait-title', 'Plated.'), h('div.r1-wait-sub', 'Both answers are on the pass. Keep a straight face.'))),
+          h('div.r1-wt-titles', h('div.r1-wait-title', 'Plated.'), h('div.r1-wait-sub', 'Both answers are on the pass.'))),
         h('div.r1-served-row', served))));
     render(ctx);
     timer.set(ctx.remaining(), ctx.duration);

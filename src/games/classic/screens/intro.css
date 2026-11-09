@@ -115,3 +115,39 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
   box-shadow: 0 2px 0 #7A5A1C, 0 6px 12px rgba(20,10,8,.35), inset 0 1px 0 rgba(255,255,255,.5); transform: rotate(2deg); font-size: 14px;
 }
 .in-face { background: radial-gradient(circle at 50% 70%, #FFF4E2, #FFFBF4 75%); }
+
+/* ===== intro portrait v3: one clean board, one type scale =====
+   Countdown is an eyebrow inside the card (nothing spills), the courses are one even row of tiles
+   (round-colour band with the numeral, name 20, line 14), and the guests sit on their own row with
+   the names centred underneath, so faces never crowd the handwriting. Portrait only. */
+@media (orientation: portrait), (min-height: 601px) {
+  .in-wrap { padding: 0 16px; }
+  .in-menu { max-width: 358px; padding: 12px 12px 12px; transform: none; }
+  @keyframes inMenuP { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: none; } }
+  .in-menu { animation-name: inMenuP; }
+  .in-head { flex-direction: column; justify-content: center; gap: 2px; padding: 2px 0 10px; }
+  .in-title { font-size: 32px; line-height: 34px; text-align: center; }
+  .in-count {
+    padding: 0; background: none; box-shadow: none; transform: none; border-radius: 0;
+    color: var(--c-candle); font: 800 13px/16px var(--f-ui); letter-spacing: .14em; text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(42,10,16,.5);
+  }
+  .in-courses { gap: 8px; }
+  .in-course {
+    padding: 0 4px 10px; gap: 2px; overflow: hidden; border-radius: 14px;
+    box-shadow: 0 3px 0 rgba(42,10,16,.45);
+  }
+  .in-num {
+    width: auto; height: auto; margin: 0 -4px 6px; align-self: stretch; border-radius: 0; box-shadow: none;
+    padding: 4px 0 3px; font: 900 15px/18px var(--f-display); letter-spacing: .08em;
+  }
+  .in-cname { font-size: 20px; line-height: 22px; }
+  .in-cwhat { font: 700 14px/17px var(--f-ui); letter-spacing: 0; color: #6A3F22; }
+  .in-table { flex-direction: column; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,200,107,.3); }
+  .in-faces { gap: 6px; }
+  .in-face, .in-faces.many .in-face { margin: 0; width: 30px; height: 30px; box-shadow: 0 0 0 2px var(--c-brass), 0 3px 6px rgba(20,8,6,.35); }
+  .in-faces.many { gap: 4px; }
+  .in-faces.many .in-face { width: 28px; height: 28px; }
+  .in-table-v, .in-table-v.long { font-size: 24px; line-height: 26px; text-align: center; padding: 0 8px; }
+  .in-table.many .in-table-v { font-size: 22px; line-height: 24px; }
+}
