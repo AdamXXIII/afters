@@ -142,10 +142,10 @@ export class Cyril {
         .replace('#include <common>', '#include <common>\nvarying float vWaxY;')
         .replace('#include <emissivemap_fragment>', [
           '#include <emissivemap_fragment>',
-          'totalEmissiveRadiance *= mix(0.45, 1.3, smoothstep(0.02, 0.245, vWaxY));',
+          'totalEmissiveRadiance *= mix(0.4, 1.05, smoothstep(0.02, 0.245, vWaxY));',
           // wax translucency: light bleeds through the silhouette edges, warmest near the flame
           'float waxFres = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.2);',
-          'totalEmissiveRadiance += vec3(1.0, 0.58, 0.26) * waxFres * mix(0.12, 0.55, smoothstep(0.05, 0.24, vWaxY));',
+          'totalEmissiveRadiance += vec3(1.0, 0.55, 0.22) * waxFres * mix(0.18, 0.75, smoothstep(0.05, 0.24, vWaxY));',
         ].join('\n'));
     };
     this.waxMat = wax;
@@ -173,8 +173,8 @@ export class Cyril {
     dish.translate(0, 0.235, 0);
     const parts = [body, dish];
     // lumpy melted rim
-    for (let i = 0; i < 11; i++) {
-      const a = (i / 11) * Math.PI * 2 + Math.sin(i * 2.1) * 0.2;
+    for (let i = 0; i < 7; i++) {
+      const a = (i / 7) * Math.PI * 2 + Math.sin(i * 2.1) * 0.2;
       const r = 0.006 + 0.004 * Math.abs(Math.sin(i * 1.7));
       const b = new THREE.SphereGeometry(r, 10, 8);
       b.scale(1.6, 0.7, 1.1);
@@ -263,15 +263,16 @@ export class Cyril {
     this.halo.position.y = 0.05;
     this.flamePivot.add(this.halo);
 
-    this.light = new THREE.PointLight('#FFB866', 1.6, 2.2, 2);
+    this.light = new THREE.PointLight('#FFB866', 2.3, 2.6, 2);
     this.light.position.y = 0.05;
     this.flamePivot.add(this.light);
 
     // Face
     this.face = new THREE.Group();
     this.rig.add(this.face);
-    const white = new THREE.MeshBasicMaterial({ color: '#FFFDF7' });
-    const pupilMat = new THREE.MeshBasicMaterial({ color: '#2A1A17' });
+    const white = new THREE.MeshStandardMaterial({ color: '#FFFDF7', roughness: 0.18, emissive: new THREE.Color('#FFF4E0'), emissiveIntensity: 0.35 });
+    const glintMat = new THREE.MeshBasicMaterial({ color: '#FFFFFF' });
+    const pupilMat = new THREE.MeshStandardMaterial({ color: '#2A1A17', roughness: 0.15 });
     const eyeGeo = new THREE.SphereGeometry(0.0178, 20, 14);
     const pupilGeo = new THREE.SphereGeometry(0.0098, 16, 10);
     const glintGeo = new THREE.SphereGeometry(0.0028, 8, 6);
@@ -287,7 +288,7 @@ export class Cyril {
       const p = new THREE.Mesh(pupilGeo, pupilMat);
       p.position.z = 0.0114;
       p.scale.z = 0.5;
-      const glint = new THREE.Mesh(glintGeo, white);
+      const glint = new THREE.Mesh(glintGeo, glintMat);
       glint.position.set(-0.0033, 0.0035, 0.0102);
       p.add(glint);
       const lid = new THREE.Mesh(lidGeo, lidMat);
@@ -319,7 +320,7 @@ export class Cyril {
     });
     this.blushMat = blushMat;
     this.mouthGeo = mouthShapes();
-    this.mouthMat = new THREE.MeshBasicMaterial({ color: CLARET, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 });
+    this.mouthMat = new THREE.MeshStandardMaterial({ color: '#6A1626', roughness: 0.35, emissive: new THREE.Color('#3A0A12'), emissiveIntensity: 0.4, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 });
     this.mouth = new THREE.Mesh(this.mouthGeo.D, this.mouthMat);
     this.mouth.position.set(0, 0.125, 0.0832);
     this.mouth.rotation.x = -0.05;
@@ -512,7 +513,7 @@ export class Cyril {
     this.flameUniforms.uBright.value = 0.95 * bright * this.flicker;
     this.tip.lerp(TIP[tipName] || TIP.calm, 1 - Math.exp(-dt * (tipName === 'shock' ? 40 : 8)));
     this.flameUniforms.uTip.value.copy(this.tip);
-    this.light.intensity = 1.6 * bright * this.flicker * this.flamePivot.scale.x;
+    this.light.intensity = 2.3 * bright * this.flicker * this.flamePivot.scale.x;
     this.halo.material.opacity = 0.26 * bright * this.flicker;
     this.glow.material.opacity = 0.16 * bright * this.flicker;
     this.coreUniforms.uBright.value = 0.75 * bright * this.flicker;

@@ -234,7 +234,7 @@ export class Bubbles {
   _score(c, rects, cy) {
     const r = { x: c.x, y: c.y, w: c.bw, h: c.bh };
     let s = (c.pen + c.si * 25) * 60; // penalties in px² terms; prefer the larger, more readable size
-    for (const o of rects) s += overlap(r, o) * o.weight;
+    for (const o of rects) s += overlap(r, o) * o.weight * 3; // covering what players read is the worst outcome
     if (cy.subject) s += overlap(r, cy.subject) * 3;
     if (document.body.dataset.layout === 'input') s += c.kind === 'free' ? -4000 : 16000; // the strip is full: prefer free sheet space
     const fc = cy.face; const gw = Math.max(0, 70 - fc.w) / 2; const gh = Math.max(0, 70 - fc.h) / 2;
@@ -263,20 +263,17 @@ export class Bubbles {
 
   _evaluate(cy) {
     const rects = this._obstacles();
+    const list = [...this._candidates(cy), ...this._freeCandidates(cy)];
     let best = null; let bestS = Infinity;
-    for (const c of [...this._candidates(cy), ...this._freeCandidates(cy)]) {
+    for (const c of list) {
       const sc = this._score(c, rects, cy);
       if (sc < bestS) { bestS = sc; best = c; }
     }
     if (!best) return;
-    let cur = this.place;
-    if (cur) {
-      // re-score the current spot at its new position (Cyril may have moved)
-      const moved = cur.kind === 'free' ? cur : this._candidates(cy).find((c) => c.id === cur.id);
-      const curS = moved ? this._score(moved, rects, cy) : Infinity;
-      if (bestS < curS * 0.8 - 3000 || !moved) cur = best; else cur = moved;
-    } else cur = best;
-    this.place = cur;
+    // hysteresis: keep the current spot (re-scored where it is now) unless clearly beaten
+    const cur = this.place && list.find((c) => c.id === this.place.id);
+    if (cur && bestS >= this._score(cur, rects, cy) * 0.85 - 2000) this.place = cur;
+    else this.place = best;
   }
 
   _position() {

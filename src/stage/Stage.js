@@ -16,8 +16,8 @@ export const SHOTS = {
   create: { expr: 'welcome', pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   join: { expr: 'welcome', pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   lobby: { expr: 'welcome', pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { expr: 'proud', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
-  write: { expr: 'attentive', pos: [0, 0.24, 0.55], target: [0, 0.2, 0], subject: 'head' },
+  intro: { expr: 'welcome', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3, maxS: 0.5 },
+  write: { expr: 'attentive', pos: [0, 0.27, 1.05], target: [0, 0.21, 0], subject: 'head' },
   vote: { expr: 'sly', pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
   reveal: { expr: 'eager', pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
   scores: { expr: 'sly', pos: [0, 0.4, 1.0], target: [0, 0.16, 0], subject: 'cyril' },
@@ -83,13 +83,13 @@ export class Stage {
     this.shakeAmp = 0;
 
     // Lights (DESIGN 3.6): key = Cyril's candle; fill hemisphere; cool rim
-    this.hemi = new THREE.HemisphereLight('#FFD9A8', '#3B1F18', 0.3);
+    this.hemi = new THREE.HemisphereLight('#FFD9A8', '#3B1F18', 0.2);
     this.scene.add(this.hemi);
     this.rim = new THREE.DirectionalLight('#9FB6D9', 0.25);
     this.rim.position.set(1.5, 2, -2.5);
     this.scene.add(this.rim);
     // a soft warm room glow so the table edge doesn't fall to black on small screens
-    this.warm = new THREE.PointLight('#FFB070', 1.9, 5, 2);
+    this.warm = new THREE.PointLight('#FFB070', 1.3, 5, 2);
     this.warm.position.set(-0.5, 0.9, 1.3);
     this.scene.add(this.warm);
 
@@ -259,8 +259,10 @@ export class Stage {
       const top = this._safeTop();
       const sh = bottom - top;
       if (r && r.width > 4) {
-        const S = Math.min(r.height + 6, sh * 0.86, 112);
-        return { mode: 'subject', subject: 'head', S, Yc: r.top + r.height / 2 + 5, Xc: r.left + r.width / 2 };
+        // only the part of the slot above the sheet is visible: fit mouth-to-flame inside it
+        const y0 = Math.max(r.top, top + 2); const y1 = Math.min(r.bottom, bottom - 6);
+        const S = Math.max(60, y1 - y0);
+        return { mode: 'subject', subject: 'head', S, Yc: (y0 + y1) / 2, Xc: r.left + r.width / 2 };
       }
       return { mode: 'subject', subject: 'head', S: sh * 0.85, Yc: top + sh / 2, Xc: 58 };
     }
@@ -304,8 +306,8 @@ export class Stage {
     const c = this.cyril.group;
     const add = (obj, x, y, z) => pts.push(obj.localToWorld(this._tmpV.set(x, y, z)).clone());
     if (subject === 'head') {
-      for (const x of [-0.075, 0.075]) add(c, x, 0.09, 0.08);
-      add(c, 0, 0.4, 0);
+      for (const x of [-0.07, 0.07]) add(c, x, 0.105, 0.08);
+      add(c, 0, 0.36, 0);
     } else if (subject === 'podium') {
       const k = this.cake;
       for (const x of [-0.22, 0.24]) for (const z of [-0.2, 0.2]) add(k, x, 0, z);
@@ -332,7 +334,7 @@ export class Stage {
     const tanH = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const f0 = this.h / (2 * tanH);
     const fw = (this.w - 20) / Math.max(1e-4, ax1 - ax0); // never wider than the phone
-    const f = THREE.MathUtils.clamp(Math.min(goal.S / Math.max(1e-4, ay1 - ay0), fw), f0 * 0.3, f0 * 4);
+    const f = THREE.MathUtils.clamp(Math.min(goal.S / Math.max(1e-4, ay1 - ay0), fw), f0 * 0.12, f0 * 4);
     const fh = 2 * f * tanH;
     const ayc = (ay0 + ay1) / 2; const axc = (ax0 + ax1) / 2;
     const fy = goal.Yc - fh / 2 + ayc * f;
@@ -461,7 +463,7 @@ export class Stage {
     this.podiumIds = top3;
     this.cake.visible = !!top3;
     this.cakeRise = 0;
-    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.25, TABLE_Y + 0.02, -0.3) : this.cyrilHome);
+    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.36, TABLE_Y + 0.02, -0.44) : this.cyrilHome);
     if (!top3) {
       for (const s of this.seats.values()) { s.group.position.set(s.home.x, TABLE_Y, s.home.z); s.group.rotation.y = -seatAngle(s.seat) * 0.45; s.avatar.scale.setScalar(1.5); }
     }

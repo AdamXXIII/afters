@@ -41,8 +41,18 @@ export function contentRects(roots, { skip = '.bubble', maxFrac = 0.6 } = {}) {
     for (const el of els) {
       if (el.ownerSVGElement) continue; // the <svg> itself counts
       if (skip && el.closest(skip)) continue;
-      const r = el.getBoundingClientRect();
+      let r = el.getBoundingClientRect();
       if (r.width < 3 || r.height < 3) continue;
+      // text can overflow its box (long prompts): use the real glyph extent
+      if ([...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) {
+        const rg = document.createRange();
+        rg.selectNodeContents(el);
+        const t = rg.getBoundingClientRect();
+        if (t.width > 0) {
+          const L = Math.min(r.left, t.left); const T = Math.min(r.top, t.top);
+          r = { left: L, top: T, width: Math.max(r.right, t.right) - L, height: Math.max(r.bottom, t.bottom) - T, right: Math.max(r.right, t.right), bottom: Math.max(r.bottom, t.bottom) };
+        }
+      }
       if (r.bottom < 0 || r.top > H || r.right < 0 || r.left > W) continue;
       if (r.width * r.height > maxFrac * W * H) continue;
       const cs = getComputedStyle(el);
