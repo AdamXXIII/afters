@@ -1,0 +1,75 @@
+/* settings overlay: the back of the menu (DESIGN 3.4). Overrides the base .settings-sheet in overlays.css. */
+.settings-sheet.st-sheet {
+  gap: 14px; padding-top: 10px;
+  background-color: var(--c-linen); background-image: var(--paper);
+  animation: stSheetIn var(--d-medium) var(--ease-out-quint) both;
+  max-height: 92%;
+}
+.st-grab { width: 40px; height: 5px; border-radius: 3px; background: var(--c-crumb); margin: 0 auto 2px; flex: none; }
+.st-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.st-title {
+  margin: 2px 0 0; font-family: var(--f-display); font-weight: 700; font-size: calc(30px * var(--ts)); line-height: 1;
+  letter-spacing: -0.015em; color: var(--c-ink); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+}
+.settings-close { width: 48px; height: 48px; background: var(--c-tablecloth); color: var(--c-ink); box-shadow: inset 0 0 0 1px rgba(122,74,42,.12); }
+.settings-close svg { width: 20px; height: 20px; }
+
+.st-group { display: flex; flex-direction: column; gap: 6px; }
+.st-group > * { animation: enterUp var(--d-medium) var(--ease-out-quint) both; }
+.st-sheet > .st-group:nth-of-type(1) > * { animation-delay: 90ms; }
+.st-sheet > .st-group:nth-of-type(2) > * { animation-delay: 150ms; }
+.st-label {
+  padding-left: 4px; font-family: var(--f-display); font-style: italic; font-weight: 600; font-size: 16px; line-height: 20px; color: var(--c-toffee);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+.st-card {
+  background: #FFFBF4; border-radius: var(--r-2);
+  box-shadow: 0 1px 0 rgba(42,26,23,.06), 0 4px 12px rgba(59,31,24,.08), inset 0 0 0 1px rgba(122,74,42,.12);
+  padding: 0 14px;
+}
+.st-row {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 0;
+  font-weight: 600; cursor: pointer;
+}
+.st-row + .st-row { border-top: 1px solid rgba(122,74,42,.12); }
+.st-ico {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--c-tablecloth); color: var(--c-claret); box-shadow: inset 0 0 0 1px rgba(122,74,42,.10);
+}
+.st-ico svg { width: 20px; height: 20px; }
+.st-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.st-text b { font-weight: 700; font-size: calc(17px * var(--ts)); line-height: 1.2; color: var(--c-ink); }
+.st-text small { font-weight: 500; font-size: calc(13.5px * var(--ts)); line-height: 1.25; color: var(--c-toffee); }
+.st-row input { flex: none; }
+.st-row input:checked { background: var(--c-sage); }
+.st-row input:focus-visible { outline: 3px solid var(--c-mustard); outline-offset: 2px; }
+
+.st-size { cursor: default; flex-wrap: wrap; }
+.st-seg { display: flex; background: var(--c-tablecloth); border-radius: 14px; padding: 3px; gap: 2px; box-shadow: inset 0 1px 2px rgba(59,31,24,.10); }
+.st-seg button {
+  appearance: none; border: 0; background: transparent; width: 46px; height: 48px; border-radius: 11px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; color: var(--c-toffee);
+  transition: background var(--d-small), color var(--d-small), box-shadow var(--d-small);
+}
+.st-seg button small { font-size: 10px; line-height: 12px; font-weight: 700; letter-spacing: .02em; opacity: .8; }
+.st-aa { font-family: var(--f-display); font-weight: 700; line-height: 1; font-variation-settings: "SOFT" 50, "WONK" 0; }
+.st-seg button[aria-pressed="true"] { background: var(--c-linen); color: var(--c-claret); box-shadow: var(--sh-1), inset 0 0 0 1px rgba(122,74,42,.10); }
+.st-seg button:focus-visible { outline: 3px solid var(--c-mustard); outline-offset: 1px; }
+
+.st-leave {
+  appearance: none; border: 0; cursor: pointer; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 14px;
+  border-radius: var(--r-2); background: rgba(226,85,59,.08); box-shadow: inset 0 0 0 1.5px rgba(226,85,59,.35);
+  font-family: var(--f-ui); font-weight: 700; font-size: calc(17px * var(--ts)); color: #B23A24;
+}
+.st-leave .st-ico { background: rgba(226,85,59,.14); color: #B23A24; box-shadow: none; }
+.st-leave:active { transform: translateY(1px); background: rgba(226,85,59,.14); }
+
+.st-foot {
+  margin: 2px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; line-height: 16px; font-weight: 800; letter-spacing: .16em; color: var(--c-toffee);
+}
+.st-foot em { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 14px; letter-spacing: 0; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.st-foot i { width: 3px; height: 3px; border-radius: 50%; background: var(--c-brass); }
+.st-foot-flame { width: 10px; height: 16px; }
+.st-foot-flame svg { width: 100%; height: 100%; }
+@keyframes stSheetIn { from { transform: translateY(100%); } to { transform: none; } }

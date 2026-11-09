@@ -1,8 +1,88 @@
-.title-top { position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 9vh); text-align: center; color: var(--c-linen); }
-.logo { margin: 0; color: var(--c-linen); font-size: 76px; text-shadow: 0 4px 24px rgba(42,26,23,.55); letter-spacing: -0.02em; }
-.logo-a { position: relative; display: inline-block; }
-.logo-flame { position: absolute; left: 50%; top: -0.42em; width: .36em; height: .36em; transform: translateX(-50%); color: var(--c-candle); filter: drop-shadow(0 0 10px rgba(255,200,107,.9)); animation: logoFlicker 1.6s ease-in-out infinite; transform-origin: 50% 100%; }
-.logo-flame svg { width: 100%; height: 100%; }
-@keyframes logoFlicker { 0%, 100% { transform: translateX(-50%) scale(1) rotate(-2deg); } 50% { transform: translateX(-50%) scale(1.08, 1.14) rotate(3deg); } }
-.tagline { margin: 6px 0 0; font-family: var(--f-display); font-style: italic; font-size: 20px; color: var(--c-crumb); font-variation-settings: "SOFT" 100; }
-.title-actions { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-b) + 28px); display: flex; flex-direction: column; gap: 14px; padding: 0 calc(var(--gutter) + 8px); }
+/* title: menu-card lockup over the candle-lit table (DESIGN 4, 3.3, 3.7) */
+.title-top {
+  position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 7.5vh);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  color: var(--c-linen); pointer-events: none;
+}
+.title-presents {
+  margin: 0 0 6px; font-family: var(--f-display); font-style: italic; font-weight: 500;
+  font-size: 17px; line-height: 20px; letter-spacing: .01em; color: var(--c-candle);
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  text-shadow: 0 1px 10px rgba(42,26,23,.7);
+  animation: titleFade 600ms 150ms var(--ease-out-quint) both;
+}
+.title-logo {
+  position: relative; margin: 0; display: flex; align-items: flex-end;
+  font-family: var(--f-display); font-weight: 850; font-size: 86px; line-height: .9; letter-spacing: -0.025em;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+  color: var(--c-linen);
+  /* letterpress sign: linen face, claret edge, warm cast shadow */
+  text-shadow: 0 1px 0 #EBDCC6, 0 2px 0 #D9C3A4, 0 4px 0 var(--c-claret), 0 5px 0 var(--c-claret-lip), 0 10px 22px rgba(30,14,10,.55);
+  animation: titleDrop 700ms 60ms var(--ease-out-back) both;
+}
+.title-a { position: relative; display: inline-block; }
+.title-flame {
+  position: absolute; left: 50%; bottom: 84%; width: 24px; height: 40px; margin-left: -12px;
+  transform-origin: 50% 92%; animation: titleFlicker 1.7s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,200,107,.95)) drop-shadow(0 0 18px rgba(255,184,102,.6));
+}
+.title-flame svg { width: 100%; height: 100%; }
+.title-halo {
+  position: absolute; left: 50%; bottom: 70%; width: 120px; height: 120px; margin-left: -60px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,200,107,.42), rgba(255,184,102,.14) 55%, transparent);
+  animation: titleHalo 2.3s ease-in-out infinite; pointer-events: none;
+}
+.title-tag {
+  margin: 14px 0 0; display: flex; align-items: center; gap: 10px;
+  font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 19px; line-height: 24px;
+  color: var(--c-tablecloth); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 24;
+  text-shadow: 0 1px 10px rgba(42,26,23,.8);
+  animation: titleFade 600ms 300ms var(--ease-out-quint) both;
+}
+.title-rule { display: flex; align-items: center; gap: 4px; }
+.title-rule.l { flex-direction: row; }
+.title-rule.r { flex-direction: row-reverse; }
+.title-rule i { display: block; width: 26px; height: 1.5px; background: linear-gradient(90deg, rgba(200,155,60,0), var(--c-brass)); }
+.title-rule.r i { background: linear-gradient(270deg, rgba(200,155,60,0), var(--c-brass)); }
+.title-rule b { display: block; width: 6px; height: 6px; background: var(--c-brass); transform: rotate(45deg); box-shadow: 0 0 6px rgba(255,200,107,.6); }
+
+/* bottom scrim so the actions sit on the table, not on Cyril's face */
+.title-scrim {
+  position: absolute; left: 0; right: 0; bottom: calc(-1 * (var(--rail-h) + var(--safe-b))); height: 46%; pointer-events: none;
+  background: linear-gradient(180deg, rgba(59,31,24,0) 0%, rgba(59,31,24,.55) 45%, rgba(42,22,17,.86) 100%);
+}
+.title-actions {
+  /* the show layer stops above the (hidden) rail; reach past it into the real thumb zone */
+  position: absolute; left: 0; right: 0; bottom: calc(22px - var(--rail-h));
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 0 calc(var(--gutter) + 8px + var(--safe-r)) 0 calc(var(--gutter) + 8px + var(--safe-l));
+}
+.title-actions > * { animation: enterUp var(--d-medium) var(--ease-out-quint) both; }
+.title-actions > :nth-child(1) { animation-delay: 420ms; }
+.title-actions > :nth-child(2) { animation-delay: 480ms; }
+.title-actions > :nth-child(3) { animation-delay: 560ms; }
+.title-actions .btn-secondary { --fill: var(--c-linen); }
+.title-meta {
+  margin: 2px 0 0; display: flex; justify-content: center; align-items: center; gap: 9px; flex-wrap: nowrap; white-space: nowrap;
+  font-size: 14px; line-height: 18px; font-weight: 600; letter-spacing: .02em; color: var(--c-crumb);
+}
+.title-meta i { width: 4px; height: 4px; border-radius: 50%; background: var(--c-brass); }
+
+@keyframes titleDrop { from { opacity: 0; transform: translateY(-18px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes titleFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes titleFlicker {
+  0%, 100% { transform: scale(1, 1) rotate(-2deg); }
+  30% { transform: scale(.96, 1.08) rotate(2deg); }
+  55% { transform: scale(1.04, .95) rotate(-1deg); }
+  80% { transform: scale(.98, 1.05) rotate(3deg); }
+}
+@keyframes titleHalo { 0%, 100% { opacity: .85; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+
+@media (max-height: 760px) {
+  .title-top { top: calc(var(--safe-t) + 5vh); }
+  .title-logo { font-size: 74px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-flame, .title-halo { animation-duration: 3.4s; }
+}
+:root[data-reduced-motion="1"] .title-flame, :root[data-reduced-motion="1"] .title-halo { animation-duration: 3.4s; }
