@@ -5,6 +5,7 @@ export default {
   title: 'Pie Chart',
   dish: 'pie',
   course: 'A slice of pie, cut by the nation',
+  hint: 'Guess the percent',
   tagline: 'What percent of people have... really?',
   blurb: 'Guess how many people admit to it, then bet higher or lower on your mates. Plus a live poll of this very table.',
   players: [3, 8],

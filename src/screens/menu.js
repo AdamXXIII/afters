@@ -82,7 +82,7 @@ export default {
       },
       h('div.mn-plate', { html: dishSvg(g.dish) + (g.comingSoon ? DOME_SVG : '') }),
       g.comingSoon ? h('span.mn-stamp', 'Coming soon') : null,
-      h('div.mn-tag', h('span.mn-tag-t', g.title), h('span.mn-tag-c', g.tagline)),
+      h('div.mn-tag', h('span.mn-tag-t', g.title), h('span.mn-tag-c', g.hint || g.tagline)),
       fans);
       onTap(btn, () => tapDish(g));
       dishes.set(g.id, { g, btn, fans });

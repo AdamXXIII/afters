@@ -8,6 +8,7 @@ export default {
   title: 'Afters Classic',
   dish: 'trifle',               // menu illustration (src/screens/menu-art.js)
   course: 'The house trifle',   // the line under the title on the menu card
+  hint: 'Write, fib, vote',
   tagline: 'Three courses of quick wit, porkies and last orders.',
   blurb: 'Write the funniest answer, fib your way through true facts, then swipe for the toast of the table.',
   players: [3, 8],
