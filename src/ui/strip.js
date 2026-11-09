@@ -9,6 +9,7 @@ const VERBS = { 'r1-write': 'plated', 'r1-wait': 'plated', 'r2-write': 'fibbed',
 export function mountStrip(stripEl, ctx) {
   const timer = timerRing();
   const chips = chipsRow(ctx.players, (p) => (ctx.progress.done[p.id] ? 'done' : 'waiting'), { compact: ctx.players.length > 3 });
+  if (ctx.players.length > 5) chips.classList.add('crowd');
   const count = h('b');
   const pips = h('span.pips', ctx.players.map(() => h('i')));
   const verb = VERBS[ctx.phase?.id] || VERBS.default;

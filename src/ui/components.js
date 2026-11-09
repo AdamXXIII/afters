@@ -16,8 +16,17 @@ function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26] } = {}) {
   const d = img.data;
   let seed = 1234567;
   const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  // low-frequency mottle (pulp clouds) so it reads as stock, not JPEG grain
+  const M = 8; const mot = Array.from({ length: M * M }, () => rnd());
+  const mott = (x, y) => {
+    const fx = (x / size) * M; const fy = (y / size) * M; const x0 = Math.floor(fx); const y0 = Math.floor(fy);
+    const tx = fx - x0; const ty = fy - y0; const at = (i, j) => mot[((j % M) * M) + (i % M)];
+    const sx = tx * tx * (3 - 2 * tx); const sy = ty * ty * (3 - 2 * ty);
+    return (at(x0, y0) * (1 - sx) + at(x0 + 1, y0) * sx) * (1 - sy) + (at(x0, y0 + 1) * (1 - sx) + at(x0 + 1, y0 + 1) * sx) * sy;
+  };
   for (let i = 0; i < d.length; i += 4) {
-    const n = rnd();
+    const px = (i / 4) % size; const py = Math.floor(i / 4 / size);
+    const n = fibres ? 0.35 * rnd() + 0.65 * mott(px, py) * mott(px * 2 + 31, py * 2 + 17) * 1.6 : rnd();
     d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2];
     d[i + 3] = Math.round(n * n * alpha * 255);
   }
@@ -34,7 +43,7 @@ function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26] } = {}) {
 }
 try {
   if (typeof document !== 'undefined') {
-    const paper = makeTile(128, { fibres: 22, alpha: 0.1 });
+    const paper = makeTile(128, { fibres: 70, alpha: 0.075 });
     const grain = makeTile(128, { alpha: 0.6, rgb: [40, 24, 18] });
     if (paper) document.documentElement.style.setProperty('--paper', `url("${paper}")`);
     if (grain) document.documentElement.style.setProperty('--grain', `url("${grain}")`);
@@ -164,7 +173,7 @@ export function timerRing({ big = false } = {}) {
   }).join('');
   const el = h(`div.timer.timer-bg${big ? '.big' : ''}`, {
     role: 'timer', 'aria-live': 'off',
-    html: `<svg viewBox="0 0 64 64">${notches}<circle class="track" cx="32" cy="32" r="${r}" stroke-width="6" fill="none"/><circle class="prog" cx="32" cy="32" r="${r}" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="${C.toFixed(3)}" stroke-dashoffset="0"/><g class="head"><circle class="head-glow" cx="${32 + r}" cy="32" r="6"/><path class="head-core" d="M${32 + r} 28.4c.9 1.4 2.3 2.2 2.3 3.8a2.3 2.3 0 0 1-4.6 0c0-1.4 1.3-2.3 2.3-3.8z" transform="rotate(90 ${32 + r} 32)"/></g></svg><div class="num">0</div>`,
+    html: `<svg viewBox="0 0 64 64">${notches}<circle class="track" cx="32" cy="32" r="${r}" stroke-width="6" fill="none"/><circle class="prog" cx="32" cy="32" r="${r}" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="${C.toFixed(3)}" stroke-dashoffset="0"/><g class="head"><circle class="head-glow" cx="${32 + r}" cy="32" r="6"/><path class="head-core" d="M${32 + r} 28.4c.9 1.4 2.3 2.2 2.3 3.8a2.3 2.3 0 0 1-4.6 0c0-1.4 1.3-2.3 2.3-3.8z" transform="rotate(90 ${32 + r} 32)"/></g></svg><div class="num"></div>`,
   });
   const prog = el.querySelector('.prog');
   const head = el.querySelector('.head');

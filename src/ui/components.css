@@ -163,7 +163,7 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 .chip {
   height: 44px; border-radius: var(--r-pill); background: var(--c-linen); box-shadow: var(--sh-1), inset 0 1px 0 rgba(255,255,255,.8), inset 0 0 0 1px rgba(122,74,42,.08);
   display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 4px; flex: none; scroll-snap-align: start;
-  font-size: 15px; line-height: 18px; font-weight: 700; color: var(--c-ink); position: relative;
+  font-size: 16px; line-height: 19px; font-weight: 700; color: var(--c-ink); position: relative;
   transition: opacity var(--d-small), transform var(--d-small) var(--ease-out-back);
 }
 .chip .av {
@@ -188,8 +188,8 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 .chip .badge svg { width: 12px; height: 12px; }
 .chip.done .badge { display: grid; animation: pop 220ms var(--ease-out-back); }
 .chip.disconnected { filter: grayscale(1); opacity: .6; }
-.chip .crown { position: absolute; left: 10px; top: -9px; width: 16px; height: 12px; color: var(--c-brass); }
-.chip .spk { width: 14px; height: 14px; color: var(--c-willow); }
+.chip .crown { position: absolute; left: 8px; top: -12px; width: 22px; height: 16px; color: var(--c-brass); filter: drop-shadow(0 1px 0 rgba(42,26,23,.35)); }
+.chip .spk { width: 18px; height: 18px; color: var(--c-willow); }
 @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
 /* ---------- timer ring ---------- */
@@ -206,6 +206,7 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 .timer.hurry .head-glow { fill: var(--c-tomato); opacity: .5; }
 .timer.hurry { animation: pulse 1s infinite; }
 .timer.out .prog, .timer.out .head { opacity: 0; }
+.timer .num:empty { opacity: 0; }
 .timer .num {
   position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--f-ui); font-weight: 800; font-size: 22px; line-height: 1;
   font-variant-numeric: tabular-nums; color: var(--c-ink); letter-spacing: -.02em; font-variation-settings: "wdth" 90;
@@ -258,7 +259,7 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 .board-row .rank { font-family: var(--f-display); font-weight: 800; font-size: 26px; width: 30px; text-align: center; color: var(--c-claret); font-variation-settings: "SOFT" 100, "WONK" 1; }
 .board-row .score { margin-left: auto; font-weight: 800; font-size: 21px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .board-row .delta {
-  position: absolute; right: 12px; top: 4px; font-size: 12px; line-height: 15px; font-weight: 800; letter-spacing: .02em;
+  position: absolute; right: 12px; top: 3px; font-size: 14px; line-height: 17px; font-weight: 800; letter-spacing: .02em;
   color: #fff; background: var(--c-sage); border-radius: var(--r-pill); padding: 0 7px; font-variant-numeric: tabular-nums;
   box-shadow: 0 1px 0 rgba(42,26,23,.15);
   animation: deltaIn 400ms var(--ease-out-back) both;
@@ -324,12 +325,12 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 
 /* ---------- toggle ---------- */
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; font-weight: 600; }
-.toggle input { appearance: none; -webkit-appearance: none; width: 52px; height: 32px; border-radius: 16px; background: var(--c-crumb); position: relative; transition: background var(--d-small); cursor: pointer; flex: none; margin: 0; box-shadow: inset 0 2px 3px rgba(59,31,24,.14); }
+.toggle input { appearance: none; -webkit-appearance: none; width: 52px; height: 32px; border-radius: 16px; background: #CDB592; outline: 1.5px solid rgba(122,74,42,.35); outline-offset: -1.5px; position: relative; transition: background var(--d-small); cursor: pointer; flex: none; margin: 0; box-shadow: inset 0 2px 3px rgba(59,31,24,.14); }
 .toggle input::after { content: ""; position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #fff, #F6EEE2); box-shadow: 0 2px 4px rgba(59,31,24,.25), inset 0 -1px 0 rgba(122,74,42,.12); transition: transform var(--d-small) var(--ease-out-back); }
 .toggle input:active::after { transform: scaleX(1.12); }
 .toggle input:checked:active::after { transform: translateX(17px) scaleX(1.12); }
 .toggle input:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.toggle input:checked { background: var(--c-sage); }
+.toggle input:checked { background: var(--c-sage); outline-color: rgba(60,90,55,.4); }
 .toggle input:checked::after { transform: translateX(20px); }
 
 /* ---------- show-strip ---------- */
@@ -343,20 +344,26 @@ em.k { font-family: var(--f-display); font-style: italic; font-weight: 600; }
 .strip-inner .cyril-slot { grid-row: 1 / span 2; grid-column: 1; height: 100%; }
 .strip-inner .strip-status {
   grid-column: 2; grid-row: 1; align-self: center;
-  font-family: var(--f-ui); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  font-family: var(--f-ui); font-size: 14px; line-height: 17px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--c-candle); text-shadow: var(--shadow-on-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   display: flex; align-items: center; gap: 8px; transition: opacity var(--d-small);
 }
 .strip-inner .strip-status b { color: var(--c-linen); font-weight: 800; font-variant-numeric: tabular-nums; }
 .strip-inner .strip-status .pips { display: inline-flex; gap: 3px; }
-.strip-inner .strip-status .pips i { width: 6px; height: 6px; border-radius: 50%; background: rgba(251,244,234,.28); transition: background var(--d-small), transform var(--d-small) var(--ease-out-back); }
+.strip-inner .strip-status .pips i { width: 9px; height: 9px; border-radius: 50%; background: rgba(251,244,234,.28); transition: background var(--d-small), transform var(--d-small) var(--ease-out-back); }
 .strip-inner .strip-status .pips i.on { background: var(--c-sage); box-shadow: 0 0 0 1px rgba(251,244,234,.35); }
 .strip-inner .strip-row { grid-column: 2; grid-row: 2; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .strip-inner .timer { width: 56px; height: 56px; }
 .strip-inner .chips { flex: 1; min-width: 0; padding: 4px 2px; mask-image: linear-gradient(90deg, #000 85%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.strip-inner .chips { gap: 4px; overflow: visible; mask-image: none; -webkit-mask-image: none; }
 .strip-inner .chip { height: 40px; }
 .strip-inner .chip .av { width: 32px; height: 32px; }
 .strip-inner .chip .av svg { width: 22px; height: 22px; }
+.strip-inner .chip.compact { height: 38px; padding: 3px; }
+/* 6+ seats: overlap like a face pile so the whole table always fits beside the clock */
+.strip-inner .chips.crowd .chip.compact { margin-left: -10px; box-shadow: 0 0 0 2px rgba(42,26,23,.35), var(--sh-1); }
+.strip-inner .chips.crowd .chip.compact:first-child { margin-left: 0; }
+.strip-inner .chips.crowd .chip.done { z-index: 1; }
 body:has(#bubbles .bubble) .strip-inner .strip-status { opacity: 0; }
 /* Cyril's line in the strip sits in the top lane (overrides the anchor maths in bubble.js) */
 body[data-layout="input"] #bubbles .bubble {
@@ -370,7 +377,8 @@ body.kb-open .strip-inner .strip-status { display: none; }
 body.kb-open .strip-inner .strip-row { grid-row: 1; }
 body.kb-open .strip-inner .cyril-slot { grid-row: 1; }
 body.kb-open .strip-inner .timer { width: 48px; height: 48px; }
-body.kb-open .strip-inner .timer .num { font-size: 18px; }
+body.kb-open .strip-inner .timer .num:empty { opacity: 0; }
+.timer .num { font-size: 18px; }
 body.kb-open[data-layout="input"] #bubbles .bubble { left: calc(var(--safe-l) + 58px) !important; top: calc(var(--safe-t) + 4px) !important; }
 
 /* ---------- misc ---------- */
@@ -392,3 +400,7 @@ body.kb-open[data-layout="input"] #bubbles .bubble { left: calc(var(--safe-l) + 
   .choice[aria-pressed="true"], .chip.done, .timer.hurry, .timer .num.bump, .rail-btn.fired svg, .rail-btn.fired .ring { animation: none; }
 }
 :root[data-reduced-motion="1"] .timer.hurry, :root[data-reduced-motion="1"] .chip.done, :root[data-reduced-motion="1"] .choice[aria-pressed="true"] { animation: none; }
+/* strip chips are avatars only: waiting = dimmed + breathing, never wider */
+.strip-inner .chip.compact .typing { display: none; }
+.strip-inner .chip.compact.waiting .av { animation: breathe 1.6s var(--ease-in-out-quint) infinite; }
+@keyframes breathe { 50% { transform: scale(.92); } }

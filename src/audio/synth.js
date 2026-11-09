@@ -168,8 +168,8 @@ class AudioEngine {
 
   /** Paper card sliding over linen: screen change. Up = sheet rising, down = settling. */
   _page({ up = true } = {}) {
-    this.noise({ dur: 0.16, freq: up ? 900 : 2200, freqEnd: up ? 2600 : 800, q: 0.8, gain: 0.06, attack: 0.04 });
-    this.noise({ dur: 0.05, when: 0.13, type: 'lowpass', freq: 700, gain: 0.05 });
+    this.noise({ dur: 0.16, freq: up ? 900 : 2200, freqEnd: up ? 2600 : 800, q: 0.8, gain: 0.16, attack: 0.04 });
+    this.noise({ dur: 0.05, when: 0.13, type: 'lowpass', freq: 700, gain: 0.12 });
   }
 
   /** Course change: a soft EP swell under the lights dipping. */
@@ -182,10 +182,10 @@ class AudioEngine {
   _pop() { this.tone(660, { freqEnd: 990, glide: 0.05, decay: 0.07, gain: 0.16 }); }
 
   /** Reaction thrown: a short airy toss. */
-  _throw() { this.noise({ dur: 0.22, freq: 500, freqEnd: 1800, q: 1.4, gain: 0.07, attack: 0.05 }); }
+  _throw() { this.noise({ dur: 0.22, freq: 500, freqEnd: 1800, q: 1.4, gain: 0.2, attack: 0.05 }); }
 
   /** Rate-limited / not allowed: a muted wooden knock. */
-  _nope() { this.tone(240, { freqEnd: 200, decay: 0.05, gain: 0.12, type: 'triangle' }); }
+  _nope() { this.tone(240, { freqEnd: 200, decay: 0.06, gain: 0.25, type: 'triangle' }); }
 
   _plated() {
     [[2093, 0.6], [3136, 0.4], [4186, 0.25]].forEach(([f, d]) => this.tone(f, { decay: d, gain: 0.14 }));
@@ -199,8 +199,10 @@ class AudioEngine {
       this.tone(600, { decay: 0.08, gain: 0.35 });
       this.noise({ dur: 0.25, type: 'highpass', freq: 6000, gain: 0.08 });
     } else {
-      this.noise({ dur: 0.05, freq: 1200, q: 8, gain: 0.5 });
-      this.tone(1200, { decay: 0.05, gain: 0.12 });
+      // woodblock: resonant knock, loud enough to cut through chatter (it is the countdown)
+      this.noise({ dur: 0.05, freq: 1200, q: 8, gain: 0.9 });
+      this.tone(1200, { decay: 0.05, gain: 0.3 });
+      this.tone(1800, { decay: 0.025, gain: 0.08 });
     }
   }
 
@@ -276,10 +278,10 @@ class AudioEngine {
 
   _swipe({ dir = 'right' } = {}) {
     const [a, b] = dir === 'right' ? [600, 2500] : [2500, 600];
-    this.noise({ dur: 0.18, freq: a, freqEnd: b, q: 1.2, gain: 0.25, attack: 0.03 });
+    this.noise({ dur: 0.18, freq: a, freqEnd: b, q: 1.2, gain: 0.6, attack: 0.03 });
   }
 
-  _fwump() { this.noise({ dur: 0.08, type: 'lowpass', freq: 400, gain: 0.5 }); }
+  _fwump() { this.noise({ dur: 0.08, type: 'lowpass', freq: 400, gain: 0.9 }); this.tone(110, { freqEnd: 70, decay: 0.08, gain: 0.25 }); }
 
   _flutter() {
     for (let i = 0; i < 6; i++) this.noise({ when: i / 30, dur: 0.02, freq: 3000, gain: 0.12 });

@@ -31,7 +31,7 @@ function staggerIn(container, baseDelay) {
   kids.forEach((el, i) => {
     el.animate(
       [{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
-      { duration: 380, delay: baseDelay + i * 50, easing: EASE_OUT, fill: 'backwards' },
+      { duration: 340, delay: baseDelay + i * 45, easing: EASE_OUT, fill: 'backwards' },
     );
   });
 }
@@ -108,13 +108,15 @@ export class Router {
     const sheetDelay = sameLayout ? 120 : 240;
     if (prev) {
       show.animate([{ opacity: 0, transform: 'translateY(14px) scale(.99)' }, { opacity: 1, transform: 'none' }], { duration: reducedMotion() ? 160 : 380, easing: EASE_OUT, fill: 'backwards', delay: 130 });
-      sheet.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: sheetDelay, easing: EASE_OUT, fill: 'backwards' });
+      sheet.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, delay: Math.round(sheetDelay * 0.4), easing: EASE_OUT, fill: 'backwards' });
     }
     if (prev && !ctx.frozen) {
       if (COURSE.test(id)) {
         document.body.classList.remove('dip'); void document.body.offsetWidth; document.body.classList.add('dip');
         clearTimeout(this._dipT); this._dipT = setTimeout(() => document.body.classList.remove('dip'), 950);
         audio.sfx('curtain');
+        // the course card lands like a menu slapped on the table
+        setTimeout(() => { try { this.stage.shake?.(); } catch { /* optional */ } }, 520);
       } else if (prev.layout !== layout || id !== prev.id) {
         audio.sfx('page', { up: layout !== 'show' });
       }
@@ -129,7 +131,7 @@ export class Router {
       console.error(`[screen ${id}] mount`, e);
       sheet.append(h('p.t-body', 'Something went wrong drawing this screen.'));
     }
-    if (layout !== 'show' && prev) staggerIn(sheet, sheetDelay);
+    if (layout !== 'show' && prev) staggerIn(sheet, Math.round(sheetDelay * 0.4));
   }
 
   update(ctx) {
