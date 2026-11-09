@@ -54,6 +54,20 @@
   --d-small: 250ms;
   --d-medium: 400ms;
   --d-large: 750ms;
+  --stagger: 50ms;
+  /* spring-ish overshoot for pops (CSS linear() approximation of stiffness 260 / damping 18) */
+  --ease-spring: linear(0, .22 8%, .62 18%, .96 30%, 1.08 40%, 1.1 46%, 1.06 56%, 1 66%, .985 76%, 1);
+
+  /* glows (candlelight, never neon) */
+  --glow-candle: 0 0 0 1px rgba(255,200,107,.35), 0 0 18px rgba(255,184,102,.45);
+  --focus-ring: 0 0 0 3px var(--c-linen), 0 0 0 6px var(--c-mustard);
+  --press-y: 3px;
+
+  /* text on dark stage */
+  --shadow-on-dark: 0 1px 0 rgba(42,26,23,.5), 0 2px 14px rgba(42,26,23,.55);
+
+  /* stacking */
+  --z-strip: 4; --z-sheet: 3; --z-bubbles: 5; --z-topbar: 6; --z-overlay: 20; --z-toast: 30;
 
   /* layout */
   --safe-t: env(safe-area-inset-top, 0px);
@@ -72,4 +86,5 @@
 @media (prefers-reduced-motion: reduce) {
   :root { --d-micro: 1ms; --d-small: 120ms; --d-medium: 200ms; --d-large: 200ms; }
 }
-:root[data-reduced-motion="1"] { --d-micro: 1ms; --d-small: 120ms; --d-medium: 200ms; --d-large: 200ms; }
+:root[data-reduced-motion="1"] { --d-micro: 1ms; --d-small: 120ms; --d-medium: 200ms; --d-large: 200ms; --stagger: 0ms; }
+@media (prefers-reduced-motion: reduce) { :root { --stagger: 0ms; } }

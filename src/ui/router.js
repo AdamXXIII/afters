@@ -15,6 +15,26 @@
 // choreography (show first, sheet 240 ms later), per-frame callbacks and the input strip.
 import { h } from './components.js';
 import { mountStrip } from './strip.js';
+import { audio } from '../audio/synth.js';
+
+// Motion language (DESIGN 3.7): show layer first, sheet 240 ms later, then its children stagger
+// 50 ms each; exits are the reverse at 70% with ease-in-quint. Never more than 3 groups at once.
+const EASE_OUT = 'cubic-bezier(.22,1,.36,1)';
+const EASE_IN = 'cubic-bezier(.64,0,.78,0)';
+const reducedMotion = () => document.documentElement.dataset.reducedMotion === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Course changes get the "lights dip" and a soft swell; everything else a paper swish.
+const COURSE = /(^|-)intro$|^podium$/;
+
+function staggerIn(container, baseDelay) {
+  if (reducedMotion()) return;
+  const kids = [...container.children].slice(0, 7);
+  kids.forEach((el, i) => {
+    el.animate(
+      [{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
+      { duration: 380, delay: baseDelay + i * 50, easing: EASE_OUT, fill: 'backwards' },
+    );
+  });
+}
 
 export class Router {
   constructor({ stage, showEl, sheetEl, stripEl }) {
@@ -49,11 +69,25 @@ export class Router {
     // tear down the old screen (exit is the reverse at 70% duration)
     if (prev) {
       try { prev.inst?.unmount?.(); } catch (e) { console.error(`[screen ${prev.id}] unmount`, e); }
-      prev.strip?.unmount();
-      prev.show.classList.add('fade-out');
-      prev.sheet.classList.add(sameLayout ? 'fade-out' : 'exit-down');
       const s1 = prev.show; const s2 = prev.sheet;
-      setTimeout(() => { s1.remove(); s2.remove(); }, 300);
+      const rm = reducedMotion();
+      const a1 = s1.animate(
+        [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-10px) scale(.985)' }],
+        { duration: rm ? 120 : 180, easing: EASE_IN, fill: 'forwards' },
+      );
+      // Sheet leaving the screen (-> show): its content rides down with it instead of vanishing.
+      // Same layout: quick fade + settle. Split <-> input: fade while the sheet resizes.
+      const sheetLeaving = layout === 'show' && prev.layout !== 'show';
+      const a2 = sheetLeaving
+        ? s2.animate([{ opacity: 1 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: rm ? 120 : 460, fill: 'forwards' })
+        : s2.animate(
+          [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${sameLayout ? 8 : 16}px)` }],
+          { duration: rm ? 100 : sameLayout ? 180 : 240, easing: EASE_IN, fill: 'forwards' },
+        );
+      // remove when the exits really finish (not on a wall-clock timer), so slow frames never cut them short
+      Promise.allSettled([a1.finished, a2.finished]).then(() => { s1.remove(); s2.remove(); });
+      // the old strip lingers a beat so the clock doesn't blink out mid-move
+      prev.strip?.unmount();
       s1.style.pointerEvents = 'none';
       s2.style.pointerEvents = 'none';
     }
@@ -71,9 +105,20 @@ export class Router {
     const sheet = h('div.sheet-page', { dataset: { screen: id } });
     this.showEl.append(show);
     this.sheetEl.append(sheet);
-    show.classList.add('fade-in');
-    sheet.classList.add('enter-up');
-    sheet.style.animationDelay = sameLayout ? '120ms' : '240ms';
+    const sheetDelay = sameLayout ? 120 : 240;
+    if (prev) {
+      show.animate([{ opacity: 0, transform: 'translateY(14px) scale(.99)' }, { opacity: 1, transform: 'none' }], { duration: reducedMotion() ? 160 : 380, easing: EASE_OUT, fill: 'backwards', delay: 130 });
+      sheet.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: sheetDelay, easing: EASE_OUT, fill: 'backwards' });
+    }
+    if (prev && !ctx.frozen) {
+      if (COURSE.test(id)) {
+        document.body.classList.remove('dip'); void document.body.offsetWidth; document.body.classList.add('dip');
+        clearTimeout(this._dipT); this._dipT = setTimeout(() => document.body.classList.remove('dip'), 950);
+        audio.sfx('curtain');
+      } else if (prev.layout !== layout || id !== prev.id) {
+        audio.sfx('page', { up: layout !== 'show' });
+      }
+    }
 
     const cur = { id, key, def, layout, show, sheet, ctx, inst: null, strip: null };
     this.current = cur;
@@ -84,6 +129,7 @@ export class Router {
       console.error(`[screen ${id}] mount`, e);
       sheet.append(h('p.t-body', 'Something went wrong drawing this screen.'));
     }
+    if (layout !== 'show' && prev) staggerIn(sheet, sheetDelay);
   }
 
   update(ctx) {
