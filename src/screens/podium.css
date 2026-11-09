@@ -1,0 +1,18 @@
+.podium-wrap { position: absolute; inset: 0; padding: calc(var(--safe-t) + 60px) calc(var(--gutter) + var(--safe-r)) 12px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; justify-content: space-between; }
+.podium-names { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.podium-name.p1 .t-title-xl { font-size: 54px; text-shadow: 0 4px 20px rgba(42,26,23,.6); }
+.podium-name.p2, .podium-name.p3 { display: inline-flex; gap: 8px; align-items: baseline; }
+.podium-score { font-weight: 800; color: var(--c-candle); font-variant-numeric: tabular-nums; }
+.bill {
+  background: var(--c-linen); background-image: var(--paper); padding: 14px 16px 18px; border-radius: 4px;
+  box-shadow: var(--sh-3); max-height: 38vh; overflow-y: auto;
+  -webkit-mask: radial-gradient(circle 6px at 8px 100%, transparent 98%, #000) -8px 0 / 16px 100% repeat-x;
+          mask: radial-gradient(circle 6px at 8px 100%, transparent 98%, #000) -8px 0 / 16px 100% repeat-x;
+  font-family: var(--f-ui);
+}
+.bill-head { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--c-crumb); padding-bottom: 6px; margin-bottom: 4px; }
+.bill-row { display: flex; align-items: center; gap: 8px; min-height: 48px; border-bottom: 1px dashed var(--c-crumb); }
+.bill-row .chip { box-shadow: none; background: transparent; padding-left: 0; }
+.bill-rank { font-family: var(--f-display); font-weight: 800; width: 22px; color: var(--c-claret); }
+.bill-award { flex: 1; text-align: right; font-size: 14px; color: var(--c-toffee); font-weight: 700; }
+.bill-score { font-weight: 800; font-variant-numeric: tabular-nums; min-width: 48px; text-align: right; }

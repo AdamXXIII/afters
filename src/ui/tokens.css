@@ -1,0 +1,75 @@
+/* AFTERS design tokens (DESIGN 3.2 - 3.7). Use these names everywhere. */
+:root {
+  /* palette */
+  --c-linen: #FBF4EA;
+  --c-tablecloth: #F3E6D3;
+  --c-beeswax: #F3E6CF;
+  --c-crumb: #E6D3B8;
+  --c-candle: #FFC86B;
+  --c-mustard: #E0A526;
+  --c-brass: #C89B3C;
+  --c-tomato: #E2553B;
+  --c-claret: #7A1E2C;
+  --c-willow: #2F5D7C;
+  --c-sage: #7F9A74;
+  --c-toffee: #7A4A2A;
+  --c-ink: #2A1A17;
+  --c-mahogany: #3B1F18;
+  --c-oak: #5A3424;
+  --c-claret-lip: #561320;
+  --c-willow-lip: #21445C;
+
+  /* player colours, by avatar index */
+  --p0: #E2553B; --p1: #2F5D7C; --p2: #E0A526; --p3: #7F9A74;
+  --p4: #B5527E; --p5: #3E8E8A; --p6: #8C5A3C; --p7: #5B6ABF;
+
+  /* round colours */
+  --round-1: var(--c-mustard);
+  --round-2: var(--c-claret);
+  --round-3: var(--c-tomato);
+  --round: var(--c-mustard);
+
+  /* type families */
+  --f-display: "Fraunces Variable", "Fraunces", Georgia, serif;
+  --f-ui: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
+  --f-hand: "Caveat Variable", "Caveat", "Comic Sans MS", cursive;
+
+  /* text scale multiplier (settings: 100 / 115 / 130%) */
+  --ts: 1;
+
+  /* radii */
+  --r-1: 10px; --r-2: 16px; --r-3: 22px; --r-4: 28px; --r-pill: 999px;
+
+  /* warm shadows, never grey */
+  --sh-1: 0 1px 0 rgba(42,26,23,.08), 0 2px 6px rgba(59,31,24,.12);
+  --sh-2: 0 2px 0 rgba(42,26,23,.10), 0 8px 20px rgba(59,31,24,.20);
+  --sh-3: 0 3px 0 rgba(42,26,23,.12), 0 18px 40px rgba(59,31,24,.32);
+
+  /* motion */
+  --ease-out-quint: cubic-bezier(.22,1,.36,1);
+  --ease-in-quint: cubic-bezier(.64,0,.78,0);
+  --ease-in-out-quint: cubic-bezier(.83,0,.17,1);
+  --ease-out-back: cubic-bezier(.34,1.56,.64,1);
+  --d-micro: 110ms;
+  --d-small: 250ms;
+  --d-medium: 400ms;
+  --d-large: 750ms;
+
+  /* layout */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --app-h: 100dvh;
+  --rail-h: 72px;
+  --strip-h: 132px;
+  --gutter: 20px;
+
+  /* paper noise (2% feTurbulence, baseFrequency .9) */
+  --paper: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25  0 0 0 0 0.15  0 0 0 0 0.1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.35'/></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --d-micro: 1ms; --d-small: 120ms; --d-medium: 200ms; --d-large: 200ms; }
+}
+:root[data-reduced-motion="1"] { --d-micro: 1ms; --d-small: 120ms; --d-medium: 200ms; --d-large: 200ms; }

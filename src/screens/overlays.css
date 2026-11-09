@@ -1,0 +1,13 @@
+.overlay-root { position: absolute; inset: 0; }
+.dim { position: absolute; inset: 0; background: rgba(42,26,23,.72); display: flex; flex-direction: column; justify-content: center; align-items: center; animation: fadeIn var(--d-small) both; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.dim-light { background: rgba(42,26,23,.45); justify-content: flex-end; }
+.reconnect-box { display: flex; flex-direction: column; gap: 14px; padding: 24px; width: 100%; max-width: 380px; }
+.settings-sheet {
+  width: 100%; background: var(--c-linen); background-image: var(--paper); border-radius: var(--r-4) var(--r-4) 0 0; box-shadow: var(--sh-3);
+  padding: 18px calc(var(--gutter) + var(--safe-r)) max(20px, var(--safe-b)) calc(var(--gutter) + var(--safe-l));
+  display: flex; flex-direction: column; gap: 6px; max-height: 90%; overflow-y: auto;
+}
+.settings-close { background: var(--c-tablecloth); color: var(--c-ink); }
+.segmented { display: flex; background: var(--c-tablecloth); border-radius: 999px; padding: 3px; gap: 2px; }
+.segmented button { appearance: none; border: 0; background: transparent; height: 40px; min-width: 60px; border-radius: 999px; font-weight: 700; color: var(--c-toffee); cursor: pointer; }
+.segmented button[aria-pressed="true"] { background: var(--c-linen); color: var(--c-ink); box-shadow: var(--sh-1); }

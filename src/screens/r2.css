@@ -1,0 +1,24 @@
+.fact-text { font-family: var(--f-display); font-weight: 600; font-size: 24px; line-height: 30px; font-variation-settings: "SOFT" 50, "WONK" 0; text-wrap: balance; }
+.fact-text .gap { display: inline-block; min-width: 4.5em; border-bottom: 3px solid var(--c-claret); height: .9em; vertical-align: -2px; margin: 0 2px; }
+.fact-card { border-top: 6px solid var(--c-claret); }
+.show-fact { color: var(--c-linen); text-shadow: 0 2px 12px rgba(42,26,23,.6); font-size: 21px; line-height: 27px; }
+.show-fact .gap { border-color: var(--c-candle); }
+.fan { position: absolute; left: 50%; bottom: 10px; width: 0; height: 90px; }
+.fan .place-card { position: absolute; bottom: 0; left: -60px; width: 120px; padding: 14px 10px 10px; transform-origin: 50% 160%; text-align: center; }
+.fan .place-card .t-answer { font-size: 20px; }
+.pick-list { display: flex; flex-direction: column; gap: 10px; }
+.pick-list .choice { min-height: 64px; --round: var(--round-2); }
+
+.porky-wrap { position: absolute; inset: 0; padding: calc(var(--safe-t) + 66px) calc(var(--gutter) + var(--safe-r)) 16px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; gap: 14px; }
+.porky-stage { margin: auto 0; display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+.porky-card { text-align: center; position: relative; animation: lift 420ms var(--ease-out-back) both; }
+.porky-card.truth { background: linear-gradient(135deg, #E9C46A, #C89B3C 45%, #F3D98B 70%, #B8862E); color: var(--c-ink); box-shadow: var(--sh-3), 0 0 40px rgba(255,200,107,.45); }
+.porky-card .who { margin-top: 10px; }
+.porky-card .pickers { display: flex; justify-content: center; gap: 6px; margin-top: 10px; min-height: 22px; }
+.porky-card .pickers .token { animation: hopOn 500ms var(--ease-out-back) both; }
+.porky-nobody { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.porky-nobody .place-card { padding: 10px 14px; opacity: .85; }
+.porky-nobody .t-answer { font-size: 22px; }
+@keyframes lift { from { transform: translateY(30px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes hopOn { 0% { transform: translateY(60px); opacity: 0; } 60% { transform: translateY(-10px); opacity: 1; } 100% { transform: none; } }
+.snout { width: 34px; height: 34px; display: inline-block; vertical-align: middle; }

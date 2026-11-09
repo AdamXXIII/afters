@@ -1,0 +1,40 @@
+.tickets { display: flex; flex-direction: column; gap: 8px; }
+.ticket {
+  background: var(--c-tablecloth); border-radius: 10px; padding: 10px 14px; box-shadow: var(--sh-1);
+  font-family: var(--f-hand); font-size: 24px; line-height: 1.1; border-left: 6px solid var(--c-tomato);
+  animation: drop 320ms var(--ease-out-back) both;
+}
+@keyframes drop { from { transform: translateY(-24px) rotate(-3deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.r3-count { display: flex; justify-content: space-between; align-items: center; }
+
+.deck-progress { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; padding: 0 30px; }
+.deck-progress i { width: 9px; height: 9px; border-radius: 50%; background: rgba(251,244,234,.25); transition: background var(--d-small), transform var(--d-small); }
+.deck-progress i.past { background: rgba(251,244,234,.6); }
+.deck-progress i.now { background: var(--c-candle); transform: scale(1.35); }
+.swipe-area { position: relative; flex: 1; min-height: 190px; display: grid; place-items: center; touch-action: pan-y; }
+.swipe-card { width: 100%; min-height: 170px; display: flex; flex-direction: column; justify-content: center; text-align: center; touch-action: none; will-change: transform; transition: transform 260ms var(--ease-out-quint), opacity 260ms; }
+.swipe-card .t-answer { font-size: 32px; }
+.swipe-card.gone-right { transform: translateX(130%) rotate(14deg) !important; opacity: 0; }
+.swipe-card.gone-left { transform: translateX(-130%) rotate(-14deg) !important; opacity: 0; }
+.swipe-card.yours { opacity: .6; border: 2px dashed var(--c-crumb); }
+.swipe-bar { height: 4px; border-radius: 2px; background: var(--c-crumb); overflow: hidden; }
+.swipe-bar i { display: block; height: 100%; background: var(--c-tomato); width: 0; }
+.glasses { display: flex; gap: 4px; color: var(--c-toffee); }
+.glasses span { width: 26px; height: 26px; }
+.glasses span svg { width: 100%; height: 100%; }
+.swipe-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.swipe-actions .btn { min-width: 0; }
+
+.toast-wrap { position: absolute; inset: 0; padding: calc(var(--safe-t) + 66px) calc(var(--gutter) + var(--safe-r)) 16px calc(var(--gutter) + var(--safe-l)); display: flex; flex-direction: column; gap: 14px; }
+.top5 { margin: auto 0; display: flex; flex-direction: column; gap: 12px; }
+.top-card { position: relative; text-align: center; animation: lift 420ms var(--ease-out-back) both; }
+.top-card .rank { position: absolute; left: -8px; top: -14px; width: 34px; height: 34px; border-radius: 50%; background: var(--c-tomato); color: var(--c-linen); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 18px; box-shadow: var(--sh-1); }
+.top-card .clinks { display: flex; justify-content: center; gap: 4px; margin-top: 8px; color: var(--c-brass); min-height: 26px; }
+.top-card .clinks span { width: 24px; height: 24px; animation: pop 220ms var(--ease-out-back) both; }
+.top-card .clinks svg { width: 100%; height: 100%; }
+.top-card.is-toast { box-shadow: var(--sh-3), 0 0 0 3px var(--c-brass), 0 0 40px rgba(255,200,107,.5); }
+.toast-banner { text-align: center; }
+.confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.confetti i { position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px; animation: fall 2.4s linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+@keyframes lift { from { transform: translateY(30px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }

@@ -1,0 +1,8 @@
+.code-boxes { display: flex; gap: 10px; justify-content: center; }
+.code-box {
+  width: 64px; height: 76px; border-radius: 12px; border: 2px solid var(--c-crumb); background: var(--c-tablecloth);
+  text-align: center; font-family: var(--f-display); font-weight: 900; font-size: 44px; color: var(--c-claret);
+  text-transform: uppercase; outline: none; padding: 0; caret-color: var(--c-mustard);
+  font-variation-settings: "WONK" 0, "SOFT" 30; -webkit-appearance: none; appearance: none;
+}
+.code-box:focus { border-color: var(--c-mustard); box-shadow: 0 0 0 4px rgba(224,165,38,.25); }

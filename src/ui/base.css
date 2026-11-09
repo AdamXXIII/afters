@@ -1,0 +1,157 @@
+/* Global layout: the dual-layer phone (DESIGN 2.2). SHOW layer on top of WebGL; INPUT sheet below. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; height: 100%; width: 100%;
+  background: var(--c-mahogany);
+  color: var(--c-ink);
+  font-family: var(--f-ui);
+  font-size: calc(17px * var(--ts));
+  line-height: 1.41;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+body { position: fixed; inset: 0; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+button { font: inherit; color: inherit; }
+img, svg { display: block; }
+
+#stage {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  display: block;
+  z-index: 0;
+}
+
+/* Fake post: vignette + film grain (DESIGN 3.6) */
+#fx {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(59,31,24,0) 55%, rgba(59,31,24,.55) 100%);
+}
+#fx::after {
+  content: ""; position: absolute; inset: -50%;
+  background-image: var(--paper);
+  opacity: .1;
+  mix-blend-mode: overlay;
+  animation: grain 0.6s steps(3) infinite;
+}
+@keyframes grain { 0% { transform: translate(0,0); } 33% { transform: translate(-3%, 2%); } 66% { transform: translate(2%, -3%); } }
+@media (prefers-reduced-motion: reduce) { #fx::after { animation: none; } }
+
+#app { position: fixed; inset: 0; height: var(--app-h); z-index: 2; pointer-events: none; }
+#app > * { pointer-events: auto; }
+
+/* SHOW layer region */
+#show {
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 100%;
+  pointer-events: none;
+  transition: height var(--d-medium) var(--ease-out-quint);
+}
+#show > * { pointer-events: auto; }
+body[data-layout="show"] #show { height: calc(100% - var(--rail-h) - var(--safe-b)); }
+body[data-layout="split"] #show { height: 40%; }
+body[data-layout="input"] #show { height: calc(var(--strip-h) + var(--safe-t)); }
+
+#bubbles { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+
+/* Input-mode show strip */
+#strip {
+  position: absolute; left: 0; right: 0; top: 0;
+  height: calc(var(--strip-h) + var(--safe-t));
+  padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 14px) 10px calc(var(--safe-l) + 14px);
+  display: none;
+  z-index: 4;
+  pointer-events: none;
+}
+#strip > * { pointer-events: auto; }
+body[data-layout="input"] #strip { display: flex; }
+body.kb-open { --strip-h: 76px; }
+
+/* INPUT sheet */
+#sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background-color: var(--c-linen);
+  background-image: var(--paper);
+  border-radius: var(--r-4) var(--r-4) 0 0;
+  box-shadow: var(--sh-3);
+  transform: translateY(105%);
+  transition: transform var(--d-medium) var(--ease-out-quint), top var(--d-medium) var(--ease-out-quint), height var(--d-medium) var(--ease-out-quint);
+  display: flex; flex-direction: column;
+  z-index: 3;
+  height: 60%;
+}
+#sheet::before {
+  content: ""; display: block; width: 40px; height: 5px; border-radius: 3px; background: var(--c-crumb);
+  margin: 10px auto 0; flex: none;
+}
+body[data-layout="split"] #sheet { transform: none; height: 60%; }
+body[data-layout="input"] #sheet { transform: none; height: calc(100% - var(--strip-h) - var(--safe-t)); }
+body[data-layout="show"] #sheet { transform: translateY(105%); transition-timing-function: var(--ease-in-quint); }
+#sheet-body {
+  position: relative; flex: 1; min-height: 0;
+  overflow: hidden;
+}
+.sheet-page {
+  position: absolute; inset: 0;
+  padding: 14px calc(var(--gutter) + var(--safe-r)) max(20px, var(--safe-b)) calc(var(--gutter) + var(--safe-l));
+  display: flex; flex-direction: column; gap: 14px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Reaction rail */
+#rail {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: calc(var(--rail-h) + var(--safe-b));
+  padding: 8px 16px var(--safe-b);
+  display: flex; justify-content: center; align-items: center; gap: 14px;
+  transform: translateY(110%);
+  transition: transform var(--d-medium) var(--ease-out-quint);
+  z-index: 3;
+}
+body[data-layout="show"][data-rail="1"] #rail { transform: none; }
+
+/* Top bar (settings gear) */
+#topbar {
+  position: absolute; top: calc(var(--safe-t) + 10px); right: calc(var(--safe-r) + 12px);
+  z-index: 6; display: flex; gap: 8px;
+}
+body[data-layout="input"] #topbar { display: none; }
+
+#overlay { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+#overlay > * { pointer-events: auto; }
+#toasts {
+  position: fixed; left: 0; right: 0; top: calc(var(--safe-t) + 12px); z-index: 30;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;
+}
+
+/* Screen enter/exit choreography (DESIGN 3.7) */
+.screen-show { position: absolute; inset: 0; }
+.enter-up { animation: enterUp var(--d-medium) var(--ease-out-quint) both; }
+.exit-down { animation: exitDown calc(var(--d-medium) * .7) var(--ease-in-quint) both; }
+.fade-in { animation: fadeIn var(--d-small) var(--ease-out-quint) both; }
+.fade-out { animation: fadeOut calc(var(--d-small) * .7) var(--ease-in-quint) both; }
+@keyframes enterUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes exitDown { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(16px); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+.stagger > * { animation: enterUp var(--d-medium) var(--ease-out-quint) both; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.grow { flex: 1; }
+.row { display: flex; align-items: center; gap: 10px; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.center { text-align: center; }
+.spacer { flex: 1 1 auto; }

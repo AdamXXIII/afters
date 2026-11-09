@@ -1,0 +1,26 @@
+{
+  "name": "afters",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AFTERS - a phone-only party game for after dinner.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "node scripts/make-icons.mjs && vite build",
+    "preview": "vite preview --host --port 4173",
+    "shoot": "node scripts/shoot.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/caveat": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "peerjs": "^1.5.5",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "peer": "^1.0.2",
+    "vite": "^8.3.7"
+  }
+}
