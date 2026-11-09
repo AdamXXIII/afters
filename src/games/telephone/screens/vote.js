@@ -20,27 +20,29 @@ const vote = {
       const pl = ctx.player(m.authorId);
       const mine = m.authorId === ctx.meId;
       let inner;
-      if (m.kind === 'draw') { const v = drawingView(m.drawing, { className: 'tp-vc-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-vc-txt', { style: { '--fs': `${m.text.length > 44 ? 30 : m.text.length > 24 ? 36 : 44}px` } }, m.text);
+      if (m.kind === 'draw') { const v = drawingView(m.drawing, { className: 'tp-vc-view' }); views.push(v); inner = v.el; } else inner = h('div.tp-vc-txt', { style: { '--fs': `${m.text.length > 44 ? 22 : m.text.length > 24 ? 26 : 32}px` } }, m.text);
       const btn = h('button.tp-vc-btn', { type: 'button', disabled: mine, 'data-e2e': mine ? 'moment-mine' : 'moment' },
-        h('span', { html: TP_ICONS.star }), mine ? 'That\'s yours' : 'Best bit!');
+        h('span', { html: TP_ICONS.star }), mine ? 'Yours' : 'This one!');
       const card = h(`div.tp-vc.k-${m.kind}${mine ? '.mine' : ''}`, { style: { '--pc': pl?.colour, '--tilt': `${tilt(ctx.phase.seed, m.key, 1.2)}deg` } },
-        h('div.tp-vc-top', h('span.tp-vc-n', `${m.step + 1}/${p.moments.length}`), h('span.tp-vc-by', av(pl, { size: 22 }), h('b', pl?.name || '?'), ` ${kindLabel(m.kind)}`)),
+        h('div.tp-vc-top', h('span.tp-vc-by', av(pl, { size: 22 }), h('b', pl?.name || '?'))),
         h('div.tp-vc-body', inner),
         btn);
       if (!mine) onTap(btn, () => { ctx.client.act('vote', { key: m.key }, { vote: m.key }); }, { sound: 'select', buzz: 'select' });
       card.btn = btn;
       return card;
     });
-    const row = h('div.tp-vc-row', tiles);
-    const dots = h('div.tp-vc-dots', p.moments.map(() => h('i')));
+    const pages = [];
+    for (let i = 0; i < tiles.length; i += 2) pages.push(h(`div.tp-vs-page${tiles[i + 1] ? '' : '.solo'}`, tiles[i], tiles[i + 1] ? h('div.tp-vs', 'VS') : null, tiles[i + 1] || null));
+    const row = h('div.tp-vc-row.tp-vs-row', pages);
+    const dots = h('div.tp-vc-dots', pages.map(() => h('i')));
     sheet.append(h('div.tp-sheet.tp-vote', top, row, dots));
     const syncDots = () => {
-      const i = Math.round(row.scrollLeft / Math.max(1, (tiles[0]?.offsetWidth || 1) + 12));
+      const i = Math.round(row.scrollLeft / Math.max(1, (pages[0]?.offsetWidth || 1) + 12));
       [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
     };
     row.addEventListener('scroll', syncDots, { passive: true });
     requestAnimationFrame(syncDots);
-    const sync = (c) => { const v = c.mine.game.vote; tiles.forEach((t, i) => { const on = list[i].key === v; t.classList.toggle('picked', on); t.btn.setAttribute('aria-pressed', String(on)); if (!t.classList.contains('mine')) t.btn.lastChild.textContent = on ? 'Your pick' : 'Best bit!'; }); };
+    const sync = (c) => { const v = c.mine.game.vote; tiles.forEach((t, i) => { const on = list[i].key === v; t.classList.toggle('picked', on); t.btn.setAttribute('aria-pressed', String(on)); if (!t.classList.contains('mine')) t.btn.lastChild.textContent = on ? 'Picked!' : 'This one!'; }); };
     sync(ctx);
     const said = null;
     return { update: sync, frame() { views.forEach((v) => v.frame()); }, unmount() { clearTimeout(said); } };
@@ -81,12 +83,11 @@ const awards = {
         cls === 'crossed' && b.crossedBy ? h('div.tp-plaque-foot', 'Wires crossed by ', who(ctx.player(b.crossedBy), { size: 16 })) : cls === 'straight' ? h('div.tp-plaque-foot', `${b.matches} guess${b.matches === 1 ? '' : 'es'} nailed`) : null);
     };
     const plaques = h('div.tp-plaques', plaque('straight', 'Straightest line', p.straight), plaque('crossed', 'Most crossed wires', p.crossed));
-    show.append(h('div.tp-aw', h('div.tp-aw-rays'), h('div.tp-aw-big', h('span', 'Best bit'), h('b', 'of the night!')), hero, plaques));
+    show.append(h('div.tp-aw-scrim'), h('div.tp-aw', h('div.tp-aw-rays'), h('div.tp-aw-big', h('span', 'Best bit'), h('b', 'of the night!')), hero, plaques));
     const tl = timeline([
-      { at: 0, fn: (c) => { c.cyril.react('drumroll', { duration: S(1400) }); if (!quiet) { c.audio.sfx('drumroll', { duration: S(1300) / 1000 }); c.say(c.line('tpAwards'), { hold: 1200, compact: true }); } } },
+      { at: 0, fn: (c) => { c.cyril.react('drumroll', { duration: S(1400) }); if (!quiet) { c.audio.sfx('drumroll', { duration: S(1300) / 1000 }); c.say(c.line('tpAwards'), { hold: 1000, compact: true }); } } },
       { at: S(1400), fn: (c) => { hero.classList.add('in'); if (!quiet) { c.audio.sfx('fanfare'); c.stage.shake?.(); } c.cyril.react('delight'); if (m?.authorId === c.meId) c.haptic('win'); } },
       { at: S(3200), fn: () => plaques.classList.add('in') },
-      { at: S(4200), fn: (c) => c.say(c.line('tpAwardsDone'), { hold: quiet ? 99999 : 1800, compact: true }) },
     ]);
     if (quiet) { hero.classList.add('in', 'still'); plaques.classList.add('in', 'still'); }
     tl.run(ctx);
