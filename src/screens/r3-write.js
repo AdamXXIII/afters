@@ -47,11 +47,14 @@ export default {
       ctx.haptic('submit');
       ctx.client.submit(t);
       field.clear();
+      btn.disabled = true;
       field.input.focus({ preventScroll: true });
     }
     // keep the keyboard up: never let the button steal focus
     btn.addEventListener('pointerdown', (e) => e.preventDefault());
-    sheet.append(prompt, h('div.r3w-entry', field, btn), padWrap);
+    sheet.append(prompt, h('div.r3w-entry', field, btn), padWrap, h('div.r3w-tip', h('b', 'Tip: '), 'short and silly beats clever.'));
+    const syncBtn = () => { btn.disabled = !field.input.value.trim() || ctx.client.state.mine.r3.length >= maxN; };
+    field.input.addEventListener('input', syncBtn);
 
     let shown = -1;
     const update = (c) => {
@@ -74,9 +77,9 @@ export default {
       shown = n;
       const left = maxN - n;
       tally.textContent = `${n} of ${maxN}`;
-      btnLeft.textContent = left > 0 ? `${left} left` : '';
+      btnLeft.textContent = '';
       btnLabel.textContent = left === 0 ? 'All four served' : n === 0 ? 'Order it!' : 'Another!';
-      btn.disabled = left === 0;
+      btn.disabled = left === 0 || !field.input.value.trim();
       field.input.disabled = left === 0;
       padWrap.classList.toggle('complete', left === 0);
       field.classList.toggle('gone', left === 0);

@@ -5,7 +5,7 @@ import './r3.css';
 import { h, button } from '../ui/components.js';
 import { glassSvg, clinkSvg, passSvg, sayIfFresh } from './r3-art.js';
 
-const pad2 = (n) => String(n).padStart(2, '0');
+const HINTS = ['Dry. Pass the rest.', 'Last one. Make it count.', 'Two left. Be choosy.', 'Three left. Steady.', 'Four left. Easy now.', 'Spend them wisely.'];
 
 export default {
   id: 'r3-swipe',
@@ -30,7 +30,8 @@ export default {
     const glassEls = Array.from({ length: p.glasses }, () => h('span.r3s-glass'));
     const left = h('span.r3s-left');
     const tray = h('div.r3s-tray', h('div.r3s-tray-g', glassEls), left);
-    const head = h('div.r3s-head', h('div.r3s-head-l', h('span.r3s-q', 'Raise a glass?'), h('span.r3s-hint', '← Pass  ·  Cheers →')), tray);
+    const hintEl = h('span.r3s-hint');
+    const head = h('div.r3s-head', h('div.r3s-head-l', h('span.r3s-q', 'Raise a glass?'), hintEl), tray);
 
     const area = h('div.r3s-area');
     const fuse = h('i');
@@ -58,6 +59,7 @@ export default {
         }
       });
       left.textContent = remaining === 1 ? '1 left' : `${remaining} left`;
+      hintEl.textContent = HINTS[Math.max(0, Math.min(HINTS.length - 1, remaining))];
       tray.classList.toggle('empty', remaining <= 0);
       if (lastLeft !== null && remaining !== lastLeft) refreshButtons();
       lastLeft = remaining;
@@ -95,6 +97,7 @@ export default {
       refreshButtons();
       if (yes && used() >= p.glasses) quip('dry', 'That\'s your last glass. Choose wisely? Too late.');
       else quip(yes ? 'yes' : 'no', yes ? 'Bold choice.' : 'Ruthless.');
+      if (yes) ctx.cyril.react('smug');
     }
     function afterNote(yes) {
       return h(`div.r3s-after${yes ? '.yes' : ''}`,
@@ -117,7 +120,7 @@ export default {
       const decided = ctx.client.state.mine.swipes[card.id];
       fuse.style.width = '100%';
       cardEl = h(`div.r3s-card${mine ? '.yours' : ''}`, { style: { '--tilt': `${((i * 53) % 5) - 2}deg` } },
-        h('div.r3s-card-top', h('span.r3s-no', `No. ${pad2(i + 1)}`), mine ? h('span.r3s-yours', 'Yours') : null),
+        mine ? h('div.r3s-card-top', h('span.r3s-yours', 'Yours')) : null,
         h(`div.r3s-text${card.text.length > 28 ? '.long' : ''}`, card.text),
         mine ? h('div.r3s-skip', 'Modesty, please. Skipping this one.') : null,
         h('div.r3s-fuse', fuse),
