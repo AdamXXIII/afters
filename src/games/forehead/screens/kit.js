@@ -15,6 +15,7 @@ export const DECK_ICONS = {
   cassette: s('<rect x="5" y="11" width="38" height="26" rx="4"/><circle cx="17" cy="23" r="4"/><circle cx="31" cy="23" r="4"/><path d="M21 23h6M13 37l3-6h16l3 6"/>'),
   megaphone: s('<path d="M8 20v8l6 1 20 9V11L14 19z"/><path d="M14 29l3 10h5l-2-9"/><path d="M39 18c2 2 2 10 0 12M43 15c3 4 3 14 0 18"/>'),
   pie: s('<path d="M5 28h38l-4 9H9z"/><path d="M8 28c0-9 7-15 16-15s16 6 16 15"/><path d="M16 21l2 3M24 18v4M32 21l-2 3"/><path d="M20 9c1-3 3-4 4-6M27 10c1-2 2-3 2-5" stroke-width="1.8"/>'),
+  spanner: s('<path d="M30 7a10 10 0 0 0-9 14L8 34a4 4 0 0 0 6 6l13-13a10 10 0 0 0 14-9l-6 6-6-2-2-6z"/>'),
   mask: s('<path d="M7 12c8 3 26 3 34 0 0 14-6 25-17 25S7 26 7 12z"/><path d="M15 21c2-2 5-2 7 0M26 21c2-2 5-2 7 0"/><path d="M17 29c4 4 10 4 14 0"/>'),
   theatre: s('<path d="M6 8h36v6c-6 3-12 3-18 0-6 3-12 3-18 0z"/><path d="M6 14v26M42 14v26M6 40h36"/><path d="M14 22c6 2 6 12 0 14M34 22c-6 2-6 12 0 14"/>'),
   paw: s('<ellipse cx="24" cy="31" rx="9" ry="7"/><circle cx="12" cy="20" r="4"/><circle cx="19" cy="12" r="4"/><circle cx="29" cy="12" r="4"/><circle cx="36" cy="20" r="4"/>'),
