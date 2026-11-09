@@ -29,6 +29,9 @@ export default {
     const prev = { shot: st?.shotName, layout: st?.layout };
     if (st) { st.setLayout('split', { instant: ctx.frozen }); st.setShot('rc-host', { duration: 900, instant: ctx.frozen }); }
     ctx.cyril?.setMood?.('hurry');
+    // Cyril turns towards the empty, reserved seat (restored on unmount)
+    const cyRot = ctx.cyril?.group?.rotation.y ?? 0;
+    if (ctx.cyril?.group) ctx.cyril.group.rotation.y = 0.45;
     hideEls.forEach((el) => { el.style.visibility = 'hidden'; });
     document.body.classList.add('rc-paused');
 
@@ -70,7 +73,6 @@ export default {
       bar.classList.toggle('hurry', s <= 15);
       bar.style.setProperty('--k', (left / HOLD_MS).toFixed(4));
       const key = `${lost}`;
-      if (!lost) retryNote.textContent = `Knocking again in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
       if (key === lastState) return;
       lastState = key;
       box.classList.toggle('lost', lost);
@@ -80,7 +82,7 @@ export default {
         ? 'Check your Wi-Fi or signal, then try again. If the host has left, the table may have closed.'
         : 'Finding the table again. Your seat and your score are safe.';
       if (!retry.disabled) retry.textContent = lost ? 'Try again' : 'Try again now';
-      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : `Knocking again in ${2 - Math.floor((elapsed() / 1000) % 2)}s`;
+      retryNote.textContent = lost ? 'Still nothing? The host\u2019s phone may have nodded off.' : 'Knocking every few seconds';
     };
     paint(ctx);
     const tick = setInterval(() => paint(ctx), 250);
@@ -90,6 +92,7 @@ export default {
       hideEls.forEach((el) => { el.style.visibility = ''; });
       document.body.classList.remove('rc-paused');
       ctx.cyril?.setMood?.('calm');
+      if (ctx.cyril?.group) ctx.cyril.group.rotation.y = cyRot;
       if (st && prev.layout) st.setLayout(prev.layout);
       if (st && prev.shot) st.setShot(prev.shot, { duration: 700 });
     } };

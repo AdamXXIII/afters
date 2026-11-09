@@ -53,14 +53,16 @@ export default {
       thumbs[p.avatar] ? h('img', { src: thumbs[p.avatar], alt: '' }) : null), 1800 + i * 60, e)));
 
 
+    const countdown = h('div.in-count');
     const menu = beat(h('div.in-menu', { role: 'group', 'aria-label': 'Tonight\'s menu' },
       h('div.in-eyebrow', h('i'), 'Three courses of comedy', h('i')),
+      countdown,
       h('div.in-title', 'Tonight\'s menu'),
       h('ol.in-courses', courses),
       beat(h('div.in-table', h('span.in-table-k', 'Tonight\'s table'), faces, h(`span.in-table-v${names.join(', ').length > 30 ? '.long' : ''}`, listNames(ctx.players, ctx.meId))), 1750, e),
     ), 650, e);
 
-    const plate = beat(h('div.in-plate', h('span.in-plate-k', 'Your host'), h('span.in-plate-v', 'Cyril Waxley')), 200, e);
+    const plate = beat(h('div.in-plate', h('span.in-plate-v', 'Cyril Waxley'), h('span.in-plate-k', 'Host')), 200, e);
     show.append(h('div.in-wrap', menu), plate);
 
     // host can move things along once the menu has landed
@@ -108,7 +110,7 @@ export default {
       const g = c.cyril?.group;
       if (!g || !c.stage.project) return;
       const p = c.stage.project(g.localToWorld(tmp.set(0, 0.0, 0.13)));
-      const y = Math.min((show.clientHeight || 844) - 52, p.y - 30);
+      const y = Math.min((show.clientHeight || 844) - 40, p.y - 10);
       plate.style.left = `${p.x.toFixed(1)}px`;
       plate.style.top = `${y.toFixed(1)}px`;
     };
@@ -117,6 +119,9 @@ export default {
     const frame = (c, dt = 0.016) => {
       place(c);
       seatGuests(c, dt);
+      const left = Math.max(1, Math.ceil((c.remaining?.() ?? 0) / 1000));
+      const txt = `First course in ${left}`;
+      if (countdown.textContent !== txt) countdown.textContent = txt;
       if (skip) skip.classList.toggle('on', c.elapsed() > 3000 / (c.phase?.speed || 1));
     };
     frame(ctx);

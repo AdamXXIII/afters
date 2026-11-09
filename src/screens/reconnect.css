@@ -85,3 +85,13 @@
 .rc-eyebrow { margin-top: 2px; }
 .rc-note { font: 450 16px/20px var(--f-ui); color: var(--c-toffee); margin-top: 2px; }
 .rc-box.lost .rc-wick { display: none; }
+
+/* the room cools and dims while you are away */
+body.rc-paused #stage { filter: saturate(.55) brightness(.72) hue-rotate(-8deg); transition: filter 600ms var(--ease-out-quint); }
+.dim.rc-dim::before { background: radial-gradient(ellipse 60% 30% at 50% 22%, rgba(20,30,50,0), rgba(16,20,34,.45) 65%, rgba(12,10,18,.85)); }
+.rc-box::before { display: none; }
+.rc-hold { background: none; box-shadow: none; padding: 4px 2px 0; }
+.rc-title { font-size: 34px; line-height: 38px; }
+.rc-leave { font-size: 16px; }
+.rc-note::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: rcDots 1.4s steps(4) infinite; }
+@keyframes rcDots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
