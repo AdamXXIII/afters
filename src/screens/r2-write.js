@@ -45,7 +45,7 @@ export default {
       h('div.r2-field', field, note),
       h('div.r2-tip', h('span.q', '“'), h('span.tx', p.index === 0 ? 'Write a porky so convincing your own nan would believe it.' : tip), h('span.by', 'Cyril')),
       h('div.sheet-actions.r2-actions',
-        h('div.r2-pay', h('span', 'Every fool'), h('b', '+500'), h('span.sep'), h('span', 'Spot the truth'), h('b', '+1000')),
+        h('div.r2-pay', h('span', 'Spot the truth'), h('b', '+1000'), h('span.sep'), h('span', 'Every fool'), h('b', '+500')),
         btn),
     );
     if (ctx.frozen && ctx.demo) {

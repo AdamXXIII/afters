@@ -40,14 +40,14 @@ export default {
           return h('div.r2-dud', { style: { '--tilt': `${tilt(seed, id, 4)}deg` } },
             h('span.r2-dud-l', letterOf.get(id)),
             h('div.r2-dud-txt', o.text),
-            h('div.r2-dud-by', o.kind === 'house' ? 'house porky' : `by ${o.authors.map((a) => pl(a)?.name || '?').join(' & ')}`),
+            h('div.r2-dud-by', o.kind === 'house' ? 'house porky' : o.authors.map((a) => nameTag(pl(a)))),
             h('div.r2-sentback', 'Sent back'));
         });
         stageEl.replaceChildren(h('div.r2-nobody',
           h('div.r2-nobody-head', h('span.r2-nobody-big', s.optionIds.length > 1 ? 'Nobody fell for these' : 'Nobody fell for it'), h('span.r2-nobody-sub', 'Zero fooled. Sent back to the kitchen.')),
           h('div.r2-duds', cards)));
         sfx('groan');
-        ctx.cyril.react('smug', { duration: quiet ? 60000 : 1600 });
+        ctx.cyril.react('shock', { duration: quiet ? 60000 : 1200 });
       },
       porky(s) {
         const o = byId.get(s.optionId);

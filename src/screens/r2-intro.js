@@ -22,7 +22,7 @@ export default {
       h('div.r2-menu-title', 'Porkies'),
       h('ol.r2-steps', STEPS.map(([a], i) => h('li', h('span.n', String(i + 1)), h('span.tx', h('b', a))))),
       h('div.r2-prices',
-        h('div.r2-price', h('span.l', 'Find the truth'), h('span.dots'), h('span.v', '1000')),
+        h('div.r2-price', h('span.l', 'Spot the truth'), h('span.dots'), h('span.v', '1000')),
         h('div.r2-price', h('span.l', 'Every fool'), h('span.dots'), h('span.v', '500'))),
     );
     show.append(h('div.r2-intro-wrap', card));
