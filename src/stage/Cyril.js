@@ -2,15 +2,15 @@
 // Build: merged wax body (1 draw call) + flame shader + eyes/brows/mouth/bow tie + brass holder.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { radialTexture } from './textures.js';
+import { radialTexture, waxTexture } from './textures.js';
 
 const WAX = '#F3E6CF';
 const CLARET = '#7A1E2C';
 const TOFFEE = '#7A4A2A';
 const BRASS = '#C89B3C';
 
-const C_BASE = new THREE.Color('#FFF4D6');
-const C_MID = new THREE.Color('#FFC86B');
+const C_BASE = new THREE.Color('#FFE6A8');
+const C_MID = new THREE.Color('#FFAE45');
 const TIP = {
   calm: new THREE.Color('#E2553B').lerp(new THREE.Color('#FFC86B'), 0.35),
   hurry: new THREE.Color('#E2553B'),
@@ -80,11 +80,25 @@ function mouthShapes() {
   s.quadraticCurveTo(0.012, -0.014, 0, -0.015);
   s.quadraticCurveTo(-0.012, -0.014, -0.017, 0.002);
   const geoD = new THREE.ShapeGeometry(d, 10);
+  geoD.scale(1.2, 1.2, 1);
   geoD.translate(0, 0.008, 0);
   const geoS = new THREE.ShapeGeometry(s, 10);
+  geoS.scale(1.2, 1.2, 1);
   geoS.translate(0, 0.006, 0);
   return { D: geoD, smile: geoS };
 }
+
+// Resting expressions (blended under reactions). brow: both up (m); browL: extra left lift;
+// tilt: inner-brow lift (kind/worried); smile 0..1; lids 0..1 (upper lids down); lean (deg).
+const EXPR = {
+  neutral: { brow: 0.001, browL: 0, tilt: 0.05, smile: 0.45, lids: 0.12, lean: 0 },
+  welcome: { brow: 0.003, browL: 0.001, tilt: 0.12, smile: 0.9, lids: 0.05, lean: 2 },
+  proud: { brow: 0.0025, browL: 0, tilt: -0.05, smile: 1, lids: 0.14, lean: -2 },
+  attentive: { brow: 0.003, browL: 0.002, tilt: 0.1, smile: 0.4, lids: 0, lean: 0 },
+  sly: { brow: 0.0005, browL: 0.005, tilt: -0.1, smile: 0.75, lids: 0.3, lean: 3 },
+  eager: { brow: 0.0045, browL: 0, tilt: 0.15, smile: 0.6, lids: 0, lean: 0 },
+  warm: { brow: 0.002, browL: 0, tilt: 0.18, smile: 0.85, lids: 0.12, lean: 1.5 },
+};
 
 export class Cyril {
   constructor({ reducedMotion = false } = {}) {
@@ -111,10 +125,14 @@ export class Cyril {
     this.tip = TIP.calm.clone();
     this.tallyCount = 0;
     this.flicker = 1;
+    this.expr = { ...EXPR.neutral };
+    this.exprGoal = { ...EXPR.neutral };
+    this.leanGoal = 0;
+    this.lean = 0;
   }
 
   _build() {
-    const wax = new THREE.MeshStandardMaterial({ color: WAX, roughness: 0.55, emissive: new THREE.Color('#FFC890'), emissiveIntensity: 0.1 });
+    const wax = new THREE.MeshPhysicalMaterial({ color: '#FFFFFF', map: waxTexture(), roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.45, sheen: 0.4, sheenColor: new THREE.Color('#FFD7A0'), sheenRoughness: 0.6, emissive: new THREE.Color('#FFB46A'), emissiveIntensity: 0.1 });
     // Fake subsurface: the wax glows more near the flame (emissive ramps with height).
     wax.onBeforeCompile = (sh) => {
       sh.vertexShader = sh.vertexShader
@@ -122,7 +140,13 @@ export class Cyril {
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWaxY = position.y;');
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying float vWaxY;')
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mix(0.55, 2.2, smoothstep(0.02, 0.245, vWaxY));');
+        .replace('#include <emissivemap_fragment>', [
+          '#include <emissivemap_fragment>',
+          'totalEmissiveRadiance *= mix(0.55, 0.8, smoothstep(0.0, 0.17, vWaxY)) + 2.2 * smoothstep(0.17, 0.245, vWaxY);',
+          // wax translucency: light bleeds through the silhouette edges, warmest near the flame
+          'float waxFres = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.2);',
+          'totalEmissiveRadiance += vec3(1.0, 0.5, 0.18) * waxFres * mix(0.12, 0.9, smoothstep(0.05, 0.24, vWaxY));',
+        ].join('\n'));
     };
     this.waxMat = wax;
 
@@ -131,18 +155,57 @@ export class Cyril {
       [0.0, 0.0], [0.084, 0.0], [0.0855, 0.006], [0.085, 0.03], [0.0835, 0.09], [0.081, 0.16],
       [0.0785, 0.222], [0.0775, 0.231], [0.0745, 0.2375], [0.069, 0.2405], [0.06, 0.241], [0.05, 0.236], [0.0, 0.232],
     ].map(([x, y]) => new THREE.Vector2(x, y));
-    const body = new THREE.LatheGeometry(prof, 48);
-    const dish = new THREE.TorusGeometry(0.07, 0.012, 8, 32);
+    const body = new THREE.LatheGeometry(prof, 64);
+    {
+      // hand-poured, not machined: gentle lumps, and the top slumps a touch toward the back
+      const pos = body.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i); const y = pos.getY(i); const z = pos.getZ(i);
+        const a = Math.atan2(x, z);
+        const k = 1 + 0.01 * Math.sin(a * 3 + y * 18) + 0.006 * Math.sin(a * 7 + 1.3) * (y / 0.24);
+        pos.setX(i, x * k); pos.setZ(i, z * k);
+        if (y > 0.2) pos.setY(i, y - Math.max(0, -Math.cos(a)) * 0.006 * ((y - 0.2) / 0.04));
+      }
+    }
+    const dish = new THREE.TorusGeometry(0.07, 0.011, 8, 48);
     dish.rotateX(-Math.PI / 2);
-    dish.scale(1, 0.6, 1);
-    dish.translate(0, 0.236, 0);
+    dish.scale(1, 0.55, 1);
+    dish.translate(0, 0.235, 0);
     const parts = [body, dish];
-    const drips = [[20, 0.009, 0.05], [95, 0.011, 0.07], [160, 0.008, 0.035], [230, 0.012, 0.06], [300, 0.01, 0.045]];
+    // lumpy melted rim
+    for (let i = 0; i < 7; i++) {
+      const a = (i / 7) * Math.PI * 2 + Math.sin(i * 2.1) * 0.2;
+      const r = 0.006 + 0.004 * Math.abs(Math.sin(i * 1.7));
+      const b = new THREE.SphereGeometry(r, 10, 8);
+      b.scale(1.6, 0.7, 1.1);
+      b.rotateY(a);
+      b.translate(Math.sin(a) * 0.073, 0.238 + Math.sin(i * 3.3) * 0.002, Math.cos(a) * 0.073);
+      parts.push(b);
+    }
+    const drips = [[38, 0.0075, 0.045], [-40, 0.007, 0.03], [80, 0.0105, 0.1], [118, 0.008, 0.05], [160, 0.009, 0.075], [215, 0.0115, 0.11], [262, 0.008, 0.06], [305, 0.01, 0.085]];
     for (const [deg, r, len] of drips) parts.push(this._dripGeo(deg, r, len));
-    const merged = mergeGeometries(parts.map((g) => g.toNonIndexed()), false);
+    const merged = mergeGeometries(parts.map((g) => { const n = g.toNonIndexed(); n.deleteAttribute('uv'); return n; }), false);
+    // cylindrical UVs so the drip streaks run down from the rim on every part
+    {
+      const pos = merged.attributes.position;
+      const uv = new Float32Array(pos.count * 2);
+      for (let i = 0; i < pos.count; i++) {
+        uv[i * 2] = Math.atan2(pos.getX(i), pos.getZ(i)) / (Math.PI * 2) + 0.5;
+        uv[i * 2 + 1] = pos.getY(i) / 0.245;
+      }
+      merged.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    }
     merged.computeVertexNormals();
     this.body = new THREE.Mesh(merged, wax);
     this.rig.add(this.body);
+    // molten pool in the dish: glossy, a little amber, lit from the wick
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(0.062, 40), new THREE.MeshStandardMaterial({
+      color: '#F2D6A0', roughness: 0.08, metalness: 0.0, emissive: new THREE.Color('#FFA040'), emissiveIntensity: 0.25, transparent: true, opacity: 0.9,
+    }));
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.y = 0.2345;
+    this.rig.add(pool);
+    this.poolMat = pool.material;
 
     // Tally drips (sad reaction): grow one per sad moment, persistent
     this.tally = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.009, 0.04, 4, 8), wax, 12);
@@ -159,7 +222,7 @@ export class Cyril {
 
     // Flame
     this.flameUniforms = {
-      uTime: { value: 0 }, uSway: { value: 1 }, uBright: { value: 1.25 },
+      uTime: { value: 0 }, uSway: { value: 1 }, uBright: { value: 1.0 },
       uBase: { value: C_BASE.clone() }, uMid: { value: C_MID.clone() }, uTip: { value: TIP.calm.clone() },
     };
     const flameMat = new THREE.ShaderMaterial({
@@ -173,6 +236,25 @@ export class Cyril {
     this.flame.scale.set(0.75, 1.8, 0.75);
     this.flame.position.y = 0.046;
     this.flamePivot.add(this.flame);
+    // inner core: blue at the root, white-hot, smaller
+    this.coreUniforms = {
+      uTime: this.flameUniforms.uTime, uSway: this.flameUniforms.uSway, uBright: { value: 1.2 },
+      uBase: { value: new THREE.Color('#6F9BFF') }, uMid: { value: new THREE.Color('#FFF8E6') }, uTip: { value: new THREE.Color('#FFE2A0') },
+    };
+    this.core = new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 10), new THREE.ShaderMaterial({
+      uniforms: this.coreUniforms, vertexShader: flameVert, fragmentShader: flameFrag,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    }));
+    this.core.scale.set(0.42, 1.05, 0.42);
+    this.core.position.y = 0.03;
+    this.flamePivot.add(this.core);
+    this.glow = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialTexture({ size: 128, inner: 'rgba(255,200,120,0.9)', mid: 'rgba(255,160,80,0.22)', outer: 'rgba(255,140,60,0)' }),
+      blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.16,
+    }));
+    this.glow.scale.setScalar(0.62);
+    this.glow.position.y = 0.04;
+    this.flamePivot.add(this.glow);
     this.halo = new THREE.Sprite(new THREE.SpriteMaterial({
       map: radialTexture({ size: 64, inner: 'rgba(255,214,140,1)', mid: 'rgba(255,184,102,0.35)', outer: 'rgba(255,170,90,0)' }),
       blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.35,
@@ -181,40 +263,64 @@ export class Cyril {
     this.halo.position.y = 0.05;
     this.flamePivot.add(this.halo);
 
-    this.light = new THREE.PointLight('#FFB866', 1.6, 2.2, 2);
+    this.light = new THREE.PointLight('#FFB866', 2.3, 2.6, 2);
     this.light.position.y = 0.05;
     this.flamePivot.add(this.light);
 
     // Face
     this.face = new THREE.Group();
     this.rig.add(this.face);
-    const white = new THREE.MeshBasicMaterial({ color: '#FFFDF7' });
-    const pupilMat = new THREE.MeshBasicMaterial({ color: '#2A1A17' });
-    const eyeGeo = new THREE.SphereGeometry(0.014, 16, 12);
-    const pupilGeo = new THREE.SphereGeometry(0.007, 12, 8);
+    const white = new THREE.MeshStandardMaterial({ color: '#FFFDF7', roughness: 0.18, emissive: new THREE.Color('#FFF4E0'), emissiveIntensity: 0.35 });
+    const glintMat = new THREE.MeshBasicMaterial({ color: '#FFFFFF' });
+    const pupilMat = new THREE.MeshStandardMaterial({ color: '#2A1A17', roughness: 0.15 });
+    const eyeGeo = new THREE.SphereGeometry(0.0178, 20, 14);
+    const pupilGeo = new THREE.SphereGeometry(0.0098, 16, 10);
+    const glintGeo = new THREE.SphereGeometry(0.0028, 8, 6);
+    // upper eyelids: wax shells that roll down over the eye (blinks, smug half-lids, squeezes)
+    const lidGeo = new THREE.SphereGeometry(0.0192, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2);
+    lidGeo.scale(1, 1.1, 0.68);
+    const lidMat = new THREE.MeshStandardMaterial({ color: '#EAD7B6', roughness: 0.55, emissive: new THREE.Color('#FFC890'), emissiveIntensity: 0.08 });
     this.eyes = [-1, 1].map((side) => {
       const g = new THREE.Group();
-      g.position.set(0.026 * side, 0.17, 0.072);
+      g.position.set(0.03 * side, 0.172, 0.0705);
       const w = new THREE.Mesh(eyeGeo, white);
       w.scale.set(1, 1.1, 0.6);
       const p = new THREE.Mesh(pupilGeo, pupilMat);
-      p.position.z = 0.0095;
+      p.position.z = 0.0114;
       p.scale.z = 0.5;
-      g.add(w, p);
+      const glint = new THREE.Mesh(glintGeo, glintMat);
+      glint.position.set(-0.0033, 0.0035, 0.0102);
+      p.add(glint);
+      const lid = new THREE.Mesh(lidGeo, lidMat);
+      lid.rotation.x = -1.2;
+      g.add(w, p, lid);
+      this._lids = this._lids || [];
+      this._lids.push(lid);
       this.face.add(g);
       return { g, pupil: p, side };
     });
     const browMat = new THREE.MeshStandardMaterial({ color: TOFFEE, roughness: 0.7 });
-    const browGeo = new THREE.CapsuleGeometry(0.003, 0.018, 4, 6);
+    const browGeo = new THREE.CapsuleGeometry(0.004, 0.024, 4, 8);
     browGeo.rotateZ(Math.PI / 2);
     this.brows = [-1, 1].map((side) => {
       const m = new THREE.Mesh(browGeo, browMat);
-      m.position.set(0.026 * side, 0.195, 0.0775);
+      m.position.set(0.03 * side, 0.2, 0.0765);
       this.face.add(m);
       return { m, side };
     });
+    // rosy cheeks, sitting on the curved wax
+    const blushMat = new THREE.MeshBasicMaterial({ map: radialTexture({ size: 64, inner: 'rgba(226,85,59,0.55)', mid: 'rgba(226,85,59,0.22)', outer: 'rgba(226,85,59,0)' }), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+    this.blush = [-1, 1].map((side) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(0.034, 0.022), blushMat);
+      const x = 0.047 * side; const R = 0.0822;
+      m.position.set(x, 0.142, Math.sqrt(R * R - x * x) + 0.0012);
+      m.rotation.y = Math.asin(x / R);
+      this.face.add(m);
+      return m;
+    });
+    this.blushMat = blushMat;
     this.mouthGeo = mouthShapes();
-    this.mouthMat = new THREE.MeshBasicMaterial({ color: CLARET, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 });
+    this.mouthMat = new THREE.MeshStandardMaterial({ color: '#6A1626', roughness: 0.35, emissive: new THREE.Color('#3A0A12'), emissiveIntensity: 0.4, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 });
     this.mouth = new THREE.Mesh(this.mouthGeo.D, this.mouthMat);
     this.mouth.position.set(0, 0.125, 0.0832);
     this.mouth.rotation.x = -0.05;
@@ -244,13 +350,24 @@ export class Cyril {
   }
 
   _dripGeo(deg, r, len) {
-    const g = new THREE.CapsuleGeometry(r, len, 4, 8);
+    // a run of wax from the rim with a fat bead at the end
+    const g = new THREE.CapsuleGeometry(r, len, 4, 10);
+    const bead = new THREE.SphereGeometry(r * 1.45, 12, 8);
+    bead.translate(0, -len / 2 - r * 0.2, 0);
     const a = THREE.MathUtils.degToRad(deg);
-    const R = 0.0775;
-    g.scale(1, 1, 0.7);
-    g.rotateY(a);
-    g.translate(Math.sin(a) * R, 0.24 - len / 2 - r * 0.3, Math.cos(a) * R);
-    return g;
+    const R = 0.0785 + (len > 0.07 ? 0.0006 : 0);
+    const m = mergeGeometries([g.toNonIndexed(), bead.toNonIndexed()]);
+    { // taper: thin at the rim, fat toward the bead, with a little wobble
+      const p = m.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const y = p.getY(i); const k = 0.75 + 0.35 * clamp01((len / 2 - y) / len) + 0.08 * Math.sin(y * 260 + deg);
+        p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k);
+      }
+    }
+    m.scale(1, 1, 0.62);
+    m.rotateY(a);
+    m.translate(Math.sin(a) * R, 0.242 - len / 2 - r * 0.3, Math.cos(a) * R);
+    return m;
   }
 
   // ---------- public API ----------
@@ -263,6 +380,12 @@ export class Cyril {
     if (name === 'drumroll') this.drumroll = true;
     else this.drumroll = false;
   }
+
+  /** Resting face for a screen: neutral | welcome | proud | attentive | sly | eager | warm. */
+  setExpression(name) { this.exprGoal = { ...(EXPR[name] || EXPR.neutral) }; }
+
+  /** Lean a few degrees toward a side (-1 left, 0 upright, 1 right), e.g. toward his speech bubble. */
+  leanTo(side) { this.leanGoal = side; }
 
   /** Flame state light: calm | hurry | celebrate */
   setMood(mood) { this.mood = TIP[mood] ? mood : 'calm'; }
@@ -301,10 +424,16 @@ export class Cyril {
     // pose defaults (idle)
     const breathe = Math.sin(t * Math.PI * 2 * 0.25) * 0.012 * amp;
     let sy = 1 + breathe; let sx = 1 - breathe * 0.5;
-    let y = 0; let tiltZ = 0; let tiltX = 0; let shakeX = 0;
+    let y = 0; let tiltX = 0; let shakeX = 0;
     let flameScale = 1; let bright = 1; let flick = 0.12;
-    let eyeSY = 1; let eyeY = 0; let browL = 0; let browR = 0; let browRotL = 0; let browRotR = 0;
-    let mouthOpen = 0; let mouthShape = 'D'; let mouthX = 1; let tipName = this.mood;
+    const ek = 1 - Math.exp(-dt * 6);
+    for (const k in this.expr) this.expr[k] += (this.exprGoal[k] - this.expr[k]) * ek;
+    const E = this.expr;
+    this.lean += (this.leanGoal - this.lean) * (1 - Math.exp(-dt * 3));
+    let eyeSY = 1; let eyeY = 0; let browL = E.brow + E.browL; let browR = E.brow; let browRotL = E.tilt; let browRotR = -E.tilt;
+    let mouthOpen = 0; let mouthShape = E.smile > 0.2 ? 'smile' : 'D'; let mouthX = 1; let tipName = this.mood;
+    let smileAmt = E.smile; let lids = E.lids;
+    let tiltZ = THREE.MathUtils.degToRad(E.lean - this.lean * 3) * amp + Math.sin(t * 0.55) * 0.012 * amp;
 
     // talking
     if (this.talking) {
@@ -328,7 +457,7 @@ export class Cyril {
             else if (p < 0.7) { const q = (p - 0.15) / 0.55; y = Math.sin(q * Math.PI) * 0.03 * amp; sy *= lerp(1.08, 1.0, Math.abs(q - 0.5) * 2); }
             else if (p < 0.85) { sy *= lerp(0.92, 1, (p - 0.7) / 0.15); sx *= lerp(1.05, 1, (p - 0.7) / 0.15); }
             flameScale *= lerp(1, 1.6, env); bright *= lerp(1, 1.35, env);
-            eyeSY = lerp(1, 0.35, env); eyeY = 0.004 * env; mouthShape = 'smile'; tipName = 'celebrate';
+            eyeSY = lerp(1, 1.12, env); eyeY = 0.003 * env; mouthShape = 'smile'; smileAmt = 1; lids = lids * (1 - env); tipName = 'celebrate';
             browL = browR = 0.003 * env;
             break;
           }
@@ -340,23 +469,23 @@ export class Cyril {
             mouthShape = 'O'; mouthOpen = 0.9 * env; mouthX = 0.6;
             const w = Math.exp(-p * 5) * Math.sin(p * 40);
             sy *= 1 + 0.06 * env * (p < 0.2 ? p / 0.2 : 1) * 0.6 + w * 0.03 * amp;
-            eyeSY = 1.15;
+            eyeSY = 1.15; lids = 0; mouthShape = 'O';
             break;
           }
           case 'smug':
-            browL = 0.005 * env; browRotL = -0.25 * env; eyeSY = lerp(1, 0.55, env);
-            tiltZ = THREE.MathUtils.degToRad(8) * env * amp; mouthShape = 'smile';
+            browL = lerp(browL, 0.006, env); browR = lerp(browR, 0, env); browRotL = lerp(browRotL, -0.25, env); lids = lerp(lids, 0.5, env);
+            tiltZ += THREE.MathUtils.degToRad(8) * env * amp; mouthShape = 'smile'; smileAmt = 0.9;
             break;
           case 'sad':
             bright *= lerp(1, 0.7, env); browRotL = 0.35 * env; browRotR = -0.35 * env; browL = browR = -0.001 * env;
-            eyeY = -0.002 * env; flameScale *= lerp(1, 0.85, env);
+            eyeY = -0.002 * env; flameScale *= lerp(1, 0.85, env); mouthShape = 'D'; lids = lerp(lids, 0.3, env);
             break;
           case 'guffaw':
             if (p < 0.65) shakeX = Math.sin(t * Math.PI * 2 * 14) * THREE.MathUtils.degToRad(2) * amp;
             flick = 0.4; mouthOpen = Math.max(mouthOpen, 0.6 + 0.4 * Math.abs(Math.sin(t * 30))); eyeSY = 0.5; browL = browR = 0.003;
             break;
           case 'drumroll':
-            eyeSY = 0.12; y = Math.sin(t * Math.PI * 2 * 20) * 0.002 * amp; flick = 0.3; flameScale *= 0.92 + 0.08 * Math.sin(t * 40);
+            lids = 1; y = Math.sin(t * Math.PI * 2 * 20) * 0.002 * amp; flick = 0.3; flameScale *= 0.92 + 0.08 * Math.sin(t * 40);
             browRotL = 0.2; browRotR = -0.2;
             break;
           default:
@@ -369,7 +498,7 @@ export class Cyril {
     if (this.blinkT >= 0) {
       const b = (t - this.blinkT) * 1000;
       const k = b < 60 ? lerp(1, 0.1, b / 60) : b < 150 ? lerp(0.1, 1, (b - 60) / 90) : 1;
-      eyeSY *= k;
+      lids = Math.max(lids, 1 - (k - 0.1) / 0.9);
       if (b >= 150) { this.blinkT = -1; this.nextBlink = t + 2.5 + Math.random() * 3.5; }
     }
 
@@ -388,12 +517,16 @@ export class Cyril {
     this.flamePivot.scale.setScalar(THREE.MathUtils.lerp(this.flamePivot.scale.x, fs, 1 - Math.exp(-dt * 18)));
     this.flameUniforms.uTime.value = t;
     this.flameUniforms.uSway.value = amp * (1 + flick * 2);
-    this.flameUniforms.uBright.value = 1.25 * bright * this.flicker;
+    this.flameUniforms.uBright.value = 0.8 * bright * this.flicker;
     this.tip.lerp(TIP[tipName] || TIP.calm, 1 - Math.exp(-dt * (tipName === 'shock' ? 40 : 8)));
     this.flameUniforms.uTip.value.copy(this.tip);
-    this.light.intensity = 1.6 * bright * this.flicker * this.flamePivot.scale.x;
-    this.halo.material.opacity = 0.35 * bright * this.flicker;
-    this.waxMat.emissiveIntensity = (0.16 + 0.1 * clamp01((this.flicker - 0.85) / 0.3)) * bright;
+    this.light.intensity = 2.3 * bright * this.flicker * this.flamePivot.scale.x;
+    this.halo.material.opacity = 0.2 * bright * this.flicker;
+    this.glow.material.opacity = 0.16 * bright * this.flicker;
+    this.coreUniforms.uBright.value = 0.55 * bright * this.flicker;
+    this.poolMat.emissiveIntensity = 0.18 + 0.12 * this.flicker * bright;
+    this.blushMat.opacity = R && (R.name === 'delight' || R.name === 'smug') ? 1 : R && R.name === 'shock' ? 0.4 : 0.75;
+    this.waxMat.emissiveIntensity = (0.2 + 0.12 * clamp01((this.flicker - 0.85) / 0.3)) * bright;
 
     // eyes + pupils
     if (this.lookTarget) {
@@ -406,19 +539,20 @@ export class Cyril {
     this.pupil.lerp(this.pupilGoal, 0.15);
     for (const e of this.eyes) {
       e.g.scale.y = THREE.MathUtils.lerp(e.g.scale.y, eyeSY, 1 - Math.exp(-dt * 30));
-      e.g.position.y = 0.17 + eyeY;
-      e.pupil.position.x = this.pupil.x * 0.005;
-      e.pupil.position.y = this.pupil.y * 0.005;
+      e.g.position.y = 0.172 + eyeY;
+      e.pupil.position.x = this.pupil.x * 0.0058;
+      e.pupil.position.y = this.pupil.y * 0.0058;
     }
-    this.brows[0].m.position.y = 0.195 + browL + eyeY; this.brows[0].m.rotation.z = browRotL;
-    this.brows[1].m.position.y = 0.195 + browR + eyeY; this.brows[1].m.rotation.z = browRotR;
+    for (const lid of this._lids) lid.rotation.x = lerp(-1.2, 1.55, clamp01(lids));
+    this.brows[0].m.position.y = 0.2 + browL + eyeY; this.brows[0].m.rotation.z = browRotL;
+    this.brows[1].m.position.y = 0.2 + browR + eyeY; this.brows[1].m.rotation.z = browRotR;
     if (this.talking && mouthOpen > 0.5) { this.brows[0].m.position.y += 0.001; this.brows[1].m.position.y += 0.001; }
 
     // mouth
     this.mouthOpen = THREE.MathUtils.lerp(this.mouthOpen, mouthOpen, 1 - Math.exp(-dt * 35));
     const geo = mouthShape === 'smile' && this.mouthOpen < 0.4 ? this.mouthGeo.smile : this.mouthGeo.D;
     if (this.mouth.geometry !== geo) this.mouth.geometry = geo;
-    if (geo === this.mouthGeo.smile) this.mouth.scale.set(1, 1, 1);
+    if (geo === this.mouthGeo.smile) this.mouth.scale.set(0.85 + 0.2 * smileAmt, 0.4 + 0.6 * smileAmt, 1);
     else this.mouth.scale.set(mouthX, lerp(0.08, mouthShape === 'O' ? 0.9 : 1, this.mouthOpen), 1);
 
     // tally drips grow out of the rim

@@ -51,11 +51,11 @@ function jelly(accent) {
 
 function sprout(accent) {
   const g = new THREE.Group();
-  const green = std('#7F9A74', { roughness: 0.7 });
+  const green = std('#8DB36B', { roughness: 0.55 });
   const body = new THREE.Mesh(new THREE.SphereGeometry(0.042, 20, 14), green);
   body.position.y = 0.045;
   g.add(body);
-  const leafMat = std(new THREE.Color('#6E8B63').lerp(new THREE.Color(accent), 0.35), { roughness: 0.75, side: THREE.DoubleSide });
+  const leafMat = std(new THREE.Color('#5E8A45'), { roughness: 0.6, side: THREE.DoubleSide });
   for (let i = 0; i < 5; i++) {
     const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.032, 12, 8, 0, Math.PI), leafMat);
     const a = (i / 5) * Math.PI * 2 + 0.4;
@@ -64,6 +64,10 @@ function sprout(accent) {
     leaf.rotation.set(0.3, a, 0);
     if (Math.abs(Math.sin(a / 2)) < 0.3) continue; // keep the face clear
     g.add(leaf);
+    // a lighter inner leaf layer so it reads as a sprout, not a ball
+    const inner = new THREE.Mesh(leaf.geometry, std('#A9CC7E', { roughness: 0.6, side: THREE.DoubleSide }));
+    inner.scale.set(0.8, 1.05, 0.3); inner.position.set(Math.sin(a + 0.6) * 0.024, 0.06, Math.cos(a + 0.6) * 0.024); inner.rotation.set(0.15, a + 0.6, 0);
+    g.add(inner);
   }
   const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.016, 8), green);
   stalk.position.y = 0.088;
