@@ -25,6 +25,45 @@ const reducedMotion = () => document.documentElement.dataset.reducedMotion === '
 // Course changes get the "lights dip" and a soft swell; everything else a paper swish.
 const COURSE = /(^|-)intro$|^podium$/;
 
+// Shared elements: a prompt/fact that is on both screens glides from its old spot to its new one
+// instead of cross-fading into a double exposure.
+const SHARED = '[class*="prompt"], [class*="fact"], .t-prompt, h1, h2';
+function sharedFrom(oldRoot) {
+  const m = new Map();
+  for (const el of oldRoot.querySelectorAll(SHARED)) {
+    const t = el.textContent.trim();
+    if (t.length < 12 || m.has(t) || el.querySelector(SHARED)) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width && r.height && r.bottom > 0) m.set(t, { el, r });
+  }
+  return m;
+}
+function sharedTo(oldMap, newRoot) {
+  if (!oldMap.size || reducedMotion()) return;
+  const done = new Set();
+  for (const el of newRoot.querySelectorAll(SHARED)) {
+    const t = el.textContent.trim();
+    const from = oldMap.get(t);
+    if (!from || done.has(t) || el.querySelector(SHARED)) continue;
+    const to = el.getBoundingClientRect();
+    if (!to.width) continue;
+    done.add(t);
+    const ghost = from.el.cloneNode(true);
+    const cs = getComputedStyle(from.el);
+    ghost.classList.add('shared-ghost');
+    Object.assign(ghost.style, { left: `${from.r.left}px`, top: `${from.r.top}px`, width: `${from.r.width}px`, color: cs.color, font: cs.font, textShadow: cs.textShadow, fontVariationSettings: cs.fontVariationSettings, textAlign: cs.textAlign });
+    document.body.append(ghost);
+    from.el.style.visibility = 'hidden';
+    el.style.visibility = 'hidden';
+    const k = to.width / from.r.width;
+    const a = ghost.animate(
+      [{ transform: 'none', opacity: 1 }, { transform: `translate(${to.left - from.r.left}px, ${to.top - from.r.top}px) scale(${k})`, opacity: 1 }],
+      { duration: 420, easing: 'cubic-bezier(.83,0,.17,1)', fill: 'forwards' },
+    );
+    a.finished.catch(() => {}).finally(() => { el.style.visibility = ''; ghost.remove(); });
+  }
+}
+
 function staggerIn(container, baseDelay) {
   if (reducedMotion()) return;
   const kids = [...container.children].slice(0, 7);
@@ -70,6 +109,7 @@ export class Router {
     if (prev) {
       try { prev.inst?.unmount?.(); } catch (e) { console.error(`[screen ${prev.id}] unmount`, e); }
       const s1 = prev.show; const s2 = prev.sheet;
+      this._shared = sharedFrom(s1);
       const rm = reducedMotion();
       const a1 = s1.animate(
         [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-10px) scale(.985)' }],
@@ -131,7 +171,9 @@ export class Router {
       console.error(`[screen ${id}] mount`, e);
       sheet.append(h('p.t-body', 'Something went wrong drawing this screen.'));
     }
-    if (layout !== 'show' && prev) staggerIn(sheet, Math.round(sheetDelay * 0.4));
+    // new sheet content waits until the old content has mostly gone (no layer soup)
+    if (layout !== 'show' && prev) staggerIn(sheet, sameLayout ? 150 : prev.layout === 'show' ? 100 : 200);
+    if (prev && this._shared) { sharedTo(this._shared, show); this._shared = null; }
   }
 
   update(ctx) {

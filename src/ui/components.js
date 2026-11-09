@@ -7,7 +7,7 @@ import { AVATARS } from '../game/constants.js';
 // ---------- procedural paper + grain (DESIGN 3.4) ----------
 // One small PNG tile made once at startup replaces the SVG feTurbulence data URI: SVG filters in
 // CSS backgrounds rasterise slowly on iOS and per element size; a decoded PNG is shared by every card.
-function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26] } = {}) {
+function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26], mottle = false } = {}) {
   const c = document.createElement('canvas');
   c.width = size; c.height = size;
   const g = c.getContext('2d');
@@ -26,7 +26,7 @@ function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26] } = {}) {
   };
   for (let i = 0; i < d.length; i += 4) {
     const px = (i / 4) % size; const py = Math.floor(i / 4 / size);
-    const n = fibres ? 0.35 * rnd() + 0.65 * mott(px, py) * mott(px * 2 + 31, py * 2 + 17) * 1.6 : rnd();
+    const n = mottle ? 0.35 * rnd() + 0.65 * mott(px, py) * mott(px * 2 + 31, py * 2 + 17) * 1.6 : rnd();
     d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2];
     d[i + 3] = Math.round(n * n * alpha * 255);
   }
@@ -43,7 +43,7 @@ function makeTile(size, { fibres = 0, alpha = 0.2, rgb = [64, 38, 26] } = {}) {
 }
 try {
   if (typeof document !== 'undefined') {
-    const paper = makeTile(128, { fibres: 70, alpha: 0.075 });
+    const paper = makeTile(128, { fibres: 22, alpha: 0.1 }); // fine grain won the blind A/B over mottled pulp
     const grain = makeTile(128, { alpha: 0.6, rgb: [40, 24, 18] });
     if (paper) document.documentElement.style.setProperty('--paper', `url("${paper}")`);
     if (grain) document.documentElement.style.setProperty('--grain', `url("${grain}")`);
@@ -277,14 +277,25 @@ export function leaderboard(rows, playerById, { animate = true, delay = 600 } = 
     for (const e of rowEls.values()) {
       const lead = e === firstRow && rows[0] && rows[0].score > 0;
       e.classList.toggle('lead', !!lead);
+      e.querySelector('.flame')?.remove();
+      if (lead) e.querySelector('.rank').after(h('span.flame', { html: ICONS.flame, 'aria-hidden': 'true' }));
     }
   };
+  // joint places read "=2" (a three-way tie is not 2nd, 3rd and 4th)
+  const label = (list, r) => {
+    const i = list.indexOf(r);
+    let first = i;
+    while (first > 0 && list[first - 1].score === r.score) first--;
+    const tied = (list[first + 1] && list[first + 1].score === r.score && first + 1 !== first) || first !== i;
+    return `${tied ? '=' : ''}${first + 1}`;
+  };
+  const showDelta = (r) => r.delta > 0 && (r.prev ?? 0) > 0; // after course one the delta just repeats the total
   for (const r of animate ? byPrev : rows) {
     const p = playerById(r.id);
     const scoreEl = h('span.score', String(animate ? r.prev ?? r.score : r.score));
-    const rowEl = h('div.board-row', h('span.rank', String((animate ? r.prevRank : rows.indexOf(r)) + 1)), chip(p), scoreEl);
+    const rowEl = h('div.board-row', h('span.rank', animate ? String((r.prevRank ?? 0) + 1) : label(rows, r)), chip(p), scoreEl);
     rowEl.scoreEl = scoreEl;
-    if (!animate && r.delta > 0) rowEl.append(h('span.delta', `+${r.delta}`));
+    if (!animate && showDelta(r)) rowEl.append(h('span.delta', `+${r.delta}`));
     rowEls.set(r.id, rowEl);
     el.append(rowEl);
   }
@@ -297,7 +308,7 @@ export function leaderboard(rows, playerById, { animate = true, delay = 600 } = 
     ));
     setTimeout(() => {
       const first = new Map([...rowEls].map(([id, e]) => [id, e.getBoundingClientRect().top]));
-      rows.forEach((r, i) => { const e = rowEls.get(r.id); el.append(e); e.querySelector('.rank').textContent = String(i + 1); });
+      rows.forEach((r) => { const e = rowEls.get(r.id); el.append(e); e.querySelector('.rank').textContent = label(rows, r); });
       let moved = false;
       for (const [id, e] of rowEls) {
         const dy = first.get(id) - e.getBoundingClientRect().top;
@@ -308,7 +319,7 @@ export function leaderboard(rows, playerById, { animate = true, delay = 600 } = 
       }
       rows.forEach((r, i) => {
         const e = rowEls.get(r.id);
-        if (r.delta > 0) setTimeout(() => e.append(h('span.delta', `+${r.delta}`)), 40 * i);
+        if (showDelta(r)) setTimeout(() => e.append(h('span.delta', `+${r.delta}`)), 40 * i);
         countUp(e.scoreEl, r.prev ?? 0, r.score, 600);
       });
       setTimeout(setLead, 440);

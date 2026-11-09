@@ -9,7 +9,6 @@ const VERBS = { 'r1-write': 'plated', 'r1-wait': 'plated', 'r2-write': 'fibbed',
 export function mountStrip(stripEl, ctx) {
   const timer = timerRing();
   const chips = chipsRow(ctx.players, (p) => (ctx.progress.done[p.id] ? 'done' : 'waiting'), { compact: ctx.players.length > 3 });
-  if (ctx.players.length > 5) chips.classList.add('crowd');
   const count = h('b');
   const pips = h('span.pips', ctx.players.map(() => h('i')));
   const verb = VERBS[ctx.phase?.id] || VERBS.default;
@@ -27,6 +26,13 @@ export function mountStrip(stripEl, ctx) {
   };
   sync(ctx);
   if (ctx.duration) timer.set(ctx.remaining(), ctx.duration);
+  // fit every seat beside the clock: shrink avatars, then overlap, never clip
+  requestAnimationFrame(() => {
+    const W = chips.clientWidth; const n = ctx.players.length;
+    if (!W || !n) return;
+    const per = Math.min(38, Math.floor((W - 4 * (n - 1)) / n));
+    if (per < 30) { chips.classList.add('crowd'); chips.style.setProperty('--ov', `${Math.min(14, 30 - per + 2)}px`); }
+  });
   return {
     update(c) {
       chips.update((p) => (c.progress.done[p.id] ? 'done' : 'waiting'));
