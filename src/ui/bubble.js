@@ -13,7 +13,8 @@ const MARGIN = 8;
 
 const CSS = `
 #bubbles .bubble { box-shadow: none; filter: drop-shadow(0 2px 0 rgba(42,26,23,.10)) drop-shadow(0 9px 16px rgba(30,14,10,.34));
-  box-sizing: border-box; text-wrap: pretty; overflow: hidden; border: 1px solid rgba(122,74,42,.10); }
+  box-sizing: border-box; text-wrap: pretty; overflow: visible; border: 1px solid rgba(122,74,42,.10); }
+#bubbles .bubble::after { background: var(--c-linen); }
 #bubbles .bubble::after { border: 0; width: 26px; height: 18px; bottom: -15px; clip-path: path('M0 0 L26 0 C 18 4, 10 10, 4 18 C 6 10, 5 5, 0 0 Z'); }
 #bubbles .bubble.side::after { width: 18px; height: 26px; left: -15px; bottom: auto; clip-path: path('M18 0 L18 26 C 14 18, 8 10, 0 4 C 8 6, 13 5, 18 0 Z'); }
 #bubbles .bubble.side.side-left::after { left: auto; right: -15px; clip-path: path('M0 0 L0 26 C 4 18, 10 10, 18 4 C 10 6, 5 5, 0 0 Z'); }

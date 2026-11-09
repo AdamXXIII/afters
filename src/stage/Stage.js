@@ -16,7 +16,7 @@ export const SHOTS = {
   create: { expr: 'welcome', pos: [0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   join: { expr: 'welcome', pos: [-0.05, 0.36, 0.78], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.3 },
   lobby: { expr: 'welcome', pos: [0, 1.6, 1.4], target: [0, 0, -0.2] },
-  intro: { expr: 'welcome', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3, maxS: 0.5 },
+  intro: { expr: 'welcome', pos: [0, 0.3, 0.95], target: [0, 0.16, 0], subject: 'cyril', orbit: 3 },
   write: { expr: 'attentive', pos: [0, 0.27, 1.05], target: [0, 0.21, 0], subject: 'head' },
   vote: { expr: 'sly', pos: [0, 0.55, 1.05], target: [0, 0.16, 0], subject: 'cyril' },
   reveal: { expr: 'eager', pos: [0, 0.34, 0.95], target: [0, 0.15, 0], subject: 'cyril' },
@@ -122,6 +122,7 @@ export class Stage {
 
     // Cake (podium)
     this.cake = buildCake();
+    this.cake.scale.setScalar(1.6);
     this.cake.visible = false;
     this.cake.position.set(0.07, TABLE_Y, -0.36);
     this.scene.add(this.cake);
@@ -252,7 +253,7 @@ export class Stage {
   /** Decide where the subject should sit, from where the HTML content actually is. */
   _measure() {
     const W = this.w; const H = this.h;
-    const bottom = this._showBottom() - (this.layout === 'show' ? 10 : 0);
+    const bottom = this._showBottom() - (this.layout === 'show' ? 22 : 0);
     if (this.layout === 'input') {
       const slot = document.querySelector('#strip .cyril-slot');
       const r = slot?.getBoundingClientRect();
@@ -289,7 +290,11 @@ export class Stage {
     const left = tryCol(W * 0.27, 62);
     let g;
     if (centre && centre.h > maxS + 110) g = fitIn(centre, W / 2); // room for Cyril and a bubble above him
-    else if (left && left.h >= minS && this.subject === 'cyril') g = fitIn(left, W * 0.27); // bubble goes beside him
+    else if (centre && centre.h >= minS + 100 && this.subject === 'cyril') {
+      // centred, a little smaller, leaving a bubble-sized gap above his flame
+      const S = Math.min(maxS, centre.h - 100);
+      g = { S, Yc: centre.bottom - S / 2 - 6, Xc: W / 2 };
+    } else if (left && left.h >= minS && this.subject === 'cyril') g = fitIn(left, W * 0.27); // bubble goes beside him
     else if (centre && centre.h >= minS) g = fitIn(centre, W / 2);
     else {
       // No room anywhere: peek over the content (flame and eyes in the gap, body behind cards).
@@ -384,7 +389,7 @@ export class Stage {
     if (this.subject !== 'podium' || !this.cake.visible) return null;
     const pts = [];
     const k = this.cake;
-    for (const x of [-0.24, 0.26]) for (const y of [0, 0.36]) pts.push(this.project(k.localToWorld(new THREE.Vector3(x, y, 0.15))));
+    for (const x of [-0.22, 0.24]) for (const y of [0, 0.3]) pts.push(this.project(k.localToWorld(new THREE.Vector3(x, y, 0.15))));
     const xs = pts.map((p) => p.x); const ys = pts.map((p) => p.y);
     const x = Math.min(...xs); const y = Math.min(...ys);
     return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y };
@@ -463,7 +468,7 @@ export class Stage {
     this.podiumIds = top3;
     this.cake.visible = !!top3;
     this.cakeRise = 0;
-    this.cyrilGoal.copy(top3 ? new THREE.Vector3(-0.36, TABLE_Y + 0.02, -0.44) : this.cyrilHome);
+    this.cyrilGoal.copy(top3 ? new THREE.Vector3(0.5, TABLE_Y + 0.02, -0.5) : this.cyrilHome);
     if (!top3) {
       for (const s of this.seats.values()) { s.group.position.set(s.home.x, TABLE_Y, s.home.z); s.group.rotation.y = -seatAngle(s.seat) * 0.45; s.avatar.scale.setScalar(1.5); }
     }
@@ -564,9 +569,9 @@ export class Stage {
         const rank = this.podiumIds.indexOf(id);
         if (rank >= 0) {
           const tier = this.cake.userData.tiers[2 - rank] || this.cake.userData.tiers[0];
-          const off = rank === 0 ? new THREE.Vector3(0, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.15, 0, 0.1) : new THREE.Vector3(0.18, 0, 0.13);
+          const off = rank === 0 ? new THREE.Vector3(0, 0, 0.0) : rank === 1 ? new THREE.Vector3(-0.17, 0, 0.06) : new THREE.Vector3(0.22, 0, 0.14);
           const goal = this.cake.position.clone().add(off);
-          goal.y = TABLE_Y + tier.top * this.cakeRise;
+          goal.y = TABLE_Y + tier.top * this.cake.scale.y * this.cakeRise;
           s.group.position.x += (goal.x - s.group.position.x) * fk;
           s.group.position.z += (goal.z - s.group.position.z) * fk;
           s.group.position.y = goal.y + Math.max(0, d.y);

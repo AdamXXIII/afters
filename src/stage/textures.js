@@ -152,11 +152,11 @@ export function wallTexture(w = 512, h = 512) {
   g.fillRect(sx - 10, sy - 10, 20, 20);
   // framed picture (a still life silhouette)
   const px = w * 0.16; const py = h * 0.24; const pw = w * 0.2; const ph = h * 0.24;
-  g.fillStyle = '#7A5A2A';
+  g.fillStyle = '#4A3020';
   g.fillRect(px - 10, py - 10, pw + 20, ph + 20);
   g.fillStyle = '#2E1A12';
   g.fillRect(px, py, pw, ph);
-  g.fillStyle = 'rgba(200,155,60,0.25)';
+  g.fillStyle = 'rgba(200,155,60,0.12)';
   g.beginPath(); g.ellipse(px + pw / 2, py + ph * 0.7, pw * 0.3, ph * 0.12, 0, 0, Math.PI * 2); g.fill();
   g.beginPath(); g.arc(px + pw * 0.42, py + ph * 0.5, pw * 0.12, 0, Math.PI * 2); g.fill();
   g.beginPath(); g.arc(px + pw * 0.6, py + ph * 0.55, pw * 0.09, 0, Math.PI * 2); g.fill();

@@ -9,7 +9,7 @@ const CLARET = '#7A1E2C';
 const TOFFEE = '#7A4A2A';
 const BRASS = '#C89B3C';
 
-const C_BASE = new THREE.Color('#FFF4D6');
+const C_BASE = new THREE.Color('#FFE6A8');
 const C_MID = new THREE.Color('#FFAE45');
 const TIP = {
   calm: new THREE.Color('#E2553B').lerp(new THREE.Color('#FFC86B'), 0.35),
@@ -132,7 +132,7 @@ export class Cyril {
   }
 
   _build() {
-    const wax = new THREE.MeshStandardMaterial({ color: '#FFFFFF', map: waxTexture(), roughness: 0.5, emissive: new THREE.Color('#FFC890'), emissiveIntensity: 0.1 });
+    const wax = new THREE.MeshPhysicalMaterial({ color: '#FFFFFF', map: waxTexture(), roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.45, sheen: 0.4, sheenColor: new THREE.Color('#FFD7A0'), sheenRoughness: 0.6, emissive: new THREE.Color('#FFB46A'), emissiveIntensity: 0.1 });
     // Fake subsurface: the wax glows more near the flame (emissive ramps with height).
     wax.onBeforeCompile = (sh) => {
       sh.vertexShader = sh.vertexShader
@@ -142,10 +142,10 @@ export class Cyril {
         .replace('#include <common>', '#include <common>\nvarying float vWaxY;')
         .replace('#include <emissivemap_fragment>', [
           '#include <emissivemap_fragment>',
-          'totalEmissiveRadiance *= mix(0.4, 1.05, smoothstep(0.02, 0.245, vWaxY));',
+          'totalEmissiveRadiance *= mix(0.55, 0.8, smoothstep(0.0, 0.17, vWaxY)) + 2.2 * smoothstep(0.17, 0.245, vWaxY);',
           // wax translucency: light bleeds through the silhouette edges, warmest near the flame
           'float waxFres = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.2);',
-          'totalEmissiveRadiance += vec3(1.0, 0.55, 0.22) * waxFres * mix(0.18, 0.75, smoothstep(0.05, 0.24, vWaxY));',
+          'totalEmissiveRadiance += vec3(1.0, 0.5, 0.18) * waxFres * mix(0.12, 0.9, smoothstep(0.05, 0.24, vWaxY));',
         ].join('\n'));
     };
     this.waxMat = wax;
@@ -357,6 +357,13 @@ export class Cyril {
     const a = THREE.MathUtils.degToRad(deg);
     const R = 0.0785 + (len > 0.07 ? 0.0006 : 0);
     const m = mergeGeometries([g.toNonIndexed(), bead.toNonIndexed()]);
+    { // taper: thin at the rim, fat toward the bead, with a little wobble
+      const p = m.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const y = p.getY(i); const k = 0.75 + 0.35 * clamp01((len / 2 - y) / len) + 0.08 * Math.sin(y * 260 + deg);
+        p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k);
+      }
+    }
     m.scale(1, 1, 0.62);
     m.rotateY(a);
     m.translate(Math.sin(a) * R, 0.242 - len / 2 - r * 0.3, Math.cos(a) * R);
@@ -450,7 +457,7 @@ export class Cyril {
             else if (p < 0.7) { const q = (p - 0.15) / 0.55; y = Math.sin(q * Math.PI) * 0.03 * amp; sy *= lerp(1.08, 1.0, Math.abs(q - 0.5) * 2); }
             else if (p < 0.85) { sy *= lerp(0.92, 1, (p - 0.7) / 0.15); sx *= lerp(1.05, 1, (p - 0.7) / 0.15); }
             flameScale *= lerp(1, 1.6, env); bright *= lerp(1, 1.35, env);
-            eyeSY = lerp(1, 0.35, env); eyeY = 0.004 * env; mouthShape = 'smile'; smileAmt = 1; lids = lids * (1 - env); tipName = 'celebrate';
+            eyeSY = lerp(1, 1.12, env); eyeY = 0.003 * env; mouthShape = 'smile'; smileAmt = 1; lids = lids * (1 - env); tipName = 'celebrate';
             browL = browR = 0.003 * env;
             break;
           }
@@ -510,16 +517,16 @@ export class Cyril {
     this.flamePivot.scale.setScalar(THREE.MathUtils.lerp(this.flamePivot.scale.x, fs, 1 - Math.exp(-dt * 18)));
     this.flameUniforms.uTime.value = t;
     this.flameUniforms.uSway.value = amp * (1 + flick * 2);
-    this.flameUniforms.uBright.value = 0.95 * bright * this.flicker;
+    this.flameUniforms.uBright.value = 0.8 * bright * this.flicker;
     this.tip.lerp(TIP[tipName] || TIP.calm, 1 - Math.exp(-dt * (tipName === 'shock' ? 40 : 8)));
     this.flameUniforms.uTip.value.copy(this.tip);
     this.light.intensity = 2.3 * bright * this.flicker * this.flamePivot.scale.x;
-    this.halo.material.opacity = 0.26 * bright * this.flicker;
+    this.halo.material.opacity = 0.2 * bright * this.flicker;
     this.glow.material.opacity = 0.16 * bright * this.flicker;
-    this.coreUniforms.uBright.value = 0.75 * bright * this.flicker;
+    this.coreUniforms.uBright.value = 0.55 * bright * this.flicker;
     this.poolMat.emissiveIntensity = 0.18 + 0.12 * this.flicker * bright;
     this.blushMat.opacity = R && (R.name === 'delight' || R.name === 'smug') ? 1 : R && R.name === 'shock' ? 0.4 : 0.75;
-    this.waxMat.emissiveIntensity = (0.16 + 0.1 * clamp01((this.flicker - 0.85) / 0.3)) * bright;
+    this.waxMat.emissiveIntensity = (0.2 + 0.12 * clamp01((this.flicker - 0.85) / 0.3)) * bright;
 
     // eyes + pupils
     if (this.lookTarget) {

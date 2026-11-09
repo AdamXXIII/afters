@@ -222,11 +222,11 @@ export function buildCake() {
     y += h;
   });
   const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.009, 0.05, 12), new THREE.MeshStandardMaterial({ color: '#F3E6CF', roughness: 0.5 }));
-  candle.position.set(0.05, y + 0.025, 0);
+  candle.position.set(0, y + 0.025, -0.055);
   g.add(candle);
   const flame = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTexture({ size: 64, inner: 'rgba(255,240,200,1)', mid: 'rgba(255,190,100,0.6)', outer: 'rgba(255,150,60,0)' }), blending: THREE.AdditiveBlending, depthWrite: false }));
   flame.scale.set(0.03, 0.05, 1);
-  flame.position.set(0.05, y + 0.07, 0);
+  flame.position.set(0, y + 0.07, -0.055);
   g.add(flame);
   return g;
 }
