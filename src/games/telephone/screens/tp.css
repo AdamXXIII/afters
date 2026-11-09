@@ -421,3 +421,32 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
 .tp-vc-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--c-crumb); transition: transform 150ms; }
 .tp-vc-dots i.on { background: var(--c-tomato); transform: scale(1.3); }
 .tp-combo .tp-pill { top: auto; bottom: 10px; right: 12px; font-size: 24px; }
+
+/* ---------------- round 5 */
+.tp-vote { padding-top: 8px; }
+.tp-vote-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 var(--gutter); }
+.tp-vote-head .t-eyebrow { color: var(--tp); }
+.tp-vote-head .tp-vote-q { font-size: 46px; color: var(--c-ink); text-shadow: none; }
+.tp-vote-sub { display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 14px; background: var(--c-sage); color: #fff; font: 600 12px/1.1 var(--f-ui); }
+.tp-vote-sub b { font: 900 22px/1 var(--f-display); color: #fff; }
+.tp-vc-row { padding: 10px 7% 8px; }
+.tp-vc { flex-basis: 86%; padding: 14px; }
+.tp-vc-view { max-height: 330px; }
+.tp-vc-txt { --fs: 46px; }
+.tp-vc-btn { height: 64px; font-size: 21px; }
+.tp-combo::before { content: ""; position: absolute; left: -14px; right: -14px; top: 24px; bottom: -6px; z-index: -1; border-radius: 30px; background: radial-gradient(120% 90% at 50% 20%, #F2BE4A, var(--c-mustard) 60%, #B7841A); box-shadow: var(--sh-3); }
+.tp-combo .as-caption { text-align: center; }
+.tp-combo .as-caption .tp-card-txt { justify-content: center; }
+.tp-pill.inline { position: static; align-self: center; margin: 4px 0 2px; transform: rotate(-3deg); animation: tpStampIn 260ms var(--ease-out-back) both; }
+@keyframes tpStampIn { from { transform: scale(1.8) rotate(-8deg); opacity: 0; } to { transform: rotate(-3deg); opacity: 1; } }
+.tp-combo .as-caption .tp-stamp { left: 50%; transform: translateX(-50%) rotate(-2deg); white-space: nowrap; }
+.tp-aw-big { position: relative; z-index: 1; text-align: center; color: var(--c-candle); text-shadow: 0 4px 0 var(--c-claret), 0 10px 30px rgba(0,0,0,.5); transform: rotate(-3deg); margin-bottom: 2px; }
+.tp-aw-big span { display: block; font: 900 74px/.86 var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -.02em; }
+.tp-aw-big b { display: block; font: 800 30px/1 var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 1; color: var(--c-linen); }
+.tp-aw-ribbon { display: none; }
+.tp-aw-hero { padding-top: 16px; }
+.tp-aw-hero .dp-view { width: min(100%, 30vh); }
+.tp-aw-prompt { margin-bottom: 6px; }
+.tp-combo { isolation: isolate; }
+.tp-vc-body { overflow: hidden; }
+.tp-vc-view { width: min(100%, 300px); height: auto; max-height: none; aspect-ratio: 1; }

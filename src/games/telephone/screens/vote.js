@@ -6,15 +6,14 @@ import { h, av, who, tilt, kindLabel, TP_ICONS, cordSvg, timeline } from './kit.
 
 const vote = {
   id: 'telephone-vote',
-  layout: 'split',
-  shot: 'vote',
-  mount({ show, sheet }, ctx) {
+  layout: 'input',
+  shot: 'write',
+  mount({ sheet }, ctx) {
     const p = ctx.payload;
     const owner = ctx.player(p.ownerId);
-    show.append(h('div.tp-vote-top',
-      h('div.t-eyebrow', `Line ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s rumour`),
-      h('div.tp-vote-q', 'Best bit?'),
-      h('div.tp-vote-sub', `Swipe through ${p.moments.length}. `, h('b', '+500'), ' a vote.')));
+    const top = h('div.tp-vote-head',
+      h('div', h('div.t-eyebrow', `Line ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s rumour`), h('div.tp-vote-q', 'Best bit?')),
+      h('div.tp-vote-sub', h('b', '+500'), h('span', 'a vote')));
     const views = [];
     const list = [...p.moments].sort((a, b) => (a.authorId === ctx.meId) - (b.authorId === ctx.meId));
     const tiles = list.map((m, i) => {
@@ -34,7 +33,7 @@ const vote = {
     });
     const row = h('div.tp-vc-row', tiles);
     const dots = h('div.tp-vc-dots', p.moments.map(() => h('i')));
-    sheet.append(h('div.tp-sheet.tp-vote', row, dots));
+    sheet.append(h('div.tp-sheet.tp-vote', top, row, dots));
     const syncDots = () => {
       const i = Math.round(row.scrollLeft / Math.max(1, (tiles[0]?.offsetWidth || 1) + 12));
       [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
@@ -43,7 +42,7 @@ const vote = {
     requestAnimationFrame(syncDots);
     const sync = (c) => { const v = c.mine.game.vote; tiles.forEach((t, i) => { const on = list[i].key === v; t.classList.toggle('picked', on); t.btn.setAttribute('aria-pressed', String(on)); if (!t.classList.contains('mine')) t.btn.lastChild.textContent = on ? 'Your pick' : 'Best bit!'; }); };
     sync(ctx);
-    const said = setTimeout(() => ctx.say(ctx.line('tpVote'), { hold: 1800, compact: true }), ctx.frozen ? 0 : 300);
+    const said = null;
     return { update: sync, frame() { views.forEach((v) => v.frame()); }, unmount() { clearTimeout(said); } };
   },
 };
@@ -82,7 +81,7 @@ const awards = {
         cls === 'crossed' && b.crossedBy ? h('div.tp-plaque-foot', 'Wires crossed by ', who(ctx.player(b.crossedBy), { size: 16 })) : cls === 'straight' ? h('div.tp-plaque-foot', `${b.matches} guess${b.matches === 1 ? '' : 'es'} nailed`) : null);
     };
     const plaques = h('div.tp-plaques', plaque('straight', 'Straightest line', p.straight), plaque('crossed', 'Most crossed wires', p.crossed));
-    show.append(h('div.tp-aw', h('div.tp-aw-rays'), hero, plaques));
+    show.append(h('div.tp-aw', h('div.tp-aw-rays'), h('div.tp-aw-big', h('span', 'Best bit'), h('b', 'of the night!')), hero, plaques));
     const tl = timeline([
       { at: 0, fn: (c) => { c.cyril.react('drumroll', { duration: S(1400) }); if (!quiet) { c.audio.sfx('drumroll', { duration: S(1300) / 1000 }); c.say(c.line('tpAwards'), { hold: 1200, compact: true }); } } },
       { at: S(1400), fn: (c) => { hero.classList.add('in'); if (!quiet) { c.audio.sfx('fanfare'); c.stage.shake?.(); } c.cyril.react('delight'); if (m?.authorId === c.meId) c.haptic('win'); } },
