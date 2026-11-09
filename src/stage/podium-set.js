@@ -9,7 +9,7 @@ import { radialTexture } from './textures.js';
 
 const CONFETTI = 240;
 const SPARKS = 70; // per sparkler
-const PAPER = ['#E2553B', '#E0A526', '#FFC86B', '#FBF4EA', '#B0243A', '#F3E6CF', '#E2553B', '#FFE6A8'];
+const PAPER = ['#E2553B', '#E0A526', '#FFC86B', '#B0243A', '#E2553B', '#FFE6A8', '#C89B3C'];
 const FOIL = '#FFD46B'; // every 4th piece is gold foil and glints
 
 const hash = (i, k = 0) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
@@ -295,7 +295,7 @@ export class PodiumSet {
     // a brass cloche hides the winner's spot until the reveal, then lifts away
     // smooth bell profile (superellipse), bottom to top
     const prof = [];
-    const CR = 0.116; const CH = 0.22;
+    const CR = 0.1; const CH = 0.2;
     for (let i = 0; i <= 40; i++) {
       const a = (i / 40) * Math.PI / 2;
       prof.push(new THREE.Vector2(CR * Math.cos(a) ** 0.85, 0.008 + CH * Math.sin(a) ** 0.95));
@@ -417,7 +417,7 @@ export class PodiumSet {
   /** Show for `rows` (ranked). mode: 'podium' (timeline from t=0) | 'end' (settled). */
   show({ rows, players, mode = 'podium', duration = 14000, reduced = false }) {
     const scale = Math.max(0.05, duration / 14000);
-    this.T = { t3: 1200 * scale, t2: 2800 * scale, cake1: 4300 * scale, win: 6000 * scale, bill: 8200 * scale, scale };
+    this.T = { t3: 1200 * scale, t2: 2800 * scale, cake1: 4300 * scale, win: 6000 * scale, bill: 9000 * scale, scale };
     this.mode = mode;
     this.reduced = reduced;
     const ids = rows.slice(0, 3).map((r) => r.id);
@@ -479,8 +479,8 @@ export class PodiumSet {
     const T = this.T;
     let pos; let target;
     if (this.mode === 'end') {
-      pos = new THREE.Vector3(0.05, TABLE_Y + 0.33, 0.95);
-      target = new THREE.Vector3(0.05, TABLE_Y + 0.25, 0);
+      pos = new THREE.Vector3(0.07, TABLE_Y + 0.35, 1.05);
+      target = new THREE.Vector3(0.07, TABLE_Y + 0.28, 0);
     } else {
       const hero = { pos: new THREE.Vector3(0, TABLE_Y + 0.36, 1.78), target: new THREE.Vector3(0, TABLE_Y + 0.15, 0.02) };
       const start = { pos: new THREE.Vector3(0, TABLE_Y + 0.95, 2.3), target: new THREE.Vector3(0, TABLE_Y + 0.05, 0) };
@@ -514,12 +514,12 @@ export class PodiumSet {
     for (const s of st.seats.values()) s.group.visible = false;
     st.cake.visible = false;
     // Cyril compères from stage right, a touch smaller so the cakes are the stars
-    if (this.mode === 'end') st.cyrilGoal.set(0.3, TABLE_Y + 0.01 + this.stickH, -0.2);
+    if (this.mode === 'end') st.cyrilGoal.set(0.32, TABLE_Y + 0.01 + this.stickH * 0.6, 0.1);
     else st.cyrilGoal.set(0.265, TABLE_Y + 0.01 + this.stickH, -0.4);
     this.stick.visible = true;
     this.stick.position.set(st.cyril.group.position.x, TABLE_Y, st.cyril.group.position.z);
     this.stick.scale.set(1, Math.max(0.01, st.cyril.group.position.y - TABLE_Y - 0.01) / this.stickH, 1);
-    st.cyril.group.scale.setScalar(this.mode === 'end' ? 0.85 : 0.95);
+    st.cyril.group.scale.setScalar(0.95);
     st.props.visible = false; // clear the table: the cakes are the only dinner now
     // light: lift the warm fill onto the cakes
     st.warm.position.set(0.05, 0.75, 0.95);
@@ -551,7 +551,9 @@ export class PodiumSet {
       const land = dk > 0.5 && dk < 0.62 ? Math.sin(((dk - 0.5) / 0.12) * Math.PI) : 0;
       const sq = 1 - land * 0.18;
       const base = i === 0 ? 1.34 : 1;
-      a.scale.set(base * (2 - sq), base * sq, base * (2 - sq));
+      const slump = i > 0 ? clamp01((t - T.win - 400 * T.scale) / (500 * T.scale)) : 0; // runners-up sag a touch
+      a.scale.set(base * (2 - sq) * (1 + 0.04 * slump), base * sq * (1 - 0.08 * slump), base * (2 - sq) * (1 + 0.04 * slump));
+      a.rotation.z = slump * (i === 1 ? -0.12 : 0.12);
       animateAvatar(a, time, this.reduced ? 0.5 : 1);
       if (a.userData.lift !== undefined) a.userData.lift = 0;
       // gentle sway toward the camera for the winner's victory bob

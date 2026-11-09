@@ -44,6 +44,27 @@ export function glyph(player, cls = '') {
   return h(`span.fin-glyph${cls}`, { style: { '--pc': colour }, html: avatarIcon(player?.avatar ?? 0) });
 }
 
+/** The bill (receipt): everyone ranked with their award. Also opened from the end screen. */
+export function buildBill(ctx, rows) {
+  const dense = rows.length > 5;
+  const drips = ctx.cyril?.tallyCount ?? 0;
+  return h(`div.fin-bill${dense ? '.dense' : ''}`,
+      h('div.fin-bill-head', h('span', 'The bill'), h('span.fin-bill-table', `Table for ${rows.length}`)),
+      h('div.fin-bill-rows', rows.map((r, i) => {
+        const p = ctx.player(r.id);
+        return h(`div.fin-row${r.id === ctx.meId ? '.me' : ''}${i < 3 ? `.top.t${i + 1}` : ''}`, { style: { '--i': i } },
+          h('span.fin-row-rank', r.shownRank),
+          glyph(p),
+          h('span.fin-row-who', h('span.fin-row-name', p?.name || '?', r.id === ctx.meId ? h('span.fin-you', 'You') : null), h('span.fin-row-award', r.award?.title || '')),
+          h('span.fin-row-dots'),
+          h('span.fin-row-score', fmt(r.score)));
+      })),
+      h('div.fin-bill-foot',
+        h('div.fin-foot-line', h('span', 'Tip for Cyril'), h('span.fin-row-dots'), h('span', 'Applause')),
+        h('div.fin-foot-line.muted', h('span', 'Wax drips'), h('span.fin-row-dots'), h('span', drips ? String(drips) : 'None, miraculously'))));
+
+}
+
 export default {
   id: 'podium',
   layout: 'show',
@@ -75,23 +96,8 @@ export default {
       h('div.fin-tag-name', name(r.id)),
       h('div.fin-tag-score', fmt(r.score))));
 
-    // --- the bill: everyone, with awards
-    const drips = ctx.cyril?.tallyCount ?? 0;
     const dense = rows.length > 5;
-    const bill = h(`div.fin-bill${dense ? '.dense' : ''}`,
-      h('div.fin-bill-head', h('span', 'The bill'), h('span.fin-bill-table', `Table for ${rows.length}`)),
-      h('div.fin-bill-rows', rows.map((r, i) => {
-        const p = ctx.player(r.id);
-        return h(`div.fin-row${r.id === ctx.meId ? '.me' : ''}${i < 3 ? `.top.t${i + 1}` : ''}`, { style: { '--i': i } },
-          h('span.fin-row-rank', r.shownRank),
-          glyph(p),
-          h('span.fin-row-who', h('span.fin-row-name', p?.name || '?', r.id === ctx.meId ? h('span.fin-you', 'You') : null), h('span.fin-row-award', r.award?.title || '')),
-          h('span.fin-row-dots'),
-          h('span.fin-row-score', fmt(r.score)));
-      })),
-      h('div.fin-bill-foot',
-        h('div.fin-foot-line', h('span', 'Tip for Cyril'), h('span.fin-row-dots'), h('span', 'Applause')),
-        h('div.fin-foot-line.muted', h('span', 'Wax drips'), h('span.fin-row-dots'), h('span', drips ? String(drips) : 'None, miraculously'))));
+    const bill = buildBill(ctx, rows);
 
     const root = h(`div.fin${dense ? '.dense' : ''}`, { dataset: { step: '0' } }, h('div.fin-dim'), h('div.fin-vignette'), head, h('div.fin-tags', tags), bill);
     show.append(root);
@@ -110,6 +116,7 @@ export default {
       beat('win', T.win, () => {
         ctx.cyril.react('delight');
         ctx.cyril.setMood?.('celebrate');
+        if (!ctx.frozen) setTimeout(() => ctx.cyril.setMood?.('calm'), 1600);
         if (!ctx.frozen) {
           ctx.stage.shake(0.006, 260);
           ctx.audio.sfx('fwump'); ctx.audio.sfx('fanfare');
@@ -123,6 +130,7 @@ export default {
       { at: T.t3 + 250, until: T.t2, lines: ['Third place. Splendid effort. Mostly.'] },
       { at: T.t2 + 250, until: T.cake1, lines: ['Second place. Close enough to smell the icing.'] },
       { at: T.cake1 + 150, until: T.win, lines: ['And the cake goes to...'] },
+      { at: T.win + 1100, until: T.bill + 1200, lines: [`${name(winner?.id)}. Who will now be insufferable.`] },
     ];
 
     let shownStep = -1;
@@ -131,6 +139,7 @@ export default {
       set.setTime(t);
       const step = t >= T.bill ? 5 : t >= T.win ? 4 : t >= T.cake1 ? 3 : t >= T.t2 ? 2 : t >= T.t3 ? 1 : 0;
       if (step !== shownStep) { shownStep = step; root.dataset.step = String(step); }
+      if (ctx.frozen && t > T.win + 1600) ctx.cyril.setMood?.('calm');
       for (const b of beats) if (!said.has(b.key) && t >= b.at) { said.add(b.key); try { b.fn(); } catch (e) { console.error(e); } }
       // Cyril: in frozen mode only the latest due line is said
       const due = lines.filter((l) => t >= l.at);

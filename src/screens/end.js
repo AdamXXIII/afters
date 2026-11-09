@@ -5,15 +5,15 @@ import { h, button, onTap } from '../ui/components.js';
 import { ICONS } from '../ui/icons.js';
 import { computeAwards } from '../game/awards.js';
 import { getPodiumSet } from '../stage/podium-set.js';
-import { finaleMemo, glyph, dedupeAwards } from './podium.js';
+import { finaleMemo, glyph, dedupeAwards, tieRanks, buildBill } from './podium.js';
 
 const ORD = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'}`;
 const fmt = (n) => Math.round(n || 0).toLocaleString('en-GB');
 
 const glassSvg = '<svg viewBox="0 0 40 52" aria-hidden="true"><defs><clipPath id="endbowl"><path d="M8 4h24c0 12-3 20-12 21C11 24 8 16 8 4z"/></clipPath></defs>'
   + '<g clip-path="url(#endbowl)"><rect class="wine" x="6" y="9" width="28" height="18" fill="#7A1E2C"/></g>'
-  + '<path d="M8 4h24c0 12-3 20-12 21C11 24 8 16 8 4z" fill="none" stroke="#7A4A2A" stroke-width="2" stroke-linejoin="round"/>'
-  + '<path d="M20 25v17M12 46h16" stroke="#7A4A2A" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  + '<path d="M8 4h24c0 12-3 20-12 21C11 24 8 16 8 4z" fill="none" stroke="#7A1E2C" stroke-width="2.6" stroke-linejoin="round"/>'
+  + '<path d="M20 25v17M12 46h16" stroke="#7A1E2C" stroke-width="3" stroke-linecap="round"/></svg>';
 
 export default {
   id: 'end',
@@ -46,6 +46,14 @@ export default {
     const meRow = rows.find((r) => r.id === ctx.meId);
     const award = meRow ? awardOf(meRow.id) : null;
     let stub = null;
+    let pop = null;
+    const billLink = h('button.end-billlink', { type: 'button', 'data-e2e': 'see-bill' }, 'See the bill');
+    onTap(billLink, () => {
+      if (pop) return;
+      const close = button('Lovely, thanks', { kind: 'secondary', block: false, onClick: () => { pop?.remove(); pop = null; } });
+      pop = h('div.end-billpop', buildBill(ctx, tieRanks(memo)), close);
+      document.body.append(pop);
+    });
     if (meRow) {
       const r = meRow.rank;
       const place = r === 1
@@ -55,7 +63,8 @@ export default {
         h('span.end-stub-av', glyph(ctx.me), h(`span.end-stub-medal.${r <= 3 ? `r${r}` : 'rx'}`, String(r))),
         h('div.end-stub-text', place,
           h('div.end-stub-sub', `Out of ${rows.length} \u00b7 ${fmt(meRow.score)} pts`),
-          award ? h('div.end-stub-award', award.title) : null));
+          award ? h('div.end-stub-award', award.title) : null),
+        memo ? billLink : null);
     }
 
     const host = ctx.player(ctx.state?.hostId) || ctx.player(ctx.payload?.hostId);
@@ -72,9 +81,9 @@ export default {
         h('h2.end-title', 'Another round?'),
         quote,
         stub,
-        h('p.end-hint', h('b', 'Same again'), ': same seats, fresh questions.'),
         h('div.end-actions',
           button('Same again', { onClick: () => ctx.client.again(), e2e: 'again' }),
+          h('p.end-hint', 'Same seats, fresh questions.'),
           button('New table', { kind: 'secondary', onClick: () => ctx.client.newTable(), e2e: 'new-table' }),
           leave));
     } else {
@@ -86,8 +95,8 @@ export default {
         h('div.end-actions',
           h('div.end-wait', h('span.end-glass', { html: glassSvg }),
             h('div.end-wait-text', h('div.t-heading', `${host?.name || 'The host'} is deciding`, h('span.end-dots', h('i'), h('i'), h('i'))),
-              h('div.end-wait-sub', 'Same again or new table. Hold your glass.'))),
-          h('div.end-throw', h('span.end-throw-label', 'Heckle while you wait (every phone sees it)'),
+              h('div.end-wait-sub', 'Same again or new table?'))),
+          h('div.end-throw', h('span.end-throw-label', 'Heckle while you wait. Everyone sees it.'),
             h('div.end-throw-row', ...[['roll', 'Throw a bread roll'], ['rose', 'Throw a rose'], ['applause', 'Applaud'], ['groan', 'Groan']].map(([kind, label]) => {
               const b = h('button.end-throw-btn', { type: 'button', 'aria-label': label, 'data-e2e': `end-react-${kind}` },
                 h('span.end-throw-ic.rail-btn', { html: ICONS[kind] || '' }), h('span.end-throw-name', { roll: 'Roll', rose: 'Rose', applause: 'Clap', groan: 'Groan' }[kind]));
@@ -99,7 +108,7 @@ export default {
     }
     sheet.append(page);
     return {
-      unmount() { document.body.classList.remove('end-nohandle'); set.hide(); clearTimeout(talk); clearTimeout(hush); ctx.cyril.setTalking(false); },
+      unmount() { pop?.remove(); document.body.classList.remove('end-nohandle'); set.hide(); clearTimeout(talk); clearTimeout(hush); ctx.cyril.setTalking(false); },
     };
   },
 };
