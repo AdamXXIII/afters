@@ -105,25 +105,13 @@ export default {
       field.classList.toggle('gone', left === 0);
       lot.hidden = n === 0 || finished;
       tip.hidden = n > 0;
-      // the straggler: everyone else is done, the clock drops to 10 s
+      // the straggler: everyone else is done and the clock drops to 10 s, so name them
       const strag = c.progress?.straggler;
-      if (strag && strag === c.meId && !finished) {
-        wait.textContent = '';
-        wait.className = 'r3w-wait';
-        tag.textContent = 'All waiting on you!';
-        tag.classList.add('hurry');
-        if (!saidStrag && !c.frozen) { saidStrag = true; c.say(`${c.me?.name || 'You'}, the kitchen's closing!`, { compact: true, hold: 1600 }); }
-      }
-      if (!(strag && strag === c.meId && !finished) && tag.classList.contains('hurry')) { tag.textContent = 'Sends when time\'s up'; tag.classList.remove('hurry'); }
-      if (strag && strag === c.meId && !finished) {
-        // handled above
-      } else if (strag && strag !== c.meId && finished) {
-        wait.textContent = `Waiting on ${c.player(strag)?.name || 'someone'}…`;
-        wait.className = 'r3w-wait';
-      } else {
-        wait.textContent = '';
-        wait.className = 'r3w-wait';
-      }
+      const meLate = !!strag && strag === c.meId && !finished;
+      tag.textContent = meLate ? 'All waiting on you!' : 'Sends when time\'s up';
+      tag.classList.toggle('hurry', meLate);
+      if (meLate && !saidStrag && !c.frozen) { saidStrag = true; c.say(`${c.me?.name || 'You'}, the kitchen's closing!`, { compact: true, hold: 1600 }); }
+      wait.textContent = strag && strag !== c.meId && finished ? `Waiting on ${c.player(strag)?.name || 'someone'}…` : '';
     };
     update(ctx);
     if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);

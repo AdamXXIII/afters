@@ -141,7 +141,7 @@
   flex: none; text-align: center; font: 700 18px/22px var(--f-ui); color: var(--c-linen); background: var(--c-willow);
   padding: 10px 16px; border-radius: var(--r-pill); box-shadow: 0 3px 0 var(--c-willow-lip);
 }
-.r3w-wait.me { background: var(--c-tomato); box-shadow: 0 3px 0 #A83A26; animation: r3hurry 420ms ease-in-out infinite alternate; }
+.r3w-tag.hurry { color: var(--c-linen); background: var(--c-tomato); box-shadow: 0 2px 0 #A83A26; animation: r3hurry 420ms ease-in-out infinite alternate; }
 /* "That's my lot" with room left: stamp sits on the empty tickets, field stays live */
 .r3w-pad-wrap.lot .r3w-slot:not(.filled) { display: none; }
 .r3w-pad-wrap.lot .r3w-done { position: static; padding: 6px 0 2px; gap: 14px; }
