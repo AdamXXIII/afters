@@ -21,9 +21,9 @@ function candleSvg() {
     <path d="M32 27v6" stroke="#2B1D18" stroke-width="2" stroke-linecap="round"/>
     <path d="M17 34q15-4 30 0v42H17z" fill="url(#rcWax)"/>
     <path d="M22 34v9a2.5 2.5 0 0 0 5 0v-9M38 34v14a2.5 2.5 0 0 0 5 0V34" fill="#FBF1DE"/>
-    <g class="rc-eyes"><ellipse cx="27" cy="52" rx="2.6" ry="3" fill="#2A1A17"/><ellipse cx="37" cy="52" rx="2.6" ry="3" fill="#2A1A17"/></g>
-    <path d="M24 46.5l5-1.2M40 46.5l-5-1.2" stroke="#7A4A2A" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M29 60q3 2 6 0" stroke="#7A1E2C" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <g class="rc-eyes"><circle cx="26.5" cy="52" r="4.2" fill="#FFFDF7"/><circle cx="37.5" cy="52" r="4.2" fill="#FFFDF7"/><circle class="rc-pupil" cx="25.5" cy="52.6" r="2.1" fill="#2A1A17"/><circle class="rc-pupil" cx="36.5" cy="52.6" r="2.1" fill="#2A1A17"/></g>
+    <path d="M23 46l5.5 1.4M41 46l-5.5 1.4" stroke="#7A4A2A" stroke-width="2" stroke-linecap="round"/>
+    <path d="M29.5 61q2.5-1.6 5 0" stroke="#7A1E2C" stroke-width="2.2" fill="none" stroke-linecap="round"/>
     <path d="M26 66l6 3 6-3-6 3z M26 66v6l6-3zM38 66v6l-6-3z" fill="#7A1E2C"/>
     <ellipse cx="32" cy="80" rx="22" ry="5" fill="url(#rcBrass)"/>
     <rect x="10" y="76" width="44" height="6" rx="3" fill="url(#rcBrass)"/>
@@ -41,6 +41,10 @@ export default {
     // Cyril's bubble belongs to the game behind us; keep it from floating over the panel.
     const bubbles = document.getElementById('bubbles');
     if (bubbles) bubbles.style.visibility = 'hidden';
+    // the gear and the game behind belong to the paused show; one clock on screen at a time
+    const hideEls = ['topbar', 'strip'].map((id) => document.getElementById(id)).filter(Boolean);
+    hideEls.forEach((el) => { el.style.visibility = 'hidden'; });
+    document.body.classList.add('rc-paused');
 
     const eyebrow = h('div.rc-eyebrow', h('span.rc-dot'), h('span.rc-eyebrow-txt', 'Connection lost'));
     const title = h('h2.rc-title', 'Hold that thought.');
@@ -48,15 +52,25 @@ export default {
     const clock = h('span.rc-clock');
     const bar = h('div.rc-bar', h('i'));
     const held = h('div.rc-held', h('span.rc-held-k', 'Seat held for'), clock);
+    const knock = h('div.rc-knock');
     const retry = button('Try again now', { onClick: () => { retry.setLoading(true); ctx.client?.retry(); setTimeout(() => retry.setLoading(false), 1600); }, e2e: 'retry' });
-    const leave = button('Leave the table', { kind: 'ghost', onClick: () => { ctx.actions.closeOverlay(); ctx.actions.leave(); } });
+    // leaving is the destructive way out: it asks once, in Cyril's voice
+    let armed = 0;
+    const leave = button('Leave the table', { kind: 'ghost', onClick: () => {
+      if (Date.now() - armed < 3000) { ctx.actions.closeOverlay(); ctx.actions.leave(); return; }
+      armed = Date.now();
+      leave.textContent = 'Tap again to leave. Cyril will sulk.';
+      leave.classList.add('armed');
+      setTimeout(() => { if (Date.now() - armed >= 2900) { leave.textContent = 'Leave the table'; leave.classList.remove('armed'); } }, 3000);
+    } });
+    leave.classList.add('rc-leave');
     const art = h('div.rc-art',
       h('div.rc-candle', { html: candleSvg() }),
       h('div.rc-card', { style: { '--pc': colour } }, h('span.rc-card-k', 'Reserved'), h('span.rc-card-v', me?.name || 'You')),
     );
     const quote = h('p.rc-quote', '“I’ve kept your seat warm. Literally.”', h('span', '— Cyril'));
     const box = h('div.rc-box', { role: 'alertdialog', 'aria-live': 'assertive', 'aria-labelledby': 'rc-title' },
-      art, eyebrow, title, body, h('div.rc-hold', held, bar), quote, h('div.rc-actions', retry, leave));
+      art, eyebrow, title, body, h('div.rc-hold', held, bar, knock), quote, h('div.rc-actions', retry, leave));
     title.id = 'rc-title';
     overlay.append(h('div.dim.rc-dim', box));
 
@@ -68,7 +82,9 @@ export default {
       const s = Math.ceil(left / 1000);
       clock.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
       bar.firstChild.style.transform = `scaleX(${(left / HOLD_MS).toFixed(4)})`;
-      bar.classList.toggle('hurry', s <= 20);
+      bar.classList.toggle('hurry', s <= 15);
+      const kn = 2 - Math.floor((elapsed() / 1000) % 2);
+      knock.textContent = `Knocking again in ${kn}s`;
       const key = `${lost}`;
       if (key === lastState) return;
       lastState = key;
@@ -82,6 +98,11 @@ export default {
     };
     paint(ctx);
     const tick = setInterval(() => paint(ctx), 250);
-    return { update: (c) => paint(c), unmount: () => { clearInterval(tick); if (bubbles) bubbles.style.visibility = ''; } };
+    return { update: (c) => paint(c), unmount: () => {
+      clearInterval(tick);
+      if (bubbles) bubbles.style.visibility = '';
+      hideEls.forEach((el) => { el.style.visibility = ''; });
+      document.body.classList.remove('rc-paused');
+    } };
   },
 };

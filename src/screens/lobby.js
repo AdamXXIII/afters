@@ -13,7 +13,7 @@ import { TABLE_Y, seatAngle } from '../stage/props.js';
 
 // Own camera: lower and further back than the shared 'lobby' shot, so the far arc of chairs sits
 // in the middle of the show strip under the code placard instead of hiding behind it.
-SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.4, -0.6] };
+SHOTS['lobby-seats'] ||= { pos: [0, 0.45, 2.5], target: [0, 0.425, -0.6] };
 
 const LOBBY_SCALE = 1.75;
 
@@ -31,6 +31,21 @@ function lobbySlots(n) {
 const FULL = lobbySlots(8);
 const FREE_SLOTS = [FULL[3], FULL[4], FULL[2], FULL[5], FULL[1], FULL[6], FULL[0], FULL[7]];
 const AVATAR_NAMES = ['Jelly', 'Sprout', 'Teacup', 'Cheese', 'Pepper', 'Pudding', 'Egg', 'Bourbon'];
+const CYRIL_SCALE = 1.15;
+
+// Cyril greets each new arrival by name (his voice: short, dry, never mean to a player).
+const JOIN_LINES = [
+  'Ah, {name}. Do sit. Napkin on the lap, please.',
+  '{name}! I\'ll fetch another fork.',
+  'Welcome, {name}. Mind the candle. That\'s me.',
+  '{name}. Splendid. The good chair\'s gone, I\'m afraid.',
+  'Evening, {name}. Elbows off the table. Eventually.',
+];
+function joinLine(p) {
+  let x = 0;
+  for (const ch of String(p.id)) x = (x * 31 + ch.charCodeAt(0)) >>> 0;
+  return JOIN_LINES[x % JOIN_LINES.length].replace('{name}', p.name);
+}
 
 function shareIcon() { return ICONS.share; }
 
@@ -59,7 +74,7 @@ export default {
       } catch { /* cancelled */ }
     });
     const placard = h('div.lc-placard',
-      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Tap to copy')),
+      h('div.lc-head', h('span.lc-eyebrow', 'Table code'), h('span.lc-hint', 'Type it in to join')),
       h('div.lc-row', tiles, invite),
     );
     const tagsLayer = h('div.lc-tags', { 'aria-hidden': 'true' });
@@ -70,7 +85,7 @@ export default {
     try { thumbs = ctx.stage.thumbnails(160); } catch (e) { console.warn('thumbs', e); }
     const grid = h('div.lb-grid', { role: 'radiogroup', 'aria-label': 'Pick your seat' });
     const cells = AVATARS.map((a, i) => {
-      const owner = h('span.lb-owner');
+      const owner = h('span.lb-owner');  // a tilted place card across a taken seat: "Sam's"
       const b = h('button.lb-cell', { type: 'button', role: 'radio', 'aria-label': AVATAR_NAMES[i], style: { '--pc': a.colour }, 'data-e2e': `avatar-${i}` },
         h('span.lb-plate'),
         thumbs[i] ? h('img', { src: thumbs[i], alt: '', draggable: false }) : h('span.lb-glyph', { html: avatarIcon(i) }),
@@ -94,6 +109,7 @@ export default {
       autocapitalize: 'words', spellcheck: false, enterkeyhint: 'done', 'data-e2e': 'lobby-name', 'aria-label': 'Name on your place card',
     });
     const nameCount = h('span.lb-name-count');
+    const thumbFor = (i) => (thumbs[i] ? h('img', { src: thumbs[i], alt: '', draggable: false }) : h('span', { html: avatarIcon(i) }));
     const commitName = () => {
       const v = input.value.trim();
       if (v && v !== ctx.me?.name) ctx.client.setProfile({ name: v });
@@ -101,27 +117,24 @@ export default {
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commitName(); input.blur(); } });
     input.addEventListener('change', commitName);
     input.addEventListener('blur', commitName);
-    const updCount = () => { nameCount.textContent = `${input.value.length}/10`; };
+    const updCount = () => { const n = input.value.length; nameCount.textContent = n >= 8 ? `${n}/10` : ''; };
     input.addEventListener('input', updCount);
     updCount();
     const nameCard = h('label.lb-namecard',
-      h('span.lb-swatch', { html: avatarIcon(ctx.me?.avatar ?? 0) }),
+      h('span.lb-swatch', thumbFor(ctx.me?.avatar ?? 0)),
       h('span.lb-namecol', h('span.lb-name-label', 'Your place card'), input),
       h('span.lb-pen', { html: '<svg viewBox="0 0 24 24"><path d="M4 20l1.2-4.6L15.8 4.8a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13.5 7l3.5 3.5" stroke="currentColor" stroke-width="1.8"/></svg>' }),
       nameCount);
 
-    // the 8-seat tally
-    const seatsLabel = h('span.lb-seats-count');
-    const seatsNote = h('span.lb-seats-note');
-    const seatsRow = h('div.lb-seats');
-    const seatEls = Array.from({ length: MAX_PLAYERS }, () => h('span.lb-seat'));
-    seatsRow.append(...seatEls);
-    const seatsBox = h('div.lb-seatsbox', h('div.lb-seats-head', seatsLabel, seatsNote), seatsRow);
+    // seat count lives in the sheet header
+    const seatsCount = h('span.lb-count');
 
     // host controls: two compact pills
-    const adultPill = h('button.lb-pill', { type: 'button', 'aria-pressed': 'false' }, h('span.lb-pill-k', 'Adult table'), h('span.lb-pill-v'));
+    const adultPill = h('button.lb-pill.lb-switchpill', { type: 'button', role: 'switch', 'aria-checked': 'false' },
+      h('span.lb-pill-txt', h('span.lb-pill-k', 'Adult table'), h('span.lb-pill-s', 'Clean words')), h('span.lb-switch', h('i')));
     onTap(adultPill, () => ctx.client.setSettings({ adult: !ctx.app.client.state.settings.adult }));
-    const speakerPill = h('button.lb-pill', { type: 'button' }, h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v'));
+    const speakerPill = h('button.lb-pill', { type: 'button', 'aria-label': 'Choose which phone plays the music' },
+      h('span.lb-pill-ic', { html: ICONS.speaker }), h('span.lb-pill-txt', h('span.lb-pill-k', 'Music from'), h('span.lb-pill-v')));
     onTap(speakerPill, () => {
       const ps = ctx.app.client.state.players;
       const i = ps.findIndex((p) => p.id === ctx.app.client.state.settings.speakerId);
@@ -131,16 +144,18 @@ export default {
 
     const startBtn = button('Start the show', { onClick: () => ctx.client.start(), e2e: 'start-show' });
     startBtn.classList.add('lb-start');
-    const waitCard = h('div.lb-wait', h('span.lb-wait-flame', { html: ICONS.flame }), h('span.lb-wait-txt'), h('span.lb-dots', h('i'), h('i'), h('i')));
+    const waitAv = h('span.lb-wait-av');
+    const waitCard = h('div.lb-wait', waitAv,
+      h('span.lb-wait-col', h('span.lb-wait-txt'), h('span.lb-wait-sub')),
+      h('span.lb-dots', h('i'), h('i'), h('i')));
     const leave = h('button.lb-leave', { type: 'button' }, 'Leave');
     onTap(leave, () => ctx.actions.leave());
 
     sheet.classList.add('lb-sheet');
     sheet.append(...[
-      h('div.lb-top', h('span.lb-title', 'Pick your seat'), leave),
+      h('div.lb-top', h('span.lb-title', 'Pick your seat'), seatsCount, h('span.lb-gap'), leave),
       grid,
       nameCard,
-      seatsBox,
       ctx.isHost ? hostRow : null,
       h('div.lb-action', ctx.isHost ? startBtn : waitCard),
     ].filter(Boolean));
@@ -148,7 +163,7 @@ export default {
     // ---------- place cards over the 3D avatars ----------
     const tagEls = new Map();
     const emptyEls = Array.from({ length: MAX_PLAYERS }, () => {
-      const e = h('span.lc-empty', h('span.lc-empty-ring'));
+      const e = h('span.lc-empty', h('i'));
       tagsLayer.append(e);
       return e;
     });
@@ -172,23 +187,37 @@ export default {
         const sc = s.group.scale.x;
         s.group.scale.setScalar(sc + (LOBBY_SCALE - sc) * k);
       });
+      const cs = c.cyril?.group?.scale;
+      if (cs) cs.setScalar(cs.x + (CYRIL_SCALE - cs.x) * k);
       const showH = show.clientHeight || 0;
-      const n2 = order.length;
-      order.forEach((id, i) => {
+      const showW = show.clientWidth || 390;
+      // Place cards stand on the cloth in front of their guest. Greedy row packing: each card takes
+      // the first row where it clears its left neighbour, so no card ever covers another's name.
+      const items = [];
+      order.forEach((id) => {
         const el = tagEls.get(id);
-        if (!el) return;
         const s = st.seats?.get?.(id);
-        if (!s) return;
+        if (!el || !s) return;
         tmp.set(s.group.position.x, TABLE_Y, s.group.position.z);
         const p = st.project(tmp);
         if (!p || p.behind || p.y > showH + 40) { el.style.opacity = '0'; return; }
-        el.style.opacity = '';
-        // a place card standing on the cloth in front of its guest; two staggered rows when crowded
-        const drop = n2 > 4 && (i % 2 === 1) ? 30 : 0;
-        const half = (el.offsetWidth || 70) / 2;
-        const x = Math.max(half + 6, Math.min((show.clientWidth || 390) - half - 6, p.x));
-        el.style.transform = `translate(${x.toFixed(1)}px, ${(p.y + 2 + drop).toFixed(1)}px) translate(-50%, 0)`;
+        const w = el.offsetWidth || 70;
+        items.push({ el, w, x: Math.max(w / 2 + 6, Math.min(showW - w / 2 - 6, p.x)), y: p.y });
       });
+      items.sort((a, b) => a.x - b.x);
+      const rowEnd = [];
+      for (const it of items) {
+        // two rows; if both are blocked, nudge the card along the row with the most room
+        let row = [0, 1].find((r) => rowEnd[r] == null || it.x - it.w / 2 >= rowEnd[r] + 4);
+        if (row == null) {
+          row = rowEnd[0] <= rowEnd[1] ? 0 : 1;
+          it.x = Math.min(showW - it.w / 2 - 4, rowEnd[row] + 4 + it.w / 2);
+        }
+        rowEnd[row] = it.x + it.w / 2;
+        it.el.style.opacity = '';
+        it.el.style.zIndex = String(20 - row);
+        it.el.style.transform = `translate(${it.x.toFixed(1)}px, ${(it.y - 6 + row * 23).toFixed(1)}px) translate(-50%, 0)`;
+      }
       const n = c.players.length;
       emptyEls.forEach((el, i) => {
         if (i < n || c.reduced) { el.style.display = 'none'; return; }
@@ -215,7 +244,7 @@ export default {
         cell.classList.toggle('taken', !!owner && !mine);
         cell.setAttribute('aria-checked', String(mine));
         cell.disabled = !!owner && !mine;
-        cell.owner.textContent = owner && !mine ? owner.name : '';
+        cell.owner.textContent = owner && !mine ? (owner.name.length > 5 ? owner.name : `${owner.name}\u2019s`) : '';
       });
 
       // place-card tags
@@ -249,47 +278,46 @@ export default {
       if (me) {
         nameCard.style.setProperty('--pc', AVATARS[me.avatar]?.colour || '#7A4A2A');
         const sw = nameCard.querySelector('.lb-swatch');
-        if (sw.dataset.av !== String(me.avatar)) { sw.dataset.av = String(me.avatar); sw.innerHTML = avatarIcon(me.avatar); }
+        if (sw.dataset.av !== String(me.avatar)) { sw.dataset.av = String(me.avatar); sw.replaceChildren(thumbFor(me.avatar)); }
         if (document.activeElement !== input && input.value !== me.name) { input.value = me.name; updCount(); }
       }
 
-      // seat tally
-      seatEls.forEach((el, i) => {
-        const p = ps[i];
-        el.classList.toggle('filled', !!p);
-        el.classList.toggle('needed', !p && i < MIN_PLAYERS);
-        el.style.setProperty('--pc', p ? (AVATARS[p.avatar]?.colour || '#7A4A2A') : '');
-        const k = p ? `${p.id}|${p.avatar}` : (i < MIN_PLAYERS ? 'need' : 'free');
-        if (el.dataset.k !== k) {
-          el.dataset.k = k;
-          el.innerHTML = p ? avatarIcon(p.avatar) : '';
-          el.title = p ? p.name : 'Free seat';
-          if (p && lastCount >= 0 && !c.frozen) el.animate([{ transform: 'scale(.4)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.34,1.56,.64,1)' });
-        }
-      });
       const n = ps.length;
-      seatsLabel.textContent = `${n} of ${MAX_PLAYERS} seats taken`;
-      seatsNote.textContent = n < MIN_PLAYERS ? `${MIN_PLAYERS - n} more to start` : n >= MAX_PLAYERS ? 'Table full' : 'Room for more';
-      seatsNote.classList.toggle('warn', n < MIN_PLAYERS);
+      seatsCount.textContent = `${n}/${MAX_PLAYERS} seated`;
+      seatsCount.classList.toggle('warn', n < MIN_PLAYERS);
 
       // host controls
       const st = c.settings || {};
-      adultPill.setAttribute('aria-pressed', String(!!st.adult));
-      adultPill.querySelector('.lb-pill-v').textContent = st.adult ? 'On' : 'Off';
+      adultPill.setAttribute('aria-checked', String(!!st.adult));
+      adultPill.querySelector('.lb-pill-s').textContent = st.adult ? 'Filter off' : 'Clean words';
       const spk = ps.find((p) => p.id === st.speakerId);
       speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : (spk?.name || 'Nobody');
 
       startBtn.disabled = n < MIN_PLAYERS;
-      startBtn.textContent = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more to start` : `Start the show · ${n} guests`;
+      startBtn.textContent = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : `Ring the bell \u00b7 ${n} at the table`;
       const host = ps.find((p) => p.id === hostId);
       waitCard.querySelector('.lb-wait-txt').textContent = n < MIN_PLAYERS
-        ? `Waiting for ${MIN_PLAYERS - n} more guest${MIN_PLAYERS - n > 1 ? 's' : ''}`
-        : `${host?.name || 'The host'} starts the show`;
+        ? `${MIN_PLAYERS - n} more guest${MIN_PLAYERS - n > 1 ? 's' : ''} needed`
+        : `Waiting on ${host?.name || 'the host'}`;
+      waitCard.querySelector('.lb-wait-sub').textContent = n < MIN_PLAYERS
+        ? 'Share the code. Fold a napkin swan.'
+        : 'They\u2019ll ring the bell. Sit tight.';
+      if (host && waitAv.dataset.av !== String(host.avatar)) {
+        waitAv.dataset.av = String(host.avatar);
+        waitAv.style.setProperty('--pc', AVATARS[host.avatar]?.colour || '#7A4A2A');
+        waitAv.replaceChildren(thumbFor(host.avatar));
+      }
 
       if (n !== lastCount) {
-        if (lastCount >= 0 && n > lastCount) c.audio.sfx('join');
+        const arrived = lastCount >= 0 && n > lastCount ? ps[ps.length - 1] : null;
+        if (arrived) c.audio.sfx('join');
         lastCount = n;
-        c.say(c.line(n >= MAX_PLAYERS ? 'lobbyFull' : n < MIN_PLAYERS ? 'lobbyWaiting' : 'lobbyReady'), { hold: 4000, placement: 'above', compact: true });
+        const line = n >= MAX_PLAYERS ? c.line('lobbyFull')
+          : arrived && arrived.id !== meId ? [joinLine(arrived)]
+            : n < MIN_PLAYERS ? c.line('lobbyWaiting')
+              : c.isHost ? ['A proper table at last. Ring the bell when you\'re ready.']
+                : [`We're waiting on ${host?.name || 'the host'}. No pressure. Some pressure.`];
+        c.say(line, { hold: 4000, placement: 'above', compact: true });
       }
     };
     update(ctx);
@@ -297,6 +325,7 @@ export default {
       update,
       frame: (c, dt) => placeTags(c, dt),
       unmount: () => {
+        ctx.cyril?.group?.scale.setScalar(1);
         for (const s of ctx.stage.seats?.values?.() || []) {
           s.group.scale.setScalar(1);
           if (s.home) { s.group.position.x = s.home.x; s.group.position.z = s.home.z; }
