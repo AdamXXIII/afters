@@ -482,14 +482,13 @@ export class PodiumSet {
       pos = new THREE.Vector3(0.05, TABLE_Y + 0.33, 0.95);
       target = new THREE.Vector3(0.05, TABLE_Y + 0.25, 0);
     } else {
-      const hero = { pos: new THREE.Vector3(0, TABLE_Y + 0.34, 1.64), target: new THREE.Vector3(0, TABLE_Y + 0.15, 0.02) };
+      const hero = { pos: new THREE.Vector3(0, TABLE_Y + 0.36, 1.78), target: new THREE.Vector3(0, TABLE_Y + 0.15, 0.02) };
       const start = { pos: new THREE.Vector3(0, TABLE_Y + 0.95, 2.3), target: new THREE.Vector3(0, TABLE_Y + 0.05, 0) };
       const k = this.reduced ? 1 : easeInOutQuint(clamp01(t / (3000 * T.scale)));
       // before the bill arrives the podium sits lower (fills the frame); then it cranes up for the bill
       const crane = this.reduced ? (t >= T.bill ? 1 : 0) : easeInOutQuint(clamp01((t - T.bill) / (900 * T.scale)));
-      hero.pos.y += 0.17 - 0.22 * crane;
-      hero.target.y += 0.17 - 0.22 * crane;
-      hero.pos.z += 0.12 * crane;
+      hero.pos.y += 0.13 - 0.2 * crane;
+      hero.target.y += 0.13 - 0.2 * crane;
       pos = start.pos.clone().lerp(hero.pos, k);
       target = start.target.clone().lerp(hero.target, k);
       // drumroll push-in, then a kick back on the reveal
@@ -525,8 +524,8 @@ export class PodiumSet {
     // light: lift the warm fill onto the cakes
     st.warm.position.set(0.05, 0.75, 0.95);
     const dim = this.mode === 'end' || this.reduced ? 0 : clamp01((t - T.cake1) / (500 * T.scale)) * (1 - clamp01((t - T.win) / (400 * T.scale)));
-    st.warm.intensity = 3.2 * (1 - 0.7 * dim);
-    st.hemi.intensity = (this.saved?.hemiI ?? 0.35) * (1 - 0.6 * dim);
+    st.warm.intensity = 3.2 * (1 - 0.3 * dim);
+    st.hemi.intensity = (this.saved?.hemiI ?? 0.35) * (1 - 0.3 * dim);
     st.rim.intensity = 1.1 * (1 - 0.6 * dim);
     st.warm.distance = 4;
 

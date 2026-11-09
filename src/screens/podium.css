@@ -93,11 +93,11 @@
 .fin[data-step="4"] .fin-tag.r1 { opacity: 1; scale: 1; transition-delay: 500ms; }
 .fin-tag.r1 { background: linear-gradient(180deg, #FFF3D6, #F6DFA6); box-shadow: 0 0 0 2px var(--c-brass), 0 10px 26px rgba(30,14,10,.55); }
 .fin-tag.r1 .fin-tag-name { font-size: 26px; line-height: 28px; }
-.fin[data-step="3"] .fin-tag { opacity: .35; }
+.fin[data-step="3"] .fin-tag { opacity: .9; }
 .fin[data-step="3"] .fin-tag.r1 { opacity: 0; }
 /* drumroll: the room goes dark around the cloche */
 .fin-dim { position: absolute; inset: 0; opacity: 0; transition: opacity 500ms var(--ease-in-out-quint);
-  background: radial-gradient(46% 30% at 50% 60%, rgba(20,8,5,0) 0%, rgba(20,8,5,.45) 60%, rgba(20,8,5,.82) 100%); }
+  background: radial-gradient(60% 40% at 50% 62%, rgba(20,8,5,0) 0%, rgba(20,8,5,.25) 60%, rgba(20,8,5,.6) 100%); }
 .fin[data-step="3"] .fin-dim { opacity: 1; }
 .fin-bill-head {
   display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px; margin-bottom: 2px;
@@ -110,6 +110,7 @@
 .fin-row { display: flex; align-items: center; gap: 9px; min-height: 43px; border-bottom: 1px dashed var(--c-crumb); }
 .fin-bill.dense .fin-row { min-height: 31px; gap: 8px; }
 .fin-bill.dense .fin-row-award { font-size: 16px; }
+.fin-bill.dense .fin-bill-foot .muted { display: none; }
 
 .fin-bill.dense .fin-row-name, .fin-bill.dense .fin-row-score { font-size: 16px; }
 .fin-bill.dense { padding-top: 12px; }
