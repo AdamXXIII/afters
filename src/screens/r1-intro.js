@@ -1,8 +1,38 @@
-// r1-intro: round card "Course One - Plate Up".
-import { introScreen } from './common.js';
+// r1-intro: "Course One - Plate Up" presented as a restaurant menu card with dotted-leader
+// "prices" for the rules. Cyril explains in 2 bubbles above. Host may skip after 3 s.
+import './r1.css';
+import { h } from '../ui/components.js';
+import { sayLater, hostSkip, coursePips, R1_ICONS, R1_LINES } from './r1-kit.js';
 
-export default introScreen({
-  id: 'r1-intro', round: 1, eyebrow: 'Course One', title: 'Plate Up',
-  rules: 'Two of you answer the same question. The table votes for the better plate.',
-  lineKey: 'r1Intro',
-});
+const MENU = [
+  { icon: 'pen', dish: 'Answer two questions', price: '80 sec' },
+  { icon: 'rival', dish: 'Each against a rival', price: '1 on 1' },
+  { icon: 'fork', dish: 'The table votes', price: '1000 pts' },
+];
+
+export default {
+  id: 'r1-intro',
+  layout: 'show',
+  shot: 'intro',
+  rail: false, // nothing to react to on a rules card; gives Cyril's face room above the menu
+  mount({ show }, ctx) {
+    const card = h('div.r1-menu',
+      h('div.r1-menu-band', h('span', 'Course One'), coursePips(1, 3)),
+      h('div.r1-menu-title', 'Plate Up'),
+      h('div.r1-menu-sub', 'Funniest answer wins the table.'),
+      h('ul.r1-menu-items', MENU.map((m) => h('li',
+        h('span.ic', { html: R1_ICONS[m.icon] }),
+        h('span.dish', m.dish),
+        h('span.lead'),
+        h('span.price', m.price)))),
+      h('div.r1-menu-foot', h('span', 'Win ', h('i', 'every'), ' vote?'), h('span.r1-menu-seal', 'Bonus ', h('b', '+250'))),
+    );
+    const wrap = h('div.r1-intro-wrap', card);
+    show.append(wrap);
+    if (ctx.frozen) card.classList.add('settled');
+    else card.classList.add('enter');
+    const skip = hostSkip(ctx, show);
+    const cancel = sayLater(ctx, R1_LINES.intro, { delay: 900, hold: 2400, placement: 'above' });
+    return { frame: (c) => skip?.frame(c), unmount: cancel };
+  },
+};
