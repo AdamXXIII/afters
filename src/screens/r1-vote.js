@@ -1,7 +1,10 @@
-// r1-vote: prompt + A/B place cards on the show layer; two big choice buttons (authors look innocent).
+// r1-vote: the show layer carries the prompt on a menu card with the timer and live "votes in"
+// discs; the sheet holds the two answers as handwritten place cards you tap to vote.
+// Authors get the same two cards, unclickable, with theirs marked: "Look innocent."
 import './r1.css';
-import { h, choice, placeCard } from '../ui/components.js';
-import { showTimer, sayLater, tiltFor } from './common.js';
+import { h, timerRing, onTap } from '../ui/components.js';
+import { ICONS } from '../ui/icons.js';
+import { avatarDisc, tiltFor, fitText, cyrilNote } from './r1-kit.js';
 
 export default {
   id: 'r1-vote',
@@ -10,34 +13,57 @@ export default {
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
     const seed = ctx.phase.seed;
-    const timer = showTimer(show);
-    show.append(h('div.show-top.with-timer',
-      h('div.t-eyebrow.on-dark', `Matchup ${p.index + 1} of ${p.count}`),
-      h('div.show-prompt', p.prompt)));
-    show.append(h('div.ab-cards', p.answers.map((a, i) => {
-      const card = placeCard(a.text, { tilt: (i ? 2 : -2) + tiltFor(seed, a.key, 1) });
-      card.prepend(h('div.ab-key', a.key));
-      return card;
-    })));
+    const author = ctx.priv.role === 'author';
+    const timer = timerRing();
+    const voters = (p.voterIds || []).map((id) => ctx.player(id)).filter(Boolean);
+    const discs = new Map(voters.map((v) => [v.id, avatarDisc(v, { size: 26, cls: '.r1-voter' })]));
+    const tally = h('span.r1-tally-n');
+    const promptText = h('div.r1-vote-prompt', p.prompt);
+    show.append(h('div.r1-vote-top',
+      h('div.r1-vote-card',
+        h('div.r1-vote-head', timer, h('div.r1-vote-meta',
+          h('span.t-eyebrow', `Head to head · ${p.index + 1} of ${p.count}`),
+          h('div.r1-tally', h('div.r1-voters', [...discs.values()]), tally))),
+        promptText)));
+    fitText(promptText, { max: 26, min: 19, maxH: 104 });
 
-    let buttons = [];
-    if (ctx.priv.role === 'author') {
-      sheet.append(h('div.waiting-card', h('div.t-heading', 'This is yours. Look innocent.'), h('p.t-body.t-muted', 'The table is voting on your plate right now.')));
+    const opts = p.answers.map((a, i) => {
+      const yours = author && ctx.priv.mine === a.key;
+      const el = h(`button.r1-opt${yours ? '.yours' : ''}`, {
+        type: 'button', 'aria-pressed': String(ctx.mine.vote === a.key), disabled: author, 'data-e2e': author ? 'choice-mine' : `vote-${a.key}`,
+        style: { '--tilt': `${(i ? 0.8 : -0.8) + tiltFor(seed, a.key, 0.5)}deg` },
+      },
+      h('span.r1-opt-key', a.key),
+      h('span.r1-opt-txt', a.text),
+      yours ? h('span.r1-opt-yours', 'Yours') : null,
+      h('span.r1-opt-tick', { html: ICONS.tick }));
+      if (!author) onTap(el, () => ctx.client.vote(a.key), { sound: 'select', buzz: 'select' });
+      return el;
+    });
+    const optA = opts[0]; const optB = opts[1];
+    const or = h('div.r1-or', h('span', 'or'));
+    if (author) {
+      sheet.append(h('div.r1-vote-sheet.r1-in',
+        h('div.r1-vote-ask', h('div.r1-vote-q', 'This one’s yours.'), h('div.r1-vote-hint', 'Look innocent. Votes are coming in.')),
+        optA, or, optB,
+        cyrilNote('I’ve seen poker faces at funerals. *Hold it.*')));
     } else {
-      sheet.append(h('div.t-eyebrow', 'Which plate was better?'));
-      buttons = p.answers.map((a) => {
-        const b = choice(a.text, { tall: true, tag: a.key, selected: ctx.mine.vote === a.key, e2e: `vote-${a.key}`, onPick: () => ctx.client.vote(a.key) });
-        b.style.setProperty('--round', 'var(--round-1)');
-        sheet.append(b);
-        return b;
-      });
-      sheet.append(h('p.t-body.t-muted.center', 'You can change your mind until the candle burns down.'));
+      sheet.append(h('div.r1-vote-sheet.r1-in',
+        h('div.r1-vote-ask', h('div.r1-vote-q', 'Which plate goes down better?'), h('div.r1-vote-hint', 'Tap one. Change your mind until the candle burns down.')),
+        optA, or, optB,
+        cyrilNote(ctx.line('r1Vote'))));
     }
-    const cancel = sayLater(ctx, ctx.line('r1Vote'), { delay: 300, hold: 2200 });
+
+    const update = (c) => {
+      opts.forEach((b, i) => b.setAttribute('aria-pressed', String(c.mine.vote === p.answers[i].key)));
+      let n = 0;
+      for (const [id, d] of discs) { const done = !!c.progress.done[id]; d.classList.toggle('in', done); if (done) n++; }
+      tally.textContent = `${n}/${voters.length} voted`;
+    };
+    update(ctx);
     return {
-      update(c) { buttons.forEach((b, i) => b.setAttribute('aria-pressed', String(c.mine.vote === p.answers[i].key))); },
+      update,
       frame(c) { timer.set(c.remaining(), c.duration); },
-      unmount: cancel,
     };
   },
 };

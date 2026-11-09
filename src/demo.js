@@ -23,6 +23,7 @@ export const DEMOS = {
   'r1-write': { match: (e) => e.phase.id === 'r1-write', me: 'idle', bots: 'some', t: 24000 },
   'r1-wait': { match: (e) => e.phase.id === 'r1-write', me: 'act', bots: 'some', t: 31000 },
   'r1-vote': { match: (e, me) => e.phase.id === 'r1-vote' && !meIsAuthor(e, me), me: 'idle', bots: 'some', t: 5200 },
+  'r1-vote-author': { match: (e, me) => e.phase.id === 'r1-vote' && meIsAuthor(e, me), me: 'idle', bots: 'some', t: 5200 },
   'r1-reveal': { match: (e, me) => e.phase.id === 'r1-reveal' && !meIsAuthor(e, me), t: 4300 },
   'r1-scores': { match: (e) => e.phase.id === 'r1-scores', t: 2600 },
   'r2-intro': { match: (e) => e.phase.id === 'r2-intro', t: 3200 },
