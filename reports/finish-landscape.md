@@ -25,3 +25,6 @@ Checked by eye (landscape): title, create, join, lobby, settings, menu, menu-fir
 - Menu landscape: Tonight's table is hidden (Cyril's line and the results screen still show the leader). If Adam wants it on the menu, it needs a single big "leader" chip, not the full row.
 - Critics compare phone screens with TV screens. A fairer bar would be phone controller shots (Jackbox's phone UI), which we don't have.
 - Not checked in landscape: r1-scores, r2-pick, r2-reveal, r3-reveal, reconnect, and the other three games' screens (they have their own landscape blocks).
+
+## Tests (2026-11-10, after all changes)
+All pass with no console errors: `e2e` (Afters Classic, full game + second helping), `e2e-percentages`, `e2e-telephone`, and `e2e-forehead` (Bonce + Gravy vs Custard, 251 s).
