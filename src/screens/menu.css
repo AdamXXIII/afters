@@ -232,10 +232,108 @@ body[data-screen="menu"] #show { height: 100%; }
 :root[data-reduced-motion="1"] .mn-dish.is-focus .mn-tag::after { animation: none; }
 @media (prefers-reduced-motion: reduce) { .mn-dish.is-focus .mn-tag::after, .mn-dish.is-focus .mn-plate::before { animation: none; } }
 
-/* 4 live games: a 2x2 grid so no tile falls off the edge (merge fix 2026-11-10) */
+/* ---------- 2+ live games: picks above ONE hero card (finish-landscape 2026-11-10) ----------
+   The picks keep their natural height (never squeezed up over Tonight's table); the hero card
+   takes what is left and its plate shrinks to fit. */
+.mn-trolley:not(.live-1) { flex: none; justify-content: flex-start; padding: 16px 4px 2px; }
+.mn-trolley:not(.live-1) ~ .mn-detail { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.mn-trolley:not(.live-1) ~ .mn-detail .mn-d-card { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.mn-hero-art { flex: 1 1 0; min-height: 0; display: grid; place-items: center; }
+.mn-hero-plate { height: 100%; max-height: 190px; max-width: 100%; aspect-ratio: 160 / 120; }
+.mn-hero-plate svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.mn-hero-art:empty { display: none; }
+
+/* 4 live games: a 2x2 grid of tiles */
 .mn-trolley.live-4 .mn-picks {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; justify-items: stretch; align-items: end;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px 10px; justify-items: stretch; align-items: stretch; padding: 0;
 }
-.mn-trolley.live-4 .mn-picks .mn-dish { --dish-w: 100%; width: 100%; }
+.mn-trolley.live-4 .mn-picks .mn-dish { --dish-w: 100%; width: 100%; height: 100%; }
 .mn-trolley.live-4 .mn-picks .mn-plate { display: none; }
+.mn-trolley.live-4 .mn-picks .mn-tag { height: 100%; transform: rotate(calc((var(--i) - 1.5) * .6deg)); }
 .mn-trolley.live-4 .mn-picks .mn-tag-t { font-size: calc(18px * var(--ts)); }
+/* fans clip onto the top edge of the tile like place-card pins, never over the name */
+.mn-trolley.live-4 .mn-fans { top: -15px; right: 8px; }
+.mn-trolley.live-4 .mn-fan { width: 24px; height: 24px; padding: 4px; margin-left: -7px; }
+.mn-trolley.live-4 .mn-fan:first-child { margin-left: 0; }
+.mn-trolley.live-4 .mn-fans-n { height: 20px; font-size: 11px; }
+.mn-trolley.live-4 .mn-dish.is-focus .mn-tag { transform: scale(1.03); }
+
+/* ---------- landscape: Cyril and the table on the left, the whole menu on the right ---------- */
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-screen="menu"] #topbar { right: auto; left: calc(42% - 58px); }
+  .mn { padding: 0 0 0 42%; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+  .mn::before { /* the bay becomes one full-height panel */
+    content: ""; position: absolute; top: 0; bottom: 0; left: 42%; right: 0; pointer-events: none;
+    border-radius: var(--r-4) 0 0 var(--r-4);
+    background:
+      radial-gradient(90% 50% at 50% 40%, rgba(255,200,107,.14), rgba(255,200,107,0) 70%),
+      radial-gradient(140% 90% at 30% 0%, var(--bay-hi) 0%, var(--bay) 45%, var(--bay-lo) 100%);
+    box-shadow: -14px 0 34px rgba(20,8,5,.5), inset 1px 0 0 rgba(255,220,170,.35);
+  }
+  .mn-head {
+    margin: 0; padding: calc(var(--safe-t) + 10px) calc(14px + var(--safe-r)) 2px 18px;
+    flex-direction: row; align-items: center; gap: 10px; text-align: left; z-index: 1;
+  }
+  .mn-title { order: 0; margin: 0; font-size: calc(25px * var(--ts)); white-space: nowrap; text-shadow: 0 2px 0 rgba(42,26,23,.6); }
+  .mn-title br { display: none; }
+  .mn-title em { margin-left: .2em; }
+  .mn-eyebrow { order: 1; margin-left: auto; }
+  .mn-code b { font-size: 17px; }
+  .mn-eyebrow .mn-code { padding: 3px 8px 4px; }
+  .mn-rating { order: 2; }
+  .mn-rate { min-height: 30px; padding: 0 10px; font-size: 12.5px; }
+  .mn-bay { background: none; box-shadow: none; border-radius: 0; padding: 4px calc(14px + var(--safe-r)) calc(var(--safe-b) + 10px) 14px; }
+  .mn-bay::before { display: none; }
+  .night { flex-direction: row; align-items: center; gap: 8px; }
+  .night-n { display: none; }
+  .night-list { flex: 1 1 auto; }
+  .night-row { height: 27px; }
+  .night-empty { padding: 0; font-size: 13px; }
+  .mn-trolley:not(.live-1) { padding-top: 14px; }
+  .mn-trolley.live-4 .mn-picks { gap: 16px 10px; }
+  .mn-trolley.live-4 .mn-tag { padding: 5px 8px 6px; }
+  .mn-trolley.live-4 .mn-tag-t { font-size: calc(16px * var(--ts)); }
+  .mn-trolley.live-4 .mn-tag-c { font-size: calc(11.5px * var(--ts)); margin-top: 1px; }
+  /* the hero card lies on its side: plate | name | serve */
+  .mn-detail { margin-top: 8px; }
+  .mn-trolley:not(.live-1) ~ .mn-detail .mn-d-card {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 12px; align-items: center; padding: 8px 12px 10px;
+  }
+  .mn-d-card .mn-note-slot { grid-column: 1 / -1; }
+  .mn-note { margin: 0 0 2px; min-height: 18px; font-size: 12px; }
+  .mn-d-card .mn-hero-art { grid-row: 2; height: 100%; max-height: 74px; width: 92px; }
+  .mn-d-card .mn-d-txt { grid-row: 2; }
+  .mn-d-card .mn-d-act { grid-row: 2; margin: 0; }
+  .mn-d-act .btn { width: auto; min-width: 0; padding-left: 18px; padding-right: 18px; white-space: nowrap; }
+  .mn-d-course { font-size: calc(16px * var(--ts)); }
+  .mn-d-title { font-size: calc(22px * var(--ts)); margin: 0 0 4px; }
+  .mn-d-blurb { display: none; }
+  .mn-rate { white-space: nowrap; }
+  .mn-eyebrow .mn-code { font-size: 0; gap: 0; } /* just the code: "ROOM" goes, the plaque stays */
+  .mn-title { font-size: calc(23px * var(--ts)); }
+  .night-k-t { white-space: nowrap; font-size: 11px; }
+  .mn-d-meta { flex-wrap: nowrap; }
+  .mn-d-meta span { white-space: nowrap; padding: 4px 7px; font-size: 10px; }
+  .mn-d-act .btn { min-height: 48px; font-size: 16px; padding-left: 14px; padding-right: 14px; }
+  .mn-note b { font-size: 14px; }
+}
+/* the note line sits on the cream card: dark ink, not linen */
+.mn-d-card .mn-note { color: var(--c-toffee); }
+.mn-d-card .mn-note b { color: var(--c-ink); }
+.mn-d-card .mn-note-k { color: var(--c-claret); }
+
+/* landscape round 1 (blind critic: "half the elements, twice the size"): drop the tiny score chips
+   and the tile hints, make the four names big and give the guests' fans their own space above. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .mn-night { display: none; }
+  .mn-trolley:not(.live-1) { padding-top: 22px; }
+  .mn-trolley.live-4 .mn-picks { gap: 22px 12px; }
+  .mn-trolley.live-4 .mn-tag { padding: 12px 8px 12px; display: grid; place-items: center; }
+  .mn-trolley.live-4 .mn-picks .mn-tag-t { font-size: calc(24px * var(--ts)); white-space: nowrap; }
+  .mn-trolley.live-4 .mn-tag-c { display: none; }
+  .mn-trolley.live-4 .mn-fans { top: -19px; right: 10px; }
+  .mn-d-meta { display: none; }
+  .mn-d-title { font-size: calc(28px * var(--ts)); }
+  .mn-d-course { font-size: calc(18px * var(--ts)); }
+}
