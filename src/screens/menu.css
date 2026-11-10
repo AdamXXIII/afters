@@ -231,3 +231,11 @@ body[data-screen="menu"] #show { height: 100%; }
 :root[data-reduced-motion="1"] .mn-dish, :root[data-reduced-motion="1"] .mn-fan, :root[data-reduced-motion="1"] .night-row,
 :root[data-reduced-motion="1"] .mn-dish.is-focus .mn-tag::after { animation: none; }
 @media (prefers-reduced-motion: reduce) { .mn-dish.is-focus .mn-tag::after, .mn-dish.is-focus .mn-plate::before { animation: none; } }
+
+/* 4 live games: a 2x2 grid so no tile falls off the edge (merge fix 2026-11-10) */
+.mn-trolley.live-4 .mn-picks {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; justify-items: stretch; align-items: end;
+}
+.mn-trolley.live-4 .mn-picks .mn-dish { --dish-w: 100%; width: 100%; }
+.mn-trolley.live-4 .mn-picks .mn-plate { display: none; }
+.mn-trolley.live-4 .mn-picks .mn-tag-t { font-size: calc(18px * var(--ts)); }
