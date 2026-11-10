@@ -1,5 +1,6 @@
-// r2-wait: "Porky told. Keep a straight face." Your lie sealed on a place card,
-// who we're still waiting on (chips), and a boop-the-snout fidget.
+// r2-wait: "Porky told." on the claret sheet. Your lie sealed on a big place card, who we're
+// still waiting on (a gold call-out by name once only one straggler is left), and a
+// boop-the-snout fidget.
 import { h } from '../../../ui/components.js';
 import { waxSeal, snoutSvg, tilt, avatarDisc } from './r2-kit.js';
 
@@ -18,15 +19,29 @@ export default {
     const t = tilt(ctx.phase?.seed || 3, ctx.meId || 'me', 2.5);
     const placeCard = h('div.r2-sealed', { style: { '--tilt': `${t}deg` } },
       h('div.t-eyebrow', 'Your porky'),
-      h('div.r2-sealed-txt', mineText || 'Sealed and served'),
+      h(`div.r2-sealed-txt${mineText.length > 24 ? '.long' : ''}`, mineText || 'Sealed and served'),
       waxSeal('.small'));
 
-    const chipsWrap = h('div.r2-waiting-chips');
-    const label = h('div.t-eyebrow.r2-waiting-label');
+    const box = h('div.r2-waiting');
+    let lastKey = '';
     const setWaiting = (c) => {
       const list = waiting(c);
-      label.textContent = list.length ? `Still fibbing (${list.length})` : 'Everyone’s lied. Here we go.';
-      chipsWrap.replaceChildren(...list.map((p, i) => h('div.r2-fibber', { style: { '--i': i } }, avatarDisc(p, '.lg'), h('span.nm', p.name), h('span.r2-dots', h('i'), h('i'), h('i')))));
+      const sid = c.progress?.straggler;
+      const strag = sid && sid !== c.meId ? c.player(sid) : null;
+      const key = strag ? `s:${strag.id}` : list.map((p) => p.id).join(',');
+      if (key === lastKey) return;
+      lastKey = key;
+      if (strag) {
+        box.replaceChildren(h('div.r2-strag',
+          avatarDisc(strag, '.xl'),
+          h('div.r2-strag-txt', h('span.k', 'Waiting on'), h('span.nm', strag.name || '?')),
+          h('span.r2-dots', h('i'), h('i'), h('i'))));
+        return;
+      }
+      box.replaceChildren(
+        h('div.r2-waiting-label', list.length ? `Still fibbing (${list.length})` : 'Everyone’s lied. Here we go.'),
+        h(`div.r2-waiting-chips${list.length > 4 ? '.many' : ''}`, list.map((p, i) => h('div.r2-fibber', { style: { '--i': i } }, avatarDisc(p, '.lg'), h('span.nm', p.name), h('span.r2-dots', h('i'), h('i'), h('i'))))),
+      );
     };
     setWaiting(ctx);
 
@@ -42,9 +57,9 @@ export default {
     });
 
     sheet.append(h('div.r2-wait',
-      h('div.r2-wait-head', h('div.r2-wait-title', 'Porky told.'), h('div.r2-wait-sub', 'Keep a straight face.')),
+      h('div.r2-wait-head', h('div.r2-wait-title', 'Porky told.'), h('div.r2-wait-sub', 'Now keep a straight face.')),
       placeCard,
-      h('div.r2-waiting', label, chipsWrap),
+      box,
       h('div.r2-boop-wrap', snout, boopTxt),
     ));
     return { update: (c) => setWaiting(c) };

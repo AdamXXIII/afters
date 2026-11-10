@@ -9,6 +9,10 @@ import { R1_PROMPTS } from './content/prompts.js';
 import { R2_FACTS } from './content/facts.js';
 import { R3_PROMPTS } from './content/lastOrders.js';
 
+/** Porkies options all look alike: lower case, no trailing punctuation, single spaces
+ *  (play-test: the truth was the only tidy, capitalised card, so it gave itself away). */
+const plain = (t) => String(t || '').replace(/\s+/g, ' ').trim().replace(/[.!?,;:]+$/, '').toLowerCase();
+
 export const newStats = () => ({ cleanPlates: 0, fooled: 0, truths: 0, r3Answers: 0, ties: 0, lastSubmits: 0, reactions: 0 });
 
 export class ClassicHost {
@@ -58,9 +62,13 @@ export class ClassicHost {
       case 'vote': return this._vote(p, msg);
       case 'pick': return this._pick(p, msg);
       case 'swipe': return this._swipe(p, msg);
+      case 'lot': return this._lot(p);
       default:
     }
   }
+
+  /** Host may skip the podium once the cake has landed (play-test: 13 s with nothing to do). */
+  canSkip(phaseId, since) { return phaseId === 'podium' && since >= this.api.dur(7000); }
 
   activeFor(phaseId, connected) {
     if (phaseId === 'r1-vote') {
@@ -73,10 +81,26 @@ export class ClassicHost {
   // ---------- helpers ----------
 
   _enter(id, dur, payload, priv = null, progress = null) {
-    this.api.enter(id, dur, payload, { priv, progress, final: id === 'end' });
+    this.g && (this.g.straggler = null);
+    this._progressNow = progress;
+    const prog = progress && (() => ({ ...progress(), straggler: this.g?.straggler || null }));
+    this.api.enter(id, dur, payload, { priv, progress: prog, final: id === 'end' });
   }
 
   _markSubmit(p) { this.g.lastSubmit = { id: p.id, at: this.api.now() }; this.g.submitters.add(p.id); }
+
+  /** Everyone but one is done writing: pull the clock in to 10 s so the table isn't sat waiting.
+   *  The straggler's id goes out in progress (`straggler`) so Cyril can call them out by name. */
+  _squeeze() {
+    const id = this.api.phase.id;
+    if (!/-write$/.test(id) || this.g.squeezed === this.api.seq || !this.api.phase.endsAt) return;
+    const live = this.players.filter((p) => p.connected);
+    if (live.length < 3) return;
+    const { done } = this.api.phase.id === id && this._progressNow ? this._progressNow() : { done: {} };
+    const left = live.filter((p) => !done[p.id]);
+    if (left.length !== 1) return;
+    if (this.api.hurry(DUR.squeeze)) { this.g.squeezed = this.api.seq; this.g.straggler = left[0].id; }
+  }
 
   _closeLate() {
     const ls = this.g.lastSubmit;
@@ -115,7 +139,7 @@ export class ClassicHost {
       seats,
       r1: { matchups, order: shuffle(matchups.map((_, i) => i), rng), index: 0 },
       r2: { facts, index: 0, porkies: {}, options: [], picks: {} },
-      r3: { prompt: r3.text, answers: [], deck: [], swipes: {}, cheers: {} },
+      r3: { prompt: r3.text, answers: [], deck: [], swipes: {}, cheers: {}, finished: new Set() },
       lastSubmit: null,
       submitters: new Set(),
     };
@@ -154,6 +178,7 @@ export class ClassicHost {
       m.answers[p.id] = t;
       this._markSubmit(p);
       this.api.ack(p, { slot: msg.slot });
+      this._squeeze();
       return this.api.progress();
     }
     if (id === 'r2-write') {
@@ -164,6 +189,7 @@ export class ClassicHost {
       this.g.r2.porkies[p.id] = t;
       this._markSubmit(p);
       this.api.ack(p);
+      this._squeeze();
       return this.api.progress();
     }
     if (id === 'r3-write') {
@@ -175,6 +201,7 @@ export class ClassicHost {
       p.stats.r3Answers += 1;
       this._markSubmit(p);
       this.api.ack(p, { n: mine.length + 1 });
+      this._squeeze();
       return this.api.progress();
     }
   }
@@ -272,7 +299,7 @@ export class ClassicHost {
     r2.options = shuffle(options, rng).map((o, i) => ({ ...o, id: `o${i}` }));
     this._enter('r2-pick', DUR['r2-pick'], {
       index: r2.index, count: r2.facts.length, fact: { id: f.id, text: f.text },
-      options: r2.options.map((o) => ({ id: o.id, text: o.text })),
+      options: r2.options.map((o) => ({ id: o.id, text: plain(o.text) })),
     },
     (p) => ({ ownOptionId: r2.options.find((o) => o.authors.includes(p.id))?.id || null }),
     () => {
@@ -305,15 +332,15 @@ export class ClassicHost {
     // Punchier reveal (2026-11-09): shorter beats, the truth lands sooner.
     const steps = [];
     let t = 0;
-    if (zero.length) { steps.push({ kind: 'nobody', optionIds: zero.map((o) => o.id), at: t, dur: 1500 }); t += 1500; }
-    for (const o of picked) { steps.push({ kind: 'porky', optionId: o.id, at: t, dur: 2400 }); t += 2400; }
+    if (zero.length) { steps.push({ kind: 'nobody', optionIds: zero.map((o) => o.id), at: t, dur: 2200 }); t += 2200; }
+    for (const o of picked) { steps.push({ kind: 'porky', optionId: o.id, at: t, dur: 2800 }); t += 2800; }
     const truth = r2.options.find((o) => o.kind === 'truth');
     steps.push({ kind: 'truth', optionId: truth.id, at: t, dur: 3400 }); t += 3400;
-    steps.push({ kind: 'aside', at: t, dur: 2200 }); t += 2200;
+    steps.push({ kind: 'aside', at: t, dur: 2600 }); t += 2600;
     const total = Math.min(t, 22000);
     this._enter('r2-reveal', total, {
       index: r2.index, count: r2.facts.length, fact: { id: f.id, text: f.text }, aside: f.aside,
-      options: r2.options.map((o) => ({ id: o.id, text: o.text, kind: o.kind, authors: o.authors, pickers: pickers[o.id] })),
+      options: r2.options.map((o) => ({ id: o.id, text: plain(o.text), kind: o.kind, authors: o.authors, pickers: pickers[o.id] })),
       steps: steps.map((s) => ({ ...s, at: this.api.dur(s.at), dur: this.api.dur(s.dur) })),
       deltas,
     });
@@ -329,10 +356,20 @@ export class ClassicHost {
       const done = {}; const counts = {};
       for (const p of this.players) {
         counts[p.id] = r3.answers.filter((a) => a.authorId === p.id).length;
-        done[p.id] = counts[p.id] >= LIMITS.r3Answers;
+        done[p.id] = counts[p.id] >= LIMITS.r3Answers || (counts[p.id] > 0 && r3.finished.has(p.id));
       }
       return { done, counts };
     });
+  }
+
+  /** "That's my lot": done writing Last Orders with fewer than 4 answers. */
+  _lot(p) {
+    if (this.api.phase.id !== 'r3-write') return;
+    if (!this.g.r3.answers.some((a) => a.authorId === p.id)) return;
+    this.g.r3.finished.add(p.id);
+    this.api.ack(p, { lot: true });
+    this._squeeze();
+    this.api.progress();
   }
 
   _r3Swipe() {
@@ -405,7 +442,11 @@ export class ClassicHost {
   _podium() {
     const ranked = this.players.slice().sort((a, b) => b.score - a.score);
     const awards = computeAwards(this.players);
-    const rows = ranked.map((p, i) => ({ id: p.id, score: p.score, rank: i + 1, award: awards[p.id] }));
+    const prevOrder = this.players.slice().sort((a, b) => b.boardScore - a.boardScore).map((p) => p.id);
+    const rows = ranked.map((p, i) => ({
+      id: p.id, score: p.score, rank: i + 1, award: awards[p.id],
+      prev: p.boardScore, delta: p.score - p.boardScore, prevRank: prevOrder.indexOf(p.id) + 1,
+    }));
     for (const p of this.players) p.boardScore = p.score;
     // tonight's table is updated as the podium starts, so the end screen can show it
     this.night = this.api.record(this.players.map((p) => ({ id: p.id, score: p.score })));

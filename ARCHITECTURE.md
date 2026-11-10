@@ -129,6 +129,14 @@ New ctx fields (game box): `game` (the current game's definition or null), `game
 
 Pre-game: `title` / `create` / `join` (local navigation). Once joined: `lobby`, `menu`, `results` for box phases; otherwise the game's `resolveScreen(state)` if it returns an id, else the phase id (Afters Classic swaps `r1-write` -> `r1-wait` and `r2-write` -> `r2-wait`). `reconnect` is an overlay driven by `client.state.status`.
 
+## Landscape (2026-11-09, classic team)
+
+Adam wants every screen to play in landscape too. The contract is small:
+- **Test**: `@media (orientation: landscape) and (max-height: 600px)`. The same test sets `body.land` (in `Stage.resize()`) for JS and for `body.land ...` selectors. Shoot it with `node scripts/shoot.mjs --landscape` (844x390).
+- **`split` and `input`**: the SHOW layer becomes the **left column** (`var(--land-l)`: 42% in split, 34% in input) and the INPUT sheet becomes a full-height card on the right. The writing strip fills the left column (status, Cyril, then timer and chips). Stage frames Cyril in that column on its own. Your sheet must fit about 390 px high, so compact it or let `.sheet-page` scroll, and keep the primary button visible. Your show-layer cards for split screens sit in the left column above Cyril.
+- **`show`**: full width with a slimmer rail (`--rail-h: 58px`). Put your cards on one side (usually the right ~58%). The content-aware framer then puts Cyril in the free side column. Add your own `@media` block in your screen CSS.
+- Shared rules live in `src/ui/landscape.css`; screen-specific ones go in each screen's CSS.
+
 ## Box phases
 
 `lobby` -> (host: Wheel in the menu) -> `menu` -> host serves a game -> the game's phases -> `results` (via `api.finish`) or the game's own final phase -> host: **Back to the menu** or **Same again**.

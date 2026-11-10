@@ -96,3 +96,30 @@ body:has(.st-sheet) #bubbles { opacity: 0; transition: opacity var(--d-small); }
 .st-cyril-flame svg { width: 100%; height: 100%; }
 @keyframes titleFlicker { 0%, 100% { transform: scale(1) rotate(-2deg); } 50% { transform: scale(.95, 1.08) rotate(3deg); } }
 body:has(.st-sheet) #topbar { opacity: 0; pointer-events: none; transition: opacity var(--d-small); }
+
+/* ===== Landscape (844x390): a wide menu-card panel. Title, Cyril's line and close along the top;
+   Sound (and Leave) on the left, Comfort on the right. Fits without scrolling. ===== */
+@media (orientation: landscape) and (max-height: 600px) {
+  .settings-sheet.st-sheet {
+    width: min(800px, calc(100% - 24px - var(--safe-l) - var(--safe-r)));
+    max-height: calc(100% - 10px - var(--safe-t));
+    display: grid; align-content: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-areas: "title cyril close" "sound comfort comfort" "leave comfort comfort";
+    column-gap: 14px; row-gap: 10px;
+    padding: 14px calc(18px + var(--safe-r)) max(14px, var(--safe-b)) calc(18px + var(--safe-l));
+  }
+  .st-grab { display: none; }
+  .st-head { display: contents; }
+  .st-head > div { grid-area: title; align-self: center; }
+  .st-head > .settings-close { grid-area: close; align-self: center; }
+  .st-title { font-size: calc(28px * var(--ts)); }
+  .st-cyril { grid-area: cyril; margin: 0; padding: 7px 12px 7px 10px; align-self: center; }
+  .st-cyril p { font-size: calc(15px * var(--ts)); line-height: 1.25; }
+  .st-cyril small { font-size: 12px; }
+  .st-cyril + .st-group { grid-area: sound; }
+  .st-group + .st-group { grid-area: comfort; }
+  .st-leave { grid-area: leave; align-self: start; min-height: 54px; }
+  .st-row { min-height: 54px; padding: 4px 0; }
+  .st-label { font-size: 17px; line-height: 20px; }
+}

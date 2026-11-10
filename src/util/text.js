@@ -54,7 +54,11 @@ export function isTooHonest(text, fact) {
   const n = normalise(text);
   if (!n) return false;
   const targets = [fact.answer, ...(fact.aliases || [])].map(normalise);
+  // Short and numeric answers need an exact match, or every one-digit guess reads as "too honest"
+  // (play-test 2026-11-09: "nine" vs "three hearts" was being rejected).
   return targets.some((t) => {
+    if (/^\d+$/.test(t) || /^\d+$/.test(n)) return n === t;
+    if (t.length <= 4) return n === t;
     const limit = t.length > 8 ? 2 : 1;
     return levenshtein(n, t) <= limit;
   });

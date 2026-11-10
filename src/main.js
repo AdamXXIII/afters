@@ -6,6 +6,7 @@ import '@fontsource-variable/caveat/index.css';
 import './ui/tokens.css';
 import './ui/base.css';
 import './ui/components.css';
+import './ui/landscape.css';
 import { App } from './app.js';
 import { params } from './util/params.js';
 

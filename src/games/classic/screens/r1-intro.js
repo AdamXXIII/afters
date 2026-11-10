@@ -1,5 +1,5 @@
 // r1-intro: "Course One - Plate Up" presented as a restaurant menu card with dotted-leader
-// "prices" for the rules. Cyril explains in 2 bubbles above. Host may skip after 3 s.
+// "prices" for the rules. Cyril says ONE short line (done typing by ~2 s of a 5.5 s phase). Host may skip after 3 s.
 import './r1.css';
 import { h } from '../../../ui/components.js';
 import { sayLater, hostSkip, coursePips, R1_ICONS, R1_LINES } from './r1-kit.js';
@@ -33,7 +33,7 @@ export default {
     if (ctx.frozen) card.classList.add('settled');
     else card.classList.add('enter');
     const skip = hostSkip(ctx, show);
-    const cancel = sayLater(ctx, R1_LINES.intro, { delay: 900, hold: 2400, placement: 'above' });
+    const cancel = sayLater(ctx, R1_LINES.intro, { delay: 600, hold: 3000, placement: 'above' });
     return { frame: (c) => skip?.frame(c), unmount: cancel };
   },
 };

@@ -1,56 +1,54 @@
-/* ===== Intro: Tonight's menu ===== */
+/* ===== Intro: Tonight's menu =====
+   A compact claret menu board up top (light course tiles on a dark field), so Cyril below is the hero. */
 .in-wrap {
-  position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 62px);
-  display: flex; justify-content: center; padding: 0 22px; perspective: 900px;
+  position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 66px);
+  display: flex; justify-content: center; padding: 0 14px; perspective: 900px;
 }
 .in-menu {
-  position: relative; width: 100%; max-width: 340px; padding: 18px 20px 14px;
-  background-color: var(--c-linen); background-image: var(--paper);
-  border-radius: 6px 6px 18px 18px;
-  box-shadow: var(--sh-3), 0 30px 60px rgba(20,10,8,.35), inset 0 0 0 1px rgba(122,74,42,.12);
-  transform-origin: 50% 0; transform: rotate(-1.4deg);
-  animation: inMenu 760ms var(--ease-out-quint) both;
+  position: relative; width: 100%; max-width: 362px; padding: 12px 12px 10px;
+  background-color: var(--c-claret);
+  background-image: radial-gradient(120% 90% at 50% 0%, rgba(255,200,107,.16), transparent 60%), var(--paper);
+  border-radius: 22px;
+  box-shadow: 0 4px 0 var(--c-claret-lip), 0 22px 44px rgba(20,8,6,.55), inset 0 0 0 1px rgba(255,200,107,.25);
+  transform-origin: 50% 0; transform: rotate(-1deg);
+  animation: inMenu 640ms var(--ease-out-quint) both;
 }
-.in-menu::before { /* double menu-card hairline */
-  content: ""; position: absolute; inset: 8px; border-radius: 3px 3px 12px 12px; pointer-events: none;
-  border: 1px solid rgba(122,30,44,.35); box-shadow: inset 0 0 0 3px var(--c-linen), inset 0 0 0 4px rgba(122,30,44,.18);
+.in-menu::before { /* gold menu-card hairline */
+  content: ""; position: absolute; inset: 5px; border-radius: 18px; pointer-events: none;
+  border: 1px solid rgba(255,200,107,.45);
 }
-@keyframes inMenu { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: rotate(-1.4deg); } }
+@keyframes inMenu { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: rotate(-1deg); } }
 
-.in-eyebrow {
-  text-wrap: nowrap;
-  display: flex; align-items: center; gap: 10px; justify-content: center;
-  font: 800 13px/15px var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--c-claret);
-}
-.in-eyebrow i { flex: 1; max-width: 46px; height: 1px; background: currentColor; opacity: .45; }
+.in-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 6px 8px; }
 .in-title {
-  margin: 4px 0 8px; text-align: center; color: var(--c-ink);
-  font: 800 32px/34px var(--f-display); font-variation-settings: "opsz" 96, "SOFT" 100, "WONK" 1; letter-spacing: -.01em;
+  color: var(--c-linen); white-space: nowrap;
+  font: 900 30px/32px var(--f-display); font-variation-settings: "opsz" 96, "SOFT" 100, "WONK" 1; letter-spacing: -.015em;
+  text-shadow: 0 2px 0 rgba(42,10,16,.45);
 }
-.in-courses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.in-courses { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 .in-course {
-  display: flex; gap: 12px; align-items: center; padding: 5px 0;
-  border-top: 1px dashed rgba(122,74,42,.28);
-  animation: inCourse 520ms var(--ease-out-quint) both;
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px;
+  padding: 9px 4px 9px; border-radius: 14px;
+  background-color: var(--c-linen); background-image: var(--paper);
+  box-shadow: 0 3px 0 rgba(42,10,16,.45), inset 0 5px 0 var(--round);
+  animation: inCourse 460ms var(--ease-out-back) both;
 }
 .in-num {
-  flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px;
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; margin-top: 4px;
   background: var(--round); color: var(--c-linen);
-  font: 800 14px/1 var(--f-display); font-variation-settings: "opsz" 24; letter-spacing: .02em;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 2px 4px rgba(59,31,24,.2);
+  font: 900 15px/1 var(--f-display); font-variation-settings: "opsz" 24; letter-spacing: .02em;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.2), 0 2px 4px rgba(59,31,24,.25);
 }
-.in-cbody { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.in-cname { font: 700 22px/26px var(--f-display); font-variation-settings: "opsz" 48, "SOFT" 60; color: var(--c-ink); }
-.in-cwhat { font: 500 16px/20px var(--f-ui); color: var(--c-ink); opacity: .82; }
-@keyframes inCourse { from { opacity: 0; transform: translateX(-14px); } }
+.in-cname { font: 800 19px/20px var(--f-display); font-variation-settings: "opsz" 48, "SOFT" 80, "WONK" 1; color: var(--c-ink); white-space: nowrap; letter-spacing: -.01em; }
+.in-cwhat { font: 700 13px/15px var(--f-ui); color: var(--c-toffee); letter-spacing: .02em; }
+@keyframes inCourse { from { opacity: 0; transform: translateY(-10px) scale(.85); } }
 
 .in-table {
-  margin-top: 2px; padding-top: 8px; border-top: 1px solid rgba(122,30,44,.3);
-  display: flex; flex-direction: column; align-items: center; text-align: center;
-  animation: inCourse 520ms var(--ease-out-quint) both;
+  margin-top: 9px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  animation: inCourse 420ms var(--ease-out-quint) both;
 }
-.in-table-k { font: 800 13px/15px var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--c-toffee); }
-.in-table-v { font: 700 24px/25px var(--f-hand); color: var(--c-claret); text-wrap: balance; }
+.in-table-k { display: none; }
+.in-table-v { font: 700 23px/24px var(--f-hand); color: var(--c-candle); text-wrap: balance; min-width: 0; }
 
 /* engraved brass nameplate on Cyril's holder */
 .in-plate {
@@ -70,20 +68,19 @@
 .in-plate-v { font: 800 21px/24px var(--f-display); font-variation-settings: "opsz" 36, "SOFT" 0, "WONK" 0; letter-spacing: .04em; font-variant: small-caps; }
 @keyframes inPlate { from { opacity: 0; transform: translate(-50%, 16px) scale(.9); } }
 
-@media (max-height: 760px) {
-  .in-cwhat { display: none; }
-  .in-course { padding: 7px 0; }
-}
 
-.in-table-v.long { font-size: 21px; line-height: 22px; }
+.in-table-v.long { font-size: 20px; line-height: 21px; }
 /* Cyril's welcome reads in fewer, wider lines here so it never climbs onto the menu */
 body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
+/* the nameplate grows with the hero */
+.in-plate { padding: 6px 22px 7px; }
+.in-plate-v { font-size: 25px; line-height: 28px; }
 
-.in-faces { display: flex; justify-content: center; margin: 4px 0 1px; }
+.in-faces { display: flex; justify-content: center; flex: none; }
 .in-face {
-  width: 36px; height: 36px; margin: 0 -1px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  width: 32px; height: 32px; margin: 0 -4px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
   background: radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--pc) 45%, #FFFBF4), #FFFBF4 75%);
-  box-shadow: 0 0 0 2px var(--c-linen), 0 0 0 3.5px var(--c-brass), 0 3px 6px rgba(59,31,24,.25);
+  box-shadow: 0 0 0 2px var(--c-claret), 0 0 0 3.5px var(--c-brass), 0 3px 6px rgba(20,8,6,.35);
   animation: inFace 420ms var(--ease-out-back) both;
 }
 .in-face img { width: 100%; height: 100%; object-fit: contain; margin-top: 3px; }
@@ -103,17 +100,54 @@ body[data-screen="intro"] .bubble:not(.compact) { max-width: 320px; }
 .in-skip svg { width: 100%; height: 100%; display: block; }
 
 .in-me { position: relative; white-space: nowrap; }
-.in-me::after { /* a red-ink ring drawn round your own name */
-  content: ""; position: absolute; left: -7px; right: -7px; top: -2px; bottom: -3px;
-  border: 2px solid var(--c-tomato); border-radius: 50% 46% 52% 48% / 60% 55% 48% 52%; transform: rotate(-3deg); opacity: .85;
+.in-me { color: var(--c-linen); }
+.in-me::after { /* an ink ring drawn round your own name */
+  content: ""; position: absolute; left: -6px; right: -6px; top: -2px; bottom: -3px;
+  border: 2px solid var(--c-candle); border-radius: 50% 46% 52% 48% / 60% 55% 48% 52%; transform: rotate(-3deg); opacity: .85;
 }
 
-.in-faces.many .in-face { width: 30px; height: 30px; }
+.in-faces.many .in-face { width: 26px; height: 26px; margin: 0 -5px; }
 
-.in-count { /* brass tab clipped to the top of the menu */
-  position: absolute; right: 18px; top: -13px; padding: 4px 10px 5px; border-radius: 6px;
+.in-count { /* brass tab on the menu board */
+  flex: none; padding: 5px 10px 6px; border-radius: 8px;
   background: linear-gradient(180deg, #E9C779, #C89B3C 55%, #B08530); color: #3E2A0C;
   font: 800 13px/15px var(--f-ui); letter-spacing: .06em; font-variant-numeric: tabular-nums; white-space: nowrap;
-  box-shadow: 0 2px 0 #7A5A1C, 0 6px 12px rgba(20,10,8,.35), inset 0 1px 0 rgba(255,255,255,.5); transform: rotate(2deg);
+  box-shadow: 0 2px 0 #7A5A1C, 0 6px 12px rgba(20,10,8,.35), inset 0 1px 0 rgba(255,255,255,.5); transform: rotate(2deg); font-size: 14px;
 }
 .in-face { background: radial-gradient(circle at 50% 70%, #FFF4E2, #FFFBF4 75%); }
+
+/* ===== intro portrait v3: one clean board, one type scale =====
+   Countdown is an eyebrow inside the card (nothing spills), the courses are one even row of tiles
+   (round-colour band with the numeral, name 20, line 14), and the guests sit on their own row with
+   the names centred underneath, so faces never crowd the handwriting. Portrait only. */
+@media (orientation: portrait), (min-height: 601px) {
+  .in-wrap { padding: 0 16px; }
+  .in-menu { max-width: 358px; padding: 12px 12px 12px; transform: none; }
+  @keyframes inMenuP { from { opacity: 0; transform: rotateX(-70deg) translateY(-30px); } 60% { opacity: 1; } to { transform: none; } }
+  .in-menu { animation-name: inMenuP; }
+  .in-head { flex-direction: column; justify-content: center; gap: 2px; padding: 2px 0 10px; }
+  .in-title { font-size: 32px; line-height: 34px; text-align: center; }
+  .in-count {
+    padding: 0; background: none; box-shadow: none; transform: none; border-radius: 0;
+    color: var(--c-candle); font: 800 13px/16px var(--f-ui); letter-spacing: .14em; text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(42,10,16,.5);
+  }
+  .in-courses { gap: 8px; }
+  .in-course {
+    padding: 0 4px 10px; gap: 2px; overflow: hidden; border-radius: 14px;
+    box-shadow: 0 3px 0 rgba(42,10,16,.45);
+  }
+  .in-num {
+    width: auto; height: auto; margin: 0 -4px 6px; align-self: stretch; border-radius: 0; box-shadow: none;
+    padding: 4px 0 3px; font: 900 15px/18px var(--f-display); letter-spacing: .08em;
+  }
+  .in-cname { font-size: 20px; line-height: 22px; }
+  .in-cwhat { font: 700 14px/17px var(--f-ui); letter-spacing: 0; color: #6A3F22; }
+  .in-table { flex-direction: column; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,200,107,.3); }
+  .in-faces { gap: 6px; }
+  .in-face, .in-faces.many .in-face { margin: 0; width: 30px; height: 30px; box-shadow: 0 0 0 2px var(--c-brass), 0 3px 6px rgba(20,8,6,.35); }
+  .in-faces.many { gap: 4px; }
+  .in-faces.many .in-face { width: 28px; height: 28px; }
+  .in-table-v, .in-table-v.long { font-size: 24px; line-height: 26px; text-align: center; padding: 0 8px; }
+  .in-table.many .in-table-v { font-size: 22px; line-height: 24px; }
+}

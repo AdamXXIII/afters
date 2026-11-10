@@ -254,3 +254,46 @@ body[data-screen="lobby"] #sheet {
 .lb-wait-crown svg { width: 100%; height: 100%; display: block; }
 .lb-wait-av img { border-radius: 14px; }
 .lc-placard { right: calc(var(--safe-r) + 80px); }
+
+/* ===== Landscape (844x390): table + code placard on the left column, the whole seat picker in the
+   full-height sheet on the right. 4x2 grid of short, wide tiles; Start always on screen. ===== */
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-screen="lobby"][data-layout="split"] #show { height: 100%; }
+  body[data-screen="lobby"][data-layout="split"] #sheet { height: auto; }
+  body[data-screen="lobby"] #sheet::before { margin-top: 7px; }
+
+  .sheet-page.lb-sheet { gap: 8px; padding-top: 6px; padding-bottom: max(12px, var(--safe-b)); }
+  .lb-top { min-height: 44px; margin-bottom: -6px; }
+  .lb-title { font-size: 21px; line-height: 26px; }
+  .lb-count { font-size: 15px; padding: 3px 9px; }
+  .lb-leave { height: 44px; }
+
+  .lb-grid { gap: 6px; }
+  .lb-cell { aspect-ratio: auto; height: 56px; border-radius: 12px; }
+  .lb-cell img { left: 18%; width: 64%; top: -2%; height: 90%; }
+  .lb-glyph { inset: 14% 30% 26%; }
+  .lb-label { display: none; }
+  .lb-owner { font-size: 16px; line-height: 16px; bottom: 2px; }
+  .lb-tick { top: 3px; right: 3px; width: 18px; height: 18px; padding: 3px; }
+
+  .lb-namecard { min-height: 52px; padding: 3px 14px 3px 6px; gap: 10px; }
+  .lb-swatch, .lb-seal { width: 42px; height: 42px; }
+  .lb-seal { font-size: 21px; }
+  .lb-name-label { font-size: 12px; line-height: 13px; }
+  .lb-name-input { font-size: 30px; line-height: 32px; }
+
+  .lb-pill { min-height: 48px; padding: 4px 12px; }
+  .lb-pill-k { font-size: 15px; line-height: 18px; }
+  .lb-pill-s, .lb-pill-v { font-size: 13px; line-height: 16px; }
+  .lb-info-i { padding: 5px 12px; }
+  .lb-info-k { font-size: 12px; line-height: 14px; }
+
+  .lb-action .btn { height: 56px; }
+  .lb-wait { min-height: 56px; padding: 4px 14px 4px 6px; }
+  .lb-wait-av { width: 46px; height: 46px; }
+
+  /* show column: the code placard fits the column, clear of the settings button */
+  .lc-tile { height: 46px; font-size: 32px; }
+  .lc-invite { height: 46px; width: 52px; }
+  body[data-screen="lobby"] .bubble.compact { max-width: calc(var(--land-l) - 24px); }
+}

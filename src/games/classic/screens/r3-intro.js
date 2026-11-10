@@ -1,5 +1,5 @@
 // r3-intro: the finale's menu card. A brass pub bell rings twice above a tomato "Last Orders"
-// card; inside, a linen menu lists the three beats (write, swipe, toast) and what they're worth.
+// card; inside, a linen menu lists the three beats (write, swipe, toast), one big line each.
 import './r3.css';
 import { h, button } from '../../../ui/components.js';
 import { bellSvg, dingSvg, penSvg, swipeSvg, crownSvg, ruleSvg, r3Timeline, sayIfFresh } from './r3-art.js';
@@ -11,10 +11,12 @@ export default {
   mount({ show }, ctx) {
     const frozen = ctx.frozen;
     const reduced = ctx.reduced;
-    const step = (icon, title, sub, i) => h('li.r3i-step', { style: { '--i': i } },
+    // one big line per rule: icon, verb, what it means. Even rows, shared baseline.
+    const step = (icon, title, sub, pts, i) => h('li.r3i-step', { style: { '--i': i } },
       h('span.r3i-ico', { html: icon }),
       h('span.r3i-step-t', title),
-      h('span.r3i-step-s', sub));
+      h('span.r3i-step-s', sub),
+      pts ? h('span.r3i-pts', pts) : null);
 
     const bell = h('div.r3i-bell', { html: bellSvg() + dingSvg() });
     const card = h('div.r3i-card',
@@ -23,13 +25,9 @@ export default {
       h('h1.r3i-title', 'Last Orders'),
       h('div.r3i-rule', { html: ruleSvg() }),
       h('ol.r3i-menu',
-        step(penSvg(), 'Write', 'Up to four', 0),
-        step(swipeSvg(), 'Swipe', 'Five glasses', 1),
-        step(crownSvg(), 'Toast', 'Most glasses', 2)),
-      h('div.r3i-prices',
-        h('span.r3i-price', h('b', '+200'), ' a glass'),
-        h('span.r3i-dot', '·'),
-        h('span.r3i-price', h('b', '+1000'), ' the toast')),
+        step(penSvg(), 'Write', 'up to four', null, 0),
+        step(swipeSvg(), 'Swipe', '5 glasses', '+200', 1),
+        step(crownSvg(), 'Toast', 'top card', '+1000', 2)),
     );
     card.prepend(bell);
     const wrap = h('div.r3i-wrap', card);

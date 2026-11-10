@@ -8,7 +8,7 @@ const VERBS = { 'r1-write': 'plated', 'r1-wait': 'plated', 'r2-write': 'fibbed',
 
 export function mountStrip(stripEl, ctx) {
   const timer = timerRing();
-  const chips = chipsRow(ctx.players, (p) => (ctx.progress.done[p.id] ? 'done' : 'waiting'), { compact: ctx.players.length > 3 });
+  const chips = chipsRow(ctx.players, (p) => (ctx.progress.done[p.id] ? 'done' : 'waiting'), { compact: true });
   const count = h('b');
   const pips = h('span.pips', ctx.players.map(() => h('i')));
   const verb = VERBS[ctx.phase?.id] || VERBS.default;
@@ -30,8 +30,10 @@ export function mountStrip(stripEl, ctx) {
   requestAnimationFrame(() => {
     const W = chips.clientWidth; const n = ctx.players.length;
     if (!W || !n) return;
-    const per = Math.min(38, Math.floor((W - 4 * (n - 1)) / n));
-    if (per < 30) { chips.classList.add('crowd'); chips.style.setProperty('--ov', `${Math.min(14, 30 - per + 2)}px`); }
+    if (document.body.classList.contains('land')) return; // landscape: chips wrap in the left column
+    const cw = chips.firstElementChild?.offsetWidth || 40;
+    const total = n * cw + 4 * (n - 1);
+    if (total > W && n > 1) { chips.classList.add('crowd'); chips.style.setProperty('--ov', `${Math.ceil((total - W) / (n - 1)) + 4}px`); }
   });
   return {
     update(c) {

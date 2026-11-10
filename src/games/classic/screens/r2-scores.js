@@ -1,8 +1,10 @@
-// r2-scores: the standings after Porkies, written up like the bill so far. Rows FLIP from the
-// old order, scores count up, each row shows what Porkies earned; the course's top earner gets a seal.
-import { h, chip } from '../../../ui/components.js';
+// r2-scores: the standings after Porkies on a claret panel. The leader gets a big hero row
+// (large avatar, big score); everyone else is a compact row. Rows FLIP from the old order,
+// scores count up, each row shows what Porkies earned; the course's best liar gets an inline
+// "Best porkies" seal tag (never floating over a neighbour's score).
+import { h } from '../../../ui/components.js';
 import { audio } from '../../../audio/synth.js';
-import { waxSeal, sayLater, countTo } from './r2-kit.js';
+import { avatarDisc, snoutSvg, sayLater, countTo } from './r2-kit.js';
 
 export default {
   id: 'r2-scores',
@@ -13,22 +15,28 @@ export default {
     const frozen = ctx.frozen;
     const best = rows.reduce((b, r) => (r.delta > (b?.delta ?? 0) ? r : b), null);
     const byPrev = rows.slice().sort((a, b) => (a.prevRank ?? 0) - (b.prevRank ?? 0));
-    const board = h('div.r2-board');
+    const board = h(`div.r2-board${rows.length > 6 ? '.many' : ''}`);
     const els = new Map();
     for (const r of frozen ? rows : byPrev) {
-      const rank = frozen ? rows.indexOf(r) : r.prevRank ?? rows.indexOf(r);
+      const pl = ctx.player(r.id);
+      const rank = frozen ? rows.indexOf(r) : r.prevRank ?? rows.indexOf(r); // prevRank is 0-based here
       const score = h('span.r2-row-score', String(frozen ? r.score : r.prev ?? r.score));
       const finalRank = rows.indexOf(r);
       const moved = (r.prevRank ?? finalRank) - finalRank;
       const delta = h('span.r2-row-delta', r.delta > 0 ? `+${r.delta}` : '+0');
-      const arrow = Math.abs(moved) >= 2 || (moved > 0 && finalRank === 0) ? h(`span.r2-move${moved > 0 ? '.up' : '.down'}`, moved > 0 ? `\u25B2 up ${moved}` : `\u25BC down ${-moved}`) : null;
+      const arrow = moved !== 0 && (Math.abs(moved) >= 2 || finalRank === 0) ? h(`span.r2-move${moved > 0 ? '.up' : '.down'}`, moved > 0 ? `▲ ${moved}` : `▼ ${-moved}`) : null;
       if (!(r.delta > 0)) delta.classList.add('zero');
-      const row = h(`div.r2-row${r.id === best?.id ? '.best' : ''}${r.id === ctx.meId ? '.me' : ''}`,
+      const isBest = r.id === best?.id && best.delta > 0;
+      const row = h(`div.r2-row${isBest ? '.best' : ''}${r.id === ctx.meId ? '.me' : ''}`,
         h('span.r2-row-rank', String(rank + 1)),
-        chip(ctx.player(r.id)),
-        arrow,
-        h('span.r2-row-right', score, delta),
-        r.id === best?.id ? waxSeal('.row') : null);
+        avatarDisc(pl, '.row'),
+        h('span.r2-row-who',
+          h('span.r2-row-lead', 'Leading'),
+          h('span.r2-row-nm', h('span.t', pl?.name || '?'), r.id === ctx.meId ? h('span.you', 'you') : null),
+          h('span.r2-row-tags',
+            isBest ? h('span.r2-best', h('span.sn', { html: snoutSvg({ ring: false }) }), 'Best porkies') : null,
+            arrow)),
+        h('span.r2-row-right', score, delta));
       row.scoreEl = score; row.rankEl = row.firstChild; row.deltaEl = delta;
       if (!frozen) delta.style.opacity = '0';
       els.set(r.id, row);
@@ -39,7 +47,7 @@ export default {
       h('div.r2-scores-head',
         h('div.t-eyebrow.on-dark', 'The bill so far'),
         h('h2.r2-scores-title', 'After course two'),
-        best && best.delta > 0 ? h('div.r2-scores-sub', h('b', ctx.player(best.id)?.name || '?'), best.id === rows[0]?.id ? ' told the best porkies and leads the table.' : ` told the best porkies. ${leader?.name || '?'} still leads.`) : null),
+        best && best.delta > 0 ? h('div.r2-scores-sub', h('b', ctx.player(best.id)?.name || '?'), best.id === rows[0]?.id ? ' told the best porkies and leads.' : ` told the best porkies. ${leader?.name || '?'} still leads.`) : null),
       board));
 
     let t1 = 0;

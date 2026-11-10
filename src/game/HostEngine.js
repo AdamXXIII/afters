@@ -239,6 +239,8 @@ export class HostEngine {
       enter: (id, duration, payload, o = {}) => eng._enter(id, duration, payload, o.priv || null, o.progress || null, o),
       /** Re-send progress (and end early once everyone active is done). */
       progress: () => eng._progress(),
+      /** Pull the phase end in to now + ms (never later than it already was) and re-send the phase. */
+      hurry: (ms) => eng._hurry(ms),
       ack: (p, extra = {}) => p.peerId && eng.send({ type: 'ack', seq: eng.seq, ...extra }, p.peerId),
       reject: (p, reason, extra = {}) => p.peerId && eng.send({ type: 'reject', seq: eng.seq, reason, ...extra }, p.peerId),
       addScores: (deltas) => eng._addScores(deltas),
@@ -352,8 +354,10 @@ export class HostEngine {
   }
 
   _skip() {
-    if (!/intro$/.test(this.phase.id)) return;
-    if (this.now() - this.phase.startsAt < this.dur(DUR['skip-after'])) return;
+    const since = this.now() - this.phase.startsAt;
+    const gameSkip = this.game?.host.canSkip?.(this.phase.id, since);
+    if (!/intro$/.test(this.phase.id) && !gameSkip) return;
+    if (since < this.dur(DUR['skip-after'])) return;
     this.advance();
   }
 
@@ -438,6 +442,16 @@ export class HostEngine {
     this._activeFn = o.active || null;
     for (const p of this.players) this._sendPhaseTo(p);
     if (progressFn) this.send(this._progressMsg());
+  }
+
+  _hurry(ms) {
+    const ph = this.phase;
+    if (!ph?.endsAt) return false;
+    const at = this.now() + this.dur(ms);
+    if (at >= ph.endsAt) return false;
+    ph.endsAt = at;
+    for (const p of this.players) this._sendPhaseTo(p);
+    return true;
   }
 
   _sendPhaseTo(p) {
