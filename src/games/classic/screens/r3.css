@@ -392,3 +392,14 @@ body.kb-open .r3w-slot { min-height: 52px; }
 .r3w-slot.next { animation: r3nextPulse 1.6s ease-in-out infinite; }
 @keyframes r3nextPulse { 50% { border-color: rgba(226,85,59,.95); } }
 .r3w-slot:not(.next):not(.filled) { border-color: #D8C09C; }
+
+/* landscape (finish-landscape 2026-11-10): the swipe mat shrinks to fit 390 px so Pass / Cheers stay on screen */
+@media (orientation: landscape) and (max-height: 600px) {
+  .r3s-area { min-height: 0; }
+  .r3s-mat { flex: 1 1 auto; min-height: 0; }
+  .r3s-ghost { max-height: 150px; }
+  .r3s-text { font-size: calc(40px * var(--ts)); }
+  .r3s-q { font-size: 22px; line-height: 25px; }
+  .r3s-hint { font-size: 14px; line-height: 17px; }
+  .r3s-glass { width: 20px; height: 25px; }
+}

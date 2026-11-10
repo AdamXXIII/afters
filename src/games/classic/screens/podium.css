@@ -297,3 +297,22 @@ body.end-nohandle #sheet-body { background-image: radial-gradient(120% 60% at 50
 .fin-skip .btn { height: 48px; padding: 0 18px; border-radius: 999px; background: rgba(42,26,23,.45); --text: var(--c-linen); font-size: 17px; box-shadow: inset 0 0 0 1.5px rgba(251,244,234,.35); }
 .fin-skip.on { opacity: 1; pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .fin-sw, .fin-sw-flag { transition: none; } }
+
+/* landscape (finish-landscape 2026-11-10): the bill lies on the right, above the reaction rail,
+   rows in the dense single-line style; Cyril and the cake keep the left. */
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-screen="podium"] .fin-bill {
+    left: 53%; right: calc(var(--gutter) + var(--safe-r));
+    bottom: calc(var(--rail-h) + var(--safe-b) + 4px); max-height: calc(100% - var(--rail-h) - var(--safe-t) - 62px);
+    padding: 10px 14px 16px; overflow: hidden;
+  }
+  body[data-screen="podium"] .fin-row { min-height: 30px; gap: 8px; }
+  body[data-screen="podium"] .fin-row-who { flex-direction: row; align-items: baseline; gap: 8px; max-width: 70%; }
+  body[data-screen="podium"] .fin-row-name, body[data-screen="podium"] .fin-row-score { font-size: 16px; }
+  body[data-screen="podium"] .fin-row-award { font-size: 15px; }
+  body[data-screen="podium"] .fin-bill-foot { display: none; }
+  body[data-screen="podium"] .fin-bill-head { padding-bottom: 4px; }
+  /* the winner moves to the left column once the bill lands */
+  body[data-screen="podium"] .fin[data-step="5"] .fin-head { right: 50%; transform: translateY(-6px) scale(.8); }
+  body[data-screen="podium"] .fin-row-award { max-width: 120px; }
+}
