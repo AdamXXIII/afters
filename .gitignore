@@ -3,3 +3,6 @@ dist
 shots
 reference/*.jpg
 reference/urls-*.txt
+reference/bar/*.jpg
+reference/bar/*.json
+reference/bar/*-shots.txt
