@@ -13,6 +13,8 @@ export default {
   blurb: 'Write the funniest answer, fib your way through true facts, then swipe for the toast of the table.',
   players: [3, 8],
   minutes: 15,
+  steps: ['Write a funny answer to a prompt.', 'Spot the true fact among the fibs.', 'Vote for the best line.'], // menu "How it plays"
+  hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#E0A526',
   tags: ['Writing', 'Voting', 'Fibbing'],
   createHost: (api) => new ClassicHost(api),

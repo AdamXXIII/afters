@@ -150,7 +150,10 @@ try {
     } catch (e) { if (/did not fill/.test(e.message)) throw e; /* screen changed under us */ }
     await sleep(200);
   }
-  const must = ['telephone-intro', 'telephone-write', 'telephone-draw', 'telephone-guess', 'telephone-wait', 'telephone-reveal', 'telephone-vote', 'telephone-awards', 'results'];
+  // telephone-wait is optional: when the bots finish fast the host goes straight to the next step
+  // and never sits on the wait screen (it made this test flaky).
+  if (!seen.has('telephone-wait')) console.log('  (note: host never sat on telephone-wait; bots were fast - fine)');
+  const must = ['telephone-intro', 'telephone-write', 'telephone-draw', 'telephone-guess', 'telephone-reveal', 'telephone-vote', 'telephone-awards', 'results'];
   const missing = must.filter((s) => !seen.has(s));
   if (missing.length) throw new Error(`host never showed: ${missing.join(', ')}`);
 

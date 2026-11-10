@@ -15,6 +15,8 @@ export default {
   blurb: 'One of you cuts the pie to a guess while the table heckles, then everyone bets higher or lower. Plus a live poll of this very table.',
   players: [3, 8],
   minutes: 6,
+  steps: ['One player guesses a percent.', 'Everyone bets: higher or lower?', 'Closest guesses score most.'], // menu "How it plays"
+  hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#7F9A74',
   tags: ['Guessing', 'Betting', 'Polls'],
   createHost: (api) => new PercentagesHost(api),

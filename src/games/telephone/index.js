@@ -65,6 +65,8 @@ export default {
   blurb: 'Your sentence goes round the table: drawn, guessed, drawn again. Then we watch it fall apart, stroke by stroke.',
   players: [3, 8],
   minutes: 12,
+  steps: ['Write a silly sentence.', 'It goes round: draw it, guess it.', 'Watch every chain fall apart.'], // menu "How it plays"
+  hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#2F5D7C',
   tags: ['Drawing', 'Guessing', 'Chaos'],
   createHost: (api) => new TelephoneHost(api),

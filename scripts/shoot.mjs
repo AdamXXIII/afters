@@ -1,6 +1,7 @@
 // Screenshot harness: renders ?demo=<screen> at 390x844 @2x and writes PNGs.
 // usage: node scripts/shoot.mjs --screens title,lobby|all --out <dir> [--wait 2500] [--seed 7] [--players 5] [--landscape (844x390)]
 //        [--me host|guest] [--no-freeze] [--extra "&t=4000"] [--base http://host:port] [--no-build-check]
+//        [--click "[data-e2e=invite]"] (tap something before the shot)
 import { createRequire } from 'node:module';
 import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -19,7 +20,7 @@ function args() {
   for (let i = 0; i < a.length; i++) {
     const k = a[i];
     const v = a[i + 1];
-    if (k === '--screens') { o.screens = v; i++; } else if (k === '--out') { o.out = path.resolve(v); i++; } else if (k === '--wait') { o.wait = Number(v); i++; } else if (k === '--seed') { o.seed = Number(v); i++; } else if (k === '--players') { o.players = Number(v); i++; } else if (k === '--me') { o.me = v; i++; } else if (k === '--extra') { o.extra = v; i++; } else if (k === '--base') { o.base = v; i++; } else if (k === '--no-freeze') o.freeze = false; else if (k === '--landscape') o.landscape = true;
+    if (k === '--screens') { o.screens = v; i++; } else if (k === '--out') { o.out = path.resolve(v); i++; } else if (k === '--wait') { o.wait = Number(v); i++; } else if (k === '--seed') { o.seed = Number(v); i++; } else if (k === '--players') { o.players = Number(v); i++; } else if (k === '--me') { o.me = v; i++; } else if (k === '--extra') { o.extra = v; i++; } else if (k === '--base') { o.base = v; i++; } else if (k === '--click') { o.click = v; i++; } else if (k === '--no-freeze') o.freeze = false; else if (k === '--landscape') o.landscape = true;
   }
   o.list = o.screens === 'all' ? ALL_SCREENS : o.screens.split(',').map((s) => s.trim()).filter(Boolean);
   return o;
@@ -55,6 +56,7 @@ for (const id of o.list) {
     await page.waitForFunction(() => window.__afters && window.__afters.ready, null, { timeout: 30000, polling: 100 });
     T.push(Date.now());
     await page.waitForTimeout(o.wait);
+    if (o.click) { await page.click(o.click); await page.waitForTimeout(500); }
     T.push(Date.now());
     // Stop the render loop (one last frame is rendered by stats()) so the capture is instant.
     stats = await page.evaluate(() => { window.__afters.app.stage.stop(); return window.__afters.stats(); });

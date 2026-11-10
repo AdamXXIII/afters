@@ -52,6 +52,8 @@ export default {
   blurb: 'Hold your phone to your bonce while the sofa acts, hums and yells clues. Tip down if you got it, up to pass.',
   players: [3, 8],
   minutes: 10,
+  steps: ['Hold your phone to your forehead.', 'Everyone shouts and acts out clues.', 'Tip down if you got it, up to pass.'], // menu "How it plays"
+  hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#E2553B',
   tags: ['Shouting', 'Acting', 'Tilt'],
   createHost: (api) => new ForeheadHost(api),

@@ -103,3 +103,8 @@ export const CHERRY_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" class="ch
   <circle cx="17.5" cy="17" r="4.6" fill="#B0243A" stroke="#3B1F18" stroke-width="1.6"/>
   <circle cx="6.5" cy="14.5" r="1.4" fill="#fff" opacity=".8"/><circle cx="16" cy="15.6" r="1.2" fill="#fff" opacity=".8"/>
 </svg>`;
+
+// small line icons for the tiles and the "How it plays" card (currentColor)
+export const PEOPLE_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.8 20c.6-3.6 3.2-5.6 6.2-5.6s5.6 2 6.2 5.6"/><circle cx="17" cy="9" r="2.6"/><path d="M16.4 14.5c2.6.1 4.4 1.9 4.9 4.6"/></svg>`;
+export const CLOCK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.2 2"/></svg>`;
+export const INVITE_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 3h7v7H3zm2 2v3h3V5zm9-2h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zm9-2h2v2h-2zm2 2h2v2h-2zm2-2h3v2h-3zm-4 4h2v3h-2zm4 0h3v3h-2v-1h-1z"/></svg>`;

@@ -1,15 +1,14 @@
-// menu: Cyril's dessert trolley. After the lobby (and after every game) the host wheels in the
-// trolley and picks tonight's next game. Every phone sees the same trolley: the host's finger
-// (focus) glows on every phone, guests tap the dish they fancy and their avatar pops onto it.
-// Layout: Cyril + title over the 3D table, then a candlelit linen "bay" holding tonight's table,
-// a compact row of coming-soon tiles and ONE hero card: the selected dish (big), its name,
-// blurb and the one big action, in the game's own colour.
+// menu: pick tonight's next game. After the lobby (and after every game) everyone sees the same
+// menu: the host taps a game and starts it; guests vote with the big button and their avatar pops
+// onto that game's tile. Layout: Cyril + title + Invite over the 3D table, then a candlelit bay with
+// tonight's scores, the game tiles (players, length, 18+) and ONE "How it plays" card + action.
 import './menu.css';
 import { h, button, onTap } from '../ui/components.js';
 import { avatarIcon } from '../ui/icons.js';
 import { AVATARS, NIGHT_POINTS } from '../game/constants.js';
 import { SHOTS } from '../stage/Stage.js';
-import { dishSvg, DOME_SVG, CHERRY_SVG } from './menu-art.js';
+import { dishSvg, CHERRY_SVG, PEOPLE_SVG, CLOCK_SVG, INVITE_SVG } from './menu-art.js';
+import { qrSvg } from '../ui/qr.js';
 import { sayLater } from './common.js';
 
 SHOTS.menu ||= { expr: 'eager', pos: [0, 0.3, 0.95], target: [0, 0.17, 0], subject: 'cyril', maxS: 0.2 };
@@ -27,31 +26,34 @@ function textOn(hex) {
 }
 
 /**
- * Tonight's table, compact: the leader plus your own row (rank badges); everyone when <= 5.
- * Names show on the leader's and your chip; the rest are avatar + rank + cherries.
+ * Tonight's scores, compact: everyone when <= 5, else the leader(s) plus your own chip.
+ * The leader's chip is gold with "1st"; no other rank numbers (they read as noise).
  */
 export function nightStrip(ctx, rows) {
   const played = (ctx.payload?.history || []).length;
-  const el = h('div.night', { 'aria-label': 'Tonight\'s table' });
+  const el = h('div.night', { 'aria-label': 'Tonight’s scores' });
   const hasAny = rows?.some((r) => r.night > 0);
   el.append(h('div.night-k', h('span.night-ic', { html: CHERRY_SVG }),
-    h('span.night-k-t', 'Tonight\u2019s table'),
-    h('span.night-n', played ? `${played} ${played === 1 ? 'dish' : 'dishes'} down` : 'no dishes yet')));
+    h('span.night-k-t', 'Tonight’s scores'),
+    h('span.night-n', `Games played: ${played}`)));
   if (!hasAny) {
-    el.append(h('div.night-empty', h('b', `Win a dish: ${NIGHT_POINTS[0]} cherries.`), ` 2nd ${NIGHT_POINTS[1]}, 3rd ${NIGHT_POINTS[2]}.`));
+    el.append(h('div.night-empty', h('b', 'No scores yet.'), ` Win a game for ${NIGHT_POINTS[0]} cherries (2nd ${NIGHT_POINTS[1]}, 3rd ${NIGHT_POINTS[2]}).`));
     return el;
   }
   const all = rows.length <= 5;
-  const pick = all ? rows : rows.filter((r, i) => i === 0 || r.id === ctx.meId);
+  const pick = all ? rows : rows.filter((r) => r.rank === 1 || r.id === ctx.meId);
   const list = h(`ol.night-list${all ? '.all' : ''}`);
   pick.forEach((r, i) => {
     const p = ctx.player(r.id);
     if (!p) return;
-    const named = !all || i === 0 || r.id === ctx.meId || rows.length <= 3;
-    list.append(h(`li.night-row${r.rank === 1 ? '.lead' : ''}${r.id === ctx.meId ? '.me' : ''}${named ? '.named' : ''}`, { style: { '--pc': AVATARS[p.avatar]?.colour, '--i': i }, title: p.name },
-      h('span.night-av', { html: avatarIcon(p.avatar) }, h('span.night-rk', String(r.rank))),
-      named ? h('span.night-nm', r.id === ctx.meId && r.rank !== 1 ? 'You' : p.name) : null,
-      h('span.night-pts', String(r.night))));
+    const lead = r.rank === 1 && r.night > 0;
+    const named = pick.length <= 3 || i === 0 || r.id === ctx.meId;
+    list.append(h(`li.night-row${lead ? '.lead' : ''}${r.id === ctx.meId ? '.me' : ''}`,
+      { style: { '--pc': AVATARS[p.avatar]?.colour, '--i': i }, title: `${p.name}: ${r.night} cherries` },
+      h('span.night-av', { html: avatarIcon(p.avatar) }),
+      named ? h('span.night-nm', r.id === ctx.meId ? 'You' : p.name) : null,
+      h('span.night-pts', String(r.night)),
+      lead && i === 0 ? h('span.night-1st', '1st') : null));
   });
   if (!all && rows.length > pick.length) list.append(h('li.night-more', `+${rows.length - pick.length}`));
   el.append(list);
@@ -65,16 +67,18 @@ export default {
   shotDuration: 1000,
   rail: false,
   mount({ show }, ctx) {
-    // playable dishes first, coming-soon after (stable)
+    // playable games first, coming-soon after (stable)
     const all = ctx.games.filter((g) => !g.hidden);
     const games = [...all.filter((g) => !g.comingSoon), ...all.filter((g) => g.comingSoon)];
     const root = h('div.mn');
     show.append(root);
     let c = ctx;
-    let local = null; // host: dish under the finger before the focus round-trips
-    let lastTapped = null; // guest: the dish this phone last tapped
+    let local = null; // host: game under the finger before the focus round-trips
+    let lastTapped = null; // guest: the game this phone last tapped
+    const hostName = () => c.player(c.state?.hostId)?.name || 'The host';
+    const adultOn = () => c.rating === 'adult';
 
-    // ---------- header ----------
+    // ---------- header: title, Invite, Family / 18+ ----------
     const ratingSeg = h('div.mn-rating', { role: 'radiogroup', 'aria-label': 'Content rating' });
     const fam = h('button.mn-rate', { type: 'button', role: 'radio', 'data-e2e': 'rating-family' }, 'Family');
     const adu = h('button.mn-rate.adult', { type: 'button', role: 'radio', 'data-e2e': 'rating-adult' }, 'Adults 18+');
@@ -83,51 +87,91 @@ export default {
     onTap(fam, () => setRating('family'));
     onTap(adu, () => setRating('adult'));
 
+    const inviteBtn = h('button.mn-invite', { type: 'button', 'data-e2e': 'invite', 'aria-label': `Invite people. Room code ${c.room || ''}` },
+      h('span.mn-invite-ic', { html: INVITE_SVG }), h('span.mn-invite-t', 'Invite'), h('b.mn-invite-code', c.room || ''));
+    onTap(inviteBtn, () => openInvite());
+
     const head = h('header.mn-head',
-      h('div.mn-eyebrow', h('span.mn-code', 'Room', h('b', c.room || ''))),
       h('h1.mn-title', 'What\'s for', h('br'), h('em', 'afters'), '?'),
-      ratingSeg);
+      h('div.mn-head-row', inviteBtn, ratingSeg));
     root.append(head);
 
-    // ---------- the bay: tonight's table, coming soon, then ONE hero card ----------
-    // The hero is the selected dish: big plate, name, blurb and the one action in a single card.
-    // With one live game its dish button IS the hero plate; with more, the live dishes become a
-    // row of picks above the hero. Coming-soon games are a compact row of small tiles.
+    // ---------- the bay: tonight's scores, the game tiles, then the "How it plays" card ----------
     const nightBox = h('div.mn-night');
     const dishes = new Map();
     const liveGames = games.filter((g) => !g.comingSoon);
     const soonGames = games.filter((g) => g.comingSoon);
     const live = liveGames.length;
-    const heroArt = h('div.mn-hero-art');
-    const picks = live > 1 ? h('div.mn-shelf.top.mn-picks', { role: 'group', 'aria-label': 'Tonight’s dishes' }) : null;
+    const picks = h('div.mn-shelf.top.mn-picks', { role: 'group', 'aria-label': 'Games' });
     const soonList = soonGames.length ? h('div.mn-shelf.bottom.mn-soon-list') : null;
     games.forEach((g, i) => {
-      const fans = h('div.mn-fans');
+      const fans = h('span.mn-fans');
       const gc = g.colour || '#C89B3C';
-      const hero = !g.comingSoon && live === 1;
-      const btn = h(`button.mn-dish${g.comingSoon ? '.soon' : '.live'}${hero ? '.hero' : ''}`, {
-        type: 'button', 'data-e2e': `dish-${g.id}`, 'aria-label': `${g.title}${g.comingSoon ? ', coming soon' : ''}`,
+      const [lo, hi] = gameRange(g);
+      const adultTag = h('span.mn-tag-18', '18+');
+      const btn = h(`button.mn-dish${g.comingSoon ? '.soon' : '.live'}`, {
+        type: 'button', 'data-e2e': `dish-${g.id}`,
+        'aria-label': `${g.title}, ${lo} to ${hi} players, ${g.minutes || 10} minutes${g.comingSoon ? ', coming soon' : ''}`,
         style: { '--gc': gc, '--gt': textOn(gc), '--i': i },
       },
-      h('div.mn-plate', { html: dishSvg(g.dish) + (g.comingSoon ? DOME_SVG : '') }),
-      h('div.mn-tag', h('span.mn-tag-t', g.title), g.comingSoon ? null : h('span.mn-tag-c', g.hint || g.tagline)),
-      fans);
+      h('div.mn-tag',
+        h('span.mn-tag-t', g.title),
+        g.comingSoon ? h('span.mn-tag-c', 'Coming soon') : h('span.mn-tag-c', g.hint || g.tagline),
+        g.comingSoon ? null : h('span.mn-tag-m',
+          h('span.mn-tag-i', h('i', { html: PEOPLE_SVG }), `${lo}–${hi}`),
+          h('span.mn-tag-i', h('i', { html: CLOCK_SVG }), `${g.minutes || 10} min`),
+          g.hasAdult ? adultTag : null,
+          fans)));
       onTap(btn, () => tapDish(g, btn));
-      dishes.set(g.id, { g, btn, fans });
+      dishes.set(g.id, { g, btn, fans, adultTag });
       if (g.comingSoon) soonList.append(btn);
-      else if (hero) heroArt.append(btn);
       else picks.append(btn);
     });
-    const soonRow = soonList ? h('div.mn-soon', h('div.mn-soon-k', h('span', 'Coming soon'), h('span.mn-soon-n', 'still in the oven')), soonList) : null;
+    const soonRow = soonList ? h('div.mn-soon', h('div.mn-soon-k', h('span', 'Coming soon')), soonList) : null;
     const trolley = h(`div.mn-trolley.live-${Math.min(live, 4)}`, picks, soonRow);
 
-    const noteSlot = h('div.mn-note-slot');
-    const txtSlot = h('div.mn-d-txt');
+    const statusSlot = h('div.mn-status-slot');
+    const topSlot = h('div.mn-d-top');
+    const howSlot = h('div.mn-how');
     const actSlot = h('div.mn-d-act');
-    const card = h('div.mn-d-card', noteSlot, heroArt, txtSlot, actSlot);
+    const card = h('div.mn-d-card', topSlot, howSlot, statusSlot, actSlot);
     const detail = h('section.mn-detail', { 'aria-live': 'polite' }, card);
     const bay = h('div.mn-bay', nightBox, trolley, detail);
     root.append(bay);
+
+    // ---------- Invite: big code + QR + the join address ----------
+    let inviteEl = null;
+    function openInvite() {
+      if (inviteEl) return;
+      c.haptic('tap');
+      const code = String(c.room || '');
+      const url = `${location.origin}${location.pathname}?room=${code}`;
+      const shortUrl = `${location.host}${location.pathname === '/' ? '' : location.pathname}`;
+      let qr = '';
+      try { qr = qrSvg(url); } catch (e) { console.warn('qr', e); }
+      const close = h('button.mn-inv-x', { type: 'button', 'aria-label': 'Close', 'data-e2e': 'invite-close' }, '×');
+      const copy = button('Copy invite link', { kind: 'secondary', e2e: 'invite-copy', onClick: async () => {
+        try {
+          if (navigator.share) await navigator.share({ title: 'AFTERS', text: `Pull up a chair. Room code ${code}.`, url });
+          else { await navigator.clipboard.writeText(url); c.toast('Invite link copied.'); }
+        } catch { /* cancelled */ }
+      } });
+      const box = h('div.mn-inv-card', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Invite people' },
+        close,
+        h('h2.mn-inv-h', 'Invite people'),
+        h('p.mn-inv-sub', 'Late to the table? Scan this with your phone camera.'),
+        h('div.mn-inv-qr', { html: qr }),
+        h('div.mn-inv-or', 'or go to'),
+        h('div.mn-inv-url', shortUrl),
+        h('div.mn-inv-or', 'and type the room code'),
+        h('div.mn-inv-code', { 'aria-label': `Room code ${code.split('').join(' ')}` }, [...code].map((ch) => h('span', ch))),
+        copy);
+      inviteEl = h('div.mn-inv', { 'data-e2e': 'invite-sheet' }, box);
+      const shut = () => { inviteEl?.remove(); inviteEl = null; };
+      onTap(close, shut);
+      inviteEl.addEventListener('pointerdown', (e) => { if (e.target === inviteEl) shut(); });
+      root.append(inviteEl);
+    }
 
     const focusId = () => (c.isHost ? (local || c.progress.focus) : c.progress.focus) || null;
     const myFancy = () => c.progress.fancy?.[c.meId] || null;
@@ -140,7 +184,6 @@ export default {
     function tapDish(g, btn) {
       c.haptic('tap');
       if (g.comingSoon) {
-        // not on tonight's menu yet: Cyril apologises, the tile wobbles, the hero stays put
         c.say(c.line('menuSoon'), { hold: 1600, compact: true });
         c.cyril.react('sad');
         btn.classList.remove('nope'); void btn.offsetWidth; btn.classList.add('nope');
@@ -151,13 +194,13 @@ export default {
         c.client.focusGame(g.id);
         c.cyril.react('delight');
       } else {
-        lastTapped = g.id; // the hero follows this phone's finger, not the host's
-        c.client.fancyGame(myFancy() === g.id ? null : g.id);
+        // a guest's tap only shows the card; the vote is the big button (no accidental votes)
+        lastTapped = g.id;
         c.cyril.react('smug');
       }
       paint();
     }
-    function fancyBtn(g) {
+    function voteBtn(g) {
       lastTapped = g.id;
       c.haptic('tap');
       c.client.fancyGame(myFancy() === g.id ? null : g.id);
@@ -166,20 +209,19 @@ export default {
     }
 
     let lastDetail = '';
-    let lastArt = '';
     function paintDetail() {
       const g = shown();
       const players = c.players.filter((p) => p.connected !== false);
       const n = players.length;
       const fancy = c.progress.fancy || {};
       const fid = focusId();
-      const key = `${g?.id}|${c.isHost}|${n}|${myFancy()}|${c.rating}|${fid}|${JSON.stringify(fancy)}`;
+      const key = `${g?.id}|${c.isHost}|${n}|${myFancy()}|${c.rating}|${fid}|${JSON.stringify(fancy)}|${hostName()}`;
       if (key === lastDetail) return;
       lastDetail = key;
       if (!g) {
         detail.replaceChildren(h('div.mn-hint', c.isHost
-          ? h('span', h('b', 'The trolley’s empty.'), ' New dishes are still in the oven.')
-          : h('span', h('b', `${c.player(c.state?.hostId)?.name || 'The host'} is choosing.`), ' Hang tight.')));
+          ? h('span', h('b', 'No games yet.'), ' New ones are still in the oven.')
+          : h('span', h('b', `${hostName()} is choosing.`), ' Hang tight.')));
         return;
       }
       const [lo, hi] = gameRange(g);
@@ -187,47 +229,54 @@ export default {
       const gc = g.colour || '#C89B3C';
       detail.style.setProperty('--gc', gc);
       detail.style.setProperty('--gt', textOn(gc));
-      detail.classList.toggle('soon', !!g.comingSoon);
-      if (live > 1 && lastArt !== g.id) {
-        lastArt = g.id;
-        heroArt.replaceChildren(h('div.mn-hero-plate', { html: dishSvg(g.dish) }));
-      }
 
-      // the slim line at the top of the card: who's pointing / what's fancied
-      let note;
-      const fanCount = Object.values(fancy).filter((x) => x === g.id).length;
+      // top: small dish, name, players / length / 18+
+      topSlot.replaceChildren(
+        h('div.mn-d-plate', { html: dishSvg(g.dish) }),
+        h('div.mn-d-txt',
+          h('h2.mn-d-title', g.title),
+          h('div.mn-d-meta',
+            h('span', h('i', { html: PEOPLE_SVG }), `${lo}–${hi} players`),
+            h('span', h('i', { html: CLOCK_SVG }), `${g.minutes || 10} min`),
+            g.hasAdult && adultOn() ? h('span.r18', '18+') : null)));
+      const steps = g.steps || [g.blurb || g.tagline || ''];
+      howSlot.replaceChildren(h('div.mn-how-k', 'How it plays'),
+        h('ol.mn-how-list', steps.slice(0, 3).map((s, i) => h('li', h('span.mn-how-n', String(i + 1)), h('span', s)))));
+
+      // status: who votes, who starts
+      const guests = players.filter((p) => p.id !== c.state?.hostId);
+      const voted = guests.filter((p) => fancy[p.id]).length;
+      const tally = {};
+      Object.values(fancy).forEach((gid) => { if (gid) tally[gid] = (tally[gid] || 0) + 1; });
+      const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+      const votesHere = tally[g.id] || 0;
+      let status;
       if (c.isHost) {
-        const tally = {};
-        Object.values(fancy).forEach((gid) => { if (gid) tally[gid] = (tally[gid] || 0) + 1; });
-        const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
-        const guests = Math.max(1, players.filter((p) => p.id !== c.meId).length);
-        note = top && dishes.get(top[0])
-          ? h('div.mn-note', h('span.mn-note-k', 'Most fancied'), live > 1 || top[0] !== g.id ? h('b', dishes.get(top[0]).g.title) : null, h('span.mn-note-n', `${top[1]} of ${guests} guests`))
-          : h('div.mn-note', h('span.mn-note-k', 'Most fancied'), h('span.mn-note-v', 'nobody’s said yet'));
+        status = h('div.mn-status',
+          h('span.mn-status-t', voted
+            ? h('span', 'Most votes: ', h('b', dishes.get(top[0])?.g.title || ''))
+            : 'Guests vote on their phones. You start the game.'),
+          guests.length ? h('span.mn-status-n', `${voted} of ${guests.length} voted`) : null);
       } else {
+        const mine = myFancy();
         const fg = dishes.get(fid)?.g;
-        const hostName = c.player(c.state?.hostId)?.name || 'Host';
-        note = fg
-          ? h('div.mn-note', h('span.mn-note-k', `${hostName} is pointing at`), fg.id === g.id ? h('span.mn-note-n', 'this one') : h('b', fg.title))
-          : h('div.mn-note', h('span.mn-note-k', `${hostName} is choosing`));
+        status = h('div.mn-status',
+          h('span.mn-status-t', mine
+            ? h('span', 'You voted. ', h('b', hostName()), ' starts the game.')
+            : h('span', 'Vote for a game. ', h('b', hostName()), ' starts it.')),
+          votesHere ? h('span.mn-status-n', `${votesHere} ${votesHere === 1 ? 'vote' : 'votes'}`) : (fg && fg.id !== g.id ? h('span.mn-status-n.soft', `${hostName()} is on ${fg.title}`) : null));
       }
+      statusSlot.replaceChildren(status);
 
       let action;
       if (c.isHost) {
         action = !okCount
           ? button(n < lo ? `Needs ${lo} players` : `Max ${hi} players`, { kind: 'secondary', disabled: true })
-          : button(`Serve ${g.title}`, { e2e: 'serve-game', onClick: () => serve(g) });
+          : button(`Start ${g.title}`, { e2e: 'serve-game', onClick: () => serve(g) });
       } else {
-        const fancied = myFancy() === g.id;
-        action = button(fancied ? `You fancy ${g.title} ✓` : `I fancy ${g.title}`, { kind: fancied ? 'secondary' : 'primary', e2e: 'fancy', onClick: () => fancyBtn(g) });
+        const votedThis = myFancy() === g.id;
+        action = button(votedThis ? `Voted for ${g.title} ✓` : `Vote for ${g.title}`, { kind: votedThis ? 'secondary' : 'primary', e2e: 'fancy', onClick: () => voteBtn(g) });
       }
-      noteSlot.replaceChildren(note);
-      txtSlot.replaceChildren(
-        h('div.mn-d-course', g.course || ''),
-        h('h2.mn-d-title', g.title),
-        h('p.mn-d-blurb', g.blurb || g.tagline || ''),
-        h('div.mn-d-meta', h('span', `${lo}\u2013${hi} players`), h('span', `${g.minutes || 10} min`),
-          !c.isHost && fanCount ? h('span.fan', `${fanCount} fancy it`) : null));
       actSlot.replaceChildren(action);
     }
 
@@ -249,23 +298,25 @@ export default {
       const sid = shown()?.id;
       for (const [id, d] of dishes) {
         d.btn.classList.toggle('is-focus', id === fid);
-        d.btn.classList.toggle('is-shown', !c.isHost && id === sid && id !== fid);
-        d.btn.setAttribute('aria-pressed', String(id === fid || (!c.isHost && myFancy() === id)));
+        d.btn.classList.toggle('is-sel', id === sid);
+        d.btn.setAttribute('aria-pressed', String(id === sid));
+        d.adultTag.hidden = !adultOn();
         const who = Object.entries(fancy).filter(([, gid]) => gid === id).map(([pid]) => c.player(pid)).filter(Boolean);
         const sig = who.map((p) => p.id).join(',');
         if (d.fans.dataset.sig !== sig) {
           d.fans.dataset.sig = sig;
-          d.fans.replaceChildren(...who.slice(0, 3).map((p, k) => h('span.mn-fan', { style: { '--pc': AVATARS[p.avatar]?.colour, '--k': k }, title: p.name, html: avatarIcon(p.avatar) })),
+          d.fans.title = who.length ? `Votes: ${who.map((p) => p.name).join(', ')}` : '';
+          d.fans.replaceChildren(...who.slice(0, 3).map((p, k) => h('span.mn-fan', { style: { '--pc': AVATARS[p.avatar]?.colour, '--k': k }, html: avatarIcon(p.avatar) })),
             ...(who.length > 3 ? [h('span.mn-fans-n', `+${who.length - 3}`)] : []));
           d.btn.classList.toggle('fancied', who.length > 0);
         }
       }
-      fam.setAttribute('aria-checked', String(c.rating !== 'adult'));
-      adu.setAttribute('aria-checked', String(c.rating === 'adult'));
+      fam.setAttribute('aria-checked', String(!adultOn()));
+      adu.setAttribute('aria-checked', String(adultOn()));
       ratingSeg.classList.toggle('locked', !c.isHost);
-      root.classList.toggle('adult', c.rating === 'adult');
+      root.classList.toggle('adult', adultOn());
       const nightRows = c.payload.night || [];
-      const nightKey = JSON.stringify(nightRows.map((r) => [r.id, r.night, r.rank])) + c.players.map((p) => p.name).join() + c.meId;
+      const nightKey = JSON.stringify(nightRows.map((r) => [r.id, r.night, r.rank])) + c.players.map((p) => p.name).join() + c.meId + (c.payload.history || []).length;
       if (nightKey !== lastNight) {
         lastNight = nightKey;
         nightBox.replaceChildren(nightStrip(c, nightRows));
@@ -273,7 +324,7 @@ export default {
       paintDetail();
     }
 
-    // host: nothing (or a coming-soon dish) focused -> point at the first playable dish so Serve
+    // host: nothing (or a coming-soon game) focused -> point at the first playable one so Start
     // is ready at second 0
     if (c.isHost && (!c.progress.focus || dishes.get(c.progress.focus)?.g.comingSoon)) {
       const first = games.find((g) => !g.comingSoon);
@@ -305,7 +356,7 @@ export default {
         }
         paint();
       },
-      unmount() { cancel?.(); },
+      unmount() { cancel?.(); inviteEl?.remove(); },
     };
   },
 };
