@@ -180,7 +180,7 @@
 .bt-note { align-self: center; font: 700 15px var(--f-ui); color: var(--c-linen); background: rgba(42,20,14,.72); padding: 6px 14px; border-radius: 999px; opacity: 0; }
 .bt-note.you { background: var(--c-mustard); color: var(--c-ink); }
 .bt-win.s-owner .bt-note { opacity: 1; transition: opacity 300ms; }
-.bt-owner { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; opacity: 0; transform: translateY(20px); }
+.bt-owner { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; opacity: 0; transform: translateY(20px); }
 .bt-owner .lbl { font: 700 16px var(--f-ui); color: var(--c-linen); text-shadow: 0 1px 4px rgba(0,0,0,.5); }
 .bt-plus { font: 800 16px var(--f-ui); color: var(--c-ink); background: var(--c-candle); padding: 6px 12px; border-radius: 999px; box-shadow: 0 2px 0 #B98A2E; }
 .bt-plus.none { background: rgba(251,244,234,.9); box-shadow: none; }
