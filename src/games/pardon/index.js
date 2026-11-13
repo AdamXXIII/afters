@@ -80,7 +80,6 @@ export default {
     'pardon-round-2': { match: (e) => e.phase.id === 'pardon-round' && e.phase.payload.round === 2, t: 1800 },
     'pardon-round-3': { match: (e) => e.phase.id === 'pardon-round' && e.phase.payload.round === 3, t: 1800 },
     'pardon-read': { match: (e, me) => e.phase.id === 'pardon-read' && readerIsMe(e, me), me: 'idle', bots: 'idle', t: 6000 },
-    'pardon-read-accent': { match: (e, me) => e.phase.id === 'pardon-read' && readerIsMe(e, me) && !!e.phase.payload.accent, me: 'idle', bots: 'idle', t: 6000 },
     'pardon-listen': { match: (e, me) => e.phase.id === 'pardon-read' && !readerIsMe(e, me), me: 'idle', bots: 'idle', t: 8000 },
     'pardon-steal': { match: (e, me) => e.phase.id === 'pardon-read' && !readerIsMe(e, me), me: 'idle', bots: 'idle', t: (p) => p.payload.stealAt + 2500 },
     'pardon-said': { match: (e) => e.phase.id === 'pardon-said' && !!e.phase.payload.got, t: 2600 },
