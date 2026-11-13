@@ -45,7 +45,7 @@
 .th-dial.live.grab { cursor: grabbing; }
 .th-dial.live.grab .nd { fill: #94283A; }
 .th-dial.ghost .bands { opacity: .55 !important; }
-.th-dial.covered .needle { opacity: .35; }
+.th-dial.covered .needle { display: none; }
 .th-holds { position: absolute; inset: 0; pointer-events: none; }
 .th-av.hold { position: absolute; transform: translate(-50%, -50%); box-shadow: 0 0 0 3px #FFFBF4, 0 4px 10px rgba(42,20,14,.4); transition: left 90ms linear, top 90ms linear; animation: thPop 260ms var(--ease-out-back) both; }
 @keyframes thPop { from { transform: translate(-50%, -50%) scale(.3); } }
@@ -72,7 +72,7 @@
 }
 .th-cluecard.final { border-top-color: var(--c-claret); }
 @keyframes thDrop { from { opacity: 0; transform: translateY(-16px) rotate(-1deg); } to { opacity: 1; transform: none; } }
-.th-cc-head { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.th-cc-head { display: flex; align-items: center; gap: 10px; min-height: 48px; padding-right: 44px; }
 .th-cc-who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .th-cc-who b { font: 800 18px/21px var(--f-ui); color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .th-cc-who small { font: 600 14px/17px var(--f-ui); color: var(--c-toffee); }
@@ -158,9 +158,9 @@
 
 /* ---------- reveal ---------- */
 .th-rv { position: absolute; inset: 0; padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 12px) calc(var(--rail-h) + var(--safe-b) + 8px) calc(var(--safe-l) + 12px); display: flex; flex-direction: column; gap: 10px; }
-.th-rv-dial { position: relative; padding: 18px 14px 12px; border-radius: 24px; background-color: #FFFBF4; background-image: var(--paper); box-shadow: 0 2px 0 rgba(42,26,23,.1), 0 16px 34px rgba(30,12,8,.45), inset 0 0 0 1px rgba(122,74,42,.14); }
+.th-rv-dial { position: relative; padding: 18px 14px 34px; margin-bottom: 22px; border-radius: 24px; background-color: #FFFBF4; background-image: var(--paper); box-shadow: 0 2px 0 rgba(42,26,23,.1), 0 16px 34px rgba(30,12,8,.45), inset 0 0 0 1px rgba(122,74,42,.14); }
 .th-rv-dial .th-dialwrap { padding: 0; }
-.th-verdict { position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%) rotate(-7deg) scale(1.6); opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 18px 6px; border-radius: 12px; border: 3.5px solid currentColor; background: rgba(255,253,247,.94); pointer-events: none; }
+.th-verdict { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -50%) rotate(-7deg) scale(1.6); opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 18px 6px; border-radius: 12px; border: 3.5px solid currentColor; background: rgba(255,253,247,.94); pointer-events: none; }
 .th-verdict b { font: 900 30px/1 var(--f-display); letter-spacing: -.01em; text-transform: uppercase; font-variation-settings: "SOFT" 30, "WONK" 0; white-space: nowrap; }
 .th-verdict .pts { font: 800 22px/1.2 var(--f-ui); font-variant-numeric: tabular-nums; }
 .th-verdict.spot { color: var(--c-claret); }
@@ -180,7 +180,7 @@
 
 /* ---------- standings ---------- */
 .th-scores { position: absolute; left: 0; right: 0; bottom: calc(var(--rail-h) + var(--safe-b) + 8px); padding: 0 calc(var(--safe-r) + 14px) 0 calc(var(--safe-l) + 14px); display: flex; flex-direction: column; gap: 8px; }
-.th-scores-h { font-family: var(--f-display); font-weight: 800; font-size: 28px; color: var(--c-linen); text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.th-scores-h { align-self: center; padding: 4px 18px 6px; border-radius: 999px; background: rgba(42,20,14,.78); font-family: var(--f-display); font-weight: 800; font-size: 26px; color: var(--c-linen); box-shadow: 0 8px 18px rgba(20,8,5,.35); }
 .th-slist { display: flex; flex-direction: column; gap: 6px; }
 .th-srow { display: grid; grid-template-columns: 26px auto 1fr auto; align-items: center; gap: 10px; min-height: 46px; padding: 5px 14px 5px 10px; border-radius: 16px; background: rgba(251,244,234,.95); background-image: var(--paper); box-shadow: 0 8px 18px rgba(20,8,5,.35); animation: thUp 380ms calc(var(--i) * 70ms) var(--ease-out-quint) both; }
 .th-srow .rk { font: 800 20px var(--f-display); color: var(--c-toffee); text-align: center; }

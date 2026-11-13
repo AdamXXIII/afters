@@ -22,6 +22,12 @@ const hotGiver = (mine) => (e, me) => {
   if (mine) last.giver = me;
   else if (last.giver === me) last.giver = e.players.find((p) => p.id !== me)?.id || last.giver;
 };
+/** Demo helper: land the dial `off` away from the target so the reveal shows a scoring band. */
+const landNear = (off) => (e) => {
+  if (e.phase.id !== 'thermostat-dial') return;
+  const r = e.game?.host?.r;
+  if (r && r.target != null) { r.dial = Math.max(0, Math.min(100, r.target + off)); r.by = e.players.find((p) => p.id !== r.giver)?.id || null; }
+};
 const at = (k, plus) => (p) => (p.payload?.steps?.[k] ?? 0) + plus;
 
 export default {
@@ -79,7 +85,7 @@ export default {
           client.act('th-lock', {}, { locked: true });
         };
         later(rand(1200, 6000), () => nudge(false));
-        later(rand(6500, 9000), () => nudge(rng() < 0.5));
+        later(rand(6500, 9000), () => nudge(false));
         later(rand(9500, 14000), lock);
         // if someone moved it after we locked, lock again a little later
         for (const t of [22000, 32000, 42000, 52000]) later(t + rand(0, 3000), lock);
@@ -105,13 +111,13 @@ export default {
     'thermostat-listen': { match: (e, me) => { firstGiver(false)(e, me); return e.phase.id === 'thermostat-clue' && !giverIs(e, me); }, me: 'idle', bots: 'idle', t: 6000 },
     'thermostat-dial': { match: (e, me) => { firstGiver(false)(e, me); return e.phase.id === 'thermostat-dial' && !giverIs(e, me) && !e.phase.payload.final; }, me: 'idle', bots: 'some', t: 14000 },
     'thermostat-squirm': { match: (e, me) => { firstGiver(true)(e, me); return e.phase.id === 'thermostat-dial' && giverIs(e, me); }, me: 'idle', bots: 'some', t: 14000 },
-    'thermostat-reveal-open': { match: (e, me) => { firstGiver(false)(e, me); return e.phase.id === 'thermostat-reveal' && !e.phase.payload.final; }, t: at('open', 900) },
-    'thermostat-reveal': { match: (e, me) => { firstGiver(false)(e, me); return e.phase.id === 'thermostat-reveal' && !e.phase.payload.final; }, t: at('points', 1400) },
+    'thermostat-reveal-open': { match: (e, me) => { firstGiver(false)(e, me); landNear(-11)(e); return e.phase.id === 'thermostat-reveal' && !e.phase.payload.final; }, t: at('open', 900) },
+    'thermostat-reveal': { match: (e, me) => { firstGiver(false)(e, me); landNear(6)(e); return e.phase.id === 'thermostat-reveal' && !e.phase.payload.final; }, t: at('points', 1400) },
     'thermostat-scores': { match: (e) => e.phase.id === 'thermostat-scores', t: 2600 },
     'thermostat-hot': { match: (e, me) => { hotGiver(false)(e, me); return e.phase.id === 'thermostat-hot'; }, t: 3000 },
     'thermostat-hot-give': { match: (e, me) => { hotGiver(true)(e, me); return e.phase.id === 'thermostat-clue' && e.phase.payload.final && giverIs(e, me); }, me: 'idle', t: 6000 },
     'thermostat-hot-dial': { match: (e, me) => { hotGiver(false)(e, me); return e.phase.id === 'thermostat-dial' && e.phase.payload.final && !giverIs(e, me); }, me: 'idle', bots: 'some', t: 14000 },
-    'thermostat-hot-reveal': { match: (e, me) => { hotGiver(false)(e, me); return e.phase.id === 'thermostat-reveal' && e.phase.payload.final; }, t: at('points', 1400) },
+    'thermostat-hot-reveal': { match: (e, me) => { hotGiver(false)(e, me); landNear(1.5)(e); return e.phase.id === 'thermostat-reveal' && e.phase.payload.final; }, t: at('points', 1400) },
   },
 
   lines: {
@@ -121,7 +127,7 @@ export default {
         ['Nobody touches the real thermostat in this house. Use this one.'],
       ],
       thIntroAgain: [['Back to the dial. Someone always wants it warmer.'], ['Another go. I\'ve given the dial a polish.']],
-      thGive: [['Only you can see it. One clue. Make it count.'], ['Think. Then say one thing. Out loud. No pointing.']],
+      thGive: [['One clue. Make it count.'], ['Think. Then say it out loud.']],
       thListen: [['Listen to {name}. No peeking at their phone.'], ['{name} is thinking. Give them a moment. Or heckle.']],
       thDial: [['One dial between you. Do try to share.'], ['Argue it out. Politely. Then lock it in.'], ['Everybody grab it at once. Splendid. Chaos.']],
       thSquirm: [['Not a word, {name}. Not even a face.'], ['Hands in your lap, {name}. You\'ve said your piece.']],
@@ -137,7 +143,7 @@ export default {
         ['Thermostat. One clue, one dial, and a proper row about it.'],
         ['Grab the dial. Fight for it. This is how families break up at Christmas.'],
       ],
-      thGive: [['One clue. Don\'t fuck it up.'], ['Say one thing out loud. Not a bloody essay.']],
+      thGive: [['One clue. Don\'t fuck it up.'], ['One clue. Not a bloody essay.']],
       thDial: [['One dial. Several opinions. Good luck, you lunatics.'], ['Argue it out. Then lock the bloody thing in.']],
       thSquirm: [['Not a word, {name}. Sit on your hands.'], ['Zip it, {name}. Watch them cock it up.']],
       thSpot: [['Spot on! How the hell did you do that?']],
