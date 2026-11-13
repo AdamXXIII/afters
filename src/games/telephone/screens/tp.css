@@ -858,3 +858,43 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
 .tp-end-did .tp-who { vertical-align: -4px; }
 .tp-al-feed { margin-top: 128px; }
 .tp-al-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 22px; line-height: 1.02; text-wrap: balance; }
+
+/* =====================================================================================
+   ALBUM, round 3: the book is the star. Full screen (the stage is covered; Cyril is a badge),
+   one tall chain of big pages, newest arriving at the bottom, the whole book scrollable.
+   ===================================================================================== */
+.tp-al { background: radial-gradient(130% 70% at 50% 0%, #2B4F69 0%, var(--tp-deep) 45%, #142838 100%); }
+.tp-al::after { content: ""; position: absolute; inset: 0; background-image: var(--paper); opacity: .18; mix-blend-mode: soft-light; pointer-events: none; }
+.tp-al::before { display: none; }
+.tp-al-head { margin: 0 62px 0 12px; flex-wrap: wrap; }
+.tp-al-title { font-size: 23px; }
+.tp-al-cy { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; min-height: 30px; padding-top: 6px; border-top: 1px dashed rgba(122,74,42,.28); }
+.tp-al-cy-badge { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--c-candle); color: var(--c-tomato); box-shadow: 0 0 0 2px var(--c-linen), var(--glow-candle); }
+.tp-al-cy-badge svg { width: 15px; height: 15px; }
+.tp-al-cy-txt { font: 600 13.5px/1.25 var(--f-ui); color: var(--c-ink); }
+.tp-al-cy-txt:empty::before { content: "Cyril is watching."; color: var(--c-toffee); }
+.tp-al-feed, .tp-al-feed { margin-top: 6px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px); mask-image: linear-gradient(to bottom, transparent 0, #000 22px); }
+.tp-al-list { gap: 18px; padding: 22px 18px 18px 12px; justify-content: flex-start; }
+.tp-pg-by { padding-top: 7px; font-size: 15px; }
+/* big pages: every drawing and sentence readable across the table */
+.tp-pg-card.k-draw, .tp-pg:not(:last-child) .tp-pg-card.k-draw { width: min(316px, 100%); }
+.tp-pg-card.k-write, .tp-pg-card.k-guess { width: 100%; }
+.tp-pg:not(:last-child) .tp-pg-txt, .tp-pg:last-child .tp-pg-txt { font-size: calc(var(--fs, 32px) * 1.1); }
+.tp-pg-card.k-guess { min-width: 0; }
+.tp-pg-stamp { font-size: 18px; }
+.tp-pg-rail .tp-av { box-shadow: 0 0 0 3px var(--tp-deep), 0 0 0 5px var(--pc), 0 3px 8px rgba(0,0,0,.4); }
+.tp-pg-bell { box-shadow: 0 0 0 3px var(--tp-deep), var(--glow-candle); }
+.tp-end-card { max-width: none; }
+.tp-al-top { display: none; align-self: center; margin-top: 2px; appearance: none; border: 0; background: transparent; color: var(--c-candle); font: 700 14px/1 var(--f-ui); padding: 8px 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.tp-al.last .tp-al-top { display: block; }
+.tp-al-top:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 8px; }
+.tp-al-wait { background: rgba(10,20,28,.55); }
+@media (max-height: 740px) { .tp-al-feed { margin-top: 4px; } .tp-pg-card.k-draw, .tp-pg:not(:last-child) .tp-pg-card.k-draw { width: min(280px, 100%); } }
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-al { padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 8px) 0 calc(var(--safe-l) + 8px); display: grid; grid-template-columns: 300px 1fr; grid-template-rows: auto 1fr auto; column-gap: 12px; }
+  .tp-al-head { grid-column: 1; grid-row: 1; margin: 0; align-self: start; }
+  .tp-al-feed { grid-column: 2; grid-row: 1 / 4; margin: 0; margin-right: 44px; }
+  .tp-al-top { grid-column: 1; grid-row: 2; align-self: end; }
+  .tp-al-bar { position: static; grid-column: 1; grid-row: 3; width: auto; padding: 6px 0 8px; }
+  .tp-pg-card.k-draw, .tp-pg:not(:last-child) .tp-pg-card.k-draw { width: min(220px, 100%); }
+}

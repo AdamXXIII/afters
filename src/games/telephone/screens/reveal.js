@@ -4,7 +4,7 @@
 // stroke by stroke; descriptions get a "Nailed it" / "Lost it" stamp; the last page is the verdict.
 import './tp.css';
 import { drawingView } from '../../../shared/drawing.js';
-import { h, av, who, tilt, cordSvg, TP_ICONS } from './kit.js';
+import { h, av, who, tilt, cordSvg, TP_ICONS, ICONS } from './kit.js';
 
 const TYPE_MS = 26; // per character
 const ANYONE_AFTER = 15000; // matches host.js: guests may turn the page once the host goes quiet
@@ -30,19 +30,14 @@ export default {
     // ---- header: whose rumour, which page
     const pageNo = h('span.tp-al-pg');
     const pips = h('div.tp-al-pips', Array.from({ length: total }, (_, i) => h(`i${i === total - 1 ? '.end' : ''}`)));
-    // the trail: every page so far, tiny, in one row, so the whole drift is on screen at once
-    const trail = h('div.tp-al-trail');
-    const addCrumb = (st, s) => {
-      if (trail.children.length) trail.append(h('span.tp-crumb-arrow', { html: TP_ICONS.send }));
-      let el;
-      if (st.kind === 'draw') {
-        const v = drawingView(st.drawing, { className: 'tp-crumb-view' });
-        requestAnimationFrame(() => v.frame());
-        el = h('span.tp-crumb.draw', v.el);
-      } else el = h(`span.tp-crumb.k-${st.kind}`, st.text);
-      el.dataset.s = String(s);
-      trail.append(el);
-      requestAnimationFrame(() => { trail.scrollLeft = trail.scrollWidth; });
+    // Cyril sits as a small badge during the album: the book gets the whole screen
+    const cy = h('div.tp-al-cy-txt');
+    const cyril = h('div.tp-al-cy', h('span.tp-al-cy-badge', { html: ICONS.flame }), cy);
+    const say = (lines) => {
+      const t = [].concat(lines || []).join(' ');
+      if (!t) return;
+      cy.textContent = t;
+      if (!quiet && !ctx.reduced) cy.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)' });
     };
     const header = h('div.tp-al-head',
       av(owner, { size: 36 }),
@@ -50,7 +45,7 @@ export default {
         // the sentence it started as stays pinned, so every page plays against it
         h('div.tp-al-title', `“${steps[0].text}”`),
         h('div.tp-al-sub', h('span', `${owner?.name || 'Someone'} · ${p.index + 1} of ${p.count}`), pips, pageNo)),
-      trail);
+      cyril);
 
     // ---- the feed
     const list = h('div.tp-al-list');
@@ -70,7 +65,9 @@ export default {
       setTimeout(() => { nextBtn.disabled = false; }, 500);
     });
 
-    const root = h('div.tp-al', header, feed, bar);
+    const topBtn = h('button.tp-al-top', { type: 'button', 'data-e2e': 'tp-top' }, 'Read it from the top');
+    topBtn.addEventListener('click', () => { ctx.audio.sfx('tap'); feed.scrollTo({ top: 0, behavior: ctx.reduced ? 'auto' : 'smooth' }); });
+    const root = h('div.tp-al', header, feed, topBtn, bar);
     show.append(root);
 
     // ---- pages
@@ -111,7 +108,6 @@ export default {
         if (st.kind === 'guess') card.append(stampFor(st));
       }
       list.append(row);
-      if (s > 0) addCrumb(st, s);
       rows[s] = { row, card, st, s, live, stamped: !live };
       return rows[s];
     };
@@ -152,11 +148,11 @@ export default {
       list.append(row);
       rows[steps.length] = { row, card, end: true, views, live };
       if (live) {
-        if (flip) { ctx.cyril.react('delight'); sfx('fanfare'); if (!quiet) ctx.say(ctx.line('tpFlip'), { hold: 1600, compact: true }); } else if (verdict === 'straight') { ctx.cyril.react('delight'); sfx('fanfare'); if (!quiet) ctx.say(ctx.line('tpStraight'), { hold: 1800, compact: true }); } else { ctx.cyril.react('guffaw'); sfx('stamp'); if (!quiet) ctx.say(ctx.line('tpCrossed'), { hold: 1800, compact: true }); }
+        if (flip) { ctx.cyril.react('delight'); sfx('fanfare'); say(ctx.line('tpFlip')); } else if (verdict === 'straight') { ctx.cyril.react('delight'); sfx('fanfare'); say(ctx.line('tpStraight')); } else { ctx.cyril.react('guffaw'); sfx('stamp'); say(ctx.line('tpCrossed')); }
         if (!quiet) ctx.stage.shake?.();
         ctx.haptic('stamp');
       }
-      if (quiet && !flip) ctx.say(verdict === 'straight' ? ctx.line('tpStraight') : ctx.line('tpCrossed'), { hold: 99999, compact: true });
+      if (!live && !flip) say(verdict === 'straight' ? ctx.line('tpStraight') : ctx.line('tpCrossed'));
     };
 
     const scrollDown = (smooth) => {
@@ -190,8 +186,8 @@ export default {
           if (live) {
             enter(r.row);
             sfx('page', { up: r.st.kind === 'draw' });
-            if (s === 0 && !quiet) c.say(c.line('tpRevealStart', { n: p.index + 1 }), { hold: 1400, compact: true });
-            if (r.st.kind === 'draw' && !r.st.drawing?.strokes?.length) { c.cyril.react('sad'); if (!quiet) c.say(c.line('tpBlank'), { hold: 1200, compact: true }); }
+            if (s === 0) say(c.line('tpRevealStart', { n: p.index + 1 }));
+            if (r.st.kind === 'draw' && !r.st.drawing?.strokes?.length) { c.cyril.react('sad'); say(c.line('tpBlank')); }
           }
         } else {
           addEnd(live);
@@ -207,21 +203,9 @@ export default {
       requestAnimationFrame(() => requestAnimationFrame(clearTop));
     };
 
-    // Pages that have scrolled up past the top of the feed fade out, so the space above the feed stays
-    // clear for Cyril (the stage frames him into free space). Scroll back up and they all come back.
+    // the cord starts at the first page and runs down the whole book
     const clearTop = () => {
-      const top = feed.getBoundingClientRect().top;
-      // (landscape: Cyril has his own column, so nothing needs hiding)
-      const atBottom = !document.body.classList.contains('land') && feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 8;
-      let first = null;
-      for (const r of rows) {
-        if (!r) continue;
-        // on the verdict the trail already shows the whole chain, so earlier pages step aside for Cyril
-        const off = (atBottom && r.row !== list.lastElementChild && r.row.getBoundingClientRect().top < top - 2) || (shownPage >= steps.length && !r.end && !document.body.classList.contains('land'));
-        if (r.row.classList.contains('off') !== off) r.row.classList.toggle('off', off);
-        if (!off && !first) first = r.row;
-      }
-      // the cord starts at the first page still on show
+      const first = rows.find(Boolean)?.row;
       list.style.setProperty('--spine-top', `${first ? first.offsetTop + 17 : 34}px`);
     };
     feed.addEventListener('scroll', clearTop, { passive: true });
@@ -249,7 +233,7 @@ export default {
               r.card.append(stampFor(r.st));
               if (!r.st.match) {
                 c.cyril.react(r.s === p.end.crossedAt ? 'shock' : 'guffaw'); sfx('nope');
-                if (r.s === p.end.crossedAt && !quiet) c.say(c.line('tpLost', { name: c.player(r.st.authorId)?.name || 'someone' }), { hold: 1500, compact: true });
+                if (r.s === p.end.crossedAt) say(c.line('tpLost', { name: c.player(r.st.authorId)?.name || 'someone' }));
               } else { c.cyril.react('delight'); sfx('select'); }
             }
             r.card.txt.textContent = s;
