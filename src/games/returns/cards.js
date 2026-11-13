@@ -30,11 +30,11 @@ export const FLAVOUR = {
   adult: {
     peek: ['Have a sneaky look. Nobody’s watching.', 'Reading their texts over their shoulder.', 'Checking the bill before you offer to split it.', 'Stalking the guest list.', 'Looking at the answers. No shame.', 'Peeking at the Secret Santa list.'],
     skip: ['Fake a phone call from your mum.', 'Hide in the garden with a cigarette you don’t even smoke.', 'Go to the bar. Stay at the bar.', 'Leave without saying goodbye. Classic.', 'Sorry, got the kids tomorrow.', 'Pretend to be asleep on the sofa.'],
-    shuffle: ['Fuck it. Mix it all up.', 'Move the seating plan when nobody’s looking.', 'Shake it like it owes you money.', 'Chaos. Lovely chaos.', 'Scramble it like your Saturday night.', 'Nobody knows anything now. Cheers.'],
-    pinch: ['Nicked it. Sorry not sorry.', 'Like borrowing a lighter. Gone forever.', 'Swipe it while they’re at the bar.', 'Mine now, dickhead.', 'Pickpocket of the year.', 'Took it. Said nothing. Legend.'],
+    shuffle: ['Fuck it. Mix it all up.', 'Move the seating plan when nobody’s looking.', 'Shake it like it owes you money.', 'Mix it up. Blame the prosecco.', 'Scramble it like your Saturday night.', 'Nobody knows a thing now. Perfect.'],
+    pinch: ['Nicked it. Sorry not sorry.', 'Like borrowing a lighter. Gone forever.', 'Swipe it while they’re at the bar.', 'Mine now, mate. Cheers.', 'Nicked it. Already on Vinted.', 'Took it. Said nothing. Legend.'],
     plate: ['Your problem now, mate.', 'Hand them the bill and run.', 'Here. You do the best man speech.', 'Pass the buck. And the cake.', 'Not my circus, not my cake.', 'Off you pop. Good luck, you bastard.'],
-    steady: ['Oi. No you fucking don’t.', 'Calm down, Judas.', 'Steady on, you absolute weapon.', 'Not tonight, sunshine.', 'Bollocks to that.', 'Nice try, you sneaky sod.'],
-    breath: ['Thirty years of vaping. Finally useful.', 'Blow like it’s last orders.', 'Huge lungs. Tiny dignity.', 'Puff like you’re sobering up in the cold.', 'Fill your cheeks and pray.', 'Blow. Then pretend you meant to.'],
+    steady: ['Oi. No you fucking don’t.', 'Put it down, you snake.', 'Steady on, you absolute weapon.', 'Not tonight, sunshine.', 'Bollocks to that.', 'Nice try, you sneaky sod.'],
+    breath: ['Thirty years of vaping. Finally useful.', 'Puff like it’s last orders.', 'Lungs like a bagpiper. Dignity of a stag do.', 'Puff like you’re sobering up in the cold.', 'Fill your cheeks and pray.', 'Puff. Then act like you planned it.'],
   },
 };
 
@@ -68,11 +68,11 @@ export const CAKES = {
     'Your boss’s boss’s birthday. Everyone’s nervous.', 'The tortoise’s 60th. He’s not bothered.', 'Your grandma’s twin’s 80th. Two of them, both bossy.',
   ]),
   adult: occ('ra', [
-    'Your ex’s 30th. You weren’t invited.', 'Gary’s 50th. He’s booked a DJ who only plays Phil Collins.', 'Dave from Accounts. Nobody fucking likes Dave.',
+    'Your ex’s 30th. You weren’t invited.', 'Gary’s 50th. He’s booked a DJ who only plays 80s ballads.', 'Dave from Accounts. Nobody fucking likes Dave.',
     'Your boss’s birthday. Smile, you coward.', 'Your 40th. Pretend you’re fine.', 'Your mate’s 30th. Third one this month.',
     'Nan’s 90th. She’s already had four sherries.', 'Your brother-in-law’s 50th. He’s doing a speech. God help us.', 'The office birthday. Whip-round was £3.20.',
     'Your landlord’s 60th. He still won’t fix the boiler.', 'A surprise 40th. You’re the one who blabbed.', 'Your cousin’s 21st. Already sick in a plant pot.',
-    'Your neighbour’s 50th. They’re playing Oasis. Loudly.', 'Uncle Pete’s 60th. He’s pissed by six.', 'Your sister’s 30th. Her husband’s a knob.',
+    'Your neighbour’s 50th. They’re playing Oasis. Loudly.', 'Uncle Pete’s 60th. He’s pissed by six.', 'Your sister’s 30th. Her husband brought a guitar.',
     'The dog’s birthday. Better party than yours.', 'Your old housemate’s 35th. Still owes you £40.', 'Your work nemesis’s 40th. Sing. Sing, you bastard.',
     'The stag-do best man’s birthday. He knows things.', 'Your dad’s 70th. He’s going to cry. Again.', 'Your 29th. For the sixth year running.',
     'Your mum’s 60th. She invited your ex.', 'Your mate’s divorce party. With a cake.', 'Your boss’s retirement. Finally.',
@@ -84,10 +84,10 @@ export const CAKES = {
     'Your boss’s kid’s 18th. Why were you invited?', 'Your mate’s 40th. Karaoke till 2am. Your voice is gone.', 'Your 35th. You’re hungover at your own party.',
     'Your godmother’s 70th. She’s three wines in.', 'Your old PE teacher’s 60th. Still a bastard.', 'Your neighbour’s 50th. The police came.',
     'Your mate’s 30th. Escape room. You didn’t escape.', 'Steve’s 40th. Steve’s gone missing.', 'Your colleague’s leaving do. Good riddance.',
-    'Your cousin’s 30th. Prosecco fountain. Grim.', 'Your stepdad’s 60th. Awkward speeches all round.', 'The golf club captain’s 70th. Dickheads in visors.',
-    'Your sister-in-law’s 40th. Matching T-shirts. Kill me.', 'Your mate’s 30th. He cried in the taxi.', 'Your dentist’s 50th. Don’t ask.',
+    'Your cousin’s 30th. Prosecco fountain. Grim.', 'Your stepdad’s 60th. Awkward speeches all round.', 'The golf club captain’s 70th. Absolute pillocks in visors.',
+    'Your sister-in-law’s 40th. Matching T-shirts. Kill me.', 'Your mate’s 30th. He cried in the taxi.', 'Your dentist’s 50th. She knows you don’t floss.',
     'Your boss’s 60th. He thinks he’s still 30.', 'Your mate’s housewarming. Somebody brought a cake. Why.', 'Your grandad’s 90th. He’s louder than the band.',
-    'Your ex’s new partner’s birthday. Bloody hell.', 'Your mate’s 45th. A midlife crisis with balloons.', 'Your auntie’s 75th. She’s on the tequila.',
+    'Your ex’s new partner’s 30th. Better hair than you.', 'Your mate’s 45th. A midlife crisis with balloons.', 'Your auntie’s 75th. She’s on the tequila.',
   ]),
 };
 
