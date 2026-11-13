@@ -27,12 +27,13 @@ const task = {
         ? h('span.sc-cat', priv.peek ? h('span', 'Peek: ', h('b', priv.peek)) : h('span', 'Category: ', h('b', '?')))
         : h('span.sc-cat', h('b', priv.cat || '')));
     const body = priv.faker
-      ? h('div.sc-cardbody.faker',
-        h('div.sc-secret', 'You had seconds.'),
-        h('div.sc-hint', h('b', 'You’re the faker. '), 'Everyone else has a task you don’t.'),
-        h('div.sc-hint', `${priv.hint} Copy the others. Don’t get caught.`),
-        priv.two ? h('div.sc-hint2', 'Somebody else had seconds too.') : null)
-      : h('div.sc-cardbody', h('div.sc-secret.task', priv.text || ''));
+      // Same type, colour and shape for both, so a glance across the table gives nothing away.
+      ? h('div.sc-cardbody',
+        h('div.sc-secret.task', 'You had seconds: you’re the faker. You don’t get the task.'),
+        h('div.sc-hint', `${priv.hint} Copy the others on three.${priv.two ? ' Someone else had seconds too.' : ''}`))
+      : h('div.sc-cardbody',
+        h('div.sc-secret.task', priv.text || ''),
+        h('div.sc-hint', 'Everyone has this task except the faker. Do it on three.'));
     const card = h('div.sc-secretcard', meta, body);
     const napkin = h('div.sc-napkin', h('span.ic', { html: HOLD }), h('b', 'Hold to read'), h('small', 'Let go to hide it'));
     const wrap = h('div.sc-cardwrap', { 'data-e2e': 'sc-card' }, card, napkin);
@@ -143,9 +144,13 @@ const vote = {
       ? 'One faker? Or are you all faking? Most votes decides.'
       : p.last
         ? 'Last task. The most-pointed-at person is accused.'
-        : `${p.need} pointing at one person accuses them. Or wait.`;
+        : `${p.need} votes on one person accuses them. Catch the faker now: ${p.task === 0 ? 1000 : 750} each.`;
     const top = topCard(p, 'Who had seconds?', { sub });
     show.append(top);
+    if (!p.final && !p.last) {
+      const need = h('div.sc-need', h('b', String(p.need)), h('span', 'votes needed'));
+      top.firstChild.append(need);
+    }
     const pick = (target) => {
       if (ctx.mine.game.target === target) return;
       ctx.client.act('sc-vote', { target }, { target });
