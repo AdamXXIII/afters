@@ -97,6 +97,8 @@
 .ts-cab.mini .ts-tok-flag { font-size: 11px; padding: 2px 5px 1px; }
 .ts-cab.mini .ts-tok-n, .ts-cab.tiny .ts-tok-n { font-size: 9.5px; padding: 2px 3px 1px; }
 .ts-cab.tiny .ts-tok-n { display: none; }
+.ts-cab.mini.dense .ts-plank-n { display: none; }
+.ts-cab.mini.dense .ts-plank { height: 3px; }
 
 .ts-cab.mini { --gut: 4px; padding: 0 6px 7px; border-radius: 12px 12px 8px 8px; }
 .ts-cab.mini .ts-cab-crown { height: 16px; }

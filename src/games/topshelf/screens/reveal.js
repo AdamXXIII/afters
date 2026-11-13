@@ -85,7 +85,7 @@ export default {
     const mine = h('div.ts-mine', h('span.ts-mine-t', myLine(p, ctx.meId)));
     const after = {};
     for (const id of ids) after[id] = p.moves[id].to;
-    const cab = cabinet(ctx, { top: p.top, size: 'full', ...shelfRange([p.before, after], p.top, 5) });
+    const cab = cabinet(ctx, { top: p.top, size: 'full', ...shelfRange([p.before, after], p.top, 5, 2) });
     const leadAfter = leaders(after);
     const note = h('div.ts-note', h('span.ts-note-f', { html: FLAME }), h('span.ts-note-t'));
     show.append(h(`div.ts-rv.m-${p.mode}`,

@@ -51,10 +51,10 @@ export function qCard(p, { timer = true, compact = false } = {}) {
 }
 
 /** The shelf window worth showing: the occupied range plus a little air, at least `min` rows. */
-export function shelfRange(maps, top, min = 6) {
+export function shelfRange(maps, top, min = 6, pad = 1) {
   const vals = maps.flatMap((m) => Object.values(m || {}));
   let lo = Math.max(0, Math.min(...vals, top) - 1);
-  let hi = Math.min(top, Math.max(...vals, 0) + 1);
+  let hi = Math.min(top, Math.max(...vals, 0) + pad);
   while (hi - lo < min) { if (hi < top) hi += 1; else if (lo > 0) lo -= 1; else break; }
   return { lo, hi };
 }
@@ -86,7 +86,7 @@ export function cabinet(ctx, { top = 15, lo = 0, hi = top, size = 'full' } = {})
   });
   const shelves = h('div.ts-shelves', planks, [...toks.values()]);
   const toTop = top - hi;
-  const el = h(`div.ts-cab.${size}`, { style: { '--rows': String(hi - lo), '--n': String(n) } },
+  const el = h(`div.ts-cab.${size}${hi - lo > 7 ? '.dense' : ''}`, { style: { '--rows': String(hi - lo), '--n': String(n) } },
     h('div.ts-cab-crown', h('span', size === 'tiny' ? `${top} shelves` : toTop > 0 ? `Top shelf: ${top} \u00b7 ${toTop} above` : 'Cyril\u2019s cabinet')),
     h('div.ts-cab-in', shelves));
   /** pos: {id: shelfFloat}; extra: {id: {flag, kind, shield, hot, lead, dim}} */

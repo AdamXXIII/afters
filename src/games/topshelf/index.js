@@ -81,7 +81,6 @@ export default {
     'topshelf-port-intro': { match: (e) => e.phase.id === 'topshelf-round-intro' && e.phase.payload.kind === 'port', t: 2200 },
     'topshelf-port': { match: ph('topshelf-port'), me: 'idle', bots: 'some', t: 3000 },
     'topshelf-q-bet': { match: (e, me) => mode('port')(e) && e.phase.payload.victim !== me, me: 'idle', bots: 'some', t: 3200 },
-    'topshelf-q-port': { match: (e, me) => mode('port')(e) && e.phase.payload.victim === me, me: 'idle', bots: 'some', t: 3200 },
     'topshelf-reveal-port': { match: rvMode('port'), t: moveT },
     'topshelf-final-intro': { match: (e) => e.phase.id === 'topshelf-round-intro' && e.phase.payload.kind === 'final', t: 2200 },
     'topshelf-wager': { match: ph('topshelf-wager'), me: 'idle', bots: 'some', t: 3000 },
