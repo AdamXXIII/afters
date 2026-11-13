@@ -76,8 +76,10 @@ export function cabinet(ctx, { top = 15, lo = 0, hi = top, size = 'full' } = {})
   ctx.players.forEach((pl, lane) => {
     const me = pl.id === ctx.meId;
     const tok = h(`div.ts-tok${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl), '--x': String(lane) } },
-      h('div.ts-tok-tag', h('span.ts-tok-flag'), h('span.ts-tok-n', me ? 'You' : pl.name)),
-      h('div.ts-tok-crown', { html: '<svg viewBox="0 0 48 32"><path d="M4 28 2 6l12 10L24 2l10 14L46 6l-2 22z" fill="#FFD27A" stroke="#8A5A10" stroke-width="3" stroke-linejoin="round"/></svg>' }),
+      h('div.ts-tok-tag',
+        h('span.ts-tok-flag'),
+        h('span.ts-tok-crown', { html: '<svg viewBox="0 0 48 32"><path d="M4 28 2 6l12 10L24 2l10 14L46 6l-2 22z" fill="#FFD27A" stroke="#8A5A10" stroke-width="3" stroke-linejoin="round"/></svg>' }),
+        h('span.ts-tok-n', me ? 'You' : pl.name)),
       h('div.ts-tok-b', { html: bottleSvg(colourOf(pl), pl.avatar) }));
     tok.title = pl.name;
     toks.set(pl.id, tok);
@@ -85,7 +87,7 @@ export function cabinet(ctx, { top = 15, lo = 0, hi = top, size = 'full' } = {})
   const shelves = h('div.ts-shelves', planks, [...toks.values()]);
   const toTop = top - hi;
   const el = h(`div.ts-cab.${size}`, { style: { '--rows': String(hi - lo), '--n': String(n) } },
-    h('div.ts-cab-crown', h('span', toTop > 0 ? `Top shelf: ${top} \u00b7 ${toTop} above` : 'Cyril\u2019s cabinet')),
+    h('div.ts-cab-crown', h('span', size === 'tiny' ? `${top} shelves` : toTop > 0 ? `Top shelf: ${top} \u00b7 ${toTop} above` : 'Cyril\u2019s cabinet')),
     h('div.ts-cab-in', shelves));
   /** pos: {id: shelfFloat}; extra: {id: {flag, kind, shield, hot, lead, dim}} */
   el.place = (pos, extra = {}) => {

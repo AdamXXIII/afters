@@ -35,7 +35,7 @@ Depth: streaks (three right in a row = a **Steady Hand**, a brass collar on your
 | `topshelf-summit` | show | 9 s, then `api.finish` (score = shelf) | - |
 
 ## Content
-`content/*.js`: nine categories (Pop culture, Music, Telly, Film, Odd facts, Sport, Words, Science and nature, History) with ~490 questions, plus **Bedroom** (28, Adults 18+ tables only). Family and adult share the questions; the adult table adds the Bedroom bottle and ruder Cyril lines. Evergreen facts only: no current holders, records, prices or ages; no food topics. `!` marks hard questions (used only for the Last Drop, 6-9 per category).
+`content/*.js`: nine categories (Pop culture, Music, Telly, Film, Odd facts, Sport, Words, Science and nature, History) with 517 questions (55-62 each), plus **Bedroom** (28, Adults 18+ tables only). Family and adult share the questions; the adult table adds the Bedroom bottle and ruder Cyril lines. Evergreen facts only: no current holders, records, prices or ages; no food topics. `!` marks hard questions (used only for the Last Drop, 6-9 per category).
 
 ## Known gaps (2026-11-13)
 - Content is still easier than the bar in places (about a third are gimmes); rewriting easy items into half-known ones would help most.
