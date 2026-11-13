@@ -1,7 +1,7 @@
 // Same Here shared bits: avatar discs, the question card, handwritten answer cards, points pips,
 // the Wobbly Chair drawing, small timing helpers. Scoped .sh-*.
 // AI-generated (Claude, Same Here builder, 2026-11-13).
-import { h, onTap } from '../../../ui/components.js';
+import { h, onTap, timerRing } from '../../../ui/components.js';
 import { AVATARS } from '../../../game/constants.js';
 import { avatarIcon } from '../../../ui/icons.js';
 
@@ -45,11 +45,15 @@ export function pips(score, target, { cls = '' } = {}) {
 }
 
 /** The question card (show layer). */
-export function questionCard(text, { round = null, compact = false, cls = '' } = {}) {
+export function questionCard(text, { round = null, compact = false, cls = '', timer = false } = {}) {
   const len = text.length;
-  return h(`div.sh-qcard${compact ? '.compact' : ''}${len > 44 ? '.long' : ''}${len > 64 ? '.xlong' : ''}${cls}`,
+  const t = timer ? timerRing() : null;
+  const card = h(`div.sh-qcard${compact ? '.compact' : ''}${len > 44 ? '.long' : ''}${len > 64 ? '.xlong' : ''}${t ? '.timed' : ''}${cls}`,
     round ? h('span.sh-qn', `Question ${round}`) : null,
+    t,
     h('div.sh-q', text));
+  card.timer = t;
+  return card;
 }
 
 /** An answer in the player's handwriting on a little place card. */

@@ -104,7 +104,8 @@ const sort = {
 
     // show layer: the question and every answer on the table (no counts yet: that's the reveal)
     const spread = h('div.sh-spread', p.groups.map((g) => answerCard(g.text, { cls: g.gid === mineGid ? '.mini.mine' : '.mini', seed, key: g.gid })));
-    show.append(h('div.sh-top', questionCard(p.q, { round: p.round, compact: true }), spread));
+    const qc = questionCard(p.q, { round: p.round, compact: true, timer: true });
+    show.append(h('div.sh-top', qc, spread));
 
     const list = h('div.sh-disputes');
     const picker = h('div.sh-pairs');
@@ -181,7 +182,7 @@ const sort = {
     };
     sync(ctx);
     const cancel = sayLater(ctx, ctx.line('shSort'), { delay: 600 });
-    return { update: sync, unmount: cancel };
+    return { update: sync, frame(c) { qc.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
   },
 };
 

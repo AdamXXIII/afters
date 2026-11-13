@@ -66,7 +66,7 @@ const reveal = {
       const lone = g.pids.length === 1;
       const el = h(`div.sh-grp${herd ? '.herd' : ''}${lone ? '.lone' : ''}`, { style: { '--tilt': '0deg' } },
         answerCard(g.text, { cls: herd ? '.herd' : '', seed, key: g.gid }),
-        h('div.sh-grp-who', g.pids.map((id, i) => h('span.sh-grp-p', { style: { '--i': i } }, disc(ctx.player(id), { size: herd ? 34 : 28 }), h('span.nm', nameOf(ctx, id))))),
+        h(`div.sh-grp-who${g.pids.length > 3 ? '.two' : ''}`, g.pids.map((id, i) => h('span.sh-grp-p', { style: { '--i': i } }, disc(ctx.player(id), { size: herd ? 34 : 28 }), h('span.nm', nameOf(ctx, id))))),
         h(`span.sh-grp-n${herd ? '.big' : ''}`, String(g.pids.length)),
         herd ? h('span.sh-stamp', 'Same here! +1') : null,
         g.also?.length ? h('span.sh-also', `Counted with: ${g.also.join(', ')}`) : null);

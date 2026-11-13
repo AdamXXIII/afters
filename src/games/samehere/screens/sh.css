@@ -68,6 +68,9 @@
 .sh-qcard.long .sh-q { font-size: 24px; }
 .sh-qcard.xlong .sh-q { font-size: 21px; }
 .sh-qcard.compact { padding: 8px 14px 11px; }
+.sh-qcard.timed { padding-right: 112px; }
+.sh-qcard .timer { position: absolute; right: 56px; top: 6px; width: 48px; height: 48px; box-shadow: none; background: transparent; }
+.sh-qcard .timer .num { font-size: 17px; }
 .sh-qcard.compact .sh-q { font-size: 22px; margin-top: 5px; }
 .sh-qcard.compact.long .sh-q { font-size: 20px; }
 .sh-qcard.compact.xlong .sh-q { font-size: 18px; }
@@ -159,7 +162,8 @@
 .sh-grp .sh-ans-t { font-size: 25px; }
 .sh-grp .sh-ans.long .sh-ans-t { font-size: 21px; }
 .sh-grp-who { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 0; }
-.sh-grp-p { display: inline-flex; align-items: center; gap: 5px; font: 650 14px/1 var(--f-ui); }
+.sh-grp-who.two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 6px; }
+.sh-grp-p { min-width: 0; display: inline-flex; align-items: center; gap: 5px; font: 650 14px/1 var(--f-ui); }
 .sh-grp-p .nm { max-width: 8ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sh-grp.on .sh-grp-p { animation: shHop 460ms calc(220ms + var(--i) * 70ms) var(--ease-out-back) both; }
 @keyframes shHop { 0% { transform: translateY(14px) scale(.6); opacity: 0; } 70% { transform: translateY(-3px); opacity: 1; } 100% { transform: none; opacity: 1; } }
@@ -168,7 +172,7 @@
 .sh-grp.chairhit { background: rgba(122,30,44,.92); box-shadow: 0 0 0 2px #C0485A, 0 10px 22px rgba(20,8,5,.4); }
 .sh-also { grid-column: 1 / -1; margin: -2px 0 0 4px; font: italic 600 13px var(--f-display); color: rgba(251,244,234,.75); }
 /* the herd: the big pile, stamped */
-.sh-grp.herd { grid-template-columns: minmax(0, 50%) 1fr auto; padding: 10px 12px 12px 8px; margin-top: 4px; background: var(--teal); box-shadow: 0 4px 0 var(--teal-lip), 0 18px 34px rgba(10,4,2,.45); }
+.sh-grp.herd { grid-template-columns: minmax(0, 42%) 1fr auto; padding: 18px 12px 12px 8px; margin-top: 4px; background: var(--teal); box-shadow: 0 4px 0 var(--teal-lip), 0 18px 34px rgba(10,4,2,.45); }
 .sh-grp.herd.on { animation: shThump 520ms var(--ease-out-back) both; }
 @keyframes shThump { 0% { transform: scale(.85); } 60% { transform: scale(1.04); } 100% { transform: none; } }
 .sh-grp.herd .sh-ans { min-height: 56px; }
@@ -176,7 +180,7 @@
 .sh-grp.herd .sh-ans.long .sh-ans-t { font-size: 27px; }
 .sh-grp-n.big { min-width: 44px; height: 44px; background: var(--c-linen); color: var(--teal-ink); font-size: 22px; }
 .sh-stamp {
-  position: absolute; right: 10px; top: -16px; padding: 5px 12px 4px; border-radius: 8px;
+  position: absolute; left: 14px; top: -16px; padding: 5px 12px 4px; z-index: 2; border-radius: 8px;
   border: 2.5px solid var(--c-linen); background: var(--c-claret); color: var(--c-linen);
   font: 900 italic 18px/1 var(--f-display); letter-spacing: .01em; transform: rotate(-5deg);
   box-shadow: 0 6px 14px rgba(20,8,5,.45);

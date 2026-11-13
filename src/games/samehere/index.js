@@ -5,6 +5,7 @@
 // AI-generated (Claude, Same Here builder, 2026-11-13).
 import { SameHereHost } from './host.js';
 import { QUESTIONS } from './content/questions.js';
+import { close } from './group.js';
 
 const STEPS = [
   'A question. Everyone secretly writes one answer.',
@@ -81,11 +82,12 @@ export default {
           const votes = { ...(mine().votes || {}) };
           for (const d of ds) {
             if (votes[d.id] !== undefined) continue;
-            votes[d.id] = rng() < 0.62;
+            const ta = p.groups.find((g) => g.gid === d.a)?.text; const tb = p.groups.find((g) => g.gid === d.b)?.text;
+            votes[d.id] = rng() < (close(ta, tb) ? 0.75 : 0.15);
             client.act('sh-vote', { id: d.id, same: votes[d.id] }, { votes: { ...votes } });
           }
           // now and then a bot claims two answers are the same
-          if (!ds.length && p.groups.length >= 3 && rng() < 0.35) {
+          if (!ds.length && p.groups.length >= 3 && rng() < 0.12) {
             const [a, b] = p.groups.slice().sort(() => rng() - 0.5);
             client.act('sh-propose', { a: a.gid, b: b.gid }, { votes });
           }
