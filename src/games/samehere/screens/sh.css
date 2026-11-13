@@ -327,3 +327,8 @@
 .sh-grp.herd > .sh-also { grid-column: 1 / -1; }
 .sh-grp.herd .sh-grp-p .nm { max-width: 10ch; }
 @media (orientation: landscape) and (max-height: 600px) { .sh-grp.herd { row-gap: 4px; margin-top: 12px; } }
+.sh-art-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sh-art-q { font: italic 650 16px/20px var(--f-display); color: var(--c-linen); }
+.sh-grp-chair { position: absolute; right: 52px; top: 50%; margin-top: -19px; opacity: 0; transform: translateY(-30px) scale(.6); transition: opacity 200ms, transform 520ms var(--ease-out-back); }
+.sh-grp.chairhit .sh-grp-chair { opacity: 1; transform: none; }
+.sh-grp-chair .ch-wood { stroke: #F1D7A6; } .sh-grp-chair .ch-seat { fill: var(--c-brass); stroke: #7A5A1C; }

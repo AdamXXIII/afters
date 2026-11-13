@@ -110,7 +110,7 @@ const sort = {
     const list = h('div.sh-disputes');
     const picker = h('div.sh-pairs');
     const pickHint = h('div.sh-pairs-l');
-    const done = button('Show the answers', { e2e: 'sh-done', onClick: () => {
+    const done = button('I’m ready', { e2e: 'sh-done', onClick: () => {
       const now = !ctx.mine.game.done;
       ctx.client.act('sh-done', { done: now }, { done: now });
     } });
@@ -162,7 +162,7 @@ const sort = {
       const ds = (c.progress.disputes || []).map((d) => ({ ...d, a: textOf(d.a), b: textOf(d.b) }));
       head.replaceChildren(
         h('div.sh-title', ds.length ? 'Same answer?' : 'Any two answers the same?'),
-        ...(ds.length ? [] : [h('div.sh-sub', 'Tap both. The table votes.')]));
+        h('div.sh-sub', ds.length ? 'Vote. Most votes decide. Argue out loud.' : 'Tap both. The table then votes.'));
       if (!ds.length) pairbox.classList.remove('closed');
       for (const d of ds) {
         if (!rows.has(d.id)) { const r = row(d); rows.set(d.id, r); list.append(r); }
@@ -180,8 +180,8 @@ const sort = {
       const full = ds.length >= (p.maxDisputes || 5);
       picker.parentElement.classList.toggle('off', full);
       const dn = c.players.filter((pl) => c.progress.done[pl.id]).length;
-      doneN.textContent = `${dn} of ${c.players.length} ready to see the answers`;
-      done.textContent = c.mine.game.done ? 'Wait, still arguing' : 'Show the answers';
+      doneN.textContent = `Answers show when everyone’s ready (${dn} of ${c.players.length})`;
+      done.textContent = c.mine.game.done ? 'Wait, still arguing' : 'I’m ready';
       done.classList.toggle('btn-secondary', !!c.mine.game.done);
     };
     sync(ctx);
