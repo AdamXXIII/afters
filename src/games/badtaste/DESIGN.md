@@ -45,3 +45,8 @@ Everyone is the Critic once (twice at 3 or 4 players). The last regular round is
 | Whole game, 3 players | 5 (Quiplash 7, CAH 4) | 5 | 5 (beats CAH 3, Quiplash 6) | stopped; gap: the Critic is kingmaking between two known rivals |
 | Whole game, 8 players | 6 (CAH 7) | 7 (CAH 7) | 7 (CAH 6, Quiplash 8) | beats CAH; gap: one crown a round makes the standings close to luck (double last round and deciders help) |
 | Tired first-timer | 3 NO of 8 | 3 NO | 2 NO (win panel, two-card pill), both fixed after | |
+
+## Lead's fix round (2026-11-13)
+- Judging: the prompt shows once. The card up top is a header (Critic, round, clock); the line with the card in the blank lives in the hero below. Blind vs Quiplash 3: **ours 8 v 5**.
+- Reveal in two beats: the crowned answer alone and big, with "<Critic> crowned", the rosette and the player; then the whole line, who played the rest and the crowns so far. Blind vs Quiplash 3: **ours 8 v 7** (gap: some empty space above the moment).
+- `dish: 'badtaste'` (art on box-v2).
