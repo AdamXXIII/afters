@@ -58,7 +58,7 @@ export default {
     'seconds-turn': { match: (e) => e.phase.id === 'seconds-turn', t: 1800 },
     'seconds-turn-two': { match: (e) => e.phase.id === 'seconds-turn' && e.phase.payload.two, t: 1800 },
     'seconds-task': { match: (e, me) => e.phase.id === 'seconds-task' && !isFaker(e, me), me: 'idle', bots: 'some', t: 4000 },
-    'seconds-task-faker': { match: (e, me) => e.phase.id === 'seconds-task' && isFaker(e, me) && e.phase.payload.task === 1, me: 'idle', bots: 'some', t: 4000 },
+    'seconds-task-faker': { match: (e, me) => e.phase.id === 'seconds-task' && isFaker(e, me), me: 'idle', bots: 'some', t: 4000 },
     'seconds-count': { match: (e) => e.phase.id === 'seconds-count', t: (ph) => ph.payload.beats.two + 200 },
     'seconds-count-now': { match: (e) => e.phase.id === 'seconds-count', t: (ph) => ph.payload.beats.now + 500 },
     'seconds-vote': { match: (e, me) => e.phase.id === 'seconds-vote' && !isFaker(e, me), me: 'idle', bots: 'some', t: 6000 },
