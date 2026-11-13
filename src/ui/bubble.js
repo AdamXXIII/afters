@@ -28,6 +28,18 @@ const CSS = `
   border-radius: 0 0 14px 0; background: radial-gradient(circle at 50% 62%, #FFF4D6 0 3px, #FFC86B 4px 6px, #E2553B 7px 8px, transparent 9px), var(--c-claret);
   clip-path: none; }
 #bubbles .bubble.detached { padding-left: 30px; }
+/* input strip: pinned in CSS (components.css, landscape.css). Let it grow to its text (fixed heights
+   came from a different measured width, and a 3-line line spilled), drop the flame badge (the strip's
+   12 px padding put it over the first letter), and point a real tail at Cyril instead. */
+body[data-layout="input"] #bubbles .bubble { height: auto !important; }
+body[data-layout="input"] #bubbles .bubble.detached { padding-left: 12px; }
+body[data-layout="input"] #bubbles .bubble.detached::before { display: none; }
+body[data-layout="input"]:not(.land) #bubbles .bubble::after { display: block; width: 18px; height: 26px; left: -15px; bottom: auto; top: 6px; clip-path: path('M18 0 L18 26 C 14 18, 8 10, 0 4 C 8 6, 13 5, 18 0 Z'); }
+body.land[data-layout="input"] #bubbles .bubble::after { display: block; left: calc(50% - 13px); right: auto; top: auto; bottom: -15px; width: 26px; height: 18px; clip-path: path('M0 0 L26 0 C 18 4, 10 10, 4 18 C 6 10, 5 5, 0 0 Z'); }
+/* anywhere else the badge stays: keep the text clear of it whatever padding a layout sets */
+#bubbles .bubble.detached:not(.tiny) { padding-left: 32px !important; }
+#bubbles .bubble.detached.tiny { padding-left: 30px !important; }
+body[data-layout="input"] #bubbles .bubble.detached { padding-left: 12px !important; }
 .bubble-measure { position: absolute !important; visibility: hidden !important; left: -9999px !important; top: 0 !important; animation: none !important; height: auto !important; }
 `;
 
@@ -188,7 +200,15 @@ export class Bubbles {
     const layout = document.body.dataset.layout;
     const roots = ['show', 'topbar', 'strip', 'rail'].map((id) => document.getElementById(id));
     if (layout !== 'show') roots.push(document.getElementById('sheet-body'));
-    try { return contentRects(roots, { maxFrac: 0.5 }); } catch (e) { return []; }
+    let rects = [];
+    try { rects = contentRects(roots, { maxFrac: 0.5 }); } catch (e) { rects = []; }
+    // Landscape: the right-hand sheet holds the game's own pills, dials and buttons. Treat the whole
+    // column as taken so Cyril's line stays over the stage column (scenery, his body) instead.
+    if (document.body.classList.contains('land') && layout !== 'show') {
+      const r = document.getElementById('sheet')?.getBoundingClientRect();
+      if (r && r.width > 4) rects.push({ x: r.left, y: r.top, w: r.width, h: r.height, weight: 1.2, el: null });
+    }
+    return rects;
   }
 
   /** Every candidate spot for every size, scored; lowest score wins. */
