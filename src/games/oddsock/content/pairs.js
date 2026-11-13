@@ -248,10 +248,10 @@ Commute|School run
 In-laws|Neighbours
 Parents' evening|School play
 Funeral|Wake
-Will|Prenup
+Will|Life insurance
 Midlife crisis|Retirement
 Sports car|Motorbike
-Tattoo|Piercing
+Tattoo|Hair dye
 Casino|Bookies
 Lottery ticket|Scratchcard
 Poker|Blackjack
@@ -292,8 +292,8 @@ Bank holiday|Sick day
 Pension pot|ISA
 Invoice|Expenses claim
 Spreadsheet|PowerPoint
-Out of office|Annual leave
-Reply all|CC
+Annual leave|Sabbatical
+Reply all|Forward
 Performance review|Disciplinary
 Middle manager|Team leader
 HR|Payroll
@@ -313,13 +313,13 @@ Toddler|Teenager
 Nursery|After-school club
 Wedding list|Baby shower
 Taxi home|Walk home
-Phone at 1%|Lost keys
+Lost keys|Lost phone
 Last orders|Closing time
 Dance floor|Mosh pit
 Hungover Sunday|Lazy Sunday
 6am alarm|Snooze button
-Ex|Old boss
-Mother-in-law|Landlady
+Ex|Old flatmate
+Mother-in-law|Stepmum
 Family WhatsApp|Work WhatsApp
 Boxing Day|New Year's Day
 Seating plan|Guest list
@@ -333,13 +333,13 @@ Wedding fund|House deposit
 Student loan|Car loan
 Gap year|Career break
 Payslip|Bank statement
-Overtime|Weekend working
+Overtime|Commission
 Freelancer|Contractor
 Startup|Side hustle
 Crypto|Premium Bonds
 Stock market|Fantasy football
 Landlord|Letting agent
-Moving house|Packing for holiday
+Moving house|Moving office
 Removal van|Skip
 Car boot sale|Jumble sale
 Flatmate|Lodger
@@ -353,9 +353,9 @@ Referee|Linesman
 Tax return|Census form
 Jobcentre|Post office queue
 GP waiting room|Dentist waiting room
-Fire alarm test|Fire drill
-Smoke alarm|Baby monitor
-Taxi rank|Bus stop
+Fire drill|First aid course
+Smoke alarm|Burglar alarm
+Bus stop|Train platform
 Uber|Black cab
 Gym membership|Personal trainer
 Marathon|Tough Mudder
@@ -364,10 +364,10 @@ Christmas jumper|Onesie
 Leaving card|Birthday card
 Group photo|Selfie
 School reunion|Class WhatsApp
-Pension|Savings account
+Savings account|Christmas club
 Promotion|New job
 Railcard|Oyster card
-Learner driver|Taxi driver
+Learner driver|Delivery driver
 Speed bump|Pothole
 Traffic jam|Roadworks
 Boy band|Girl band

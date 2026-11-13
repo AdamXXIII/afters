@@ -213,6 +213,9 @@
 .os-reveal.flipped .os-truth { display: flex; animation: osFlip 520ms var(--ease-out-back) both; }
 @keyframes osFlip { from { opacity: 0; transform: perspective(600px) rotateX(-70deg); } to { opacity: 1; transform: none; } }
 .os-truth.caught { background: rgba(226,85,59,.12); box-shadow: inset 0 0 0 2px rgba(226,85,59,.55); }
+.os-truth.again { background: rgba(122,74,42,.08); box-shadow: inset 0 0 0 2px rgba(122,74,42,.35); }
+.os-truth.again .os-truth-h { color: var(--c-toffee); }
+.os-outnote { padding: 16px; border-radius: 18px; background: var(--c-tablecloth); font-size: 17px; line-height: 23px; text-align: center; color: var(--c-ink); }
 .os-truth.escaped { background: rgba(62,142,138,.12); box-shadow: inset 0 0 0 2px rgba(62,142,138,.55); }
 .os-truth-sock { flex: none; width: 52px; height: 66px; transform: rotate(10deg); }
 .os-truth-av { position: relative; flex: none; }

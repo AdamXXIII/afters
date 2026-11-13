@@ -53,7 +53,7 @@ export function nameTape(word, { size = 'big', label = 'Your word', cls = '' } =
 export function header(ctx, { title, line, timer = true, tone = '' } = {}) {
   const p = ctx.payload || {};
   const t = timer ? timerRing() : null;
-  const badge = p.round ? h(`span.os-badge${p.final ? '.x2' : ''}`, p.final ? 'Last round · ×2' : `Round ${p.round} of ${p.rounds}`) : null;
+  const badge = p.round ? h(`span.os-badge${p.final ? '.x2' : ''}`, `${p.final ? 'Last round · ×2' : `Round ${p.round} of ${p.rounds}`}${p.laps > 1 && p.lap ? ` · clues lap ${p.lap} of ${p.laps}` : ''}`) : null;
   const el = h(`div.os-head${tone ? `.${tone}` : ''}`,
     h('div.os-head-row', t, h('div.os-head-t', badge, h('div.os-title', title), line ? h('div.os-line', line) : null)));
   el.timer = t;
@@ -76,7 +76,6 @@ export function washingLine(ctx, { order, turn = -1, lap = 1, laps = 1 } = {}) {
       h('span.nm', you(ctx, id)));
   });
   return h('div.os-line-wrap',
-    laps > 1 ? h('div.os-lap', `Clues: lap ${lap} of ${laps}`) : null,
     h('div.os-washing', { style: { '--n': n } }, h('span.os-rope'), h('div.os-pegs', items)));
 }
 

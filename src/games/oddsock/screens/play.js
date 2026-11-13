@@ -103,10 +103,11 @@ const vote = {
   shot: 'vote',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const hd = header(ctx, { title: 'Who’s the Odd Sock?', line: 'Argue out loud. Votes show live.', tone: 'claret' });
+    const hd = header(ctx, { title: (p.out || []).length ? 'Vote again' : 'Who’s the Odd Sock?', line: 'Argue out loud. Votes show live.', tone: 'claret' });
     const tl = tally(ctx, p.order);
     show.append(h('div.os-top', hd, tl));
-    const btns = p.order.filter((id) => id !== ctx.meId).map((id) => {
+    const out = (p.out || []).includes(ctx.meId);
+    const btns = out ? [] : p.order.filter((id) => id !== ctx.meId).map((id) => {
       const b = nameBtn(ctx, id);
       onTap(b, () => {
         const to = ctx.mine.game.vote === id ? null : id;
@@ -117,7 +118,7 @@ const vote = {
     const hint = h('div.os-hint');
     sheet.append(h(`div.os-sheet.os-votesheet.os-in${btns.length > 5 ? '.many' : ''}`,
       h('div.os-voterow', h('div.os-ask', 'Vote for the Odd Sock'), nameTape(ctx.priv?.word, { size: 'small', label: 'Yours' })),
-      h('div.os-picks', btns),
+      out ? h('div.os-outnote', h('b', 'You’re out of this vote.'), ' The table got it wrong about you. Watch them try again.') : h('div.os-picks', btns),
       hint));
     const sync = (c) => {
       const votes = c.progress.votes || {};
@@ -125,7 +126,7 @@ const vote = {
       const mine = c.mine.game.vote !== undefined ? c.mine.game.vote : votes[c.meId] ?? null;
       for (const b of btns) b.setAttribute('aria-pressed', String(b.dataset.id === mine));
       const n = Object.keys(votes).length;
-      hint.textContent = mine ? `Voted ${nameOf(c, mine)}. Change it any time. ${n} of ${c.players.length} voted.` : `You can’t vote for yourself. ${n} of ${c.players.length} voted.`;
+      hint.textContent = out ? '' : mine ? `Voted ${nameOf(c, mine)}. Change it any time. ${n} of ${c.players.length} voted.` : `You can’t vote for yourself. ${n} of ${c.players.length} voted.`;
       hint.classList.toggle('locked', !!mine);
     };
     sync(ctx);

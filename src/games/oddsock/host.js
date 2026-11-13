@@ -67,7 +67,10 @@ export class OddSockHost {
         if (r.turn + 1 < r.order.length * r.laps) { r.turn += 1; return this._clue(); }
         return this._vote();
       case 'oddsock-vote': return this._reveal();
-      case 'oddsock-reveal': return r.caught ? this._guess() : this._round();
+      case 'oddsock-reveal':
+        if (r.caught) return this._guess();
+        if (r.again) { this._relap(); return this._clue(); }
+        return this._round();
       case 'oddsock-guess': return this._round();
       case 'oddsock-round':
         if (this.i + 1 < this.rounds.length) { this.i += 1; return this._word(); }
@@ -81,6 +84,7 @@ export class OddSockHost {
     if (!r) return connected;
     if (phaseId === 'oddsock-clue') return connected.filter((p) => p.id === this._speaker());
     if (phaseId === 'oddsock-guess') return connected.filter((p) => p.id === r.sock);
+    if (phaseId === 'oddsock-vote') return connected.filter((p) => !r.out?.includes(p.id));
     return connected;
   }
 
@@ -102,9 +106,9 @@ export class OddSockHost {
         this.api.progress();
         return;
       case 'os-vote': {
-        if (ph !== 'oddsock-vote') return;
+        if (ph !== 'oddsock-vote' || r.out.includes(p.id)) return;
         const to = msg.to ?? null;
-        if (to !== null && (to === p.id || !this.api.player(to))) return;
+        if (to !== null && (to === p.id || !this.api.player(to) || r.out.includes(to))) return;
         if (to === null) delete r.votes[p.id];
         else r.votes[p.id] = to;
         this.api.progress();
@@ -142,11 +146,19 @@ export class OddSockHost {
     if (ids[start] === r.sock) start = (start + 1) % ids.length;
     r.order = ids.slice(start).concat(ids.slice(0, start));
     r.laps = lapsFor(ids.length);
-    Object.assign(r, { ready: {}, said: {}, votes: {}, turn: 0, guess: null, caught: false, accused: null });
+    Object.assign(r, { ready: {}, said: {}, votes: {}, turn: 0, guess: null, caught: false, accused: null, out: [], again: false });
     api.enter('oddsock-word', OS.word, { ...this._base(), order: r.order }, {
       priv: (p) => ({ word: p.id === r.sock ? r.odd : r.common }),
       progress: () => ({ done: this._doneMap((p) => !!r.ready[p.id]), counts: {} }),
     });
+  }
+
+  /** After a wrong accusation: one more lap with whoever is left (never starting on the sock). */
+  _relap() {
+    const r = this.r;
+    let left = r.order.filter((id) => !r.out.includes(id));
+    if (left[0] === r.sock) left = left.slice(1).concat(left[0]);
+    Object.assign(r, { order: left, laps: 1, turn: 0, said: {}, again: false });
   }
 
   _speaker() { const r = this.r; return r.order?.[r.turn % r.order.length]; }
@@ -165,9 +177,10 @@ export class OddSockHost {
 
   _vote() {
     const r = this.r;
-    this.api.enter('oddsock-vote', OS.vote, { ...this._base(), order: r.order }, {
+    r.votes = {};
+    this.api.enter('oddsock-vote', OS.vote, { ...this._base(), order: r.order, out: r.out.slice() }, {
       priv: (p) => ({ word: p.id === r.sock ? r.odd : r.common }),
-      progress: () => ({ done: this._doneMap((p) => !!r.votes[p.id]), counts: {}, votes: { ...r.votes } }),
+      progress: () => ({ done: this._doneMap((p) => r.out.includes(p.id) || !!r.votes[p.id]), counts: {}, votes: { ...r.votes } }),
     });
   }
 
@@ -176,9 +189,10 @@ export class OddSockHost {
     const api = this.api;
     if (this.rig?.catch) for (const p of api.players) if (p.id !== r.sock) r.votes[p.id] = r.sock;
     if (this.rig?.miss) {
-      const inno = api.players.filter((p) => p.id !== r.sock).map((p) => p.id);
-      for (const p of api.players) r.votes[p.id] = p.id === inno[0] ? inno[1] : inno[0];
-      r.votes[inno[2] || inno[1]] = r.sock;
+      const inno = r.order.filter((id) => id !== r.sock);
+      r.votes = {};
+      for (const id of r.order) r.votes[id] = id === inno[0] ? inno[1] : inno[0];
+      if (inno[2]) r.votes[inno[2]] = r.sock;
     }
     const counts = {};
     for (const to of Object.values(r.votes)) counts[to] = (counts[to] || 0) + 1;
@@ -187,6 +201,9 @@ export class OddSockHost {
     r.accused = top > 0 && leaders.length === 1 ? leaders[0] : null;
     r.tie = leaders.length > 1;
     r.caught = r.accused === r.sock;
+    // wrong sock: they drop off the line and the rest go again, until only three are left
+    r.again = !!r.accused && !r.caught && r.order.length - 1 >= 3;
+    if (r.accused && !r.caught) r.out.push(r.accused);
     // the votes, one by one: biggest pile last so the drama builds
     const order = Object.entries(r.votes).sort((a, b) => (counts[a[1]] - counts[b[1]]) || (a[0] < b[0] ? -1 : 1));
     const at = order.map((_, k) => api.dur(BEAT.first + k * BEAT.perVote));
@@ -195,7 +212,7 @@ export class OddSockHost {
     api.enter('oddsock-reveal', flipAt + api.dur(BEAT.tail), {
       ...this._base(), votes: order.map(([from, to]) => ({ from, to })), at, stampAt, flipAt,
       accused: r.accused, tie: r.tie, leaders: r.tie ? leaders : [], caught: r.caught,
-      sock: r.sock, oddWord: r.odd,
+      sock: r.again ? null : r.sock, oddWord: r.again ? null : r.odd, again: r.again, left: r.again ? r.order.length - 1 : null, out: r.out.slice(),
     });
   }
 
@@ -225,7 +242,7 @@ export class OddSockHost {
     api.addScores(deltas);
     api.enter('oddsock-round', OS.round, {
       ...this._base(), outcome, sock: r.sock, common: r.common, odd: r.odd, guess: r.guess, right,
-      accused: r.accused, tie: r.tie, votes: { ...r.votes }, deltas, rows: this._rows(), last: this.i === this.rounds.length - 1,
+      accused: r.accused, tie: r.tie, out: r.out.slice(), votes: { ...r.votes }, deltas, rows: this._rows(), last: this.i === this.rounds.length - 1,
     });
   }
 
