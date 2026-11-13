@@ -28,15 +28,21 @@ function botAnswer(q, rating, rng) {
   if (roll < 0.35) return pick.toLowerCase();
   return pick;
 }
-/** Demo helper: make sure the sort screen has a close call on it to argue about. */
+/** Demo helper: seed a close call ("Sherlock Holmes" vs "Holmes") so the sort screen shows up. */
 const sortDemo = (e) => {
-  if (e.phase.id !== 'samehere-sort') return false;
   const h = e.game?.host; const r = h?.cur;
-  if (r && !r.disputes.length && r.groups.length >= 2) {
-    r.disputes.push({ id: 'd0', a: r.groups[0].gid, b: r.groups[1].gid, by: null, votes: {} });
-    h.api.progress();
+  if (e.phase.id === 'samehere-write' && r && !r.seeded) {
+    const multi = (r.q.answers || []).find((a) => a.includes(' '));
+    const ps = e.players.slice(-2);
+    if (multi && ps.length === 2) {
+      r.answers[ps[0].id] = multi;
+      r.answers[ps[1].id] = multi.split(' ').pop();
+      r.fixed = new Set(ps.map((x) => x.id));
+      r.seeded = true;
+    }
+    return false;
   }
-  return true;
+  return e.phase.id === 'samehere-sort';
 };
 const stepAt = (kind, plus, fallback = 2000) => (p) => {
   const s = p.payload.steps.filter((x) => x.kind === kind);

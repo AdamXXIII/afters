@@ -51,7 +51,7 @@ export class SameHereHost {
       case 'sh-answer': {
         if (ph !== 'samehere-write') return;
         const t = this.api.clean(msg.text, SH.max);
-        if (!t) return;
+        if (!t || r.fixed?.has(p.id)) return; // r.fixed: answers pinned by the sort demo
         r.answers[p.id] = t;
         this.api.ack(p);
         this.api.progress();
