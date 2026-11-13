@@ -310,7 +310,6 @@
 .bt-picklist.n7 .bt-pick-t { font-size: 15px; line-height: 1.1; }
 .bt-picklist.n7 .bt-pick-n { width: 24px; height: 24px; line-height: 24px; font-size: 13px; }
 .bt-picklist.n7 .bt-pick-tick { width: 24px; height: 24px; }
-.bt-win.many .bt-prompt.win .bt-ptext { font-size: 24px; }
 @media (orientation: landscape) and (max-height: 600px) {
   .bt-win .bt-rest { display: none; }
   .bt-owner { margin-top: 14px; padding: 8px 10px; gap: 10px; }
@@ -334,3 +333,8 @@
   .bt-prompt.win .bt-ptext, .bt-win.s-rest .bt-prompt.win .bt-ptext { font-size: 21px; }
   .bt-prompt.win.long .bt-ptext, .bt-prompt.win.xlong .bt-ptext { font-size: 18px; }
 }
+
+.bt-mine.two { display: flex; flex-direction: column; gap: 10px; }
+.bt-mine.two .bt-card.big { min-height: 96px; padding: 12px 16px 22px; }
+.bt-mine.two .bt-card.big .bt-card-t { font-size: 22px; }
+.bt-mine.two .bt-card:last-child { --tilt: -1.5deg; }

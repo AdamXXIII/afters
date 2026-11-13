@@ -157,7 +157,7 @@ const played = {
     const p = ctx.payload;
     const seed = ctx.phase?.seed || 1;
     const mineList = ctx.mine.game.list || [];
-    const text = mineList.length > 1 ? mineList.map((x) => x.text).join(' / ') : ctx.mine.game.played || '';
+    const text = ctx.mine.game.played || '';
     const out = p.decider && !p.tied?.includes(ctx.meId);
     if (out) {
       const pc = promptCard(ctx, p);
@@ -170,12 +170,14 @@ const played = {
       const cancel = sayLater(ctx, ctx.line('btDecider'), { delay: 600 });
       return { update: (c) => row.sync(c), frame(c) { pc.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
     }
-    const pc = promptCard(ctx, p, { answer: text || null });
+    const pc = promptCard(ctx, p, { answer: mineList.length > 1 ? null : text || null });
     const row = playedRow(ctx, others(ctx));
     show.append(h('div.bt-top', pc, row));
     sheet.append(h('div.bt-sheet.bt-playedsheet',
-      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', `Face down. ${nameOf(ctx, p.critic)} won’t know it’s yours.`)),
-      h('div.bt-mine', cardBack({ cls: '.under', seed, key: 'u1' }), answerCard(text || 'Played', { cls: '.big.mine', seed, key: 'mine' }))));
+      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', `Face down. ${nameOf(ctx, p.critic)} won’t know ${mineList.length > 1 ? 'they’re' : 'it’s'} yours.`)),
+      mineList.length > 1
+        ? h('div.bt-mine.two', mineList.map((x, i) => answerCard(x.text, { cls: '.big.mine', seed, key: `mine${i}` })))
+        : h('div.bt-mine', cardBack({ cls: '.under', seed, key: 'u1' }), answerCard(text || 'Played', { cls: '.big.mine', seed, key: 'mine' }))));
     const cancel = sayLater(ctx, ctx.line('btPlayed'), { delay: 600 });
     return { update: (c) => row.sync(c), frame(c) { pc.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
   },
