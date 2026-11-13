@@ -96,6 +96,7 @@ export default {
       osCaught: [['Caught! {name} was the Odd Sock.'], ['There it is. {name}, you don’t match.']],
       osWrong: [['Wrong sock. {name} was perfectly normal. Rude.'], ['Not {name}. The real Odd Sock is still sitting there, smiling.']],
       osWrongYou: [['They picked you. You were perfectly normal. Rude.'], ['Wrong sock. You were innocent all along.']],
+      osAgainYou: [['Wrong sock. You’re out. Sit back and judge them.']],
       osAgain: [['Wrong sock. {name} is out. Round again, the rest of you.'], ['Not {name}. The Odd Sock is still in there. Another lap.']],
       osTie: [['A tie. Nobody leaves the wash.']],
       osGuess: [['{name} gets one guess at your word. Faces like stone, please.'], ['Quiet. {name} is working it out.']],

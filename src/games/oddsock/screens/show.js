@@ -103,7 +103,7 @@ const reveal = {
           if (p.sock === c.meId) c.haptic('fooled');
         }
         c.cyril.react(p.caught ? 'delight' : 'shock', { duration: c.frozen ? 60000 : 1400 });
-        const line = p.again ? c.line('osAgain', { name: you(c, accused) }) : p.caught ? c.line('osCaught', { name: you(c, p.sock) }) : accused ? (accused === c.meId ? c.line('osWrongYou') : c.line('osWrong', { name: nameOf(c, accused) })) : c.line('osEscaped', { name: sockName });
+        const line = p.again ? (accused === c.meId ? c.line('osAgainYou') : c.line('osAgain', { name: nameOf(c, accused) })) : p.caught ? c.line('osCaught', { name: you(c, p.sock) }) : accused ? (accused === c.meId ? c.line('osWrongYou') : c.line('osWrong', { name: nameOf(c, accused) })) : c.line('osEscaped', { name: sockName });
         cancel = sayLater(c, line, { delay: c.frozen ? 0 : 500, hold: 2600 });
       }
     };
