@@ -52,7 +52,7 @@ const stepAt = (kind, plus, fallback = 2000) => (p) => {
 export default {
   id: 'samehere',
   title: 'Same Here',
-  dish: 'seconds',        // menu illustration (src/screens/menu-art.js); see dishArt for a dish of its own
+  dish: 'teacups',        // menu illustration (src/screens/menu-art.js)
   dishArt: 'Four matching teacups in a row on a doily, a fifth odd one (a chipped willow-pattern cup) perched on a tiny wobbly bentwood chair, one leg short, tilted.',
   mood: ['loud', 'talky', 'clever'],
   course: 'Seconds all round. Everyone has what they’re having.',

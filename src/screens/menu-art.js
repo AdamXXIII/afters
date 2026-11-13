@@ -170,6 +170,104 @@ const DISHES = {
     <text x="40" y="40" font-family="Fraunces Variable, Georgia, serif" font-weight="900" font-style="italic" font-size="24" fill="#7A1E2C" transform="rotate(-10 52 34)">eh?</text>
     <path d="M30 56 q 6 -4 12 0 t 12 0 t 12 0" stroke="#2F5D7C" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
 
+  // Many Happy Returns: a squat two-tier birthday cake, claret drip, five lit candles (one bent and
+  // smoking), a paper party hat leaning on the plate.
+  cake: () => `
+    ${plate(64)}
+    <path d="M36 92 V 70 h88 v22 c0 4 -88 4 -88 0z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M36 72 h88 v6 c-6 0 -6 8 -12 8 s-4 -8 -10 -8 s-6 10 -12 10 s-6 -10 -12 -10 s-6 8 -12 8 s-6 -8 -12 -8 s-6 6 -12 6 s-4 -6 -8 -6z" fill="#7A1E2C"/>
+    <path d="M50 70 V 52 h60 v18" fill="#FBF4EA" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M50 54 h60 v5 c-5 0 -5 6 -10 6 s-5 -6 -10 -6 s-5 8 -10 8 s-5 -8 -10 -8 s-5 6 -10 6 s-5 -6 -10 -6z" fill="#7A1E2C"/>
+    <path d="M36 70 h88" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#E0A526"><circle cx="46" cy="86" r="2"/><circle cx="66" cy="88" r="2"/><circle cx="96" cy="88" r="2"/><circle cx="114" cy="86" r="2"/></g>
+    <g stroke="${OUT}" stroke-width="2.2" stroke-linejoin="round">
+      <rect x="56" y="38" width="5" height="14" rx="1.5" fill="#2F5D7C"/>
+      <rect x="67" y="36" width="5" height="16" rx="1.5" fill="#E2553B"/>
+      <rect x="78" y="38" width="5" height="14" rx="1.5" fill="#7F9A74"/>
+      <rect x="89" y="36" width="5" height="16" rx="1.5" fill="#E0A526"/>
+      <path d="M100 52 v -8 q 0 -4 5 -6 l 3 -1" fill="none" stroke="#B5527E" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g fill="#FFC86B" stroke="#E2553B" stroke-width="1.4">
+      <path d="M58.5 35 c -3 -4 0 -8 0 -10 c 2 3 4 6 0 10z"/><path d="M69.5 33 c -3 -4 0 -8 0 -10 c 2 3 4 6 0 10z"/>
+      <path d="M80.5 35 c -3 -4 0 -8 0 -10 c 2 3 4 6 0 10z"/><path d="M91.5 33 c -3 -4 0 -8 0 -10 c 2 3 4 6 0 10z"/>
+    </g>
+    <path d="M110 34 q -4 -6 2 -10 q 6 -4 2 -10" stroke="#9A8A80" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/>
+    <path d="M124 96 l 10 -34 l 14 30z" fill="#2F5D7C" stroke="${OUT}" stroke-width="2.8" stroke-linejoin="round"/>
+    <path d="M129 80 l 13 -2 M126 89 l 18 -2" stroke="#FFC86B" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="134" cy="60" r="4" fill="#E2553B" stroke="${OUT}" stroke-width="2"/>`,
+
+  // Odd Sock: two teal striped socks crossed on a plate, an odd tomato one with cream spots over the rim.
+  socks: () => `
+    ${plate(64)}
+    ${[[34, 30, -8, '#FBF4EA', '#3E8E8A'], [62, 28, 6, '#FBF4EA', '#3E8E8A']].map(([x, y, r, fill, band]) => `
+      <g transform="translate(${x} ${y}) rotate(${r} 10 30)">
+        <path d="M0 0 h20 v34 c0 4 2 6 6 6 h12 c9 0 10 14 0 14 h-24 c-9 0 -14 -6 -14 -14z" fill="${fill}" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M0 6 h20 M0 13 h20" stroke="${band}" stroke-width="4"/>
+        <path d="M0 0 h20 v4 h-20z" fill="${band}" stroke="${OUT}" stroke-width="2.4"/>
+        <path d="M32 40 c 6 0 8 6 6 10" stroke="${band}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      </g>`).join('')}
+    <g transform="translate(108 40) rotate(22 10 30)">
+      <path d="M0 0 h20 v34 c0 4 2 6 6 6 h12 c9 0 10 14 0 14 h-24 c-9 0 -14 -6 -14 -14z" fill="#E2553B" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M0 0 h20 v4 h-20z" fill="#B83A24" stroke="${OUT}" stroke-width="2.4"/>
+      <g fill="#FBF4EA"><circle cx="6" cy="12" r="2.4"/><circle cx="14" cy="22" r="2.4"/><circle cx="6" cy="31" r="2.2"/><circle cx="20" cy="46" r="2.4"/><circle cx="31" cy="47" r="2"/></g>
+    </g>
+    <path d="M104 26 l 4 -8 M114 30 l 8 -6 M98 22 l -2 -8" stroke="#E0A526" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+
+  // Thermostat: a brass dial on a side plate: half-moon linen face with ticks, willow-to-tomato rim,
+  // an ink needle on a brass hub.
+  thermostat: () => `
+    ${plate(60)}
+    <defs><linearGradient id="th-rim" x1="0" x2="1"><stop offset="0" stop-color="#2F5D7C"/><stop offset=".5" stop-color="#E0A526"/><stop offset="1" stop-color="#E2553B"/></linearGradient></defs>
+    <path d="M30 86 a 50 50 0 0 1 100 0z" fill="#C89B3C" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M38 86 a 42 42 0 0 1 84 0" fill="none" stroke="url(#th-rim)" stroke-width="9"/>
+    <path d="M46 86 a 34 34 0 0 1 68 0z" fill="#FBF4EA" stroke="${OUT}" stroke-width="2.4"/>
+    <g stroke="${OUT}" stroke-width="2.2" stroke-linecap="round">
+      <path d="M52 86 h5 M103 86 h5 M80 58 v5 M60 66 l 4 4 M100 66 l -4 4"/>
+      <path d="M55 75 l 3 1.5 M105 75 l -3 1.5 M69 61 l 1.5 3 M91 61 l -1.5 3" stroke-width="1.6"/>
+    </g>
+    <path d="M80 84 L 98 62" stroke="${OUT}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="80" cy="84" r="6" fill="#C89B3C" stroke="${OUT}" stroke-width="2.6"/>
+    <path d="M36 82 q 2 -14 10 -24" stroke="#F3D58A" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+    <path d="M128 40 q 8 -4 12 -12 M134 50 l 10 -4 M22 44 q -2 -8 4 -14" stroke="#E2553B" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+
+  // Same Here: matching teacups in a row on a doily; one chipped willow-pattern cup tips off the end.
+  teacups: () => `
+    <ellipse cx="80" cy="104" rx="68" ry="10" fill="rgba(42,26,23,.28)"/>
+    <ellipse cx="80" cy="98" rx="68" ry="13" fill="#FBF4EA" stroke="${OUT}" stroke-width="2.6"/>
+    <ellipse cx="80" cy="97" rx="60" ry="9" fill="none" stroke="#D9C6A8" stroke-width="2.2" stroke-dasharray="3 4"/>
+    ${[20, 50, 80].map((x) => `
+      <path d="M${x} 62 h28 l -3 24 c -1 6 -21 6 -22 0z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M${x + 1} 70 h26" stroke="#3E8E8A" stroke-width="5"/>
+      <path d="M${x + 28} 66 c 9 0 9 12 -1 12" fill="none" stroke="${OUT}" stroke-width="3"/>
+      <ellipse cx="${x + 14}" cy="62" rx="14" ry="3" fill="#7A4A2A" stroke="${OUT}" stroke-width="2.2"/>
+      <path d="M${x + 10} 52 q 5 -6 0 -12 q -5 -6 0 -12" stroke="#FBF4EA" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".85"/>`).join('')}
+    <g transform="rotate(24 126 80)">
+      <path d="M112 60 h28 l -3 24 c -1 6 -21 6 -22 0z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M116 70 q 4 -4 8 0 t 8 0 M117 78 h18" stroke="#2F5D7C" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M140 64 c 9 0 9 12 -1 12" fill="none" stroke="${OUT}" stroke-width="3"/>
+      <path d="M121 60 l 4 6 l 4 -6" fill="#FBF4EA" stroke="${OUT}" stroke-width="2.2" stroke-linejoin="round"/>
+    </g>
+    <text x="134" y="44" font-family="Fraunces Variable, Georgia, serif" font-weight="900" font-style="italic" font-size="24" fill="#E0A526" stroke="${OUT}" stroke-width="1" paint-order="stroke">?</text>`,
+
+  // Bad Taste: a fanned hand of menu cards, the top one stamped in red.
+  badtaste: () => `
+    ${plate(62)}
+    <g stroke="${OUT}" stroke-width="2.8" stroke-linejoin="round">
+      <rect x="42" y="26" width="46" height="62" rx="5" fill="#F3E6CF" transform="rotate(-18 64 88)"/>
+      <rect x="56" y="22" width="46" height="62" rx="5" fill="#FBF4EA" transform="rotate(-4 78 84)"/>
+      <rect x="70" y="24" width="46" height="62" rx="5" fill="#FBF4EA" transform="rotate(12 94 86)"/>
+    </g>
+    <g transform="rotate(12 94 86)" stroke-linecap="round">
+      <path d="M78 34 h30" stroke="#7A1E2C" stroke-width="3"/>
+      <path d="M80 42 h26 M80 48 h22 M80 54 h24" stroke="#D9C6A8" stroke-width="2.2"/>
+      <g transform="rotate(-20 93 68)">
+        <ellipse cx="93" cy="68" rx="17" ry="10" fill="none" stroke="#E2553B" stroke-width="2.8"/>
+        <path d="M82 68 h22" stroke="#E2553B" stroke-width="3.2"/>
+      </g>
+    </g>
+    <path d="M60 34 h20 M62 42 h16" transform="rotate(-4 78 84)" stroke="#D9C6A8" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M128 30 l 8 -6 M132 42 l 10 -2 M124 20 l 2 -10" stroke="#E2553B" stroke-width="3" stroke-linecap="round"/>`,
+
   // Fallback for a new game that hasn't drawn its own dish yet: a covered plate.
   cloche: () => `
     ${plate(60)}
