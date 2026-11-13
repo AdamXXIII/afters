@@ -140,11 +140,11 @@ const banish = {
     const verdict = h('div.sp-verdict');
     if (p.banished) {
       const pois = p.role === 'poisoner';
-      verdict.append(
-        h('div.sp-vd-av', disc(ctx, p.banished, { size: 96 }), h('div.sp-stamp', 'Banished')),
+      verdict.append(...[
+        h('div.sp-vd-av', disc(ctx, p.banished, { size: 96, cls: '.keep' }), h('div.sp-stamp', 'Banished')),
         h('div.sp-vd-nm', nameOf(ctx, p.banished)),
         p.tie ? h('div.sp-vd-tie', `A tie between ${p.leaders.map((id) => nameOf(ctx, id)).join(' and ')}. Cyril drew a straw.`) : null,
-        h(`div.sp-rolecard.${pois ? 'pois' : 'faith'}`, h('div.sp-rc-q', 'They were…'), h('div.sp-rc-a', h('span.ic', { html: pois ? VIAL : SPOON }), pois ? 'a Poisoner' : 'Faithful')));
+        h(`div.sp-rolecard.${pois ? 'pois' : 'faith'}`, h('div.sp-rc-q', 'They were…'), h('div.sp-rc-a', h('span.ic', { html: pois ? VIAL : SPOON }), pois ? 'a Poisoner' : 'Faithful'))].filter(Boolean));
     } else verdict.append(h('div.sp-vd-nm', 'Nobody leaves.'), h('div.sp-vd-tie', 'The table couldn’t decide. The Poisoners are delighted.'));
     const card = h('div.sp-card.sp-banish', h('div.sp-banish-t', p.final ? 'Banish again' : 'The vote'), list, verdict);
     show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));

@@ -145,7 +145,15 @@ export default {
     'soup-banish': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-banish'; }, t: (ph) => ph.payload.roleAt + 900 },
     'soup-night': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-night'; }, me: 'idle', bots: 'some', t: 6000 },
     'soup-morning': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-morning' && !!e.phase.payload.victim; }, t: 4200 },
-    'soup-ghost': { match: (e, me) => e.phase.id === 'soup-vote' && !e.game.host.alive.has(me) && e.game.host.ghosts.length >= 1, me: 'idle', bots: 'some', t: 6000 },
+    'soup-ghost': {
+      match: (e, me) => {
+        const h = e.game?.host;
+        forceRole(e, me, 'faithful');
+        if (h?.alive && e.phase.id === 'soup-result' && h.alive.has(me)) { h.alive.delete(me); h.ghosts.push({ id: me, how: 'poisoned', day: 1, role: 'faithful' }); }
+        return e.phase.id === 'soup-vote' && !!h?.alive && !h.alive.has(me);
+      },
+      me: 'idle', bots: 'some', t: 6000,
+    },
     'soup-final': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-final' && e.game.host.alive.has(me); }, me: 'idle', bots: 'some', t: 8000 },
     'soup-final-reveal': { match: (e) => e.phase.id === 'soup-final-reveal', t: (ph) => ph.payload.verdictAt + 900 },
     'soup-end': { match: (e) => e.phase.id === 'soup-end', t: 6000 },

@@ -26,7 +26,7 @@ const intro = {
         row(VIAL, p.poisoners > 1 ? 'Two of you are secretly Poisoners.' : 'One of you is secretly a Poisoner.'),
         row(SPOON, 'By day, grow the pot, argue, and vote someone out.'),
         row(MOON, 'By night, the Poisoners strike. Survive to share the pot.')),
-      h('div.sp-intro-foot', `${p.n} at the table · ${p.poisoners} Poisoner${p.poisoners > 1 ? 's' : ''} · about 15 minutes`));
+      h('div.sp-intro-foot', `${p.n} at the table · ${p.poisoners} Poisoner${p.poisoners > 1 ? 's' : ''} · about 10 minutes`));
     show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);

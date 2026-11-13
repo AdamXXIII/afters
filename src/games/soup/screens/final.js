@@ -8,7 +8,7 @@ const final = {
   shot: 'vote',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const hd = header(ctx, { title: 'The final table', line: 'All share, or banish again. A Poisoner here takes the lot.', tone: 'brass' });
+    const hd = header(ctx, { title: 'The final table', line: 'All share, or banish again. A Poisoner here takes the lot.', tone: 'brass', pot: false });
     const ring = h('div.sp-finalists', p.alive.map((id) => h('div.sp-seat.in', disc(ctx, id, { size: 40 }), h('span.nm', nameOf(ctx, id)))));
     show.append(h('div.sp-top', hd, ring));
     let body;

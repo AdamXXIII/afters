@@ -63,8 +63,8 @@ const morning = {
     } else if (p.saved) {
       parts.push(h('div.sp-saved', h('span', { html: SHIELD })), h('div.sp-vd-nm', 'Nobody died'), h('div.sp-morning-l', 'A Shield took the poison. Someone at this table is very lucky, and someone else is furious.'));
     }
-    if (p.hunch) parts.push(h('div.sp-hunch', 'Last night, ', h('b', `${p.hunch.n} of you`), ' lay awake thinking about ', disc(ctx, p.hunch.id, { size: 20 }), h('b', nameOf(ctx, p.hunch.id)), '.'));
-    const card = h('div.sp-card.sp-morning', parts);
+    if (p.hunch) parts.push(h('div.sp-hunch', 'Last night, ', h('b', `${p.hunch.n} of you`), ' lay awake thinking about ', disc(ctx, p.hunch.id, { size: 20 }), h('b', `${nameOf(ctx, p.hunch.id)}.`)));
+    const card = h('div.sp-card.sp-morning', parts.filter(Boolean));
     show.append(h('div.sp-dawn'), h('div.sp-cardwrap', card));
     if (!ctx.frozen) {
       card.animate([{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 500, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' });

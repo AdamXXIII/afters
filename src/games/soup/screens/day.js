@@ -180,7 +180,8 @@ const result = {
       pot, gainEl, h('div.sp-result-d', detail));
     const priv = ctx.priv || {};
     const shield = priv.newShield ? h('div.sp-psst', h('span', { html: SHIELD }), h('span', h('b', 'Psst. '), 'You found a Shield. It saves you from one poisoning. Tell nobody. Or everybody.')) : null;
-    show.append(h('div.sp-dim'), h('div.sp-cardwrap', card), shield);
+    show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));
+    if (shield) show.append(shield);
     const line = gain >= 800 ? 'spGood' : gain > 0 ? 'spMeh' : 'spBad';
     const cancel = say(ctx, ctx.line(line), { hold: 2600 }, 1900);
     let counted = false;

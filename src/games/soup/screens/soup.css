@@ -14,6 +14,7 @@
   background-color: #FFFBF4; background-image: var(--paper);
   box-shadow: 0 2px 0 rgba(42,26,23,.1), 0 14px 30px rgba(30,12,8,.45), inset 0 0 0 1px rgba(122,74,42,.14);
   border-top: 6px solid var(--c-willow);
+  -webkit-mask: radial-gradient(circle 32px at calc(100% - 26px) 18px, transparent 30px, #000 31px); mask: radial-gradient(circle 32px at calc(100% - 26px) 18px, transparent 30px, #000 31px);
   animation: spDrop 460ms var(--ease-out-back) both;
 }
 .sp-head.claret { border-top-color: var(--c-claret); }
@@ -22,7 +23,9 @@
 .sp-head.dark .sp-title { color: var(--c-beeswax); }
 .sp-head.dark .sp-line { color: #BFAF98; }
 @keyframes spDrop { from { opacity: 0; transform: translateY(-14px) rotate(-1deg); } to { opacity: 1; transform: none; } }
-.sp-head-row { display: flex; align-items: center; gap: 10px; }
+.sp-head-row { display: flex; align-items: center; gap: 10px; padding-right: 50px; }
+.sp-head-row:has(.sp-hpot) { padding-right: 0; }
+.sp-hpot { margin-top: 30px; }
 .sp-head .timer { flex: none; width: 52px; height: 52px; }
 .sp-head-t { flex: 1; min-width: 0; }
 .sp-title { font-family: var(--f-display); font-weight: 800; font-size: 25px; line-height: 27px; color: var(--c-ink); font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -0.01em; }
@@ -38,12 +41,12 @@
 .sp-seat .nm { font-size: 11px; font-weight: 700; color: var(--c-linen); max-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sp-av { display: inline-grid; place-items: center; border-radius: 50%; background: var(--pc); color: #fff; box-shadow: 0 0 0 2px rgba(251,244,234,.9), 0 2px 5px rgba(30,12,8,.35); flex: none; }
 .sp-av svg { width: 64%; height: 64%; }
-.sp-av.ghost { filter: grayscale(1) opacity(.55); }
+.sp-av.ghost:not(.keep) { filter: grayscale(1) opacity(.55); }
 .sp-av.ghostic { background: #4A3A44; color: #E8DDF0; }
 
 /* ---------- show-layer cards ---------- */
 .sp-dim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,7,5,.9) 0, rgba(14,7,5,.82) 62%, rgba(14,7,5,.35) 100%); }
-.sp-cardwrap { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: calc(var(--safe-t) + 18px) 18px 0; }
+.sp-cardwrap { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: calc(var(--safe-t) + 60px) 18px 0; }
 .sp-card {
   width: min(100%, 356px); border-radius: 24px; padding: 18px 18px 20px; position: relative;
   background-color: #FFFBF4; background-image: var(--paper);
@@ -62,6 +65,7 @@
 .sp-how li { display: flex; gap: 12px; align-items: center; font-size: 17px; line-height: 22px; font-weight: 550; color: var(--c-ink); }
 .sp-how .ic { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--c-tablecloth); box-shadow: inset 0 0 0 1px rgba(122,74,42,.18); }
 .sp-how .ic svg { width: 26px; height: 26px; }
+.sp-how li:last-child .ic { background: #2B2236; }
 .sp-intro-foot { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--c-crumb); font-size: 14px; font-weight: 650; color: var(--c-toffee); }
 
 /* tureen */
@@ -361,7 +365,7 @@ body.sp-night #sheet::after { box-shadow: inset 0 1px 0 rgba(243,230,207,.12); }
   .sp-hpot b { font-size: 18px; }
   .sp-dim { background: linear-gradient(90deg, rgba(14,7,5,.25) 0, rgba(14,7,5,.75) 36%, rgba(14,7,5,.92) 60%); }
   .sp-dawn { background: linear-gradient(90deg, rgba(120,70,60,.35) 0, rgba(60,40,62,.85) 40%, rgba(40,30,52,.94)); }
-  .sp-cardwrap { justify-content: flex-end; align-items: center; padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 18px) 8px 0; }
+  .sp-cardwrap { justify-content: flex-end; align-items: center; padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 70px) 8px 0; }
   .sp-card { width: min(56%, 470px); max-height: calc(100% - 4px); overflow: auto; padding: 14px 16px; }
   .sp-intro { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; text-align: left; align-items: center; }
   .sp-intro-t { font-size: 30px; line-height: 30px; grid-column: 1 / 3; }
