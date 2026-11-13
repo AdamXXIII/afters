@@ -321,7 +321,6 @@
   .pd-racer { width: 42px; }
   .pd-racer .pd-av { width: 28px !important; height: 28px !important; }
   .pd-racer-nm { display: none; }
-  .pd-top, .pd-top.row, .pd-tunetop { padding-right: 10px; }
   .pd-peek { height: 40px; }
   .pd-grid { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .pd-who { min-height: 54px; }
@@ -340,11 +339,13 @@
   .pd-opts { grid-template-columns: 1fr 1fr; gap: 8px; }
   .pd-opt { min-height: 74px; }
   .pd-opt-t { font-size: 17px; }
-  .pd-tr { left: auto; width: 60%; top: calc(var(--safe-t) + 10px); flex-direction: row; align-items: flex-start; }
+  .pd-tr { left: auto; right: calc(var(--safe-r) + 8px); width: 64%; top: calc(var(--safe-t) + 62px); flex-direction: row; align-items: flex-start; }
+  .pd-tr-list { min-width: 300px; }
+  .pd-tr-row .what { max-width: 110px; }
   .pd-tr-card { max-width: 240px; }
   .pd-tr-title { font-size: 28px; }
   .pd-tr-list { overflow: auto; max-height: 100%; }
-  .pd-verdict { left: auto; width: 60%; top: calc(var(--safe-t) + 10px); }
+  .pd-verdict { left: auto; width: 60%; top: calc(var(--safe-t) + 56px); }
   .pd-vlist { overflow: auto; }
   .pd-vtext { font-size: 24px; }
   .pd-vcard.top .pd-vtext { font-size: 28px; }
