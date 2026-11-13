@@ -116,8 +116,8 @@ export default {
         lastAll = all;
       }
       if (isCritic) {
-        title.textContent = all ? 'Pick the winner' : flipped ? 'Read it out loud' : 'Turn the first card';
-        sub.textContent = all ? 'Tap the one you liked best, then press Crown.' : flipped ? 'Read the line out to the table. Then turn the next.' : 'Then read the line out to the table.';
+        title.textContent = all ? (p.duo ? 'Which is funnier?' : 'Pick the winner') : flipped ? 'Read it out loud' : 'Turn the first card';
+        sub.textContent = all ? (p.duo ? `One is ${nameOf(ctx, ctx.players.find((x) => x.id !== p.critic)?.id)}’s, one is Cyril’s. Tap the funnier, then Crown.` : 'Tap the one you liked best, then press Crown.') : flipped ? 'Read the line out to the table. Then turn the next.' : 'Then read the line out to the table.';
         btn.disabled = all && focus < 0;
         btn.innerHTML = all ? `${CROWN}<span>Crown card ${focus + 1}</span>` : `<span>Turn card ${flipped + 1} of ${n}</span>`;
         btn.classList.toggle('crown', all);

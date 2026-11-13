@@ -40,7 +40,11 @@ export default {
       b.addEventListener('click', () => { if (!host) return; ctx.audio.sfx('select'); ctx.haptic('select'); ctx.client.act('length', { length: l.id }, { length: l.id }); });
       return b;
     });
-    const lenRow = lenBtns.length > 1 ? h('div.tp-len', { role: 'group', 'aria-label': 'How far each sentence travels' }, lenBtns) : null;
+    // two of you: no choice to make, each sentence swaps back and forth three times
+    const duo = ctx.players.length === 2;
+    const lenRow = duo
+      ? h('div.tp-len.duo', h('div.tp-len-opt', { 'aria-pressed': 'true' }, h('b', 'Back and forth'), h('span', `${lens.once || 6} turns`)))
+      : lenBtns.length > 1 ? h('div.tp-len', { role: 'group', 'aria-label': 'How far each sentence travels' }, lenBtns) : null;
     const startBtn = host ? button('Start writing', { e2e: 'tp-start', onClick: () => ctx.client.skip() }) : null;
     const note = h('div.tp-intro-foot', host ? null : h('span.tp-dots', h('i'), h('i'), h('i')), host ? null : h('span', `${ctx.players.find((p) => p.isHost)?.name || 'The host'} is picking the mode`));
     const card = h('div.tp-intro-card',

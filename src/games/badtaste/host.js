@@ -19,8 +19,8 @@ export const shuffle = (arr, rng) => {
   return a;
 };
 
-/** Laps of Critics: everyone judges once; at 3 or 4 players everyone judges twice. */
-export const roundsFor = (n) => (n <= 4 ? n * 2 : n);
+/** Laps of Critics: everyone judges once; at 3 or 4 players everyone judges twice; two of you, three times each. */
+export const roundsFor = (n) => (n === 2 ? 6 : n <= 4 ? n * 2 : n);
 
 export class BadTasteHost {
   constructor(api) {
@@ -44,7 +44,10 @@ export class BadTasteHost {
     this.i = 0;
     this.deciders = 0;
     this.decider = null;
-    api.enter('badtaste-intro', DUR.intro, { rounds: n, plays: api.plays });
+    // two of you: the other plays one card against one of Cyril's; Cyril keeps his own crowns
+    this.duo = ids.length === 2;
+    this.house = 0;
+    api.enter('badtaste-intro', DUR.intro, { rounds: n, plays: api.plays, duo: this.duo });
   }
 
   advance(id) {
@@ -155,7 +158,8 @@ export class BadTasteHost {
 
   /** The last regular round is worth two crowns (a deciding round is worth one). */
   _double() {
-    return this.i === this.regular - 1 && this.order.length >= 3;
+    // not at two: the last round's player would get a double chance the other never had
+    return !this.duo && this.i === this.regular - 1 && this.order.length >= 3;
   }
 
   /** In a decider only the tied players play. */
@@ -166,7 +170,7 @@ export class BadTasteHost {
   _base() {
     const r = this.r;
     const decider = !!this.decider && this.i === this.order.length - 1;
-    return { round: this.i + 1, of: this.regular, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length, decider, tied: decider ? [...this.decider] : [], double: this._double() };
+    return { round: this.i + 1, of: this.regular, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length, decider, tied: decider ? [...this.decider] : [], double: this._double(), duo: !!this.duo, house: this.house || 0 };
   }
 
   _play() {
@@ -181,12 +185,14 @@ export class BadTasteHost {
     const r = this.r;
     const answering = () => api.players.filter((p) => p.id !== r.critic && !this._out(p.id));
     // only two people answering (a table of three, or a two-way decider): each plays two cards
-    r.per = answering().filter((p) => p.connected !== false).length <= 2 ? 2 : 1;
+    // (two of you: one card, head to head with Cyril's)
+    r.per = !this.duo && answering().filter((p) => p.connected !== false).length <= 2 ? 2 : 1;
+    const ghost = this.duo ? 1 : 0; // Cyril's card is already face down on the pile
     api.enter('badtaste-play', DUR.play + (r.per - 1) * DUR.playExtra, { ...this._base(), max: MAX, per: r.per }, {
       priv: (p) => (p.id === r.critic ? { role: 'critic' } : { role: 'player', hand: this.hands[p.id] || [] }),
       progress: () => ({
         done: this._doneMap((p) => p.id === r.critic || this._out(p.id) || (r.played[p.id]?.length || 0) >= r.per),
-        counts: { played: answering().filter((p) => (r.played[p.id]?.length || 0) >= r.per).length, of: answering().length, cards: Object.values(r.played).reduce((n, x) => n + x.length, 0) },
+        counts: { played: answering().filter((p) => (r.played[p.id]?.length || 0) >= r.per).length, of: answering().length, cards: ghost + Object.values(r.played).reduce((n, x) => n + x.length, 0) },
       }),
     });
   }
@@ -207,7 +213,8 @@ export class BadTasteHost {
     const entries = Object.entries(r.played).flatMap(([pid, list]) => list.map((pl) => ({ by: pid, text: pl.text, written: pl.written })));
     // too few answers for a real choice (a three-player table): Cyril slips his own in for cover
     let tries = 0;
-    const want = r.per > 1 ? entries.length + 1 : 3; // two answering: Cyril always slips one in for cover
+    // two answering: Cyril always slips one in for cover; two of you: Cyril's card is the one to beat (and never just one card)
+    const want = this.duo ? Math.max(2, entries.length + 1) : r.per > 1 ? entries.length + 1 : 3;
     while (entries.length < want && tries++ < 6) {
       const [c] = api.take(ANSWERS, 'bt-a', 1, rng);
       if (c && !entries.some((e) => e.text === c.text)) entries.push({ by: 'house', text: c.text, written: false });
@@ -237,9 +244,10 @@ export class BadTasteHost {
     const win = r.cards[k];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
     if (win && win.by !== 'house' && win.by in deltas) deltas[win.by] = this._double() ? 2 : 1;
+    if (win && win.by === 'house' && this.duo) this.house += 1;
     api.addScores(deltas);
     api.enter('badtaste-win', DUR.win + r.cards.length * DUR.winPer, {
-      ...this._base(), winner: k, cyrilChose, deltas,
+      ...this._base(), winner: k, cyrilChose, deltas, house: this.house,
       cards: r.cards.map((c) => ({ id: c.id, text: c.text, by: c.by, written: c.written })),
       scores: this._rows(),
     });
