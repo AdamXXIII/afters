@@ -42,8 +42,11 @@ const hand = {
     const grid = h('div.bt-hand', tiles, blank);
     const btn = button('Play this card', { onClick: () => play(), e2e: 'submit' });
     const subEl = h('div.bt-sub');
+    const per = p.per || 1;
+    const critic = nameOf(ctx, p.critic);
+    const title = h('div.bt-title', p.decider ? `The decider: play to ${critic}` : `Play a card to ${critic}`);
     const page = h('div.bt-sheet.bt-handsheet',
-      h('div.bt-sheethead', h('div.bt-title', p.decider ? `The decider: play to ${nameOf(ctx, p.critic)}` : `Play a card to ${nameOf(ctx, p.critic)}`), subEl),
+      h('div.bt-sheethead', title, subEl),
       grid, writeBox,
       h('div.bt-actions', btn));
     sheet.append(page);
@@ -57,16 +60,25 @@ const hand = {
         const t = field.input.value.trim();
         if (!t) { field.error(); return; }
         ctx.audio.sfx('plated'); ctx.haptic('submit');
-        ctx.client.act('bt-play', { text: t }, { played: t });
+        const list = [...(ctx.mine.game.list || []), { text: t, written: true }];
+        ctx.client.act('bt-play', { text: t }, { played: t, list });
+        writing = false; field.clear(); sync();
         return;
       }
       const c = cards.find((x) => x.id === sel);
       if (!c) return;
       ctx.audio.sfx('plated'); ctx.haptic('submit');
-      ctx.client.act('bt-play', { cardId: c.id }, { played: c.text });
+      const list = [...(ctx.mine.game.list || []), { text: c.text, id: c.id }];
+      ctx.client.act('bt-play', { cardId: c.id }, { played: c.text, list });
+      sel = null; sync();
     }
     let lastPreview = null;
     function sync() {
+      const list = ctx.mine.game.list || [];
+      const left = per - list.length;
+      tiles.forEach((b, i) => { b.hidden = list.some((x) => x.id === cards[i].id); });
+      blank.hidden = list.some((x) => x.written);
+      if (per > 1) title.textContent = left < per ? `One more card for ${critic}` : `Play two cards to ${critic}`;
       page.classList.toggle('writing', writing);
       tiles.forEach((b, i) => b.setAttribute('aria-pressed', String(cards[i].id === sel)));
       const a = current();
@@ -77,13 +89,14 @@ const hand = {
       }
       btn.disabled = !a;
       btn.textContent = writing ? 'Play my card' : 'Play this card';
-      subEl.textContent = writing ? 'Type it. It appears in the blank up top.' : 'Tap one to try it in the blank. Nobody sees who played what.';
+      subEl.textContent = writing ? 'Type it. It appears in the blank up top.' : per > 1 ? 'Only two of you are playing, so two cards each. Tap one to try it.' : 'Tap one to try it in the blank. Nobody sees who played what.';
     }
     if (ctx.frozen && ctx.demo && cards[2]) sel = cards[2].id;
     sync();
     const cancel = sayLater(ctx, ctx.line(p.last ? 'btLast' : 'btHand', { name: nameOf(ctx, p.critic) }), { delay: 800 });
     let autoSent = false;
     return {
+      update: () => sync(),
       frame(c) {
         pc.timer?.set(c.remaining(), c.duration);
         // out of time with a card chosen or words typed: play it rather than let Cyril pick
@@ -116,7 +129,7 @@ const critic = {
     let n = -1;
     const sync = (c) => {
       row.sync(c);
-      const k = c.progress.counts?.played ?? 0;
+      const k = c.progress.counts?.cards ?? c.progress.counts?.played ?? 0;
       if (k === n) return;
       const grew = n >= 0 && k > n;
       n = k;
@@ -143,7 +156,8 @@ const played = {
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
     const seed = ctx.phase?.seed || 1;
-    const text = ctx.mine.game.played || '';
+    const mineList = ctx.mine.game.list || [];
+    const text = mineList.length > 1 ? mineList.map((x) => x.text).join(' / ') : ctx.mine.game.played || '';
     const out = p.decider && !p.tied?.includes(ctx.meId);
     if (out) {
       const pc = promptCard(ctx, p);

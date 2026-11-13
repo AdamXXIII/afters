@@ -9,8 +9,8 @@ import { PROMPTS, ANSWERS } from './content/index.js';
 export const HAND = 7;
 export const MAX = 48; // characters on a written card
 export const DUR = {
-  intro: 10000, play: 45000, judgeBase: 14000, judgePer: 7000, judgeMax: 75000,
-  win: 9500, winPer: 700,
+  intro: 10000, play: 45000, judgeBase: 14000, judgePer: 10000, judgeMax: 100000,
+  win: 9500, winPer: 700, playExtra: 15000,
 };
 
 export const shuffle = (arr, rng) => {
@@ -73,16 +73,18 @@ export class BadTasteHost {
     if (!r) return;
     switch (msg.type) {
       case 'bt-play': {
-        if (ph !== 'badtaste-play' || p.id === r.critic || r.played[p.id] || this._out(p.id)) return;
+        const mine = r.played[p.id] || [];
+        if (ph !== 'badtaste-play' || p.id === r.critic || mine.length >= r.per || this._out(p.id)) return;
         if (msg.text != null) {
           const t = this.api.clean(String(msg.text), MAX);
           if (!t) return this.api.reject(p, 'empty');
-          r.played[p.id] = { text: t, written: true };
+          if (mine.some((x) => x.written)) return;
+          r.played[p.id] = [...mine, { text: t, written: true }];
         } else {
           const hand = this.hands[p.id] || [];
           const card = hand.find((c) => c.id === msg.cardId);
-          if (!card) return;
-          r.played[p.id] = { cardId: card.id, text: card.text, written: false };
+          if (!card || mine.some((x) => x.cardId === card.id)) return;
+          r.played[p.id] = [...mine, { cardId: card.id, text: card.text, written: false }];
         }
         this.api.ack(p);
         this.api.progress();
@@ -122,8 +124,9 @@ export class BadTasteHost {
     const rows = this._rows();
     const top = rows.filter((r) => r.rank === 1).map((r) => r.id);
     if (top.length < 2) return false;
-    const judge = this.api.connected.find((p) => !top.includes(p.id));
-    if (!judge) return false;
+    const pool = this.api.connected.filter((p) => !top.includes(p.id));
+    if (!pool.length) return false;
+    const judge = pool[Math.floor(this.api.sub(`decider-${this.deciders || 0}`)() * pool.length)];
     this.deciders = (this.deciders || 0) + 1;
     this.order.push(judge.id);
     this.decider = new Set(top);
@@ -135,7 +138,7 @@ export class BadTasteHost {
   // ---------- phases ----------
 
   _critic() {
-    if (this.decider && this.i === this.order.length - 1) return this.order[this.i];
+    if (this.decider && this.i === this.order.length - 1 && this.api.connected.some((p) => p.id === this.order[this.i])) return this.order[this.i];
     // skip a Critic who has left the table
     const connected = new Set(this.api.connected.map((p) => p.id));
     for (let k = 0; k < this.order.length; k++) {
@@ -167,11 +170,13 @@ export class BadTasteHost {
     this.r = { critic: this._critic(), prompt: this.prompts[this.i] || this.prompts[0], played: {}, cards: [], flipped: 0, focus: -1, crowned: null };
     const r = this.r;
     const answering = () => api.players.filter((p) => p.id !== r.critic && !this._out(p.id));
-    api.enter('badtaste-play', DUR.play, { ...this._base(), max: MAX }, {
+    // only two people answering (a table of three, or a two-way decider): each plays two cards
+    r.per = answering().filter((p) => p.connected !== false).length <= 2 ? 2 : 1;
+    api.enter('badtaste-play', DUR.play + (r.per - 1) * DUR.playExtra, { ...this._base(), max: MAX, per: r.per }, {
       priv: (p) => (p.id === r.critic ? { role: 'critic' } : { role: 'player', hand: this.hands[p.id] || [] }),
       progress: () => ({
-        done: this._doneMap((p) => p.id === r.critic || this._out(p.id) || !!r.played[p.id]),
-        counts: { played: answering().filter((p) => r.played[p.id]).length, of: answering().length },
+        done: this._doneMap((p) => p.id === r.critic || this._out(p.id) || (r.played[p.id]?.length || 0) >= r.per),
+        counts: { played: answering().filter((p) => (r.played[p.id]?.length || 0) >= r.per).length, of: answering().length, cards: Object.values(r.played).reduce((n, x) => n + x.length, 0) },
       }),
     });
   }
@@ -182,13 +187,17 @@ export class BadTasteHost {
     const rng = api.sub(`judge-${this.i}`);
     // nobody gets a card played for them: no card, no chance (phones send a chosen card at the buzzer)
     // played cards leave the hand (refilled next round)
-    for (const [pid, pl] of Object.entries(r.played)) {
-      if (pl.cardId) this.hands[pid] = (this.hands[pid] || []).filter((c) => c.id !== pl.cardId);
+    for (const [pid, list] of Object.entries(r.played)) {
+      for (const pl of list) {
+        const hand = this.hands[pid] || [];
+        // a written card still uses one up, so hands keep moving
+        this.hands[pid] = pl.cardId ? hand.filter((c) => c.id !== pl.cardId) : hand.slice(1);
+      }
     }
-    const entries = Object.entries(r.played).map(([pid, pl]) => ({ by: pid, text: pl.text, written: pl.written }));
+    const entries = Object.entries(r.played).flatMap(([pid, list]) => list.map((pl) => ({ by: pid, text: pl.text, written: pl.written })));
     // too few answers for a real choice (a three-player table): Cyril slips his own in for cover
     let tries = 0;
-    while (entries.length < 4 && tries++ < 6) {
+    while (entries.length < 3 && tries++ < 6) {
       const [c] = api.take(ANSWERS, 'bt-a', 1, rng);
       if (c && !entries.some((e) => e.text === c.text)) entries.push({ by: 'house', text: c.text, written: false });
     }
@@ -199,7 +208,7 @@ export class BadTasteHost {
     api.enter('badtaste-judge', dur, {
       ...this._base(), count: n, cards: r.cards.map((c) => ({ id: c.id, text: c.text })),
     }, {
-      priv: (p) => ({ role: p.id === r.critic ? 'critic' : 'player', own: r.cards.findIndex((c) => c.by === p.id) }),
+      priv: (p) => ({ role: p.id === r.critic ? 'critic' : 'player', own: r.cards.map((c, k) => (c.by === p.id ? k : -1)).filter((k) => k >= 0) }),
       progress: () => ({
         done: this._doneMap((p) => p.id !== r.critic || r.crowned != null),
         counts: {}, flipped: r.flipped, focus: r.focus, crowned: r.crowned,

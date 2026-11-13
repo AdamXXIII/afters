@@ -42,6 +42,8 @@ export default {
       h('b', String(r.score))))));
     const note = p.cyrilChose ? h('div.bt-note', `${critic} ran out of time. Cyril picked one.`)
       : p.decider ? h('div.bt-note', 'The decider') : null;
+    const next = h('div.bt-next');
+    tally.append(next);
     const wrap = h(`div.bt-win${house ? '.house' : ''}${p.cards.length > 5 ? '.many' : ''}`, h('div.bt-wincard', pc, rosette), note, owner, restBox, tally);
     show.append(wrap);
 
@@ -64,7 +66,15 @@ export default {
       for (const [k, fn] of beats) if (!fired.has(k) && t >= at(k)) { fired.add(k); try { fn(); } catch (e) { console.error('[badtaste-win]', e); } }
     };
     if (ctx.frozen) wrap.classList.add('frozen');
-    run(ctx);
-    return { frame: run };
+    let lastSec = -1;
+    const tick = (c) => {
+      run(c);
+      const sec = Math.max(0, Math.ceil(c.remaining() / 1000));
+      if (sec === lastSec) return;
+      lastSec = sec;
+      next.innerHTML = p.last && !p.decider ? `Final scores in <b>${sec}</b>` : `Next round in <b>${sec}</b>`;
+    };
+    tick(ctx);
+    return { frame: tick };
   },
 };

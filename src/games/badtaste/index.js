@@ -42,11 +42,12 @@ export default {
       case 'badtaste-play': {
         if (p.critic === me || (p.decider && !p.tied.includes(me))) return true;
         const hand = ph.private?.hand || [];
-        later(rand(1500, 9000), () => {
-          if (!still() || mine().played || !hand.length) return;
-          const c = hand[Math.floor(rng() * hand.length)];
-          client.act('bt-play', { cardId: c.id }, { played: c.text });
-        });
+        const picks = [...hand].sort(() => rng() - 0.5).slice(0, p.per || 1);
+        picks.forEach((c, k) => later(rand(1500, 9000) + k * 2500, () => {
+          if (!still() || (mine().list?.length || 0) >= (p.per || 1)) return;
+          const list = [...(mine().list || []), { text: c.text, id: c.id }];
+          client.act('bt-play', { cardId: c.id }, { played: c.text, list });
+        }));
         return true;
       }
       case 'badtaste-judge': {
@@ -71,7 +72,8 @@ export default {
     if (ph.id === 'badtaste-play') {
       if (ph.payload?.critic === state.me) return 'badtaste-critic';
       if (ph.payload?.decider && !ph.payload.tied?.includes(state.me)) return 'badtaste-played';
-      return state.mine?.game?.played || state.progress?.done?.[state.me] ? 'badtaste-played' : 'badtaste-hand';
+      const n = state.mine?.game?.list?.length || 0;
+      return n >= (ph.payload?.per || 1) || state.progress?.done?.[state.me] ? 'badtaste-played' : 'badtaste-hand';
     }
     return null;
   },
@@ -92,12 +94,12 @@ export default {
     family: {
       btIntro: [
         ['Bad Taste. Play the worst card you own. Proudly.'],
-        ['One of you judges. The rest of you grovel. Lovely.'],
+        ['One of you is the Critic. The rest of you grovel. Lovely.'],
       ],
       btIntroAgain: [['Back for more. Your taste hasn’t improved.'], ['Another hand. Same terrible people.']],
       btHand: [
         ['Play to {name}. Not to me. I have standards.'],
-        ['Think about what makes {name} laugh. Then lower it.'],
+        ['Think about what makes {name} laugh. Then aim lower.'],
         ['Pick one. Try it in the blank. Commit.'],
       ],
       btLast: [['Last round. Play the card you’ve been saving.']],
@@ -114,7 +116,7 @@ export default {
     adult: {
       btIntro: [
         ['Bad Taste. Play the worst thing in your hand. I mean it.'],
-        ['One of you judges. The rest of you suck up. Shamelessly.'],
+        ['One of you is the Critic. The rest of you suck up. Shamelessly.'],
         ['Cards out. Dignity in the bin.'],
       ],
       btHand: [
