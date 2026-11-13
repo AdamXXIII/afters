@@ -42,3 +42,11 @@ Depth: streaks (three right in a row = a **Steady Hand**, a brass collar on your
 - No catch-up beyond lowest-picks and the Steal; a runaway leader can settle rounds 3-6. Idea: a "floor bonus" (+1 extra for the lowest bottle's right answer).
 - Ties at the top share the win: the box results only see whole shelves. Needs an `api.finish` rank/tiebreak (shared change).
 - Menu tile uses the fallback `cloche` dish; a drinks-cabinet dish in `src/screens/menu-art.js` is a shared change.
+
+## Critic verdicts (blind A/B vs Mount Cleverest app + Party Pack 6 stills, 2026-11-13)
+- Onboarding: lost r1 (no win condition up front), **won r2** after the goal line.
+- Core question screen: lost r1 and r2 (weak time pressure), **won r3** after the big fuse and larger question.
+- Reveal / standings: lost r1 (tiny unnamed bottles), **won r2** after the shelf window, name tags and crowns.
+- Content: **won r1**, lost r2 on a different sample (too many gimmes); 30 half-known questions added and 11 give-aways swapped, then stopped.
+- Whole-game arc: **won r1**.
+- Fact-check: 60 random questions, 56 clean; 2 doubtful dropped, 2 reworded.
