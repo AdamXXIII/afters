@@ -76,7 +76,6 @@ const read = {
     peek.addEventListener('pointerdown', on); peek.addEventListener('pointerup', off);
     peek.addEventListener('pointerleave', off); peek.addEventListener('pointercancel', off);
     peek.addEventListener('contextmenu', (e) => e.preventDefault());
-    card.append(peek);
     show.append(h('div.pd-top', card));
 
     const others = ctx.players.filter((x) => x.id !== p.reader);
@@ -98,6 +97,7 @@ const read = {
     onTap(nobody, () => send('none', nobody));
     const stealNote = h('div.pd-stealnote');
     sheet.append(h('div.pd-sheet.pd-in',
+      peek,
       h('div.pd-ask', 'Who said it first?'),
       grid,
       h('div.pd-sheet-foot', stealNote, nobody)));

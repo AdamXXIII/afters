@@ -97,8 +97,7 @@ const verdict = {
       const el = h(`div.pd-vcard${e.top ? '.top' : ''}`, { style: { '--t': `${(srand(ctx.phase.seed, `v${e.key}`) - 0.5) * 3}deg`, '--pc': colourOf(authors[0]) } },
         e.top ? h('div.pd-vwin', 'Funniest') : null,
         h('div.pd-vtext', e.text),
-        h('div.pd-vfoot', h('span.pd-voters', e.voters.map((id) => disc(ctx.player(id), { size: 22 }))), h('span.pd-vn', `${e.voters.length} vote${e.voters.length === 1 ? '' : 's'}`)),
-        stamp);
+        h('div.pd-vfoot', h('span.pd-voters', e.voters.map((id) => disc(ctx.player(id), { size: 22 }))), h('span.pd-vn', `${e.voters.length} vote${e.voters.length === 1 ? '' : 's'}`), stamp));
       return { e, el, at: p.start + i * p.per };
     });
     show.append(h('div.pd-verdict', h('div.pd-verdict-line', `“${p.line}”`), h('div.pd-vlist', cards.slice().reverse().map((c) => c.el))));
