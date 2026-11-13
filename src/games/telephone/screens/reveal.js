@@ -30,12 +30,27 @@ export default {
     // ---- header: whose rumour, which page
     const pageNo = h('span.tp-al-pg');
     const pips = h('div.tp-al-pips', Array.from({ length: total }, (_, i) => h(`i${i === total - 1 ? '.end' : ''}`)));
+    // the trail: every page so far, tiny, in one row, so the whole drift is on screen at once
+    const trail = h('div.tp-al-trail');
+    const addCrumb = (st, s) => {
+      if (trail.children.length) trail.append(h('span.tp-crumb-arrow', { html: TP_ICONS.send }));
+      let el;
+      if (st.kind === 'draw') {
+        const v = drawingView(st.drawing, { className: 'tp-crumb-view' });
+        requestAnimationFrame(() => v.frame());
+        el = h('span.tp-crumb.draw', v.el);
+      } else el = h(`span.tp-crumb.k-${st.kind}`, st.text);
+      el.dataset.s = String(s);
+      trail.append(el);
+      requestAnimationFrame(() => { trail.scrollLeft = trail.scrollWidth; });
+    };
     const header = h('div.tp-al-head',
       av(owner, { size: 36 }),
       h('div.tp-al-head-t',
         // the sentence it started as stays pinned, so every page plays against it
         h('div.tp-al-title', `“${steps[0].text}”`),
-        h('div.tp-al-sub', h('span', `${owner?.name || 'Someone'} · ${p.index + 1} of ${p.count}`), pips, pageNo)));
+        h('div.tp-al-sub', h('span', `${owner?.name || 'Someone'} · ${p.index + 1} of ${p.count}`), pips, pageNo)),
+      trail);
 
     // ---- the feed
     const list = h('div.tp-al-list');
@@ -96,6 +111,7 @@ export default {
         if (st.kind === 'guess') card.append(stampFor(st));
       }
       list.append(row);
+      if (s > 0) addCrumb(st, s);
       rows[s] = { row, card, st, s, live, stamped: !live };
       return rows[s];
     };
@@ -128,8 +144,8 @@ export default {
           h('div.tp-end-cord', { html: cordSvg(300, 20, { loops: 12, stroke: 2.4 }) }),
           h('div.tp-end-k', 'Ended as', who(lastBy, { size: 18 })),
           h('div.tp-end-txt.last', lastStep.text),
-          culprit ? h('div.tp-end-did', culprit.view.el, h('span', 'The drawing that did it, by ', who(ctx.player(culprit.st.authorId), { size: 16 }))) : null,
-          verdict === 'crossed' && crosser ? h('div.tp-end-foot', h('span', 'It went wrong on ', h('b', `page ${p.end.crossedAt + 1}`), ', thanks to'), who(crosser, { size: 18 }))
+          culprit ? h('div.tp-end-did', culprit.view.el, h('span', who(ctx.player(culprit.st.authorId), { size: 16 }), ' drew this. ', h('b', ctx.player(steps[p.end.crossedAt].authorId)?.name || 'Someone'), ' called it ', h('q', steps[p.end.crossedAt].text))) : null,
+          verdict === 'crossed' && crosser && !culprit ? h('div.tp-end-foot', h('span', 'It went wrong on ', h('b', `page ${p.end.crossedAt + 1}`), ', thanks to'), who(crosser, { size: 18 }))
             : verdict === 'straight' ? h('div.tp-end-foot', h('b', '+300'), ' to everyone on this one') : null);
       }
       const row = h('div.tp-pg.end', h('div.tp-pg-rail', h('span.tp-pg-bell', { html: TP_ICONS.handset })), h('div.tp-pg-body', card));
@@ -200,7 +216,8 @@ export default {
       let first = null;
       for (const r of rows) {
         if (!r) continue;
-        const off = atBottom && r.row !== list.lastElementChild && r.row.getBoundingClientRect().top < top - 2;
+        // on the verdict the trail already shows the whole chain, so earlier pages step aside for Cyril
+        const off = (atBottom && r.row !== list.lastElementChild && r.row.getBoundingClientRect().top < top - 2) || (shownPage >= steps.length && !r.end && !document.body.classList.contains('land'));
         if (r.row.classList.contains('off') !== off) r.row.classList.toggle('off', off);
         if (!off && !first) first = r.row;
       }

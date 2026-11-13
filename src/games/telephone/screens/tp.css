@@ -834,3 +834,27 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
   .tp-end-did .dp-view { width: 56px; }
 }
 .tp-end-card { margin-top: 30px; }
+/* critic round 2: the trail of every page so far, inside the header */
+.tp-al-head { flex-wrap: wrap; row-gap: 6px; }
+.tp-al-trail { flex: 1 0 100%; display: flex; align-items: center; gap: 4px; height: 40px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px -2px; padding: 0 4px; }
+.tp-al-trail:empty { display: none; }
+.tp-al-trail::-webkit-scrollbar { display: none; }
+.tp-crumb { flex: none; display: inline-flex; align-items: center; height: 36px; max-width: 120px; padding: 0 9px; border-radius: 9px; background: var(--c-tablecloth); box-shadow: inset 0 0 0 1px var(--c-crumb); font: 700 15px/1 var(--f-hand); color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 36px; }
+.tp-crumb.k-guess { background: #EAF0F4; color: var(--tp-ink); box-shadow: inset 0 0 0 1px rgba(47,93,124,.3); }
+.tp-crumb.draw { width: 36px; padding: 0; background: #FFFDF8; }
+.tp-crumb .dp-view { width: 36px; border-radius: 9px; box-shadow: none; }
+.tp-crumb-arrow { flex: none; width: 12px; height: 12px; color: var(--c-toffee); opacity: .6; }
+.tp-crumb-arrow svg { width: 100%; height: 100%; }
+.tp-al-feed { margin-top: 112px; }
+.tp-pg-by { font-size: 15px; color: var(--c-linen); }
+.tp-pg-by b { color: var(--c-candle); }
+.tp-end-did q { font: 700 18px/1.1 var(--f-hand); color: var(--tp-ink); }
+.tp-end-did b { font-weight: 800; }
+.tp-end-did span { display: block; }
+@media (max-height: 740px) { .tp-al-feed { margin-top: 96px; } }
+@media (orientation: landscape) and (max-height: 600px) { .tp-al-feed { margin-top: 4px; } .tp-al-trail { height: 32px; } .tp-crumb { height: 28px; line-height: 28px; } .tp-crumb.draw, .tp-crumb .dp-view { width: 28px; } }
+.tp-end-did span { display: inline-flex; }
+.tp-end-did > span { display: block; }
+.tp-end-did .tp-who { vertical-align: -4px; }
+.tp-al-feed { margin-top: 128px; }
+.tp-al-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 22px; line-height: 1.02; text-wrap: balance; }
