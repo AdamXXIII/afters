@@ -15,6 +15,13 @@ const meOnStand = (e, me) => {
     if (last?.final) last.defendant = me;
   }
 };
+/** Demo helper: keep this phone in the jury for the cross-examination shots. */
+const someoneElseOnStand = (e, me) => {
+  if (e.phase.id !== 'witness-scores') return;
+  const h = e.game?.host;
+  const last = h?.rounds?.[h.rounds.length - 1];
+  if (last?.final && last.defendant === me) last.defendant = e.players.find((p) => p.id !== me)?.id || last.defendant;
+};
 const stepAt = (kind, plus) => (p) => { const s = p.payload.steps.find((x) => x.kind === kind); return s ? s.at + plus : 2000; };
 const normal = (e, me) => e.phase.id === 'witness-reveal' && e.phase.payload.outcome === 'normal' && !isDef(e, me) && !e.phase.payload.final;
 
@@ -92,9 +99,9 @@ export default {
     'witness-scores': { match: (e) => e.phase.id === 'witness-scores', t: 2600 },
     'witness-cross-intro': { match: (e) => e.phase.id === 'witness-cross-intro', t: 3000 },
     'witness-choose': { match: (e, me) => { meOnStand(e, me); return e.phase.id === 'witness-choose'; }, me: 'idle', bots: 'some', t: 5000 },
-    'witness-recess': { match: (e, me) => e.phase.id === 'witness-choose' && !isDef(e, me), me: 'idle', bots: 'idle', t: 5000 },
-    'witness-cross-pick': { match: (e, me) => e.phase.id === 'witness-pick' && e.phase.payload.final && !isDef(e, me), me: 'idle', bots: 'some', t: 5000 },
-    'witness-cross-reveal': { match: (e, me) => e.phase.id === 'witness-reveal' && e.phase.payload.final && !isDef(e, me), t: stepAt('truth', 1900) },
+    'witness-recess': { match: (e, me) => { someoneElseOnStand(e, me); return e.phase.id === 'witness-choose' && !isDef(e, me); }, me: 'idle', bots: 'idle', t: 5000 },
+    'witness-cross-pick': { match: (e, me) => { someoneElseOnStand(e, me); return e.phase.id === 'witness-pick' && e.phase.payload.final && !isDef(e, me); }, me: 'idle', bots: 'some', t: 5000 },
+    'witness-cross-reveal': { match: (e, me) => { someoneElseOnStand(e, me); return e.phase.id === 'witness-reveal' && e.phase.payload.final && !isDef(e, me); }, t: stepAt('truth', 1900) },
   },
 
   lines: {
