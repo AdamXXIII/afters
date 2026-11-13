@@ -270,8 +270,10 @@
   .bt-hcard .bt-card-t.long { font-size: 14px; }
   .bt-herowrap { min-height: 110px; }
   .bt-hero.on { min-height: 110px; padding: 10px 14px 18px; }
-  .bt-hero-t { font-size: 19px; }
-  .bt-hero-t.long, .bt-hero-t.xlong { font-size: 16px; }
+  .bt-hero-t { font-size: 23px; }
+  .bt-hero-t.long { font-size: 20px; }
+  .bt-hero-t.xlong { font-size: 18px; }
+  .bt-hero.on { min-height: 150px; }
   .bt-tab { height: 40px; width: 36px; }
   .bt-picklist { display: none; }
   .bt-judgesheet.choosing .bt-picklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
