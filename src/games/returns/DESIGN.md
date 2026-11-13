@@ -53,3 +53,10 @@ The box's linen/claret/candle world. Cards are linen stock with a colour band an
 - Content: zero sexual lines; "blow" jokes, a real-person butt and weak lines replaced.
 - Tired first-timer: two rounds. Fixed repeated messages, unclear odds, live-looking hand on others' turns, tuck wording, target chips that looked like labels.
 - Whole game at 3 and 8: reference won 8 vs 6. Gap left: players are a row of avatars, not characters sat round a table; that is the box's stage (3D seats), not this game. 8 seats fit but are small.
+
+## Two of you (2026-11-13)
+- A duel: one cake, a deeper pile (20 action cards: 4 each in hand, 12 in the pile) and 2 spare Big Breaths (`DUO` in `cards.js`). Measured with bots over 24 seeds: about 6.5 minutes median at human-ish turn times. Two cakes swung from 1.5 to 9 minutes, so no.
+- **No tucking on top.** Straight back on top made a cake ping-pong that ended the duel in three draws. The tuck sheet at 2 offers second (lands on you), third (lands on them, after a turn they can dodge in), random, bottom; the host maps a stray `pos: 0` to third.
+- Pinch picks the only other player for you. Bots dodge (Skip / Plate / Shuffle) after the other one tucks a cake at 2.
+- Demos: `returns-duo-intro`, `returns-duo-myturn`, `returns-duo-tuck`.
+- Blind critic (2026-11-13) vs Exploding Kittens two-player rules: ours won 8 v 6 (theirs ping-pongs the bomb). Gap: the hand row overflows with 5+ cards (all table sizes).

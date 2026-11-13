@@ -51,7 +51,7 @@ export class TopShelfHost {
         if (!this.cat) this.cat = this.options[Math.floor(this.api.sub(`ts-auto-${this.round}`)() * this.options.length)];
         this.lastCat = this.cat;
         this.qInRound = 0;
-        if (this.kind === 'port') return this._port();
+        if (this.kind === 'port') return this._duo() ? this._question() : this._port(); // two of you: no vote, see _victim
         if (this.kind === 'final') return this._wager();
         return this._question();
       }
@@ -134,8 +134,10 @@ export class TopShelfHost {
     return out;
   }
 
+  _duo() { return this.api.players.length === 2; }
+
   _base() {
-    return { round: this.round, of: PLAN.length, kind: this.kind, top: TOP, shelves: this._shelves(), shields: this._shields() };
+    return { duo: this._duo(), round: this.round, of: PLAN.length, kind: this.kind, top: TOP, shelves: this._shelves(), shields: this._shields() };
   }
 
   _standings() {
@@ -156,7 +158,7 @@ export class TopShelfHost {
 
   _roundStart() {
     if (this.kind === 'normal') return this._pick();
-    const leader = this.kind === 'steal' ? this._leader() : null;
+    const leader = this.kind === 'steal' || (this.kind === 'port' && this._duo()) ? this._leader() : null;
     this.api.enter('topshelf-round-intro', TS.roundIntro, { ...this._base(), leader });
   }
 
@@ -204,6 +206,9 @@ export class TopShelfHost {
   }
 
   _victim() {
+    // Two of you: "Make them answer". No vote (it would always be a tie): the leader answers
+    // alone and the one below calls it, so the round is a catch-up shot, not a coin flip.
+    if (this._duo()) { this.portTally = {}; return this._leader(); }
     const tally = {};
     for (const to of Object.values(this.portVotes || {})) tally[to] = (tally[to] || 0) + 1;
     const ids = this.api.players.map((p) => p.id);

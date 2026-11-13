@@ -12,6 +12,7 @@ export const FH = {
   hit: 100,
   streakBonus: 50,
   shout: 100,
+  clue: 50, // two players: the describer gets this per card got (no shouter vote with one shouter)
 };
 
 export class ForeheadHost {
@@ -102,7 +103,7 @@ export class ForeheadHost {
   _hostId() { return this.api.hostPlayer?.id || this.api.players[0]?.id; }
 
   _introPayload() {
-    return { canTeams: this.api.players.length >= 4, ids: this.api.players.map((p) => p.id), teams: TEAMS };
+    return { canTeams: this.api.players.length >= 4, duo: this._duo(), ids: this.api.players.map((p) => p.id), teams: TEAMS };
   }
 
   _buildOrder() {
@@ -142,6 +143,7 @@ export class ForeheadHost {
     this.turn = { guesserId, team: this._teamOf(guesserId), modifier: null };
     this.api.enter('forehead-pick', FH.pick, {
       turn: this.turnIndex + 1, of: this.order.length, guesserId, team: this.turn.team, teams: this.teams,
+      duo: this._duo(),
       decks: this.offer.map(({ id, name, hint, icon, colour, examples }) => ({ id, name, hint, icon, colour, examples })),
       scores: this._standings(),
     }, {
@@ -190,7 +192,7 @@ export class ForeheadHost {
     this.turn.countdown = countdown;
     this.api.enter('forehead-turn', FH.countdown + FH.turn, {
       turn: this.turnIndex + 1, of: this.order.length, guesserId: this.turn.guesserId, team: this.turn.team, teams: this.teams,
-      deck: this.turn.deck, modifier: this.turn.modifier, cards, countdown, length: this.api.dur(FH.turn),
+      duo: this._duo(), deck: this.turn.deck, modifier: this.turn.modifier, cards, countdown, length: this.api.dur(FH.turn),
       votes: this.turn.votes,
     }, {
       progress: () => ({
@@ -242,11 +244,18 @@ export class ForeheadHost {
     const points = hits * FH.hit + bonus;
     if (t.team) this.teamScore[t.team] += points;
     else this.api.addScores({ [t.guesserId]: points });
+    // Two of you: the describer earns clue points for every card got, so describing well pays
+    // and the winner is whoever guessed more. Replaces the top-shouter vote (only one shouter).
+    let clue = null;
+    if (this._duo() && !t.team) {
+      const other = this.api.players.find((p) => p.id !== t.guesserId);
+      if (other) { clue = { id: other.id, pts: hits * FH.clue }; if (clue.pts) this.api.addScores({ [other.id]: clue.pts }); }
+    }
     this.shout = null;
     const last = this.turnIndex + 1 >= this.order.length;
     this.api.enter('forehead-recap', FH.recap, {
       turn: this.turnIndex + 1, of: this.order.length, guesserId: t.guesserId, team: t.team, teams: this.teams,
-      deck: t.deck, modifier: t.modifier, results, hits, points, bonus, last,
+      deck: t.deck, modifier: t.modifier, results, hits, points, bonus, last, clue, duo: this._duo(),
       shoutable: this._shoutable().map((x) => x.id),
       nextId: last ? null : this.order[this.turnIndex + 1],
       scores: this._standings(),
@@ -256,8 +265,11 @@ export class ForeheadHost {
     });
   }
 
+  _duo() { return this.api.players.length === 2; }
+
   _shoutable() {
     const t = this.turn;
+    if (this._duo()) return [];
     return this.api.players.filter((p) => p.id !== t.guesserId && (!t.team || this._teamOf(p.id) === t.team));
   }
 

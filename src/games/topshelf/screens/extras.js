@@ -37,13 +37,19 @@ const ROUND = {
   final: { title: 'The Last Drop', art: DROP_ART, line: 'tsFinalIntro', rule: 'One hard question. Bet one, two or three shelves on it.' },
 };
 
+// Two of you: the port has no vote. The leader answers alone and the one below calls it.
+const DUO_ROUND = {
+  steal: { title: 'Steal!', art: STEAL_ART, line: 'tsStealIntro', rule: 'One question. Get it right while the leader gets it wrong, and you swap shelves.' },
+  port: { title: 'Make Them Answer', art: PORT_ART, line: 'tsPortIntroDuo', rule: 'The leader answers this one alone. Right: up two. Wrong: down two. The other calls it.' },
+};
+
 const roundIntro = {
   id: 'topshelf-round-intro',
   layout: 'show',
   shot: 'intro',
   mount({ show }, ctx) {
     const p = ctx.payload;
-    const r = ROUND[p.kind] || ROUND.steal;
+    const r = (p.duo && DUO_ROUND[p.kind]) || ROUND[p.kind] || ROUND.steal;
     const leader = p.leader ? ctx.player(p.leader) : null;
     const card = h(`div.ts-card.special.k-${p.kind}`,
       h('div.ts-card-round', `Round ${p.round + 1} of ${p.of}`),

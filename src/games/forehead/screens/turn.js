@@ -51,7 +51,7 @@ function mountTable(show, ctx0) {
 
   const top = h('div.fh-top',
     h('div.fh-top-ring', ring),
-    h('div.fh-top-who', disc(g, { size: 40 }), h('div', h('div.fh-eyebrow-dark', foulOnly ? 'Watch them' : 'Shout at'), h('div.fh-top-name', `${g?.name || '?'}'s bonce`), teamTag)));
+    h('div.fh-top-who', disc(g, { size: 40 }), h('div', h('div.fh-eyebrow-dark', foulOnly ? 'Watch them' : p.duo ? 'You describe' : 'Shout at'), h('div.fh-top-name', `${g?.name || '?'}'s bonce`), teamTag)));
   const hitsBox = h('div.fh-top-hits', hitsN, h('small', 'got'));
 
   let btns;
@@ -66,7 +66,7 @@ function mountTable(show, ctx0) {
     foul.addEventListener('pointerdown', () => send('foul'));
     btns = h('div.fh-slabs', foul);
   } else {
-    const hit = h('button.fh-slab.hit', { type: 'button', 'data-e2e': 'fh-hit' }, h('i', { html: ICONS.tick }), h('b', 'Got it!'), h('small', `Only ${g?.name || 'they'} can pass`));
+    const hit = h('button.fh-slab.hit', { type: 'button', 'data-e2e': 'fh-hit' }, h('i', { html: ICONS.tick }), h('b', 'Got it!'), h('small', p.duo ? `Tap when ${g?.name || 'they'} says it` : `Only ${g?.name || 'they'} can pass`));
     hit.addEventListener('pointerdown', () => send('hit'));
     btns = h('div.fh-slabs', hit);
   }
@@ -142,7 +142,7 @@ function mountTable(show, ctx0) {
       word.textContent = '';
       return;
     }
-    if (!saidGo) { saidGo = true; setQuip(firstLine(c.line(p.modifier ? `fhMod_${p.modifier.id}` : 'fhGo'))); if (!c.frozen) c.audio.sfx('bell'); }
+    if (!saidGo) { saidGo = true; setQuip(firstLine(c.line(p.modifier ? `fhMod_${p.modifier.id}` : p.duo ? 'fhGoDuo' : 'fhGo'))); if (!c.frozen) c.audio.sfx('bell'); }
     paintCard(s, seen > 0 || s.idx > 0);
     if (s.results.length > seen) { for (const r of s.results.slice(seen)) onResult(r, s); seen = s.results.length; }
     const sec = Math.ceil(s.left / 1000);
@@ -172,7 +172,7 @@ function mountGuesser(show, ctx0) {
   const hintR = h('div.fh-g-half.right', { 'data-e2e': 'fh-g-hit' }, h('span.fh-g-side.hit', h('b', 'Got it'), h('small', 'nod')));
   const clock = h('b.fh-g-clock', '60');
   const shouters = ctx.players.filter((x) => x.id !== p.guesserId && (!p.team || (p.teams?.[p.team] || []).includes(x.id)));
-  const crowd = h('div.fh-g-crowd', h('small', 'Shouting:'), shouters.map((x) => disc(x, { size: 30 })), h('i', { html: CYRIL_BADGE }));
+  const crowd = h('div.fh-g-crowd', h('small', p.duo ? 'Describing:' : 'Shouting:'), shouters.map((x) => disc(x, { size: 30 })), h('i', { html: CYRIL_BADGE }));
   const peek = h('i.fh-g-cyril', { html: CYRIL_BONCE_SVG });
   const inner = h('div.fh-g-inner', peek, status, h('div.fh-g-mid', h('div.fh-g-card', word)), h('div.fh-g-foot', crowd, h('div.fh-g-bar', bar)), count, flash, hintL, hintR);
   status.insertBefore(h('span.fh-g-clockwrap', clock), status.lastChild);

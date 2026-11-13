@@ -62,7 +62,7 @@ export default {
     } else if (!canVote) {
       foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', h('b', 'Your job: catch them cheating.'), ' Say any word on the card and it\'s a FOUL.')));
     } else {
-      foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', ctx.line('fhPick', { name: g?.name || 'them' }).join(' '))));
+      foot.append(h('div.fh-pk-note', h('i', { html: CYRIL_BADGE }), h('span', ctx.line(p.duo ? 'fhPickDuo' : 'fhPick', { name: g?.name || 'them' }).join(' '))));
     }
     const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}${meG ? '.blind' : ''}`, h('div.fh-pk-side', head, foot), h('div.fh-pk-fan', tiles));
     show.append(root);

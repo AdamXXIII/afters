@@ -40,7 +40,7 @@ export const CAT_BOTTLE = '<svg viewBox="0 0 16 28" aria-hidden="true"><path d="
 /** The question card for the show layer: category, timer, question, "Q 1 of 2". */
 export function qCard(p, { timer = true, compact = false } = {}) {
   const t = timer ? timerRing() : null;
-  const tag = p.mode === 'steal' ? 'Steal' : p.mode === 'port' ? 'Pass the Port' : p.mode === 'final' ? 'The Last Drop' : `Round ${p.round + 1} of ${p.of}${p.perRound > 1 ? ` · ${p.n} of 2` : ''}`;
+  const tag = p.mode === 'steal' ? 'Steal' : p.mode === 'port' ? (p.duo ? 'Leader alone' : 'Pass the Port') : p.mode === 'final' ? 'The Last Drop' : `Round ${p.round + 1} of ${p.of}${p.perRound > 1 ? ` · ${p.n} of 2` : ''}`;
   const card = h(`div.ts-qcard${compact ? '.compact' : ''}.m-${p.mode || 'normal'}`, { style: { '--g': cat(p.cat).glass } },
     h('div.ts-qhead', t, catChip(p.cat), h('span.ts-qtag', tag)),
     h('div.ts-q', p.q));

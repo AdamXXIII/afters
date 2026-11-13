@@ -84,7 +84,7 @@ const q = {
     if (p.mode === 'steal') {
       banner = p.leader === ctx.meId
         ? h('div.ts-banner.steal', h('b', 'You’re the leader.'), ' Get it right and nobody can steal your shelf.')
-        : h('div.ts-banner.steal', h('b', 'Steal:'), ` fastest right answer swaps shelves with ${nameOf(ctx, p.leader)} (shelf ${p.shelves[p.leader]}).`);
+        : h('div.ts-banner.steal', h('b', 'Steal:'), p.duo ? ` get it right while ${nameOf(ctx, p.leader)} gets it wrong, and you swap shelves (they’re on ${p.shelves[p.leader]}).` : ` fastest right answer swaps shelves with ${nameOf(ctx, p.leader)} (shelf ${p.shelves[p.leader]}).`);
     } else if (port && !betting) {
       banner = h('div.ts-banner.port', h('b', 'All eyes on you.'), ' Right: up two shelves. Wrong: down two.');
     } else if (betting) {

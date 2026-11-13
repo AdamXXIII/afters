@@ -53,3 +53,10 @@ Rewritten 2026-11-13 against Heads Up! (one thing everyone in the room knows, de
 
 ## 7. Look
 Bonce colour is **tomato** (the jelly). The turn card is a fat linen "place card" on the deck's colour; deck icons are hand-drawn SVG in `screens/kit.js` (film, tv, star, note, paw, theatre, mask, spanner, globe, ball, cassette, bag, monocle, blocks, pint, fizz, briefcase, dice, house, moon, suitcase). The pick tile shows icon, name, hint and three example cards on linen slips; small text on mid-bright deck colours is ink, on dark ones linen. Got it = sage, Pass = willow, Foul = tomato. Fonts per the bible: Fraunces for the card, Bricolage for UI, Caveat for nothing (no player writing here).
+
+## Two of you (2026-11-13)
+- One wears the phone, the other describes; the running order alternates, so you swap every go (2 goes each by default).
+- No top-shouter vote (one shouter). Instead the describer gets **+50 clue points** per card got, so describing well pays and the winner is whoever guessed more.
+- Copy at 2: intro "Phone on your head. Your mate describes. Swap every go."; "Describe to" / "Describing:" instead of "Shout at" / "Shouting:"; the pick line is `fhPickDuo`; the recap stamp reads "Clue points · Name +N". Teams need 4+.
+- Demos: `forehead-duo-intro|pick|turn|recap` (shoot with `--players 2`).
+- Blind critic (2026-11-13) vs plain Heads Up two-player: ours 7 v 7, won narrowly; note: the points stack is noise at 2 (cards guessed decide it).
