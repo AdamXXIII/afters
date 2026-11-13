@@ -1,7 +1,7 @@
 // Pardon? host logic. Runs on the host phone only; talks to phones ONLY through `api`.
-// Round 1 Say What? (read gibberish aloud, the reader taps who got it), Round 2 Hum Along
-// (Cyril plays a public-domain tune, everyone picks its name, fastest scores most), Round 3
-// Mishearing (write your own misheard version of a line, the table votes the funniest).
+// Round 1 Say What? (read gibberish aloud, the reader taps who got it), Round 2 Mishearing
+// (write your own misheard version of a line, the table votes the funniest), Round 3 Hum Along
+// (Cyril plays public-domain tunes, everyone picks the name, fastest scores most; ends on Backwards).
 // Rules, timers and scoring: ./DESIGN.md.
 import { GIBBERISH } from './content/gibberish.js';
 import { TUNES } from './content/tunes.js';
@@ -73,19 +73,19 @@ export class PardonHost {
       case 'pardon-round':
         this.i = 0;
         if (this.roundNo === 1) return this._read();
-        if (this.roundNo === 2) return this._tune();
-        return this._write();
+        if (this.roundNo === 2) return this._write();
+        return this._tune();
       case 'pardon-read': return this._said();
       case 'pardon-said':
         this.i += 1;
         return this.i < this.reads.length ? this._read() : this._round(2);
+      case 'pardon-write': return this._vote();
+      case 'pardon-vote': return this._verdict();
+      case 'pardon-verdict': return this._round(3);
       case 'pardon-tune': return this._tuneReveal();
       case 'pardon-tune-reveal':
         this.i += 1;
-        return this.i < this.tunes.length ? this._tune() : this._round(3);
-      case 'pardon-write': return this._vote();
-      case 'pardon-vote': return this._verdict();
-      case 'pardon-verdict':
+        if (this.i < this.tunes.length) return this._tune();
         return this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
       default:
     }
@@ -162,7 +162,7 @@ export class PardonHost {
     this.roundNo = n;
     this.api.enter('pardon-round', PD.round, {
       round: n,
-      count: n === 1 ? this.reads.length : n === 2 ? this.tunes.length : 1,
+      count: n === 1 ? this.reads.length : n === 3 ? this.tunes.length : 1,
       rows: n > 1 ? this._standings() : null,
     });
   }

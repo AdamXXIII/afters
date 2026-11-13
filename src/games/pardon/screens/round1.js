@@ -5,8 +5,8 @@ import { say, disc, colourOf, gibCard, skipBtn, standings, HINT, TRUMPET, EYE, M
 
 const ROUNDS = {
   1: { name: 'Say What?', rule: 'One reads nonsense aloud. The rest shout what it really says.', pts: 'Guess it: 1000 · Reader: up to 500' },
-  2: { name: 'Hum Along', rule: 'Cyril plays a tune. Tap its name. Faster is more.', pts: 'Up to 1200 a tune · last two count double' },
-  3: { name: 'Mishearing', rule: 'Write your own misheard version of a famous line. Vote the funniest.', pts: '300 a vote · 500 for the funniest' },
+  2: { name: 'Mishearing', rule: 'Write your own misheard version of a famous line. Vote the funniest.', pts: '300 a vote · 500 for the funniest' },
+  3: { name: 'Hum Along', rule: 'Cyril plays a tune. Tap its name. Faster is more.', pts: 'Up to 1200 a tune · last two count double' },
 };
 
 // ---------- intro ----------

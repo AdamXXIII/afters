@@ -4,8 +4,8 @@
 
 ## How it plays (the three menu panels)
 1. The reader says nonsense out loud. Shout what you hear.
-2. Cyril plays a tune. Tap its name, fast.
-3. Mishear a famous line. Vote for the funniest.
+2. Mishear a famous line. Vote for the funniest.
+3. Cyril plays a tune. Tap its name, fast.
 
 ## Flow
 | Phase | Layout | Timer | Ends early when |
@@ -21,7 +21,7 @@
 | `pardon-verdict` | show | 9.5 s | - |
 | -> `results` via `api.finish` | | | |
 
-Round 1: everyone reads once (twice each with 3 players). Round 2: 5 tunes (4 at 7-8 players); the second-last is **Wonky** (notes thrown into the wrong octave), the last is **Backwards**, both double points. Round 3: one line. About 9-12 minutes.
+Order: Say What? -> Mishearing -> Hum Along (the arc critic: end on the loud, shared, double-points tunes, not on quiet typing). Round 1: everyone reads once (twice each with 3 players). Round 2: one line. Round 3: 5 tunes (4 at 7-8 players); the second-last is **Wonky** (notes thrown into the wrong octave), the last is **Backwards**, both double points, so a trailing player can still come back. About 9-12 minutes.
 
 ## Round 1, Say What?
 - The reader's phone shows the gibberish big, word by word, on a linen card, plus "Hold to see the answer" (press and hold; so the reader knows when someone's said it). The sheet is a big grid of everyone else: tap who said it first, or "Nobody got it".
@@ -30,12 +30,12 @@ Round 1: everyone reads once (twice each with 3 players). Round 2: 5 tunes (4 at
 - **Wrong accent:** every third card the reader must do a voice (newsreader, pirate, your nan...). Every phone shows it, so the table knows.
 - Scores: guesser 1000 (500 on a steal). Reader 500 if it's got within 10 s, 200 if later (before the steal).
 
-## Round 2, Hum Along
+## Round 3, Hum Along
 - The speaker phone plays the melody on the house electric piano (with a soft octave below), and hushes the music bed while it plays. Every other phone has "Play here too". A music-box strip (punched paper under a brass comb) runs on every phone in time with the notes.
 - Four titles: the answer, two of the same kind (nursery / carol / folk / classical), one wildcard. One tap, no changing.
 - Scores: `max(300, 1000 - 45 x seconds)` from when the tune starts, +200 for the first right answer, x2 on Wonky and Backwards. The reveal plays a backwards or wonky tune the right way round on the speaker phone.
 
-## Round 3, Mishearing
+## Round 2, Mishearing
 - Everyone writes their own misheard version of one public-domain line (max 70 chars; the real line is refused).
 - Anonymous vote (not your own; duplicates merge and credit both). If fewer than 3 entries, Cyril adds his own mishearings (worth nothing).
 - Verdict: cards land from fewest votes to most, author stamps, the top one gets "Funniest". 300 a vote, +500 for the funniest.
