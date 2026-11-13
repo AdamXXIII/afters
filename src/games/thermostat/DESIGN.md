@@ -14,7 +14,7 @@ One of you secretly sees a spot on a scale ("Tacky ... Classy") and says one clu
 | Phase | Screens | Layout | Timer | Ends early when |
 |---|---|---|---|---|
 | `thermostat-intro` | intro | show | 9 s (host skip after 2 s) | - |
-| `thermostat-clue` | `thermostat-give` (Clue-giver) / `thermostat-listen` | input / split | 45 s | the Clue-giver taps "I've said my clue" |
+| `thermostat-clue` | `thermostat-give` (Clue-giver) / `thermostat-listen` | input / split | 45 s | the Clue-giver taps "Send my clue" (typing is optional; it shows on every phone, and they say it out loud too) |
 | `thermostat-dial` | `thermostat-dial` / `thermostat-squirm` (Clue-giver) | split | 60 s | every guesser is locked in |
 | `thermostat-reveal` | reveal | show | 8.4 s (bands bloom 1.4 s, verdict 3.2 s, points 4.5 s) | - |
 | `thermostat-scores` (once) | standings + who takes the hot seat | show | 7 s | - |
@@ -47,3 +47,10 @@ An old brass-rimmed room thermostat on a walnut mount, at the dinner table. Half
 
 ## Changes from the critic loop
 - Round 1 (blind vs the official app's store screenshots): ours won onboarding, core dial, reveal and whole game; content lost (physical-fact scales with one right answer, food-prone ends like Cold/Hot, a Soft/Hard scale that invites innuendo, duplicates). Fixes: 27 scales rewritten or replaced; a "last hand on the dial" bonus cut (every critic found it confusing); the "You: +300" pill cut; needle changed from claret to ink because it vanished on the claret bullseye; the verdict stamp moved below the dial so it doesn't hide the result; Cyril stays quiet on scoring reveals so his bubble doesn't sit on the points.
+- Round 2: core and reveal still won blind; content still lost (too many factual scales, duplicates). Tired first-timer: the Give screen was unclear (type or say?), "Sam is turning it" next to Cyril's "Everybody grab it" contradicted, the scale-end arrows looked tappable. Fixes: 20 more scales (abstract and sensory: Feels cold / Feels warm, Mainstream / Niche, Sounds made up / Sounds real, More of a dog / More of a cat, Feels like a hug / Feels like a slap...); Give says "Type your clue, then say it" with a "Send my clue" button; a one-line "One dial for everyone" hint; arrows removed; a dotted target mark on the bullseye.
+- Round 3: content critic still says no, with a moving target (it now wants physical scales, which round 1 cut). Stopped (two rounds without a decisive win). **Gap left:** about a third of the family deck is the same "Bad X / Great X" verdict shape. The first-timer critic flagged the squirm title (read like an error) and that the reveal didn't say what the bands are worth: retitled "Your clue is out. Keep quiet." and added a colour key under the reveal (Spot on 300 / Warm 200 / Lukewarm 100). Zero sexual entries across all three content reads (Soft / Hard and two abstract shape scales were cut as innuendo risks anyway).
+
+## Gaps and shared changes
+- Shared: no `thermostat` dish art in `src/screens/menu-art.js` (cloche fallback).
+- Shared: Cyril's bubble in the `input` strip is clipped at the top of the screen (same on Character Witness's dock screen).
+- The reveal is a show screen that moves on by itself; one first-timer looked for a Next button (box-wide pattern).

@@ -65,7 +65,9 @@ const reveal = {
     const panel = h(`div.th-rv${p.final ? '.final' : ''}`,
       card,
       h('div.th-rv-dial', h('div.th-dialwrap', d, ends(p.scale))),
-      stamp, pts, you);
+      stamp, pts,
+      h('div.th-key', ['spot', 'warm', 'luke'].map((b) => h(`span.k.${b}`, h('i'), `${VERDICT[b]} ${{ spot: 300, warm: 200, luke: 100 }[b] * m}`))),
+      you);
     show.append(panel);
 
     // points rows

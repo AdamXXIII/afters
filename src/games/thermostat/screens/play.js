@@ -21,8 +21,8 @@ const give = {
     const d = dial({ cls: '.give', needle: false });
     d.bands(target, p.final);
     d.heat(1);
-    const field = textField({ max: p.max || 40, placeholder: 'Type it too, so it shows on every phone', onSubmit: () => send(), e2e: 'clue-input', enterkeyhint: 'done' });
-    const btn = button('I’ve said my clue', { onClick: () => send(), e2e: 'said' });
+    const field = textField({ max: p.max || 40, placeholder: 'It shows on every phone', onSubmit: () => send(), e2e: 'clue-input', enterkeyhint: 'done' });
+    const btn = button('Send my clue', { onClick: () => send(), e2e: 'said' });
     function send() {
       const clue = field.input.value.trim();
       ctx.audio.sfx('plated'); ctx.haptic('submit');
@@ -35,8 +35,8 @@ const give = {
     }
     const el = h(`div.th-sheet.th-give.th-in${p.final ? '.final' : ''}`,
       h('div.th-head',
-        h('div.th-title', p.final ? 'Hot seat: say one clue' : 'Say one clue out loud'),
-        h('div.th-sub', 'Only you can see the target (the dark red bit). Say something that sits right there.')),
+        h('div.th-title', p.final ? 'Hot seat: type your clue' : 'Type your clue, then say it'),
+        h('div.th-sub', 'Only you can see the target: the dark red middle. Pick a thing that sits right there.')),
       h('div.th-dialwrap', d, ends(p.scale)),
       h('div.th-rule', p.final ? 'The target is half as wide. Every point triples.' : 'One clue. No numbers, no pointing, no faces.'),
       h('div.th-field', field),
@@ -216,7 +216,7 @@ const squirm = {
     const status = h('div.th-status');
     const locks = locksRow(ctx);
     sheet.append(h(`div.th-sheet.th-dialsheet.th-squirm.th-in${p.final ? '.final' : ''}`,
-      h('div.th-head.center', h('div.th-title', 'Not a word'), h('div.th-sub', 'You score double whatever they score.')),
+      h('div.th-head.center', h('div.th-title', 'Your clue is out. Keep quiet.'), h('div.th-sub', 'They’re dragging the dial. You score double what they score.')),
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
       h('div.th-lockrow.solo', locks)));

@@ -176,6 +176,12 @@
 .th-prow.giver .lbl, .th-prow.hand .lbl { padding-left: 0; }
 .th-prow .v { font: 900 21px var(--f-display); color: var(--c-claret); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .th-prow.none .lbl { text-align: center; color: var(--c-toffee); }
+.th-key { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; font: 700 13px/16px var(--f-ui); color: var(--c-linen); opacity: .92; }
+.th-key .k { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 5px; border-radius: 999px; background: rgba(42,20,14,.6); }
+.th-key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.th-key .spot i { background: var(--c-claret); box-shadow: 0 0 0 1.5px #FFFBF4; }
+.th-key .warm i { background: var(--c-tomato); }
+.th-key .luke i { background: var(--c-candle); }
 .th-you { align-self: center; padding: 6px 14px; border-radius: 999px; background: rgba(42,20,14,.72); color: var(--c-linen); font: 700 16px/20px var(--f-ui); opacity: 0; transition: opacity 300ms 200ms; text-align: center; }
 .th-you.on { opacity: 1; }
 
@@ -231,7 +237,7 @@
   .th-prow .v { font-size: 17px; }
   .th-verdict b { font-size: 22px; }
   .th-verdict .pts { font-size: 17px; }
-  .th-you { display: none; }
+  .th-you, .th-key { display: none; }
 
   .th-cardwrap { justify-content: flex-end; padding: 12px calc(var(--safe-r) + 18px) calc(var(--rail-h) + var(--safe-b) + 6px) 40%; }
   .th-how { width: 100%; max-width: 500px; padding: 16px 18px 14px; display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: center; }
