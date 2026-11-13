@@ -38,7 +38,7 @@ function handRow(ctx, { pick = null, ready = null } = {}) {
   const order = ['breath', 'steady', 'skip', 'plate', 'peek', 'shuffle', 'pinch'];
   const cards = hand.slice().sort((a, b) => order.indexOf(a.k) - order.indexOf(b.k));
   const els = new Map();
-  const row = h(`div.rt-hand${cards.length > 5 ? '.lots' : ''}`, { role: pick ? 'listbox' : 'list', 'aria-label': 'Your hand' },
+  const row = h(`div.rt-hand${cards.length > 3 ? '.lots' : ''}`, { role: pick ? 'listbox' : 'list', 'aria-label': 'Your hand' },
     cards.length ? cards.map((c, i) => {
       const el = cardFace(ctx, c, { size: 'hand', cls: `${ready?.(c) ? '.ready' : ''}${pick && !KINDS[c.k].act ? '.idle' : ''}` });
       el.style.setProperty('--i', i);
@@ -132,7 +132,7 @@ const myturn = {
       if (K.target) {
         const others = (ctx.payload.alive || []).filter((id) => id !== ctx.meId);
         targets.hidden = false;
-        targets.append(h('span.rt-targets-l', 'From'), ...others.map((id) => {
+        targets.append(h('span.rt-targets-l', target ? 'Pinch from' : 'Tap who to pinch from:'), ...others.map((id) => {
           const n = ctx.payload.counts?.[id] || 0;
           const t = h(`button.rt-target${target === id ? '.on' : ''}${n ? '' : '.empty'}`, { type: 'button', 'data-e2e': `rt-target-${id}`, disabled: !n, style: { '--pc': colourOf(ctx, id) } },
             disc(ctx, id, { size: 30 }), h('span.nm', ownName(ctx, id)), h('span.ct', `${n}`));
@@ -140,7 +140,7 @@ const myturn = {
           return t;
         }));
       }
-      const label = K.target ? (target ? `Pinch from ${ownName(ctx, target)}` : 'Pick who to pinch from') : `Play ${K.name}`;
+      const label = K.target ? (target ? `Pinch from ${ownName(ctx, target)}` : 'Tap a name first') : `Play ${K.name}`;
       const go = button(label, { e2e: 'rt-play', onClick: playSel, disabled: K.target && !target });
       go.classList.add('rt-play-btn');
       go.style.setProperty('--kc', K.colour);
@@ -200,6 +200,7 @@ const watch = {
       out ? null : h('div.rt-handhead', h('span.rt-handhead-t', 'Your hand'), h('div.rt-hint', hasSteady ? 'Just watch. If they play a card, you can Steady On it.' : 'Just watch. Nothing to tap till your turn.')),
       out ? h('div.rt-ghostnote', disc(ctx, ctx.meId, { size: 40, cls: '.gone' }), h('span', 'Your candles are out. You can still throw bread rolls.')) : handRow(ctx, { ready: (c) => c.k === 'steady' }));
     sheet.append(body);
+    if (!ctx.frozen) ctx.stage?.hop?.(p.turn);
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 900 });
     const cancel = sayLater(ctx, ctx.line('rtWatch', { name: ownName(ctx, p.turn) }), { delay: 900 });
     return { frame(c) { b.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
@@ -234,7 +235,7 @@ const play = {
         c.append(h('span.rt-by', { style: { '--pc': colourOf(ctx, x.by) } }, nameOf(ctx, x.by)));
         return c;
       }));
-    const verdict = h(`div.rt-verdict${p.cancelled ? '.no' : '.yes'}`, p.cancelled ? 'Cancelled… unless someone Steadies On back' : chain.length > 1 ? 'Back on… unless someone Steadies On again' : 'Happens in a moment, unless someone says Steady On');
+    const verdict = h(`div.rt-verdict${p.cancelled ? '.no' : '.yes'}`, p.cancelled ? 'Cancelled… unless someone Steadies On back' : chain.length > 1 ? 'Back on… unless someone Steadies On again' : 'Goes ahead when the fuse burns out, unless someone says Steady On');
     const fuse = h('div.rt-fuse', h('i'));
     const priv = ctx.priv || {};
     const nSteady = (priv.hand || []).filter((c) => c.k === 'steady').length;
@@ -328,7 +329,7 @@ const tuck = {
   shot: 'vote',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const b = top(show, ctx, { label: 'Hide the cake', sub: 'Nobody else can see where', line: null });
+    const b = top(show, ctx, { label: 'You survived!', sub: 'Now hide the cake. Only you see where.', line: null });
     const n = p.pile || 0;
     const slots = SLOTS.filter((s) => !(Number.isInteger(s.pos) && s.pos > n));
     const list = h('div.rt-slots', slots.map((s, i) => {

@@ -143,6 +143,7 @@
 .rt-hint { font-size: 14px; line-height: 18px; font-weight: 550; color: var(--c-toffee); text-wrap: balance; min-width: 0; }
 .rt-hand { display: flex; gap: 8px; overflow-x: auto; overflow-y: visible; padding: 14px 4px 10px; margin: -12px -18px 0; padding-left: 18px; padding-right: 18px; scroll-snap-type: x proximity; scrollbar-width: none; flex: none; }
 .rt-hand::-webkit-scrollbar { display: none; }
+.rt-hand.lots { -webkit-mask: linear-gradient(90deg, #000 calc(100% - 46px), transparent); mask: linear-gradient(90deg, #000 calc(100% - 46px), transparent); }
 .rt-hand > .rt-card { scroll-snap-align: start; animation: rtDeal 420ms var(--ease-out-back) calc(var(--i) * 45ms) backwards; }
 @keyframes rtDeal { from { opacity: 0; transform: translateY(26px) rotate(4deg); } to { opacity: 1; transform: none; } }
 .rt-hand[role="listbox"] > .rt-card { cursor: pointer; }
@@ -160,7 +161,7 @@
 .rt-targets { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .rt-targets[hidden] { display: none; }
 .rt-targets-l { font-weight: 800; font-size: 15px; color: var(--c-ink); margin-right: 2px; }
-.rt-target { display: inline-flex; align-items: center; gap: 7px; height: 46px; padding: 0 12px 0 7px; border-radius: 999px; border: 2px solid var(--c-crumb); background: #FFFBF4; color: var(--c-ink); font: 700 15px var(--f-ui); cursor: pointer; transition: transform 160ms var(--ease-out-back), border-color 160ms, background-color 160ms; }
+.rt-target { display: inline-flex; align-items: center; gap: 7px; height: 48px; padding: 0 12px 0 7px; border-radius: 999px; border: 2px solid var(--pc); background: #FFFBF4; box-shadow: 0 3px 0 rgba(59,31,24,.18), var(--sh-1); color: var(--c-ink); font: 700 15px var(--f-ui); cursor: pointer; transition: transform 160ms var(--ease-out-back), border-color 160ms, background-color 160ms; }
 .rt-target .ct { font-size: 12px; font-weight: 800; color: var(--c-toffee); background: var(--c-tablecloth); border-radius: 8px; padding: 1px 6px; }
 .rt-target.on { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 14%, #FFFBF4); transform: scale(1.04); }
 .rt-target.empty { opacity: .4; cursor: default; }
