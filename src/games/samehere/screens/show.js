@@ -53,7 +53,7 @@ function standingsBoard(ctx, p) {
       h('span.sc', String(r.score)),
       up ? h('span.sh-plus', '+1') : null);
   });
-  return h('div.sh-board', h('div.sh-board-h', h('span', 'Total points. First to '), h('b', String(p.target)), h('span', ' wins')), rows,
+  return h(`div.sh-board${p.standings.length > 5 ? '.many' : ''}`, h('div.sh-board-h', h('span', 'Total points. First to '), h('b', String(p.target)), h('span', ' wins')), rows,
     p.chair ? h('div.sh-board-foot', chair({ size: 20 }), `${nameOf(ctx, p.chair)} can’t win while on the Wobbly Chair.`) : null);
 }
 

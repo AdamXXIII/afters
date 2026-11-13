@@ -332,3 +332,8 @@
 .sh-grp-chair { position: absolute; right: 52px; top: 50%; margin-top: -19px; opacity: 0; transform: translateY(-30px) scale(.6); transition: opacity 200ms, transform 520ms var(--ease-out-back); }
 .sh-grp.chairhit .sh-grp-chair { opacity: 1; transform: none; }
 .sh-grp-chair .ch-wood { stroke: #F1D7A6; } .sh-grp-chair .ch-seat { fill: var(--c-brass); stroke: #7A5A1C; }
+.sh-board.many { gap: 1px; padding: 8px 10px; }
+.sh-board.many .sh-srow { min-height: 32px; }
+.sh-board.many .sh-srow .sh-av { width: 24px !important; height: 24px !important; }
+.sh-board.many .sh-srow .nm { font-size: 15px; }
+.sh-board.many .sh-srow .sc { font-size: 17px; }
