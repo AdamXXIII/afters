@@ -332,7 +332,7 @@ export default {
       speakerPill.querySelector('.lb-pill-v').textContent = spk?.id === meId ? 'My phone' : spk ? spk.name : 'Off';
 
       startBtn.disabled = n < MIN_PLAYERS;
-      const want = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more for a party` : `Ring the bell \u00b7 ${n} at the table`;
+      const want = n < MIN_PLAYERS ? `Need ${MIN_PLAYERS - n} more to play` : (n === 2 ? 'Ring the bell \u00b7 just the two of you' : `Ring the bell \u00b7 ${n} at the table`);
       if (startBtn.dataset.lbl !== want) { startBtn.dataset.lbl = want; setStart(want, n >= MIN_PLAYERS); }
       const host = ps.find((p) => p.id === hostId);
       waitCard.querySelector('.lb-wait-txt').textContent = n < MIN_PLAYERS

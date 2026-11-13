@@ -16,7 +16,7 @@ function bool(name, def = false) {
 export const params = {
   demo: q.get('demo') || null,            // screen id to jump to
   seed: num('seed', 0) >>> 0 || null,     // determinism
-  players: Math.max(3, Math.min(8, num('players', 5))),
+  players: Math.max(2, Math.min(8, num('players', 5))),
   me: q.get('me') === 'guest' ? 'guest' : 'host',
   freeze: bool('freeze'),                 // stop timers / engine for screenshots
   t: q.has('t') ? num('t', 0) : null,     // frozen elapsed ms within the phase

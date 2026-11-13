@@ -11,7 +11,7 @@ import { AVATARS, NIGHT_POINTS } from '../game/constants.js';
 import { SHOTS } from '../stage/Stage.js';
 import {
   dishSvg, CHERRY_SVG, PEOPLE_SVG, CLOCK_SVG, INVITE_SVG, BACK_SVG, TICK_SVG, EYE_SVG,
-  AGAIN_SVG, NEW_SVG, MOOD_ICONS,
+  AGAIN_SVG, NEW_SVG, MOOD_ICONS, TWO_SVG,
 } from './menu-art.js';
 import { qrSvg } from '../ui/qr.js';
 import { sayLater } from './common.js';
@@ -192,6 +192,9 @@ export default {
       const gc = g.colour || '#C89B3C';
       const fans = h('span.mn-fans');
       const fitTag = h('span.mn-row-need');
+      const two = gameRange(g)[0] <= 2 && !g.comingSoon; // plays with two: marked at any table size
+      const duoMark = two ? h('span.mn-row-two', { title: 'Good for two', 'aria-label': 'Good for two too' }, h('i', { html: TWO_SVG }), 'Two can play') : null;
+      const hint = h('span.mn-row-c', g.comingSoon ? 'Coming soon' : (g.hint || g.tagline || ''));
       const look = h('span.mn-row-look', h('i', { html: EYE_SVG }), h('span.mn-row-look-t'));
       const btn = h(`button.mn-row${g.comingSoon ? '.soon' : ''}`, {
         type: 'button', 'data-e2e': `dish-${g.id}`,
@@ -200,15 +203,15 @@ export default {
       h('span.mn-row-dish', { html: dishSvg(g.dish) }),
       h('span.mn-row-txt',
         h('span.mn-row-t', g.title),
-        h('span.mn-row-c', g.comingSoon ? 'Coming soon' : (g.hint || g.tagline || '')),
+        hint,
         h('span.mn-row-m',
           h('span.mn-row-i', h('i', { html: PEOPLE_SVG }), `${lo}–${hi}`),
           h('span.mn-row-i', h('i', { html: CLOCK_SVG }), `${g.minutes || 10} min`),
-          fitTag, look)),
+          duoMark, fitTag, look)),
       fans);
       onTap(btn, () => tapRow(g, btn));
       const li = h('li.mn-li', btn);
-      rows.set(g.id, { g, li, btn, fans, fitTag, look });
+      rows.set(g.id, { g, li, btn, fans, fitTag, look, hint, duoMark });
     });
     const emptyBox = h('li.mn-empty');
 
@@ -220,6 +223,7 @@ export default {
     function openCard(g) {
       openId = g.id;
       cardKey = '';
+      document.body.classList.add('mn-reading'); // Cyril's chatter steps back while a card is read
       if (c.isHost) c.client.focusGame(g.id);
       card.hidden = false;
       card.classList.remove('out');
@@ -232,6 +236,7 @@ export default {
       if (!openId) return;
       const was = openId;
       openId = null;
+      document.body.classList.remove('mn-reading');
       if (c.isHost && c.progress.focus === was) c.client.focusGame(null);
       card.classList.remove('in');
       card.classList.add('out');
@@ -283,6 +288,9 @@ export default {
         h('li', h('i', { html: CLOCK_SVG }), h('span', `${g.minutes || 10} min`)),
         h(`li.rate${r18 ? '.r18' : ''}`, h('span', r18 ? 'Adults 18+' : 'Family')));
 
+      const duoBox = n === 2 && ok && g.duo
+        ? h('div.mn-duo', h('i', { html: TWO_SVG }), h('p', h('b', 'With two: '), g.duo))
+        : null;
       const steps = (g.steps || [g.blurb || g.tagline || '']).slice(0, 3);
       const how = h('ol.mn-how', { 'aria-label': 'How it plays' },
         steps.map((s, i) => h('li.mn-panel', { style: { '--k': i } }, h('span.mn-panel-n', String(i + 1)), h('p', s))));
@@ -316,6 +324,7 @@ export default {
               h('h2.mn-card-t#mn-card-title', g.title),
               h('p.mn-card-tag', g.tagline || g.hint || ''))),
           facts,
+          duoBox,
           h('h3.mn-how-h', 'How it plays'),
           how,
           fanLine),
@@ -350,8 +359,12 @@ export default {
         onTap(b, () => (c.isHost ? serve(g) : fancy(g)));
         return b;
       };
-      againBox.replaceChildren(tile(last, 'same'), tile(next, 'new'));
-      againSide.replaceChildren(tile(last, 'same'), tile(next, 'new'));
+      // the last game may not fit any more (two left after a 3+ game): then only the suggestion shows
+      const same = fits(last) ? last : null;
+      againBox.classList.toggle('one', !same);
+      againSide.classList.toggle('one', !same);
+      againBox.replaceChildren(...[tile(same, 'same'), tile(next, 'new')].filter(Boolean));
+      againSide.replaceChildren(...[tile(same, 'same'), tile(next, 'new')].filter(Boolean));
     }
 
     // ---------- Invite: big code + QR + the join address ----------
@@ -389,6 +402,7 @@ export default {
     function serve(g) {
       if (served || !fits(g)) return;
       served = true;
+      document.body.classList.remove('mn-reading');
       c.audio.sfx('bell');
       c.cyril.react('guffaw');
       c.say(c.line('menuServe', { game: g.title }), { hold: 1400, compact: true });
@@ -440,7 +454,9 @@ export default {
           kids.push(emptyBox);
         }
         if (tail.length) {
-          kids.push(h('li.mn-tail-h', `Not for ${n} of you`));
+          const minTail = Math.min(...tail.map((g) => gameRange(g)[0]));
+          kids.push(h('li.mn-tail-h', h('b', `Not for ${n} of you`),
+            n < minTail ? h('span', ` These need ${minTail} or more. Invite someone and they’re on.`) : null));
           kids.push(...tail.map((g) => rows.get(g.id).li));
         }
         list.replaceChildren(...kids);
@@ -451,8 +467,13 @@ export default {
         const ok = fits(g);
         const [lo, hi] = gameRange(g);
         r.btn.classList.toggle('cant', !g.comingSoon && !ok);
-        r.fitTag.textContent = g.comingSoon || ok ? '' : (n < lo ? `Needs ${lo}` : `Max ${hi}`);
+        r.fitTag.textContent = g.comingSoon || ok ? '' : (n < lo ? `${lo}+ players` : `Max ${hi}`);
         r.fitTag.hidden = g.comingSoon || ok;
+        // at two, the row's second line says how it plays with two; the mark would only repeat it
+        const duoLine = n === 2 && ok && g.duo;
+        r.hint.textContent = g.comingSoon ? 'Coming soon' : duoLine ? g.duo : (g.hint || g.tagline || '');
+        r.hint.classList.toggle('duo', !!duoLine);
+        if (r.duoMark) r.duoMark.hidden = n === 2;
         r.btn.classList.toggle('is-focus', id === focus);
         r.btn.classList.toggle('is-open', id === openId);
         const lookOn = id === focus && !c.isHost;
@@ -493,7 +514,8 @@ export default {
       const guests = seated().filter((p) => p.id !== c.state?.hostId);
       const fancied = guests.filter((p) => fancyOf(p.id)).length;
       const tally = {};
-      for (const gid of Object.values(c.progress.fancy || {})) if (gid) tally[gid] = (tally[gid] || 0) + 1;
+      // only games this table can actually play count as "most fancied"
+      for (const gid of Object.values(c.progress.fancy || {})) if (gid && byId.get(gid) && fits(byId.get(gid))) tally[gid] = (tally[gid] || 0) + 1;
       const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
       const topG = top && byId.get(top[0]);
       const key = [c.isHost, focus?.id, openId, fancied, guests.length, topG?.id, top?.[1], hostName(), fancyOf(c.meId)].join('|');
@@ -527,7 +549,7 @@ export default {
     const lead = (c.payload.night || []).find((r) => r.rank === 1 && r.night > 0);
     const greet = lead && c.player(lead.id) && (c.payload.history || []).length
       ? c.line('nightLead', { name: c.player(lead.id).name })
-      : c.line(c.isHost ? 'menuHost' : 'menuGuest');
+      : c.line(seated().length === 2 ? 'menuDuo' : c.isHost ? 'menuHost' : 'menuGuest');
     const cancel = sayLater(c, greet, { delay: 700, hold: 2600, placement: 'side', compact: true });
     let lastRating = c.rating;
     let lastFocus = c.progress.focus;
@@ -551,7 +573,7 @@ export default {
         }
         paint();
       },
-      unmount() { cancel?.(); inviteEl?.remove(); window.removeEventListener('keydown', onKey); window.removeEventListener('resize', syncArrows); },
+      unmount() { document.body.classList.remove('mn-reading'); cancel?.(); inviteEl?.remove(); window.removeEventListener('keydown', onKey); window.removeEventListener('resize', syncArrows); },
     };
   },
 };

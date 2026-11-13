@@ -55,6 +55,11 @@ export const LINES = {
     ['The trolley, madam. Or sir. Or whoever\'s holding the phone.'],
     ['Something sweet? Something savage? Point at a dish.'],
   ],
+  menuDuo: [
+    ['Just the two of you. These are the ones made for a pair.'],
+    ['A table for two. I\'ve put the right dishes at the top.'],
+    ['Two of you, a candle and a menu. Romantic. Pick one.'],
+  ],
   menuGuest: [
     ['Your host is choosing. Shout at them if you must.'],
     ['Tap the dish you fancy. The host may even listen.'],

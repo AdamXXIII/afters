@@ -4,6 +4,8 @@
    play again, heading, mood chips, the menu card), and a foot line that says who serves.
    A game's card slides up over the bay. Every functional text is 16 px or more, targets 44+. */
 body[data-screen="menu"] #show { height: 100%; }
+/* a game card is open: Cyril's bubble steps back so it never sits on the rules (his serve line still shows) */
+body.mn-reading #bubbles { opacity: 0; transition: opacity var(--d-small); }
 .mn {
   --band: calc(var(--safe-t) + 158px);
   position: absolute; inset: 0;
@@ -199,7 +201,19 @@ body[data-screen="menu"] #show { height: 100%; }
 .mn-row-i { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .mn-row-i i, .mn-row-look i { width: 17px; height: 17px; display: block; flex: none; }
 .mn-row-i svg, .mn-row-look svg { width: 100%; height: 100%; display: block; }
-.mn-row-need { padding: 3px 8px; border-radius: var(--r-pill); background: var(--c-tomato); color: var(--c-linen); font: 800 15px/1.1 var(--f-ui); white-space: nowrap; }
+.mn-row-need { padding: 3px 8px; border-radius: var(--r-pill); background: var(--c-tablecloth); box-shadow: inset 0 0 0 1.5px var(--c-crumb); color: var(--c-toffee); font: 800 15px/1.1 var(--f-ui); white-space: nowrap; }
+/* plays with two: a small willow mark on the info line, at any table size */
+.mn-row-two { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 6px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--c-willow) 12%, var(--c-linen)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c-willow) 45%, transparent); color: var(--c-willow); font: 800 15px/1.1 var(--f-ui); white-space: nowrap; }
+.mn-row-two[hidden] { display: none; }
+.mn-row-two i { width: 17px; height: 17px; display: block; }
+.mn-row-two svg { width: 100%; height: 100%; display: block; }
+.mn-row-c.duo { color: var(--c-willow); font-weight: 650; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mn-again.one { grid-template-columns: 1fr; }
+.mn-duo { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r-2); background: color-mix(in srgb, var(--c-willow) 10%, var(--c-linen)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c-willow) 35%, transparent); }
+.mn-duo i { width: 26px; height: 26px; flex: none; color: var(--c-willow); }
+.mn-duo svg { width: 100%; height: 100%; display: block; }
+.mn-duo p { margin: 0; font: 600 calc(17px * var(--ts))/1.35 var(--f-ui); color: var(--c-ink); text-wrap: pretty; }
+.mn-duo b { color: var(--c-willow); font-weight: 800; }
 .mn-row-need[hidden], .mn-row-look[hidden] { display: none; }
 .mn-row-look { display: inline-flex; align-items: center; gap: 4px; color: var(--c-willow); font-weight: 800; white-space: nowrap; }
 .mn-row.cant .mn-row-dish { filter: grayscale(.85) opacity(.6); }
@@ -223,7 +237,8 @@ body[data-screen="menu"] #show { height: 100%; }
 .mn-fans-n { margin-left: 3px; font: 800 15px/1 var(--f-ui); color: var(--c-toffee); }
 .mn-row.mine .mn-fans { filter: drop-shadow(0 0 0 transparent); }
 
-.mn-tail-h { margin: 8px 16px 0; padding-top: 12px; border-top: 2px solid var(--c-crumb); font: 800 16px/1.2 var(--f-ui); color: var(--c-toffee); }
+.mn-tail-h { margin: 8px 16px 0; padding-top: 12px; border-top: 1.5px dashed var(--c-crumb); font: 500 16px/1.3 var(--f-ui); color: var(--c-toffee); }
+.mn-tail-h b { color: var(--c-ink); font-weight: 800; }
 .mn-empty { padding: 18px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; font: 500 17px/1.3 var(--f-ui); color: var(--c-toffee); }
 .mn-empty p { margin: 0; }
 .mn-empty-b { appearance: none; cursor: pointer; min-height: 44px; padding: 0 16px; border-radius: var(--r-pill); border: 2px solid var(--c-willow); background: transparent; color: var(--c-willow); font: 800 16px/1 var(--f-ui); }
