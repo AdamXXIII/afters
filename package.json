@@ -6,7 +6,7 @@
   "description": "AFTERS - a phone-only party game for after dinner.",
   "scripts": {
     "dev": "vite --host",
-    "build": "node scripts/make-icons.mjs && vite build",
+    "build": "vite build",
     "preview": "vite preview --host --port 4173",
     "shoot": "node scripts/shoot.mjs",
     "e2e": "node scripts/e2e.mjs",
