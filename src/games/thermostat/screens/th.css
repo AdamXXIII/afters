@@ -252,3 +252,42 @@
   .th-srow, .th-srow.top { min-height: 40px; }
   .th-nextup { padding: 6px 12px; }
 }
+
+/* ---------- two players (co-op against Cyril's target) ---------- */
+.th-duo-target { display: grid; justify-items: center; gap: 2px; font-style: normal; }
+.th-duo-target small { font: 700 12px/14px var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: rgba(251,244,234,.75); }
+.th-duo-target b { font: 900 40px/1 var(--f-display); color: var(--c-candle); font-variant-numeric: tabular-nums; font-variation-settings: "SOFT" 60, "WONK" 0; }
+.th-duo-target em { font: italic 600 15px/19px var(--f-display); color: rgba(251,244,234,.85); }
+.th-tally { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; align-items: center; column-gap: 10px; row-gap: 6px; padding: 9px 14px 10px; border-radius: 16px; background: rgba(251,244,234,.96); background-image: var(--paper); box-shadow: 0 8px 18px rgba(20,8,5,.3); }
+.th-tally .lbl { font: 700 13px/16px var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--c-toffee); }
+.th-tally > b { justify-self: start; font: 900 26px/1 var(--f-display); color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.th-tally .of { justify-self: end; font: 650 14px/18px var(--f-ui); color: var(--c-toffee); font-variant-numeric: tabular-nums; }
+.th-tally .bar { grid-column: 1 / -1; position: relative; height: 12px; border-radius: 999px; background: var(--c-crumb); box-shadow: inset 0 1px 2px rgba(42,26,23,.18); overflow: visible; }
+.th-tally .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: linear-gradient(90deg, var(--c-willow), var(--c-mustard) 55%, var(--c-tomato)); transition: width 650ms var(--ease-out-quint); }
+.th-tally .goal { position: absolute; right: -2px; top: -5px; width: 4px; height: 22px; border-radius: 2px; background: var(--c-claret); }
+.th-tally.beat .of { color: var(--c-claret); font-weight: 800; }
+.th-scores.duo { gap: 10px; }
+.th-duo-need { align-self: center; max-width: 340px; padding: 7px 16px; border-radius: 16px; background: rgba(42,20,14,.78); color: var(--c-linen); font: 600 16px/21px var(--f-ui); text-align: center; text-wrap: balance; }
+.th-duo-need b { color: var(--c-candle); font-weight: 800; }
+.th-vd { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.th-vd.beat { box-shadow: 0 0 0 3px var(--c-brass), 0 4px 0 #3B1F18, 0 0 60px rgba(255,200,107,.35), 0 24px 50px rgba(10,4,2,.55); }
+.th-vd-avs { display: flex; gap: 0; }
+.th-vd-avs .th-av { box-shadow: 0 0 0 3px #5A3424; }
+.th-vd-avs .th-av + .th-av { margin-left: -10px; }
+.th-vd-eyebrow { font: 700 13px/16px var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--c-candle); }
+.th-vd-sub { font: italic 600 17px/22px var(--f-display); color: rgba(251,244,234,.9); text-wrap: balance; }
+.th-vd-score { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+.th-vd-score b { font: 900 54px/1 var(--f-display); font-variant-numeric: tabular-nums; font-variation-settings: "SOFT" 60, "WONK" 0; }
+.th-vd-score span { font: 700 18px var(--f-ui); color: rgba(251,244,234,.8); font-variant-numeric: tabular-nums; }
+.th-vd-bands { display: flex; gap: 6px; }
+.th-vd-bands i { width: 22px; height: 22px; border-radius: 6px; background: rgba(251,244,234,.18); box-shadow: inset 0 0 0 1.5px rgba(251,244,234,.35); }
+.th-vd-bands i.spot { background: var(--c-claret); box-shadow: inset 0 0 0 2px #FFFBF4; }
+.th-vd-bands i.warm { background: var(--c-tomato); box-shadow: none; }
+.th-vd-bands i.luke { background: var(--c-candle); box-shadow: none; }
+.th-vd-bands i.hot { width: 30px; border-radius: 8px; }
+.th-vd-key { font: 650 14px/18px var(--f-ui); color: rgba(251,244,234,.75); }
+@media (orientation: landscape) and (max-height: 600px) {
+  .th-vd { display: flex; }
+  .th-vd-score b { font-size: 40px; }
+  .th-scores.duo .th-tally { grid-column: auto; }
+}

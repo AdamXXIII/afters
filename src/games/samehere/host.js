@@ -5,7 +5,7 @@
 // Wobbly Chair (it stays until someone else is the lone one). First to the target without the
 // chair wins. See ./DESIGN.md. AI-generated (Claude, Same Here builder, 2026-11-13).
 import { QUESTIONS } from './content/questions.js';
-import { autoGroup, suggestDisputes, merge } from './group.js';
+import { autoGroup, suggestDisputes, merge, obvious } from './group.js';
 
 export const SH = {
   intro: 10000, write: 30000, sort: 25000, crown: 9000,
@@ -13,6 +13,20 @@ export const SH = {
 };
 // reveal beats (ms, before api.dur)
 const BEAT = { lead: 900, group: 1100, herd: 2200, verdict: 1600, chair: 2600, standings: 2600 };
+/**
+ * Two players: "Mind meld". Same question, both answer in secret. Same answer = 2 points.
+ * Different? One go at meeting in the middle (an answer that links both) = 1 point.
+ * Fixed questions, a target Cyril sets, and his verdict on how in sync you are.
+ */
+export const DUO = { questions: 8, meld: 2, middle: 1, target: 7, raise: 1, cap: 12 };
+const DUO_BEAT = { a: 700, b: 1500, verdict: 2700, tally: 3900, end: 6400 };
+export const DUO_LADDER = [
+  { at: 1.5, key: 'onebrain', title: 'One brain between you', sub: 'Frankly, unsettling.' },
+  { at: 1, key: 'meld', title: 'In sync', sub: 'Finishing each other’s sentences.' },
+  { at: 0.6, key: 'nearly', title: 'Nearly in step', sub: 'Same street. Different houses.' },
+  { at: 0, key: 'strangers', title: 'Strangers on a train', sub: 'Lovely people. Total strangers.' },
+];
+export const duoRank = (total, target) => DUO_LADDER.find((r) => total >= r.at * target) || DUO_LADDER[DUO_LADDER.length - 1];
 
 export class SameHereHost {
   constructor(api) {
@@ -26,17 +40,19 @@ export class SameHereHost {
   start() {
     this.round = 0;
     this.chair = null;
-    this.target = SH.target;
+    this.duo = this.api.players.length === 2;
+    this.target = this.duo ? Math.min(DUO.cap, DUO.target + DUO.raise * Math.max(0, (this.api.plays || 1) - 1)) : SH.target;
     this.last = null;
-    this.api.enter('samehere-intro', SH.intro, { target: this.target, plays: this.api.plays });
+    this.melds = 0; this.middles = 0;
+    this.api.enter('samehere-intro', SH.intro, { target: this.target, plays: this.api.plays, ...(this.duo ? { duo: true, questions: DUO.questions } : {}) });
   }
 
   advance(id) {
     switch (id) {
       case 'samehere-intro': return this._write();
       case 'samehere-write': return this._afterWrite();
-      case 'samehere-sort': return this._reveal();
-      case 'samehere-reveal': return this._next();
+      case 'samehere-sort': return this.duo ? this._duoReveal() : this._reveal();
+      case 'samehere-reveal': return this.duo ? this._duoNext() : this._next();
       case 'samehere-crown': return this._finish();
       default:
     }
@@ -52,6 +68,8 @@ export class SameHereHost {
         if (ph !== 'samehere-write') return;
         const t = this.api.clean(msg.text, SH.max);
         if (!t || r.fixed?.has(p.id)) return; // r.fixed: answers pinned by the sort demo
+        // meeting in the middle: a new answer, not one of the two already said
+        if (r.meld && (obvious(t, r.meld.a) || obvious(t, r.meld.b))) { this.api.reject(p, 'sh-repeat'); return; }
         r.answers[p.id] = t;
         this.api.ack(p);
         this.api.progress();
@@ -96,12 +114,13 @@ export class SameHereHost {
     return this.api.players.map((p) => ({ id: p.id, score: p.score })).sort((a, b) => b.score - a.score);
   }
 
-  _write() {
-    this.round += 1;
-    const [q] = this.api.take(QUESTIONS, 'sh-q', 1, this.api.sub('q'));
-    this.cur = { q, answers: {}, groups: [], disputes: [], done: {} };
+  _write(meld = null) {
+    if (!meld) this.round += 1;
+    const q = meld ? this.cur.q : this.api.take(QUESTIONS, 'sh-q', 1, this.api.sub('q'))[0];
+    this.cur = { q, answers: {}, groups: [], disputes: [], done: {}, meld };
     this.api.enter('samehere-write', SH.write, {
       round: this.round, q: q.q, max: SH.max, target: this.target, chair: this.chair, standings: this._standings(),
+      ...(this.duo ? { duo: true, count: DUO.questions, total: this._total(), meld } : {}),
     }, {
       progress: () => ({ done: this._doneMap((p) => !!this.cur.answers[p.id]), counts: {} }),
     });
@@ -114,14 +133,14 @@ export class SameHereHost {
     r.disputes = suggestDisputes(r.groups, 3).map(([a, b], i) => ({ id: `d${i}`, a, b, by: null, votes: {} }));
     // sort only when Cyril has spotted a close call: no heads-down phone time otherwise
     if (r.disputes.length) return this._sort();
-    return this._reveal();
+    return this.duo ? this._duoReveal() : this._reveal();
   }
 
   _sort() {
     const r = this.cur;
     r.done = {};
     const groups = r.groups.map((g) => ({ gid: g.gid, text: g.text, n: g.pids.length }));
-    this.api.enter('samehere-sort', SH.sort, { round: this.round, q: r.q.q, groups, suggested: r.disputes.length, maxDisputes: SH.maxDisputes }, {
+    this.api.enter('samehere-sort', SH.sort, { round: this.round, q: r.q.q, groups, suggested: r.disputes.length, maxDisputes: SH.maxDisputes, ...(this.duo ? { duo: true, meld: r.meld } : {}) }, {
       priv: (p) => ({ mine: r.groups.find((g) => g.pids.includes(p.id))?.gid || null }),
       progress: () => ({
         done: this._doneMap((p) => !!r.done[p.id]),
@@ -144,6 +163,55 @@ export class SameHereHost {
   }
 
   _mayVote(d, pid) { return this._judges(d).includes(pid); }
+
+  // ---------- two players: Mind meld ----------
+
+  _total() { return this.api.players[0]?.score ?? 0; }
+
+  /** Did the two of you match? Obvious matches count; a close call counts only if you both said Same. */
+  _duoReveal() {
+    const api = this.api;
+    const r = this.cur;
+    const ps = api.players;
+    const agreed = r.disputes.some((d) => {
+      const vs = Object.values(d.votes);
+      return ps.every((p) => d.votes[p.id] === true) && vs.length >= ps.length;
+    });
+    const texts = ps.map((p) => r.answers[p.id] || '');
+    const both = texts.every(Boolean);
+    const auto = both && r.groups.length === 1;
+    const match = both && (auto || agreed);
+    const pts = match ? (r.meld ? DUO.middle : DUO.meld) : 0;
+    if (match) { if (r.meld) this.middles += 1; else this.melds += 1; }
+    api.addScores(Object.fromEntries(ps.map((p) => [p.id, pts])));
+    // what comes next: a miss on the first go gets one go at meeting in the middle
+    const next = !match && !r.meld && both ? 'middle' : this.round >= DUO.questions ? 'end' : 'next';
+    r.next = next;
+    r.pair = texts;
+    const steps = Object.fromEntries(Object.entries(DUO_BEAT).map(([k, v]) => [k, api.dur(v)]));
+    api.enter('samehere-reveal', DUO_BEAT.end + 600, {
+      duo: true, round: this.round, count: DUO.questions, q: r.q.q, meld: r.meld, target: this.target,
+      answers: ps.map((p) => ({ id: p.id, text: r.answers[p.id] || '' })),
+      match, agreed: match && !auto, pts, total: this._total(), next, steps,
+      standings: this._standings(), deltas: Object.fromEntries(ps.map((p) => [p.id, pts])),
+    });
+  }
+
+  _duoNext() {
+    const r = this.cur;
+    if (r.next === 'middle') return this._write({ a: r.pair[0], b: r.pair[1] });
+    if (r.next === 'next') return this._write();
+    return this._duoCrown();
+  }
+
+  _duoCrown() {
+    const total = this._total();
+    const rank = duoRank(total, this.target);
+    this.api.enter('samehere-crown', SH.crown, {
+      duo: true, total, target: this.target, beat: total >= this.target, rank: rank.key, title: rank.title, sub: rank.sub,
+      melds: this.melds, middles: this.middles, rounds: this.round, winners: this.api.players.map((p) => p.id), standings: this._standings(),
+    });
+  }
 
   _reveal() {
     const api = this.api;
@@ -231,6 +299,7 @@ export class SameHereHost {
   }
 
   _finish() {
+    if (this.duo) return this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
     // The chair can't win: pass explicit places. Everyone off the chair is ranked by score
     // (ties share a place); the chair holder comes last, with their real score on the bill.
     const off = this.api.players.filter((p) => p.id !== this.chair).sort((a, b) => b.score - a.score);

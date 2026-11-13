@@ -54,3 +54,9 @@ An old brass-rimmed room thermostat on a walnut mount, at the dinner table. Half
 - Shared: no `thermostat` dish art in `src/screens/menu-art.js` (cloche fallback).
 - Shared: Cyril's bubble in the `input` strip is clipped at the top of the screen (same on Character Witness's dock screen).
 - The reveal is a show screen that moves on by itself; one first-timer looked for a Next button (box-wide pattern).
+
+## Two players (co-op, 2026-11-13)
+- Take turns: one gives the clue, the other turns the dial; six clues (three each), then the hot clue (half-width bands, x3) from whoever didn't give the sixth. Both score the same (no giver double).
+- Cyril's number: 1200 (+200 each Same again, cap 1800). Called "number", not "target", so it never clashes with the dial's target. End phase `thermostat-verdict`: total vs his number, a title (Draughty / Lukewarm / Toasty / Central heating), one square per clue.
+- Demos: `thermostat-duo-{intro,dial,squirm,reveal,scores,verdict}` (shoot with `--players 2`).
+- Critic (blind vs the published co-op rules): ours wins for two phones. Fixed: who goes first on the intro, hot-clue wording, verdict labels, dial hint. Left: no bullseye bonus clue; the number may be soft for good pairs (tune after real play).

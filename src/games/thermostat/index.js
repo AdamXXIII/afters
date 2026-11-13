@@ -29,6 +29,14 @@ const landNear = (off) => (e) => {
   if (host) host.demoLand = off;
 };
 const at = (k, plus) => (p) => (p.payload?.steps?.[k] ?? 0) + plus;
+/** Demo helper (two players): give the pair a believable running total before a phase. */
+const duoTotal = (n) => (e) => {
+  if (e.players.length !== 2 || e.phase.id === 'thermostat-intro') return;
+  const h = e.game?.host;
+  if (!h || h.demoTotal) return;
+  h.demoTotal = true;
+  for (const p of e.players) p.score = n;
+};
 
 export default {
   id: 'thermostat',
@@ -41,8 +49,9 @@ export default {
   hint: 'One clue, one dial, everyone argues',
   tagline: 'Is Glastonbury overrated? Argue with your hands.',
   blurb: 'One of you sees a secret spot on a scale and says one clue out loud. Everyone else drags the same dial to find it, all at once, live. Closer scores more.',
-  players: [3, 8],
+  players: [2, 8],
   minutes: 12,
+  duo: 'Co-op: take turns giving the clue and turning the dial, and beat Cyril’s number together.',
   steps: [
     'One of you secretly sees a spot on a scale, like Cold to Hot.',
     'They say one clue out loud. Everyone else drags the same dial to it.',
@@ -118,6 +127,13 @@ export default {
     'thermostat-hot-give': { match: (e, me) => { hotGiver(true)(e, me); return e.phase.id === 'thermostat-clue' && e.phase.payload.final && giverIs(e, me); }, me: 'idle', t: 6000 },
     'thermostat-hot-dial': { match: (e, me) => { hotGiver(false)(e, me); return e.phase.id === 'thermostat-dial' && e.phase.payload.final && !giverIs(e, me); }, me: 'idle', bots: 'some', t: 14000 },
     'thermostat-hot-reveal': { match: (e, me) => { hotGiver(false)(e, me); landNear(1.5)(e); return e.phase.id === 'thermostat-reveal' && e.phase.payload.final; }, t: at('points', 1400) },
+    // two players (shoot with --players 2)
+    'thermostat-duo-intro': { match: (e) => e.phase.id === 'thermostat-intro', t: 3200 },
+    'thermostat-duo-dial': { match: (e, me) => { firstGiver(false)(e, me); return e.phase.id === 'thermostat-dial' && !giverIs(e, me) && !e.phase.payload.final; }, me: 'idle', bots: 'idle', t: 9000 },
+    'thermostat-duo-squirm': { match: (e, me) => { firstGiver(true)(e, me); return e.phase.id === 'thermostat-dial' && giverIs(e, me); }, me: 'idle', bots: 'some', t: 14000 },
+    'thermostat-duo-reveal': { match: (e, me) => { firstGiver(false)(e, me); duoTotal(400)(e); landNear(6)(e); return e.phase.id === 'thermostat-reveal' && !e.phase.payload.final; }, t: at('points', 1400) },
+    'thermostat-duo-scores': { match: (e) => { duoTotal(900)(e); return e.phase.id === 'thermostat-scores'; }, t: 2600 },
+    'thermostat-duo-verdict': { match: (e) => { duoTotal(1000)(e); if (e.phase.payload?.final) landNear(1.5)(e); return e.phase.id === 'thermostat-verdict'; }, t: 3200 },
   },
 
   lines: {
@@ -137,6 +153,12 @@ export default {
       thCold: [['Stone cold. Were you even listening?'], ['Nowhere near. I\'ve felt warmer draughts.']],
       thScores: [['The standings. Last place takes the hot seat.']],
       thHot: [['The hot seat! A tiny target and triple points.'], ['Final round. Half the target, three times the points.']],
+      thDuoIntro: [['Two of you. One dial. My target. Let’s see.'], ['Just the pair of you? Then it’s you two against me.']],
+      thDuoDial: [['Just you on the dial. No one to blame.'], ['Take your time. Then lock it in.']],
+      thDuoSquirm: [['Not a word, {name}. Not even a sigh.'], ['Sit on your hands, {name}. Trust them.']],
+      thDuoScores: [['One clue left. Worth triple. No pressure.']],
+      thDuoWin: [['You beat my number. I’m genuinely touched.'], ['Over the line. I shall raise the bar next time.']],
+      thDuoLose: [['Short of my number. The heating stays off.'], ['Not quite. Same again? I’ll keep the target warm.']],
     },
     adult: {
       thIntro: [
@@ -149,6 +171,9 @@ export default {
       thSpot: [['Spot on! How the hell did you do that?']],
       thCold: [['Stone cold. Were any of you actually listening?'], ['Nowhere near. Shocking. Absolutely shocking.']],
       thHot: [['The hot seat. Tiny target, triple points, no pressure. Lots of pressure.']],
+      thDuoIntro: [['Two of you against me. I fancy my chances.'], ['Just you two? Right. Beat my bloody number.']],
+      thDuoWin: [['You beat my number. Bloody hell. Well done.']],
+      thDuoLose: [['Short of my number. Absolute shambles. Again?']],
     },
   },
 };

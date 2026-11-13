@@ -52,3 +52,9 @@ A plain question ("Name a TV detective"). Everyone secretly writes one answer. Y
 - Raising your own pair is only possible on rounds where Cyril found a close call (so most rounds have no phone time between write and reveal); a box-level "object!" button on the reveal would cover the rest.
 - No catch-up for trailing players; 8-player rounds with easy questions can be all-match.
 - Cyril's speech bubble can be clipped at the top of the input strip (box bubble placement).
+
+## Two players: Mind meld (2026-11-13)
+- 8 questions. Both answer in secret; same answer = 2 points. Close calls go to the sort screen and count only if both tap Same. A miss gets one "meet in the middle" retry: a new answer linking the two (repeats refused) = 1 point. No Wobbly Chair at two.
+- Cyril's target: 7 (+1 each Same again, cap 12). The crown shows the total and a title (Strangers on a train / Nearly in step / In sync / One brain between you).
+- Demos: `samehere-duo-{intro,write,match,miss,middle,crown}` (shoot with `--players 2`).
+- Critic (blind vs a published say-the-same-word game): ours wins narrowly for two phones. Fixed: retry copy with an example, rating title no longer reuses "Mind meld". Left: only one bridging retry (the critic wanted 2-3).

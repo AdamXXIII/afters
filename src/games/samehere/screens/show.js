@@ -19,21 +19,39 @@ function introArt(seed) {
   return h('div.sh-art-wrap', h('div.sh-art-q', '“Name something with a screen”'), h('div.sh-art', row, odd));
 }
 
+const DUO_STEPS = [
+  'A question. You both secretly write one answer.',
+  'Same answer? Mind meld: 2 points.',
+  'Different? One go at meeting in the middle: a new answer that links both, for 1 point.',
+];
+
+function duoArt(seed) {
+  return h('div.sh-art-wrap.duo',
+    h('div.sh-duo-ex',
+      answerCard('Telly', { cls: '.mini.herd', seed, key: 'd1' }), h('span.sh-duo-eq', '='), answerCard('Telly', { cls: '.mini.herd', seed, key: 'd2' }),
+      h('span.sh-duo-pts', '+2')),
+    h('div.sh-duo-ex',
+      answerCard('Columbo', { cls: '.mini', seed, key: 'd3' }), h('span.sh-duo-eq', '+'), answerCard('Morse', { cls: '.mini', seed, key: 'd4' }),
+      h('span.sh-duo-arrow', '→'), answerCard('Detective', { cls: '.mini.herd', seed, key: 'd5' }), h('span.sh-duo-pts', '+1')));
+}
+
 const intro = {
   id: 'samehere-intro',
   layout: 'show',
   shot: 'intro',
   mount({ show }, ctx) {
-    const steps = ctx.game?.steps || [];
-    const card = h('div.sh-menu',
-      h('div.sh-menu-title', 'Same Here'),
-      h('div.sh-menu-art', introArt(ctx.phase?.seed || 1)),
+    const duo = !!ctx.payload.duo;
+    const steps = duo ? DUO_STEPS : ctx.game?.steps || [];
+    const card = h(`div.sh-menu${duo ? '.duo' : ''}`,
+      h('div.sh-menu-title', duo ? 'Mind meld' : 'Same Here'),
+      duo ? h('div.sh-menu-eyebrow', 'Same Here for two') : null,
+      h('div.sh-menu-art', duo ? duoArt(ctx.phase?.seed || 1) : introArt(ctx.phase?.seed || 1)),
       h('ol.sh-rules', steps.map((r, i) => h('li', h('span.n', String(i + 1)), h('span.t', r)))),
-      h('div.sh-menu-foot', `First to ${ctx.payload.target} points wins.`));
+      h('div.sh-menu-foot', duo ? `Cyril’s target: ${ctx.payload.target} points in ${ctx.payload.questions} questions.` : `First to ${ctx.payload.target} points wins.`));
     show.append(h('div.sh-dim'), h('div.sh-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
-    const cancel = sayLater(ctx, ctx.line(ctx.payload.plays > 1 ? 'shIntroAgain' : 'shIntro'), { delay: 900, hold: 3000 });
+    const cancel = sayLater(ctx, ctx.line(duo ? 'shDuoIntro' : ctx.payload.plays > 1 ? 'shIntroAgain' : 'shIntro'), { delay: 900, hold: 3000 });
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1200 });
     return { frame: (c) => sk?.(c), unmount: cancel };
   },
@@ -62,6 +80,7 @@ const reveal = {
   layout: 'show',
   shot: 'reveal',
   mount({ show }, ctx) {
+    if (ctx.payload.duo) return duoReveal(show, ctx);
     const p = ctx.payload;
     const seed = ctx.phase?.seed || 1;
     const stepOf = (kind, gid) => p.steps.find((s) => s.kind === kind && (gid == null || s.gid === gid));
@@ -141,12 +160,77 @@ const reveal = {
   },
 };
 
+// ---------- two players: did you match? ----------
+function duoReveal(show, ctx) {
+  const p = ctx.payload;
+  const seed = ctx.phase?.seed || 1;
+  const s = p.steps;
+  const cards = p.answers.map((a, i) => {
+    const pl = ctx.player(a.id);
+    return h(`div.sh-duo-card${p.match ? '.match' : ''}`, { style: { '--i': i } },
+      h('div.sh-duo-who', disc(pl, { size: 30 }), h('span', nameOf(ctx, a.id))),
+      a.text ? answerCard(cap(a.text), { cls: p.match ? '.herd' : '', seed, key: `d${i}` }) : h('div.sh-duo-blank', 'Nothing written'));
+  });
+  const head = p.meld
+    ? h('div.sh-qcard.compact.sh-midcard', h('span.sh-qn', 'Meet in the middle'), h('div.sh-q', `${cap(p.meld.a)} + ${cap(p.meld.b)}`))
+    : questionCard(p.q, { round: `${p.round} of ${p.count}`, compact: true });
+  const word = p.match ? (p.meld ? 'Met in the middle' : 'Mind meld') : p.meld ? 'Still apart' : 'Different';
+  const stamp = h(`div.sh-duo-stamp${p.match ? '.match' : ''}`, h('b', word), p.match ? h('span', `+${p.pts}`) : null);
+  const nextTxt = p.match ? (p.agreed ? 'You both said they’re the same. Fair enough.' : null)
+    : p.next === 'middle' ? 'Next: meet in the middle. A new answer that links both, for 1 point.'
+      : p.next === 'end' ? 'That was the last question.' : 'Next question.';
+  const note = nextTxt ? h('div.sh-verdict.sh-duo-note', nextTxt) : null;
+  const tally = h('div.sh-duo-tally',
+    h('span.l', 'Together'), h('b', String(p.total)), h('span.of', `of ${p.target}`), pips(p.total, p.target));
+  const root = h(`div.sh-rv.sh-duo-rv${p.match ? '.match' : ''}`, head, h('div.sh-duo-pair', cards[0], h('span.sh-duo-eq.big', p.match ? '=' : '≠'), cards[1]), stamp, note, tally);
+  show.append(root);
+  const fired = new Set();
+  const once = (k, fn) => { if (!fired.has(k)) { fired.add(k); fn(); } };
+  let cancel = () => {};
+  const apply = (c) => {
+    const t = c.elapsed();
+    cards[0].classList.toggle('on', t >= s.a);
+    cards[1].classList.toggle('on', t >= s.b);
+    root.classList.toggle('judged', t >= s.verdict);
+    stamp.classList.toggle('on', t >= s.verdict);
+    note?.classList.toggle('on', t >= s.verdict + 300);
+    tally.classList.toggle('on', t >= s.tally);
+    if (c.frozen) return;
+    if (t >= s.a) once('a', () => c.audio.sfx('stamp'));
+    if (t >= s.b) once('b', () => c.audio.sfx('stamp'));
+    if (t >= s.verdict) once('v', () => {
+      if (p.match) { c.audio.sfx('fanfare'); c.haptic('win'); c.cyril.react('delight'); cancel = sayLater(c, c.line('shDuoMatch'), { delay: 200 }); }
+      else { c.audio.sfx('groan'); c.cyril.react(p.meld ? 'sad' : 'smug'); cancel = sayLater(c, c.line(p.meld ? 'shDuoMissAgain' : 'shDuoMiss'), { delay: 200 }); }
+    });
+  };
+  apply(ctx);
+  return { frame: apply, unmount: () => cancel() };
+}
+
 // ---------- crown ----------
+function duoCrown(show, ctx) {
+  const p = ctx.payload;
+  const card = h(`div.sh-crown.sh-duo-crown.${p.rank}${p.beat ? '.beat' : ''}`,
+    h('div.sh-crown-avs', ctx.players.slice(0, 2).map((pl) => disc(pl, { size: 64 }))),
+    h('div.sh-duo-eyebrow', p.beat ? 'You beat Cyril’s target' : 'Short of Cyril’s target'),
+    h('div.sh-crown-name', p.title),
+    h('div.sh-crown-sub', p.sub),
+    h('div.sh-duo-score', h('b', String(p.total)), h('span', `of ${p.target}`)),
+    pips(p.total, p.target, { cls: '.big' }),
+    h('div.sh-crown-foot', `${p.melds} mind meld${p.melds === 1 ? '' : 's'} · ${p.middles} met in the middle · ${p.rounds} questions`));
+  show.append(h('div.sh-dim'), h('div.sh-cardwrap', card));
+  if (!ctx.frozen) { ctx.audio.sfx(p.beat ? 'fanfare' : 'groan'); card.animate([{ transform: 'scale(.9)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 560, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' }); }
+  ctx.cyril.react(p.beat ? 'guffaw' : 'sad', { duration: ctx.frozen ? 60000 : 1200 });
+  const cancel = sayLater(ctx, ctx.line(p.beat ? 'shDuoWin' : 'shDuoLose'), { delay: 900, hold: 3000 });
+  return { unmount: cancel };
+}
+
 const crown = {
   id: 'samehere-crown',
   layout: 'show',
   shot: 'scores',
   mount({ show }, ctx) {
+    if (ctx.payload.duo) return duoCrown(show, ctx);
     const p = ctx.payload;
     const names = p.winners.map((id) => nameOf(ctx, id));
     const wname = names.join(' & ') || 'Nobody';

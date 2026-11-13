@@ -5,7 +5,7 @@
 // AI-generated (Claude, Same Here builder, 2026-11-13).
 import { SameHereHost } from './host.js';
 import { QUESTIONS } from './content/questions.js';
-import { close } from './group.js';
+import { close, obvious } from './group.js';
 
 const STEPS = [
   'A question. Everyone secretly writes one answer.',
@@ -44,6 +44,21 @@ const sortDemo = (e) => {
   }
   return e.phase.id === 'samehere-sort';
 };
+/** Demo helper (two players): pin both answers so the first reveal is a match or a miss. */
+const duoPair = (same) => (e) => {
+  const h = e.game?.host; const r = h?.cur;
+  if (e.phase.id === 'samehere-write' && r && !r.meld && !r.seeded && e.players.length === 2) {
+    const a = r.q.answers || ['Telly'];
+    const [x, y] = e.players;
+    r.answers[x.id] = a[0];
+    r.answers[y.id] = same ? a[0].toLowerCase() : (a[1] || 'Something else');
+    r.fixed = new Set([x.id, y.id]);
+    r.seeded = true;
+    if (!same) for (const p of e.players) p.score = 4;
+    return false;
+  }
+  return e.phase.id === 'samehere-reveal' && !e.phase.payload.meld;
+};
 const stepAt = (kind, plus, fallback = 2000) => (p) => {
   const s = p.payload.steps.filter((x) => x.kind === kind);
   return s.length ? s[s.length - 1].at + plus : fallback;
@@ -59,8 +74,9 @@ export default {
   hint: 'Think like the table',
   tagline: 'Don’t be clever. Be everyone else.',
   blurb: 'A plain question, one secret answer each. Match the most popular answer to score. The one person on their own gets the Wobbly Chair, and nobody wins from the Wobbly Chair.',
-  players: [3, 8],
+  players: [2, 8],
   minutes: 10,
+  duo: 'Mind meld: you both answer in secret and score together when you match. Beat Cyril’s target.',
   steps: STEPS,
   hasAdult: true,
   colour: '#3E8E8A',
@@ -76,7 +92,12 @@ export default {
       case 'samehere-write': {
         later(rand(1500, 9000), () => {
           if (!still() || mine().sent) return;
-          const text = botAnswer(p.q, rating, rng);
+          // meeting in the middle: lean on one of the two answers already on the table
+          const m = p.meld;
+          let text = botAnswer(p.q, rating, rng);
+          // meeting in the middle: not one of the two already said (bots just try another likely answer)
+          for (let k = 0; m && k < 6 && (obvious(text, m.a) || obvious(text, m.b)); k++) text = botAnswer(p.q, rating, rng);
+          if (m && (obvious(text, m.a) || obvious(text, m.b))) text = 'No idea';
           client.act('sh-answer', { text }, { sent: text });
         });
         return true;
@@ -122,6 +143,21 @@ export default {
     'samehere-chair': { match: (e) => e.phase.id === 'samehere-reveal' && !!e.phase.payload.lone && e.phase.payload.outcome === 'herd', t: stepAt('chair', 1900) },
     'samehere-standings': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.round >= 3, t: stepAt('standings', 1600) },
     'samehere-crown': { match: (e) => e.phase.id === 'samehere-crown', t: 3000 },
+    // two players, "Mind meld" (shoot with --players 2)
+    'samehere-duo-intro': { match: (e) => e.phase.id === 'samehere-intro', t: 3200 },
+    'samehere-duo-write': { match: (e) => e.phase.id === 'samehere-write' && !e.phase.payload.meld, me: 'idle', bots: 'some', t: 9000 },
+    'samehere-duo-match': { match: duoPair(true), t: 4600 },
+    'samehere-duo-miss': { match: duoPair(false), t: 4600 },
+    'samehere-duo-middle': { match: (e) => { duoPair(false)(e); return e.phase.id === 'samehere-write' && !!e.phase.payload.meld; }, me: 'idle', bots: 'some', t: 9000 },
+    'samehere-duo-crown': {
+      match: (e) => {
+        const h = e.game?.host;
+        if (e.phase.id === 'samehere-intro' && h) h.round = 7;
+        if (e.phase.id === 'samehere-reveal' && h && !h.demoSet) { h.demoSet = true; h.melds = 3; h.middles = 2; for (const p of e.players) p.score = 8 - (e.phase.payload.pts || 0); }
+        return e.phase.id === 'samehere-crown';
+      },
+      t: 3000,
+    },
   },
 
   lines: {
@@ -140,6 +176,15 @@ export default {
       shChair: [['{name}, the Wobbly Chair is yours. Sit carefully.'], ['On your own with that one, {name}. Have a wobble.']],
       shFinal: [['{name} thinks like the table. I don’t know if that’s a compliment.']],
       shRobbed: [['{chair} had the points. But you can’t win from the Wobbly Chair.']],
+      shDuoIntro: [['Two of you. Let’s see if you share a brain.'], ['Just the pair of you? Then think as one.']],
+      shDuoWrite: [['Don’t look at each other. Well, you can look.'], ['What would they say? Say that.']],
+      shDuoMiddle: [['Meet in the middle. One answer that links both.'], ['Find the bridge between those two. Together.']],
+      shDuoRepeat: [['Not one of those two. Something new that links them.']],
+      shDuoMatch: [['Mind meld! Frankly, eerie.'], ['Same answer. Have you two rehearsed this?']],
+      shDuoMiss: [['Different. Don’t panic. Meet in the middle.']],
+      shDuoMissAgain: [['Still apart. Never mind. Next question.']],
+      shDuoWin: [['You beat my number. Two minds, one brain cell. Lovely.']],
+      shDuoLose: [['Short of my number. Same again? Practice makes telepathy.']],
     },
     adult: {
       shIntro: [
@@ -153,6 +198,10 @@ export default {
       shScattered: [['Every answer different. What the hell is wrong with you all?']],
       shChair: [['{name}, Wobbly Chair. Nobody else said that. Nobody.'], ['On your own, {name}. Sit down and think about what you’ve done.']],
       shRobbed: [['{chair} had the points. Shame about the bloody chair.']],
+      shDuoIntro: [['Two of you. Let’s see if you share a single bloody brain cell.']],
+      shDuoMatch: [['Mind meld! That’s actually a bit creepy.']],
+      shDuoMissAgain: [['Still miles apart. Bloody hell. Next.']],
+      shDuoLose: [['Short of my number. Have you two even met?']],
     },
   },
 };
