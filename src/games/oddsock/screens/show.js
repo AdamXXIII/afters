@@ -28,7 +28,7 @@ const intro = {
       h('div.os-intro-title', 'Odd Sock'),
       pairArt(),
       h('ol.os-rules', rules.map(([b, t], i) => h('li', h('span.n', String(i + 1)), h('span.t', h('b', b), t)))),
-      h('div.os-foot', `Wrong person? They’re out and the rest go again. ${p.rounds} rounds, last one double.`));
+      h('div.os-foot', `Wrong person? They’re out and the rest go again, down to the last three. ${p.rounds} rounds, last one double.`));
     show.append(h('div.os-dim'), h('div.os-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
@@ -70,7 +70,7 @@ const reveal = {
       ? h('div.os-truth.caught', h('span.os-truth-sock', { html: sockSvg({ body: ODD, pattern: 'spot' }) }),
         h('div', h('div.os-truth-h', 'Odd Sock!'), h('div.os-truth-s', p.sock === ctx.meId ? 'Your word was ' : 'Their word was ', h('b', p.oddWord), '. Now one guess at everyone else’s word.')))
       : h('div.os-truth.escaped', h('div.os-truth-av', disc(ctx, p.sock, { size: 52 }), h('span.os-truth-mini', { html: sockSvg({ body: ODD, pattern: 'spot' }) })),
-        h('div', h('div.os-truth-h', accused ? 'Wrong sock.' : 'Got away.'), h('div.os-truth-s', p.sock === ctx.meId ? 'The Odd Sock was ' : 'The Odd Sock was ', h('b', p.sock === ctx.meId ? 'you' : sockName), '. They walk free.')));
+        h('div', h('div.os-truth-h', accused ? 'Wrong sock.' : 'Got away.'), h('div.os-truth-s', accused ? 'Down to the last three, so they walk free. The Odd Sock was ' : 'The Odd Sock was ', h('b', p.sock === ctx.meId ? 'you' : sockName), '.')));
     const card = h(`div.os-card.os-reveal${p.caught ? '.caught' : p.again ? '.again' : '.escaped'}`, h('div.os-reveal-t', 'The vote'), list, verdict, truth);
     show.append(h('div.os-dim'), h('div.os-cardwrap', card));
     let shown = -1; let stamped = false; let flipped = false;
@@ -124,7 +124,7 @@ const round = {
     const sub = {
       stolen: `${sockName} guessed “${p.guess}”. The round is theirs.`,
       caught: p.guess ? `${sockName} guessed “${p.guess}”. Wrong. The table wins.` : `${sockName} didn’t guess. The table wins.`,
-      escaped: (p.out || []).length ? `The table picked ${(p.out || []).map((id) => (id === ctx.meId ? 'you' : nameOf(ctx, id))).join(', then ')}. Wrong sock. ${sockName} slipped away.` : `Nobody got the most votes. ${sockName} slipped away.`,
+      escaped: (p.out || []).length ? `The table picked ${(p.out || []).map((id) => (id === ctx.meId ? 'you' : nameOf(ctx, id))).join(', then ')}. Wrong sock. Down to three, so ${sockName} slipped away.` : `Nobody got the most votes. ${sockName} slipped away.`,
     }[p.outcome];
     const pair = h('div.os-pair',
       h('div.os-pw.common', h('span.os-pw-sock', { html: sockSvg({ body: TEAL, pattern: 'stripe' }) }), nameTape(p.common, { size: 'small', label: 'Everyone' })),

@@ -52,4 +52,5 @@
 - Content round 1: zero sexual pairs; family deck judged better than Undercover's; adult deck weak (unrelated joke pairs, repeated words) -> adult deck rebuilt around close siblings, repeats removed.
 - Whole game round 1: better than Undercover at 4, worse at 8 (one vote, coin flip, no arc) -> wrong sock now knocks that player out and the table goes again (Undercover-style narrowing).
 - Content round 2: zero sexual pairs; adult deck now judged better than Undercover's; synonyms, near-duplicates and borderline pairs (Hot tub, Tattoo/Piercing, Ex) swapped.
+- First-timer round 2: every screen YES except the escape rule (when does the Odd Sock get away?) -> intro, reveal and round now say "down to the last three"; guess screen says what a wrong guess means.
 - First-timer round 1: wrong-accusation path confusing ("Accused: You", "Alex", "You voted out you"), "Can't be you" hint misleading, faint host link, lap counter unexplained -> all reworded; host nudge is a real button; lap moved into the header.

@@ -158,7 +158,7 @@ const guess = {
           h('div', h('div.os-title.dark', 'You’re the Odd Sock'), h('div.os-say-s', 'Everyone else had a different word. One guess. Get it and the round is yours.'))),
         nameTape(p.oddWord, { size: 'small', label: 'Yours was' }),
         sent ? h('div.os-sentguess', 'Guessed: ', h('b', sent)) : h('div.os-field', field),
-        h('div.os-pay', h('b', `+${1500 * (p.mult || 1)}`), ' for you if you’re right. Nothing for anyone else.'),
+        h('div.os-pay', h('b', `+${1500 * (p.mult || 1)}`), ' for you if you’re right. Wrong, and the table scores instead.'),
         sent ? null : h('div.os-actions', btn)));
       if (ctx.frozen && ctx.demo) { field.input.value = 'Swimm'; field.input.dispatchEvent(new Event('input')); }
       else if (!sent) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
