@@ -1,6 +1,6 @@
-// Top Shelf content: nine categories (plus Bedroom on Adults 18+ tables), each a bottle in Cyril's cabinet.
+// Top Shelf content: nine categories (plus Grown-up life on Adults 18+ tables), each a bottle in Cyril's cabinet.
 // Questions are 'Question|Right|Wrong|Wrong|Wrong' strings; a leading '!' marks a hard one for the Last Drop.
-// Family and adult tables share the questions; adult tables add the Bedroom bottle.
+// Family and adult tables share the questions; adult tables add the Grown-up life bottle (never sexual).
 import pop from './pop.js';
 import music from './music.js';
 import telly from './telly.js';
@@ -10,7 +10,7 @@ import sport from './sport.js';
 import words from './words.js';
 import science from './science.js';
 import history from './history.js';
-import bedroom from './bedroom.js';
+import grownup from './grownup.js';
 
 // colour = the bottle's glass; note = the label's small print, in Cyril's voice
 const META = [
@@ -24,7 +24,7 @@ const META = [
   { id: 'science', name: 'Science and nature', note: 'Stars, beasts, atoms', glass: '#E0A526', raw: science },
   { id: 'history', name: 'History', note: 'Kings, wars, dates', glass: '#C89B3C', raw: history },
 ];
-const BEDROOM_META = { id: 'bedroom', name: 'Bedroom', note: 'Adults only. Behave.', glass: '#E2553B', raw: bedroom, adult: true };
+const ADULT_META = { id: 'grownup', name: 'Grown-up life', note: 'Tax, cars, forms, regret', glass: '#E2553B', raw: grownup, adult: true };
 
 function hash(s) {
   let x = 2166136261;
@@ -44,8 +44,10 @@ function build(m) {
 }
 
 export const CATEGORIES = META.map(build);
-export const BEDROOM = build(BEDROOM_META);
-export const ALL = [...CATEGORIES, BEDROOM];
+export const ADULT_SHELF = build(ADULT_META);
+// host.js still imports it under its old name; it is the Grown-up life bottle now.
+export const BEDROOM = ADULT_SHELF;
+export const ALL = [...CATEGORIES, ADULT_SHELF];
 export const CAT_INFO = Object.fromEntries(ALL.map((c) => [c.id, { id: c.id, name: c.name, note: c.note, glass: c.glass, adult: c.adult }]));
 
 const decks = new Map();

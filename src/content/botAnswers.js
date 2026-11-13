@@ -7,18 +7,19 @@ const FAMILY = [
   'Grandad\'s karaoke', 'Fourteen spoons',
 ];
 
+// Adults 18+: swearing and grown-up life, never sexual (Adam, 2026-11-13).
 const ADULT = [
-  'A vibrator with a flat battery', 'My ex, unfortunately', 'Lube, and lots of it', 'A lap dance from a pensioner',
-  'Accidentally texting my mum', 'A suspicious rash', 'Gary\'s hairy back', 'A disappointing willy',
-  'Naked except for wellies', 'Handcuffs, but furry', 'A budget hotel in Swindon', 'Doing it in a hatchback',
-  'Thrush, again', 'My mother-in-law\'s nipples', 'Wet wipes, everywhere', 'The walk of shame',
-  'Two fingers and a prayer', 'Queefing in yoga', 'A thong, regrettably', 'A dodgy dating app date',
-  'Spanking the vicar', 'Bending over in the garden centre', 'Nipple tassels', 'A quickie in the airing cupboard',
-  'Love eggs', 'Brenda\'s swingers party', 'A wonky boob', 'Morning wood', 'My pelvic floor giving up',
-  'Sexting in Comic Sans', 'A thong full of glitter', 'Crotchless pants from the middle aisle', 'Puking in a taxi',
-  'Faking it, badly', 'A hen do in Newquay', 'The 2am booty call', 'Sixty-nining in a caravan',
-  'My best friend\'s dad', 'An erection at a funeral', 'Cheeky bum stuff', 'A hangover with legs',
-  'Spooning, then tears', 'Pubes in the soap',
+  'Six pints and a bad idea', 'My ex, unfortunately', 'A parking ticket on the fucking wheel clamp', 'Reply-all to the whole company',
+  'Accidentally texting my mum', 'A hangover with its own postcode', 'Gary from accounts, pissed', 'A tax return, again',
+  'Crying in a Wetherspoons', 'Council tax, the bastards', 'A budget hotel in Swindon', 'Puking in a taxi',
+  'Absolutely nothing, I\'m knackered', 'My mother-in-law\'s opinions', 'Wet wipes, everywhere', 'Shit happens',
+  'Losing a shoe on the night bus', 'Three Jägerbombs and a regret', 'Ringing in sick on a Monday', 'A dodgy kebab van',
+  'Being sick in a plant pot', 'The group chat, screenshotting', 'A smoke alarm at 4am', 'Karaoke, unfortunately',
+  'Your round, you tight git', 'Brenda\'s fortieth', 'Sticky carpets', 'My overdraft', 'My back going',
+  'An email in Comic Sans', 'A stag do in Prague', 'Flat-pack furniture and swearing', 'Bollocks, basically',
+  'Calling my boss "Mum"', 'A hen do in Newquay', 'Texting my boss at 2am', 'A caravan in the rain',
+  'My best friend\'s dad\'s jokes', 'Laughing at a funeral', 'Sod all', 'A hangover with legs',
+  'Crying at the bank', 'Unexpected item in my fucking life',
 ];
 export const BOT_ANSWERS = {
   family: FAMILY,

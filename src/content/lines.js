@@ -97,7 +97,7 @@ export const LINES = {
   ],
   r1Close: [
     ['By a whisker. Recount? No. Moving on.'],
-    ['Close! I\'ve seen tighter, but only on trousers.'],
+    ['Close! Tighter than my jeans after Christmas.'],
   ],
   r2TruthFound: [
     ['Too many of you knew that. Who\'s been reading?'],
@@ -108,7 +108,7 @@ export const LINES = {
     ['{name} leads. Somebody tread on their toe.'],
   ],
   scoresLast: [
-    ['{name}, bringing up the rear. Steady.'],
+    ['{name}, last. Chin up. It\'s a long night.'],
     ['{name} is last. Plenty of pudding left to play for.'],
   ],
   ratingAdult: [
@@ -116,7 +116,7 @@ export const LINES = {
     ['Oh, it\'s THAT sort of party. Lovely.'],
   ],
   ratingFamily: [
-    ['Family rules. I\'ll keep my wick in my trousers.'],
+    ['Family rules. Best behaviour. I\'ve put my good cardigan on.'],
   ],
 };
 
