@@ -93,7 +93,8 @@ const reveal = {
         if (p.band === 'spot') { sfx('fanfare'); ctx.cyril.react('delight', { duration: quiet ? 60000 : 1400 }); if (!quiet) { ctx.haptic('win'); ctx.stage.shake?.(); } }
         else if (p.band === 'cold') { sfx('groan'); ctx.cyril.react('sad', { duration: quiet ? 60000 : 1400 }); }
         else { sfx('stamp'); ctx.cyril.react(p.band === 'warm' ? 'delight' : 'smug', { duration: quiet ? 60000 : 1200 }); if (!quiet) ctx.haptic('stamp'); }
-        ctx.say(ctx.line(LINE[p.band]), { hold: 2200, placement: 'side' });
+        // Cyril only talks when nobody scores: otherwise the stamp says it and his bubble would sit on the points
+        if (p.band === 'cold') ctx.say(ctx.line(LINE[p.band]), { hold: 2200, placement: 'side' });
       }
       if (k >= 3) { pts.classList.add('on'); you.classList.add('on'); }
     };
