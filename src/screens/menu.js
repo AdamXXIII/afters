@@ -115,7 +115,7 @@ export default {
     let c = ctx;
     let openId = null; // the game card open on THIS phone
     let mood = 'all';
-    let fitsOnly = false;
+    let fitsOnly = true; // on by default: games that don't fit drop to a labelled "Not for N of you" tail
     const hostName = () => c.player(c.state?.hostId)?.name || 'The host';
     const adultOn = () => c.rating === 'adult';
     const seated = () => c.players.filter((p) => p.connected !== false);
@@ -265,7 +265,7 @@ export default {
       const r18 = adultOn() && g.hasAdult;
       const facts = h('ul.mn-facts',
         h(`li${ok ? '.ok' : '.no'}`, h('i', { html: ok ? TICK_SVG : PEOPLE_SVG }),
-          h('span', ok ? `Good for ${n}` : `${n} of you, ${need}`)),
+          h('span', ok ? `${lo}–${hi} players: fine for ${n}` : `${lo}–${hi} players: ${need}`)),
         h('li', h('i', { html: CLOCK_SVG }), h('span', `${g.minutes || 10} min`)),
         h(`li.rate${r18 ? '.r18' : ''}`, h('span', r18 ? 'Adults 18+' : 'Family')));
 
@@ -289,7 +289,7 @@ export default {
       }
       const note = c.isHost
         ? (ok ? null : h('p.mn-card-note', n < lo ? `Invite ${lo - n} more to play this.` : 'Too many at the table for this one.'))
-        : h('p.mn-card-note', h('b', hostName()), ' serves. They see what you fancy.');
+        : h('p.mn-card-note', h('b', hostName()), ' starts the game. They see what you fancy.');
       const extra = (!ok && c.isHost && n < lo) ? h('button.mn-card-inv', { type: 'button', 'data-e2e': 'card-invite' }, h('i', { html: INVITE_SVG }), 'Invite') : null;
       if (extra) onTap(extra, () => openInvite());
 
@@ -402,10 +402,9 @@ export default {
         const count = live.filter((g) => (id === 'all' || moodsOf(g).includes(id)) && (!fitsOnly || fits(g))).length;
         b.querySelector('.mn-chip-n').textContent = String(count);
       }
-      const fitN = live.filter((g) => inMood(g) && fits(g)).length;
       fitsRow.setAttribute('aria-checked', String(fitsOnly));
       fitsRow.classList.toggle('on', fitsOnly);
-      fitsRow.querySelector('.mn-fits-t').replaceChildren(h('b', `Only games for ${n} of us`), h('span', ` ${fitN} of ${live.filter(inMood).length}`));
+      fitsRow.querySelector('.mn-fits-t').replaceChildren(h('b', `Games for ${n} of us first`));
 
       const moodLabel = MOODS.find((m) => m.id === mood)?.label;
 
@@ -489,7 +488,7 @@ export default {
           ? [h('span.mn-foot-t', 'Most fancied: ', h('b', topG.title), h('span.mn-foot-n', ` ${top[1]} of ${guests.length}`))]
           : [h('span.mn-foot-t', 'Guests fancy games on their phones. ', h('b', 'You serve.'))];
         if (topG && topG.id !== openId) {
-          const b = h('button.mn-foot-b', { type: 'button', 'data-e2e': 'foot-open' }, 'Open');
+          const b = h('button.mn-foot-b', { type: 'button', 'data-e2e': 'foot-open' }, 'See it');
           onTap(b, () => openCard(topG));
           kids.push(b);
         }
