@@ -1,7 +1,7 @@
 // Character Witness: one of you is in the dock with a question about themselves. They answer
 // truthfully; everyone else writes a fake in their voice; the table picks the real one.
 // Halfway on, every round pays double. Finale: Cross-examination (last place takes the stand, keeps
-// two fakes beside the truth; fooled jurors pay them, triple points).
+// two fakes beside the truth, triple points).
 // Rules + screens: ./DESIGN.md. AI-generated (Claude, Character Witness builder, 2026-11-13).
 import { WitnessHost } from './host.js';
 import { HOUSE } from './content/questions.js';

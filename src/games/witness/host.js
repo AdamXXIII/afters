@@ -258,11 +258,10 @@ export class WitnessHost {
       if (o.kind === 'truth') ps.forEach((pid) => add(pid, PTS.truth * m));
       else {
         missed += ps.length;
-        // in cross-examination the fakes are the defendant's picks: fooled jurors pay the defendant
-        if (o.kind === 'fake' && !r.final) o.authors.forEach((a) => add(a, PTS.perFooled * m * ps.length));
+        if (o.kind === 'fake') o.authors.forEach((a) => add(a, PTS.perFooled * m * ps.length));
       }
     }
-    add(r.defendant, (r.final ? PTS.perFooled : PTS.defendant) * m * missed);
+    add(r.defendant, PTS.defendant * m * missed);
     // expert witness: whoever found the truth fastest
     const found = pickers[truth.id].slice().sort((a, b) => r.picks[a].at - r.picks[b].at);
     const expert = found[0] || null;
@@ -300,7 +299,7 @@ export class WitnessHost {
 
   _scores() {
     const rows = this._rows();
-    // the final defendant: last place (ties broken by seed). Catch-up: fooled jurors pay them, x3.
+    // the final defendant: last place (ties broken by seed). Catch-up: they pick the two fakes, x3.
     const low = rows[rows.length - 1].score;
     const tied = rows.filter((x) => x.score === low);
     const def = tied[Math.floor(this.api.sub('cross')() * tied.length)].id;

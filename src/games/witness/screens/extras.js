@@ -60,7 +60,7 @@ const scores = {
     show.append(h('div.wt-scores',
       h('div.wt-scores-h', 'The standings'),
       h('div.wt-slist', list),
-      h('div.wt-nextup', dock(next, { size: 46 }), h('div', h('b', ctx.payload.next === ctx.meId ? 'You take the stand next' : `${next?.name || '?'} takes the stand next`), h('small', 'Last place. Fooled jurors pay them, triple.')))));
+      h('div.wt-nextup', dock(next, { size: 46 }), h('div', h('b', ctx.payload.next === ctx.meId ? 'You take the stand next' : `${next?.name || '?'} takes the stand next`), h('small', 'Last place. They pick the lies. Triple points.')))));
     if (!ctx.frozen) ctx.audio.sfx('fanfare');
     ctx.cyril.react('delight', { duration: ctx.frozen ? 60000 : 1200 });
     const cancel = sayLater(ctx, ctx.line('wtScores'), { delay: 900 });

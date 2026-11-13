@@ -72,9 +72,9 @@ export default {
         stageEl.replaceChildren(h('div.wt-card.fake',
           st, by,
           o.pickers.length ? h('div.wt-fooled', h('span.lbl', o.pickers.length === 1 ? 'Fooled' : `Fooled ${o.pickers.length}`), h('span.list', fooled)) : null,
-          p.final ? h('div.wt-ptsrow', h('span.each', `Kept by ${name}. Fooled jurors pay ${isMe(p.defendant) ? 'you' : 'them'}.`)) : house ? h('div.wt-ptsrow', h('span.each', 'Mine. No points for anyone.')) : h('div.wt-ptsrow', pts, h('span.each', `to ${o.authors.map((a) => (isMe(a) ? 'you' : pl(a)?.name || '?')).join(' & ')}`)),
+          house ? h('div.wt-ptsrow', h('span.each', 'Mine. No points for anyone.')) : h('div.wt-ptsrow', pts, h('span.each', `to ${o.authors.map((a) => (isMe(a) ? 'you' : pl(a)?.name || '?')).join(' & ')}`)),
           fellMe ? youLine(`You fell for it. That isn’t ${name}.`) : toldMe ? youLine(`Your fake fooled ${o.pickers.length}. Shameless.`) : null));
-        if (!house && !p.final) countTo(pts, 500 * m * o.pickers.length, { frozen: quiet });
+        if (!house) countTo(pts, 500 * m * o.pickers.length, { frozen: quiet });
         sfx('stamp');
         if (!quiet) { ctx.stage.shake?.(); ctx.haptic('stamp'); if (toldMe && o.pickers.length) ctx.haptic('fooled'); }
         if (o.pickers.length >= 2) ctx.say(ctx.line('wtFooledMany', { n: o.pickers.length }), { hold: 1500, placement: 'side' });
@@ -101,7 +101,7 @@ export default {
             ? h('div.wt-fooled.found', h('span.lbl', 'Found by'), h('span.list', found))
             : h('div.wt-fooled.none', h('span.lbl', 'Found by nobody. Not one of you.')),
           finders.length ? h('div.wt-ptsrow', pts, h('span.each', finders.length > 1 ? 'each' : `to ${isMe(finders[0]) ? 'you' : pl(finders[0])?.name || '?'}`), p.expert ? h('span.wt-xp', `+${250 * m} fastest`) : null) : null,
-          isMe(p.defendant) ? youLine(p.missed ? `You fooled ${p.missed}. +${(p.final ? 500 : 250) * m * p.missed}.` : 'They know you too well.') : null));
+          isMe(p.defendant) ? youLine(p.missed ? `You fooled ${p.missed}. +${250 * m * p.missed}.` : 'They know you too well.') : null));
         if (finders.length) countTo(pts, 1000 * m, { frozen: quiet });
         sfx('truth');
         if (!quiet && finders.includes(ctx.meId)) ctx.haptic('win');

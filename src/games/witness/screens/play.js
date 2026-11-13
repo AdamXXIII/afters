@@ -59,11 +59,11 @@ function writeSheet(sheet, ctx, { defendant }) {
   }
 
   const head = defendant
-    ? h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', p.final ? 'You’re on the stand' : 'You’re in the dock'), h('div.wt-sub', p.final ? 'Answer honestly. Triple points, and every fooled juror pays you.' : 'Answer honestly. They’re about to fake it.')))
+    ? h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', p.final ? 'You’re on the stand' : 'You’re in the dock'), h('div.wt-sub', p.final ? 'Answer honestly. Triple points.' : 'Answer honestly. They’re about to fake it.')))
     : h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', `Be ${name}`), h('div.wt-sub', `Write what ${name} would say. Fool the table.`)));
   const pay = defendant
-    ? h('div.wt-pay.one', h('div.wt-pay-i', h('b', `+${(p.final ? 500 : 250) * (p.mult || 1)}`), h('span', 'for every juror who picks a fake')))
-    : h('div.wt-pay', p.final ? null : h('div.wt-pay-i', h('b', `+${500 * (p.mult || 1)}`), h('span', 'per person fooled')), h('div.wt-pay-i.gold', h('b', `+${1000 * (p.mult || 1)}`), h('span', 'for finding the real one')));
+    ? h('div.wt-pay.one', h('div.wt-pay-i', h('b', `+${250 * (p.mult || 1)}`), h('span', 'for every juror who picks a fake')))
+    : h('div.wt-pay', h('div.wt-pay-i', h('b', `+${500 * (p.mult || 1)}`), h('span', 'per person fooled')), h('div.wt-pay-i.gold', h('b', `+${1000 * (p.mult || 1)}`), h('span', 'for finding the real one')));
   const tip = defendant ? h('div.wt-tip', 'Honest, but not obvious. That\u2019s the trick.') : h('div.wt-tip', TIPS[Math.abs(Math.round(tilt(ctx.phase?.seed || 1, 'tip', 100))) % TIPS.length]);
   const sheetEl = h(`div.wt-sheet.wt-write.wt-in${defendant ? '.dockside' : ''}${p.final ? '.final' : ''}`,
     head,
@@ -257,7 +257,7 @@ const choose = {
     const sync = (c) => {
       const k = c.mine.game.kept || [];
       btns.forEach((b, i) => b.setAttribute('aria-pressed', String(k.includes(p.fakes[i].id))));
-      hint.textContent = k.length >= need ? 'Kept. You can still change your mind.' : k.length ? `Pick ${need - k.length} more.` : `Every juror you fool pays you +${500 * (p.mult || 3)}.`;
+      hint.textContent = k.length >= need ? 'Kept. You can still change your mind.' : k.length ? `Pick ${need - k.length} more.` : `Every juror you fool pays you +${250 * (p.mult || 3)}.`;
       hint.classList.toggle('locked', k.length >= need);
     };
     sync(ctx);
