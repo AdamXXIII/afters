@@ -65,6 +65,12 @@ const myturn = {
     const b = top(show, ctx, { sub: p.turnsLeft > 1 ? 'Two turns. Play cards, then draw.' : 'Play cards if you like, then draw.' });
     const glow = h('div.rt-myglow', { 'aria-hidden': 'true' });
     document.body.append(glow);
+    // a one-second "Your turn!" slam across the table, then it gets out of the way
+    if (!ctx.frozen || ctx.elapsed() < 1400) {
+      const slam = h('div.rt-slam', { 'aria-hidden': 'true' }, h('span', p.turnsLeft > 1 ? 'Your turn ×2' : 'Your turn!'));
+      document.body.append(slam);
+      setTimeout(() => slam.remove(), ctx.frozen ? 60000 : 1500);
+    }
     let sel = null;
     let target = null;
     const pz = pile(ctx, { onTap: true });

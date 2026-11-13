@@ -152,6 +152,10 @@ export default {
         h._turn();
       }), me: 'idle', bots: 'idle', t: 7000,
     },
+    'returns-yourturn': {
+      match: rig((e, me) => isTurn(e) && e.phase.payload.turn === me, (h, me) => { give(h, me, 'skip'); h._turn(); }),
+      me: 'idle', bots: 'idle', t: 500,
+    },
     'returns-watch': {
       match: rig((e, me) => isTurn(e) && e.phase.payload.turn !== me, asOther((h, who, me) => {
         give(h, me, 'steady'); h.last = { kind: 'drew', by: me }; h._turn();
