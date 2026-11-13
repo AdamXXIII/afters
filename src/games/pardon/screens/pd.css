@@ -311,7 +311,7 @@
   .pd-how li { font-size: 15px; line-height: 19px; }
   .pd-stand { display: none; }
   /* split + input: show layer is the left column */
-  .pd-top { padding: 0 10px; }
+  .pd-top { padding: 0 60px 0 10px; }
   .pd-readcard { padding: 6px 10px 8px; }
   .pd-gib.xl { padding: 4px 0; }
   .pd-gib.xl .pd-word { font-size: 40px; }
@@ -351,7 +351,7 @@
   .pd-verdict { left: auto; width: 60%; top: calc(var(--safe-t) + 56px); }
   .pd-vlist { overflow: auto; }
   .pd-verdict-line { font-size: 14px; line-height: 17px; }
-  .pd-vlist { gap: 6px; }
+  .pd-vlist { gap: 6px; padding-top: 12px; }
   .pd-vcard { padding: 8px 12px 6px; }
   .pd-vcard.top { padding-top: 14px; }
   .pd-vtext, .pd-vlist.n4 .pd-vtext { font-size: 20px; }
