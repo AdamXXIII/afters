@@ -650,3 +650,19 @@ body[data-screen="forehead-intro"] #show, body[data-screen="forehead-pick"] #sho
 .fh-pk-fan .fh-pk-tile { margin: 0 -3px; width: 126px; max-width: 126px; min-height: 320px; }
 .fh-pk-fan .fh-pk-txt b { font-size: clamp(16px, 4.9vw, 20px); line-height: 1.1; overflow-wrap: normal; word-break: normal; hyphens: manual; }
 .fh-pk-fan .fh-pk-txt small { font-size: 13px; line-height: 16px; }
+/* critic round 2: no clipping at the screen edge, use the empty band under the title, bigger example cards */
+.fh-pk-fan { align-items: flex-start; padding-top: 14px; }
+.fh-pk-fan .fh-pk-tile { width: 118px; max-width: 118px; margin: 0 2px; min-height: 360px; padding: 14px 8px 24px; }
+.fh-pk-fan .fh-pk-tile:nth-child(1) { transform: rotate(-5deg) translateY(12px); }
+.fh-pk-fan .fh-pk-tile:nth-child(3) { transform: rotate(5deg) translateY(12px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(1) { transform: rotate(-5deg) translateY(-8px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(3) { transform: rotate(5deg) translateY(-8px); }
+.fh-pk-fan .fh-pk-txt b { display: block; width: 100%; white-space: normal; overflow-wrap: normal; }
+.fh-pk-ex { gap: 7px; margin-top: 6px; }
+.fh-pk-ex span { font-size: 14.5px; line-height: 17px; padding: 7px 5px 8px; }
+.fh-pk-fan .fh-pk-tile { width: 112px; max-width: 112px; margin: 0 3px; }
+.fh-pk-fan .fh-pk-tile:nth-child(1) { transform: rotate(-4deg) translateY(12px); }
+.fh-pk-fan .fh-pk-tile:nth-child(3) { transform: rotate(4deg) translateY(12px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(1) { transform: rotate(-4deg) translateY(-8px); }
+.fh-pk-fan .fh-pk-tile.on:nth-child(3) { transform: rotate(4deg) translateY(-8px); }
+.fh-pk-ex span { overflow-wrap: normal; word-break: normal; font-size: 14px; }

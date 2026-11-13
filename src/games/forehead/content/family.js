@@ -76,7 +76,7 @@ export const FAMILY_DECKS = [
     Yoda|Gollum|Homer Simpson|Scooby-Doo|Kermit the Frog|Mickey Mouse|Donald Duck|The Terminator|
     David Attenborough|Mr Bean|Alan Partridge|A Dalek|A sat nav|A robot|A newsreader|A football commentator|
     A weather presenter|A pirate|A toddler|A posh estate agent|A train announcer|A radio DJ|A fitness instructor|
-    A hypnotist|A sergeant major|An opera singer|An auctioneer|A monster truck advert|Count Dracula|A witch|
+    A hypnotist|A sergeant major|An opera singer|An auctioneer|A bingo caller|Count Dracula|A witch|
     The King's Christmas speech|Peppa Pig|Shrek|Donkey from Shrek|Michael Caine|Elvis|Marilyn Monroe|
     Joey from Friends|Gordon Ramsay|Sean Connery|A golf commentator|A whispering ASMR video`),
 

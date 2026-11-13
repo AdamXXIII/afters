@@ -2,7 +2,7 @@
 // tappable tiles with voters' avatars landing on them. The guesser watches and taps I'm ready.
 import './forehead.css';
 import { h, button, timerRing } from '../../../ui/components.js';
-import { deckIcon, disc, teamOf, TEAMS, armGuesser, HEAD_SVG, CYRIL_BADGE } from './kit.js';
+import { deckIcon, disc, fit, teamOf, TEAMS, armGuesser, HEAD_SVG, CYRIL_BADGE } from './kit.js';
 
 // Mid-bright deck colours (mustard, brass, sage, teal, tomato) take ink for small text, dark ones linen.
 const lightDeck = (hex) => {
@@ -66,6 +66,14 @@ export default {
     }
     const root = h(`div.fh-pick.fh-burst.claret${canVote ? '.can' : ''}${meG ? '.blind' : ''}`, h('div.fh-pk-side', head, foot), h('div.fh-pk-fan', tiles));
     show.append(root);
+    // Deck names and example cards never break mid-word: shrink a long one ("Characters") until it fits.
+    const fitNames = () => tiles.forEach((t) => {
+      const b = t.querySelector('.fh-pk-txt b');
+      if (b?.clientWidth) fit(b, { max: 20, min: 14, maxW: b.clientWidth });
+      t.querySelectorAll('.fh-pk-ex span').forEach((x) => { if (x.clientWidth) fit(x, { max: 14, min: 11, maxW: x.clientWidth }); });
+    });
+    fitNames();
+    document.fonts?.ready?.then(fitNames);
     if (!ctx.frozen) tiles.forEach((t, i) => t.animate([{ translate: '0 260px', rotate: '0deg', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 520, delay: 80 + i * 110, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }));
 
     const paint = () => {
