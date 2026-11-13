@@ -116,14 +116,15 @@ export default {
     },
     adult: {
       pdIntro: [
-        ['Pardon? Read filth that looks like nonsense.', 'Straight face, please. That’s the hard part.'],
+        ['Pardon? Read nonsense out loud. It turns into swearing.', 'Straight face, please. That\'s the hard part.'],
         ['Pardon? after dark. Say it out loud. Regret it later.'],
       ],
       pdRead: [['Read it exactly as written. Innocently. Ha.'], ['Straight face. Do not look at your mother.']],
-      pdGot: [['Got it! Filthy. Well done.'], ['There it is. I’m blushing. Through the wax.']],
-      pdNobody: [['Nobody? You’re all far too innocent. Or drunk.']],
-      pdWrite: [['Mishear it. Make it rude. Make your nan blush.'], ['Go on. Ruin a classic. That’s the game.']],
-      pdVerdict: [['And the filthiest ear in the house...']],
+      pdGot: [['Got it! Disgusting. Well done.'], ['There it is. I\'m blushing. Through the wax.']],
+      pdQuick: [['Under ten seconds. Too much practice, that.']],
+      pdNobody: [['Nobody? It was swearing, you lot. Your specialist subject.'], ['Not one of you. Too pissed or too polite.']],
+      pdWrite: [['Mishear it. Make it sweary. Make your nan blush.'], ['Go on. Ruin a classic. That\'s the game.']],
+      pdVerdict: [['And the filthiest mouth in the house...'], ['And the ear of the evening, God help us...']],
     },
   },
 };
