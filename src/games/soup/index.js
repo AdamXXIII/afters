@@ -36,7 +36,7 @@ export default {
   tagline: 'One of you is poisoning the soup.',
   blurb: 'Secret Poisoners sit among you. Grow the pot by day, banish a suspect at the round table, and pray you wake up in the morning.',
   players: [4, 8],
-  minutes: 15,
+  minutes: 10,
   steps: [
     'One or two of you are secretly Poisoners. The rest are Faithful.',
     'By day, grow the pot, argue, then vote someone away from the table.',

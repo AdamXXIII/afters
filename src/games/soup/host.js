@@ -258,7 +258,7 @@ export class SoupHost {
     const pois = this._pois().length;
     const faith = this._faith().length;
     const n = pois + faith;
-    if (pois === 0 || pois >= faith) return this._end();
+    if (pois === 0 || faith === 0) return this._end();
     if (this.finalMode) return n > 2 ? this._final() : this._end();
     if (n <= 3) return this._final();
     return this._night();
@@ -302,7 +302,7 @@ export class SoupHost {
   _afterMorning() {
     const pois = this._pois().length;
     const faith = this._faith().length;
-    if (pois >= faith) return this._end();
+    if (faith === 0) return this._end();
     if (pois + faith <= 3) return this._final();
     return this._task();
   }
