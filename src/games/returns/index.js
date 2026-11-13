@@ -60,9 +60,9 @@ export default {
   players: [3, 8],
   minutes: 10,
   steps: [
-    'On your turn, draw a card. Draw a birthday cake and you’re out.',
+    'Take turns drawing a card. Draw a birthday cake and you’re out; last one in wins.',
     'A Big Breath blows the candles out and saves you. You start with one.',
-    'Before you draw, play cards to dodge, peek and stitch up your mates. Last one in wins.',
+    'Before you draw, play cards to skip, peek or pinch. Each card says what it does.',
   ],
   hasAdult: true,
   colour: '#7A1E2C',

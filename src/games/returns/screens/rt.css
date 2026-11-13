@@ -150,7 +150,8 @@
 .rt-hand.picking > .rt-card:not(.sel) { opacity: .5; filter: saturate(.5); }
 .rt-hand > .rt-card.sel { transform: translateY(-10px); box-shadow: 0 0 0 3px var(--kc), 0 14px 26px rgba(59,31,24,.35); opacity: 1; filter: none; }
 .rt-hand > .rt-card.thrown { transform: translateY(-140px) rotate(-6deg) scale(.9); opacity: 0; transition: transform 360ms var(--ease-in-quint), opacity 360ms; }
-.rt-sheet.watch .rt-hand > .rt-card:not(.ready) { opacity: .82; }
+.rt-sheet.watch .rt-hand > .rt-card:not(.ready) { opacity: .5; filter: saturate(.35); }
+.rt-sheet.watch .rt-handhead-t { color: var(--c-toffee); }
 .rt-sheet.watch .rt-hand > .rt-card.ready { box-shadow: 0 0 0 2.5px var(--c-candle), 0 0 18px rgba(255,180,90,.55), 0 6px 14px rgba(59,31,24,.22); }
 .rt-hand-empty { padding: 26px 4px; font-size: 15px; color: var(--c-toffee); font-style: italic; }
 

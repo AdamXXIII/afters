@@ -164,7 +164,7 @@ const myturn = {
       ctx.stage?.hop?.(ctx.meId);
     }
     ctx.cyril.react('drumroll', { duration: ctx.frozen ? 60000 : 900 });
-    const cancel = sayLater(ctx, ctx.line(p.turnsLeft > 1 && p.last?.kind === 'plate' ? 'rtTwoTurns' : 'rtYourTurn'), { delay: 500 });
+    const cancel = p.last ? () => {} : sayLater(ctx, ctx.line('rtYourTurn'), { delay: 500 });
     return {
       update(c) {
         const done = !!(c.mine.game.played || c.mine.game.drew);
@@ -195,7 +195,7 @@ const watch = {
       news(ctx),
       status,
       pz.el,
-      out ? null : h('div.rt-handhead', h('span.rt-handhead-t', 'Your hand'), h('div.rt-hint', hasSteady ? 'Got a Steady On? Use it when they play a card.' : 'Wait for your turn.')),
+      out ? null : h('div.rt-handhead', h('span.rt-handhead-t', 'Your hand'), h('div.rt-hint', hasSteady ? 'Just watch. If they play a card, you can Steady On it.' : 'Just watch. Nothing to tap till your turn.')),
       out ? h('div.rt-ghostnote', disc(ctx, ctx.meId, { size: 40, cls: '.gone' }), h('span', 'Your candles are out. You can still throw bread rolls.')) : handRow(ctx, { ready: (c) => c.k === 'steady' }));
     sheet.append(body);
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 900 });
@@ -232,7 +232,7 @@ const play = {
         c.append(h('span.rt-by', { style: { '--pc': colourOf(ctx, x.by) } }, nameOf(ctx, x.by)));
         return c;
       }));
-    const verdict = h(`div.rt-verdict${p.cancelled ? '.no' : '.yes'}`, p.cancelled ? 'Cancelled… unless someone Steadies On back' : chain.length > 1 ? 'Back on… unless someone Steadies On again' : 'Going ahead…');
+    const verdict = h(`div.rt-verdict${p.cancelled ? '.no' : '.yes'}`, p.cancelled ? 'Cancelled… unless someone Steadies On back' : chain.length > 1 ? 'Back on… unless someone Steadies On again' : 'Happens in a moment, unless someone says Steady On');
     const fuse = h('div.rt-fuse', h('i'));
     const priv = ctx.priv || {};
     const nSteady = (priv.hand || []).filter((c) => c.k === 'steady').length;
@@ -313,11 +313,11 @@ const peekwatch = {
 
 // ---------- tuck the cake back ----------
 const SLOTS = [
-  { pos: 0, t: 'Right on top', s: 'The next player draws it' },
+  { pos: 0, t: 'On top', s: 'The next player draws it. Nasty.' },
   { pos: 1, t: 'Second from the top', s: '' },
   { pos: 2, t: 'Third from the top', s: '' },
   { pos: 'random', t: 'Somewhere random', s: 'Even you won’t know' },
-  { pos: 'bottom', t: 'Right at the bottom', s: 'Safe for ages' },
+  { pos: 'bottom', t: 'At the very bottom', s: 'Nobody sees it for ages' },
 ];
 const tuck = {
   id: 'returns-tuck',
@@ -340,7 +340,7 @@ const tuck = {
       }, { sound: null, buzz: null });
       return el;
     }));
-    sheet.append(h('div.rt-sheet.tuck.rt-in', h('div.rt-tuckh', cardFace(ctx, { k: 'cake' }, { size: 'mini' }), h('div', h('b', 'Where does the cake go?'), h('span', `${n} cards in the pile. Pick a spot.`))), list));
+    sheet.append(h('div.rt-sheet.tuck.rt-in', h('div.rt-tuckh', cardFace(ctx, { k: 'cake' }, { size: 'mini' }), h('div', h('b', 'Put the cake back in the pile'), h('span', `Pick where. ${n} cards in the pile. Only you know.`))), list));
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1200 });
     const cancel = sayLater(ctx, ctx.line('rtTuck'), { delay: 600 });
     return {

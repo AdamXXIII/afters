@@ -126,7 +126,7 @@ export function pile(ctx, { big = false, onTap = null } = {}) {
     h('div.rt-meter-cakes', { 'aria-label': `${cakes} cakes in the pile` },
       Array.from({ length: cakes }, () => h('span.rt-meter-cake', { html: ICON.cake })),
       h('span.rt-meter-t', `${cakes} ${cakes === 1 ? 'cake' : 'cakes'} in there`)),
-    h('div.rt-odds', { style: { '--odds': `${Math.min(100, odds)}%` } }, h('i'), h('span', `${odds}% chance the next card is cake`)));
+    h('div.rt-odds', { style: { '--odds': `${Math.min(100, odds)}%` } }, h('i'), h('span', odds >= 50 ? 'The next card is more likely cake than not' : `About 1 in ${Math.max(2, Math.round(100 / Math.max(1, odds)))} chance the next card is cake`)));
   return { stack, meter, el: h(`div.rt-pilezone${big ? '.big' : ''}`, stack, meter) };
 }
 

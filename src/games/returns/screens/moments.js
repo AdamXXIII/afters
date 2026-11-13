@@ -21,9 +21,9 @@ const intro = {
     const p = ctx.payload;
     const cakes = p.cakes || 1;
     const panels = [
-      { art: h('div.rt-pan-art', cardBack({ cls: '.mini' }), cardFace(ctx, { k: 'cake' }, { size: 'mini' })), t: 'On your turn, draw a card. Draw a birthday cake and you’re out.' },
+      { art: h('div.rt-pan-art', cardBack({ cls: '.mini' }), cardFace(ctx, { k: 'cake' }, { size: 'mini' })), t: 'Take turns drawing a card. Draw a birthday cake and you’re out; last one in wins.' },
       { art: h('div.rt-pan-art', cardFace(ctx, { k: 'breath' }, { size: 'mini' })), t: 'A Big Breath blows the candles out and saves you. You start with one.' },
-      { art: h('div.rt-pan-art.fan', cardFace(ctx, { k: 'skip' }, { size: 'mini' }), cardFace(ctx, { k: 'pinch' }, { size: 'mini' }), cardFace(ctx, { k: 'steady' }, { size: 'mini' })), t: 'Before you draw, play cards to dodge, peek and stitch up your mates. Last one in wins.' },
+      { art: h('div.rt-pan-art.fan', cardFace(ctx, { k: 'skip' }, { size: 'mini' }), cardFace(ctx, { k: 'pinch' }, { size: 'mini' }), cardFace(ctx, { k: 'steady' }, { size: 'mini' })), t: 'Before you draw, play cards to skip, peek or pinch. Each card says what it does.' },
     ];
     const card = h('div.rt-intro',
       h('div.rt-intro-h', h('span.rt-intro-cake', cakeArt('.tiny')), h('div', h('div.rt-intro-t', 'Many Happy Returns'), h('div.rt-intro-s', `${cakes} ${cakes === 1 ? 'cake' : 'cakes'} hidden in ${p.pile} cards`))),
