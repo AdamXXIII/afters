@@ -130,7 +130,7 @@ export default {
     // bar: Invite (code) + Family / Adults 18+
     const ratingSeg = h('div.mn-rating', { role: 'radiogroup', 'aria-label': 'Content rating' });
     const fam = h('button.mn-rate', { type: 'button', role: 'radio', 'data-e2e': 'rating-family' }, 'Family');
-    const adu = h('button.mn-rate.adult', { type: 'button', role: 'radio', 'data-e2e': 'rating-adult' }, 'Adults 18+');
+    const adu = h('button.mn-rate.adult', { type: 'button', role: 'radio', 'data-e2e': 'rating-adult', 'aria-label': 'Adults 18+' }, '18+');
     ratingSeg.append(fam, adu);
     const setRating = (r) => { if (c.isHost && c.rating !== r) c.client.setSettings({ rating: r }); };
     onTap(fam, () => setRating('family'));
@@ -150,12 +150,22 @@ export default {
     const againSide = h('section.mn-again.side', { 'aria-label': 'Play again' }); // landscape: under Cyril
     root.append(againSide);
     const filters = h('div.mn-filters', { role: 'toolbar', 'aria-label': 'Filter games by mood' });
-    const fitsRow = h('button.mn-fits', { type: 'button', 'data-e2e': 'mood-fits', role: 'switch', 'aria-checked': 'false' },
-      h('i.mn-fits-ic', { html: PEOPLE_SVG }), h('span.mn-fits-t'), h('span.mn-fits-sw', h('span.mn-fits-knob')));
-    onTap(fitsRow, () => { fitsOnly = !fitsOnly; paint(); });
+    // the chip row scrolls sideways; arrows at either end say so and scroll it a page
+    const arrowL = h('button.mn-filt-arrow.l', { type: 'button', 'aria-label': 'Earlier filters', tabindex: '-1', html: BACK_SVG });
+    const arrowR = h('button.mn-filt-arrow.r', { type: 'button', 'aria-label': 'More filters', tabindex: '-1', html: BACK_SVG });
+    const filtWrap = h('div.mn-filt', filters, arrowL, arrowR);
+    const syncArrows = () => {
+      const max = filters.scrollWidth - filters.clientWidth;
+      filtWrap.classList.toggle('more-r', filters.scrollLeft < max - 4);
+      filtWrap.classList.toggle('more-l', filters.scrollLeft > 4);
+    };
+    filters.addEventListener('scroll', syncArrows, { passive: true });
+    window.addEventListener('resize', syncArrows);
+    onTap(arrowR, () => filters.scrollBy({ left: filters.clientWidth * 0.7, behavior: c.reduced ? 'auto' : 'smooth' }));
+    onTap(arrowL, () => filters.scrollBy({ left: -filters.clientWidth * 0.7, behavior: c.reduced ? 'auto' : 'smooth' }));
     const list = h('ul.mn-list', { 'aria-label': 'Games' });
-    const sheet = h('div.mn-sheet', fitsRow, list);
-    scroll.append(againBox, filters, sheet);
+    const sheet = h('div.mn-sheet', list);
+    scroll.append(againBox, filtWrap, sheet);
     const foot = h('div.mn-foot', { 'aria-live': 'polite' });
     bay.append(foot);
 
@@ -168,6 +178,10 @@ export default {
       chipEls.set(id, b);
       return b;
     };
+    const fitsChip = mkChip('fits', 'For us', MOOD_ICONS.fits, () => { fitsOnly = !fitsOnly; paint(); });
+    fitsChip.classList.add('fits');
+    fitsChip.prepend(h('i.mn-chip-tick', { html: TICK_SVG }));
+    filters.append(fitsChip, h('span.mn-chip-sep', { 'aria-hidden': 'true' }));
     filters.append(mkChip('all', 'All', MOOD_ICONS.all, () => { mood = 'all'; paint(); }));
     for (const m of MOODS) filters.append(mkChip(m.id, m.label, MOOD_ICONS[m.id], () => { mood = mood === m.id ? 'all' : m.id; paint(); }));
 
@@ -394,6 +408,7 @@ export default {
       const inMood = (g) => mood === 'all' || moodsOf(g).includes(mood);
 
       for (const [id, b] of chipEls) {
+        if (id === 'fits') continue;
         const m = MOODS.find((x) => x.id === id);
         if (m?.adult) b.hidden = !adult;
         const on = id === mood;
@@ -402,9 +417,11 @@ export default {
         const count = live.filter((g) => (id === 'all' || moodsOf(g).includes(id)) && (!fitsOnly || fits(g))).length;
         b.querySelector('.mn-chip-n').textContent = String(count);
       }
-      fitsRow.setAttribute('aria-checked', String(fitsOnly));
-      fitsRow.classList.toggle('on', fitsOnly);
-      fitsRow.querySelector('.mn-fits-t').replaceChildren(h('b', `Games for ${n} of us first`));
+      fitsChip.setAttribute('aria-pressed', String(fitsOnly));
+      fitsChip.classList.toggle('on', fitsOnly);
+      fitsChip.querySelector('.mn-chip-t').textContent = `For ${n} of us`;
+      fitsChip.setAttribute('aria-label', `Show games for ${n} players first`);
+      requestAnimationFrame(syncArrows);
 
       const moodLabel = MOODS.find((m) => m.id === mood)?.label;
 
@@ -534,7 +551,7 @@ export default {
         }
         paint();
       },
-      unmount() { cancel?.(); inviteEl?.remove(); window.removeEventListener('keydown', onKey); },
+      unmount() { cancel?.(); inviteEl?.remove(); window.removeEventListener('keydown', onKey); window.removeEventListener('resize', syncArrows); },
     };
   },
 };
