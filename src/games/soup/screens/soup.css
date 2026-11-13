@@ -386,12 +386,21 @@ body.sp-night #sheet::after { box-shadow: inset 0 1px 0 rgba(243,230,207,.12); }
   .sp-result .sp-tureen { grid-row: 2 / 4; }
   .sp-psst { left: auto; right: calc(var(--safe-r) + 18px); transform: none; bottom: 10px; }
   .sp-banish-t, .sp-end-t { font-size: 24px; line-height: 26px; }
-  .sp-verdict { display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; column-gap: 14px; }
-  .sp-vd-av .sp-av { width: 72px !important; height: 72px !important; }
-  .sp-vd-nm { font-size: 28px; }
+  .sp-banish { gap: 4px; }
+  .sp-verdict { gap: 2px; }
+  .sp-vd-av { margin: 0; }
+  .sp-vd-av .sp-av { width: 60px !important; height: 60px !important; }
+  .sp-stamp { font-size: 15px; padding: 1px 8px; bottom: -6px; border-width: 2px; }
+  .sp-vd-nm { font-size: 26px; line-height: 28px; margin-top: 8px; }
   .sp-rolecard { padding: 8px; }
   .sp-rc-a { font-size: 26px; }
-  .sp-endgrid { grid-template-columns: repeat(3, 1fr); }
+  .sp-endgrid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .sp-end { gap: 6px; }
+  .sp-endp { grid-template-columns: 28px 1fr; padding: 3px 6px; column-gap: 6px; }
+  .sp-endp .sp-av { width: 28px !important; height: 28px !important; }
+  .sp-endp .nm { font-size: 13px; line-height: 15px; }
+  .sp-endp .role, .sp-endp .fate { font-size: 11px; line-height: 13px; }
+  .sp-end-s b { font-size: 22px; line-height: 24px; }
   .sp-end-row .sp-tureen { --sz: 84px !important; }
   .sp-saved { width: 64px; height: 64px; }
   .sp-seats { padding: 4px 6px; }

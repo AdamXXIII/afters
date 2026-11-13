@@ -20,7 +20,7 @@ const intro = {
     pot.set(0);
     const row = (icon, text) => h('li', h('span.ic', { html: icon }), h('span', text));
     const card = h('div.sp-card.sp-intro',
-      h('div.sp-intro-t', 'Something', h('br'), h('i', 'in the'), ' Soup'),
+      h('div.sp-intro-t', 'Something ', h('br'), h('i', 'in the'), ' Soup'),
       pot,
       h('ul.sp-how',
         row(VIAL, p.poisoners > 1 ? 'Two of you are secretly Poisoners.' : 'One of you is secretly a Poisoner.'),
