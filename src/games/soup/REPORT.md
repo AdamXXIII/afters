@@ -9,7 +9,7 @@
   - Ghosts: banished and poisoned players see every screen and get one Séance vote per game, shown as "A ghost".
   - The table's hunch: Faithful taps at night become a hint the next morning.
   - The daily clue: for spoons, every hand anonymously; for the code, whose digit most people got wrong; for the parcel, who dropped it.
-- Bots play every phase. Parcel bots play live, and a Poisoner bot sometimes hangs on to the parcel. There is a demo for every screen (17).
+- Bots play every phase. Parcel bots play live, and a Poisoner bot sometimes hangs on to the parcel. There is a demo for every screen (17, including a banish shown just before the flip).
 - Content: 234 items. 30+30 counting items, 20+20 safe rooms, 30+30 morning reports and 74 Cyril line variants, including landslide and tie reactions. Every line has family and Adults 18+ versions. There are no food topics in anything players answer.
 - `hidden` is removed.
 
@@ -37,7 +37,7 @@ Blind A/B against Push The Button's Steam screenshots. For onboarding, content a
 | Piece | Round 1 | Fix | Round 2 |
 |---|---|---|---|
 | Core action (tasks, round table) | **Ours** (medium-high). Gap: the top was crowded, the bubble covered the tally, and the gear overlapped the pot | Cut-out for the gear, compact 2.4 s bubbles on split screens | Stopped: won |
-| Reveal (banish, morning, night) | Bar (about 65%). Gap: no build-up beat before the role | The role card is held face-down and trembling, then flips with a shake, haptic and sound | see reply |
+| Reveal (banish, morning, night) | Bar (about 65%). Gap: no build-up beat before the role | The role card is held face-down and trembling, then flips with a shake, haptic and sound | **Ours** (about 70%). Remaining gap: a bigger payoff. Added a full-screen wash in the role colour on the flip |
 | Onboarding | Bar. Gap: rule 3 was a conditional sentence, a blank icon, the wrong minutes | Rule 3 now says "If any are left at the end, they take the pot"; icon and minutes fixed | Bar. Gap: the intro card is still dense. Stopped (two rounds lost) |
 | Content | Mixed. Gap: lines don't react to play | Landslide and tie lines, more intro lines | **Ours** on voice. Remaining gap: more event-keyed lines, fewer near-identical mornings |
 | Whole-game arc | Bar. Gap: the Faithful have nothing to deduce from | Daily public clue | Bar. Clues are real but weak. Stopped (two rounds lost) |
