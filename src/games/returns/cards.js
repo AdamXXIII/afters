@@ -4,14 +4,14 @@
 
 /** Card kinds. `act`: playable on your own turn. `steady`: only in someone else's window. */
 export const KINDS = {
-  peek: { name: 'Peek', rule: 'Look at the top three cards of the pile.', colour: '#2F5D7C', lip: '#21445C', act: true },
+  peek: { name: 'Peek', rule: 'See the top three cards of the pile.', colour: '#2F5D7C', lip: '#21445C', act: true },
   skip: { name: 'Skip', rule: 'End your turn without drawing.', colour: '#5E7F52', lip: '#45603C', act: true },
   shuffle: { name: 'Shuffle', rule: 'Shuffle the pile.', colour: '#B07F14', lip: '#86600C', act: true },
   pinch: { name: 'Pinch', rule: 'Take a random card from someone.', colour: '#B5527E', lip: '#8A3A5E', act: true, target: true },
-  plate: { name: 'Pass the Plate', rule: 'End your turn without drawing. The next player takes two turns.', colour: '#C8452D', lip: '#9A3220', act: true },
+  plate: { name: 'Pass the Plate', rule: 'Don’t draw. The next player takes two turns.', colour: '#C8452D', lip: '#9A3220', act: true },
   steady: { name: 'Steady On', rule: 'Cancel a card someone just played.', colour: '#3B1F18', lip: '#22110C', act: false },
-  breath: { name: 'Big Breath', rule: 'Blows out a cake and saves you. Then hide the cake back in the pile.', colour: '#3E8E8A', lip: '#2B6A67', act: false },
-  cake: { name: 'Birthday Cake', rule: 'You’re out. Unless you’ve got a Big Breath.', colour: '#7A1E2C', lip: '#561320', act: false },
+  breath: { name: 'Big Breath', rule: 'Blows out a cake. Saves you.', colour: '#3E8E8A', lip: '#2B6A67', act: false },
+  cake: { name: 'Birthday Cake', rule: 'You’re out, unless you’ve got a Big Breath.', colour: '#7A1E2C', lip: '#561320', act: false },
 };
 
 export const ACTION_KINDS = ['peek', 'skip', 'shuffle', 'pinch', 'plate', 'steady'];
