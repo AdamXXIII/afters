@@ -59,11 +59,11 @@ function writeSheet(sheet, ctx, { defendant }) {
   }
 
   const head = defendant
-    ? h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', p.final ? 'You’re on the stand' : 'You’re in the dock'), h('div.wt-sub', p.final ? 'Answer honestly. Double points.' : 'Answer honestly. They’re about to fake it.')))
+    ? h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', p.final ? 'You’re on the stand' : 'You’re in the dock'), h('div.wt-sub', p.final ? 'Answer honestly. Triple points, and every fooled juror pays you.' : 'Answer honestly. They’re about to fake it.')))
     : h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', `Be ${name}`), h('div.wt-sub', `Write what ${name} would say. Fool the table.`)));
   const pay = defendant
-    ? h('div.wt-pay.one', h('div.wt-pay-i', h('b', '+250'), h('span', 'for every juror who picks a fake')))
-    : h('div.wt-pay', h('div.wt-pay-i', h('b', '+500'), h('span', 'per person fooled')), h('div.wt-pay-i.gold', h('b', '+1000'), h('span', 'for finding the real one')));
+    ? h('div.wt-pay.one', h('div.wt-pay-i', h('b', `+${(p.final ? 500 : 250) * (p.mult || 1)}`), h('span', 'for every juror who picks a fake')))
+    : h('div.wt-pay', p.final ? null : h('div.wt-pay-i', h('b', `+${500 * (p.mult || 1)}`), h('span', 'per person fooled')), h('div.wt-pay-i.gold', h('b', `+${1000 * (p.mult || 1)}`), h('span', 'for finding the real one')));
   const tip = defendant ? h('div.wt-tip', 'Honest, but not obvious. That\u2019s the trick.') : h('div.wt-tip', TIPS[Math.abs(Math.round(tilt(ctx.phase?.seed || 1, 'tip', 100))) % TIPS.length]);
   const sheetEl = h(`div.wt-sheet.wt-write.wt-in${defendant ? '.dockside' : ''}${p.final ? '.final' : ''}`,
     head,
@@ -76,7 +76,8 @@ function writeSheet(sheet, ctx, { defendant }) {
     field.input.dispatchEvent(new Event('input'));
   }
   if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
-  const cancel = sayLater(ctx, ctx.line(defendant ? 'wtDock' : 'wtWrite', { name }), { delay: 700 });
+  const firstDouble = p.mult === 2 && p.index === Math.ceil((p.count || 1) / 2);
+  const cancel = sayLater(ctx, ctx.line(firstDouble ? 'wtDouble' : defendant ? 'wtDock' : 'wtWrite', { name }), { delay: 700 });
   let autoSent = false;
   return {
     frame(c) {
@@ -174,8 +175,8 @@ const pick = {
     const hint = h('div.wt-hint');
     sheet.append(h(`div.wt-sheet.wt-picksheet.wt-in${p.final ? '.final' : ''}${p.options.length > 5 ? '.many' : ''}`,
       h('div.wt-pickhead',
-        h('div.wt-title', p.final ? `Truth or lie? Which is ${name}?` : `Which one did ${name} write?`),
-        h('div.wt-sub', p.final ? 'One is real. Double points.' : `${p.options.length} answers. One is real.`)),
+        h('div.wt-title', `Which one did ${name} write?`),
+        h('div.wt-sub', `${p.options.length} answers. One is real.${p.mult > 1 ? ` Points ×${p.mult}.` : ''}`)),
       echo ? h('div.wt-echo', h('b', 'You wrote exactly what they wrote.'), ' +750 for that. Now pick from the rest.') : null,
       h('div.wt-opts', btns),
       hint));
@@ -183,7 +184,7 @@ const pick = {
       const mine = c.mine.game.pick;
       btns.forEach((b, i) => b.setAttribute('aria-pressed', String(mine === p.options[i].id)));
       const i = p.options.findIndex((o) => o.id === mine);
-      hint.textContent = i >= 0 ? `Locked in on ${LETTERS[i]}. Change it till time’s up.` : `Fastest to the real one gets +${p.final ? 500 : 250}.`;
+      hint.textContent = i >= 0 ? `Locked in on ${LETTERS[i]}. Change it till time’s up.` : `Fastest to the real one gets +${250 * (p.mult || 1)}.`;
       hint.classList.toggle('locked', i >= 0);
       row.sync(c);
     };
@@ -236,20 +237,28 @@ const choose = {
         h(`span.wt-opt-t${o.text.length > 32 ? '.long' : ''}`, o.text),
         o.house ? h('span.wt-opt-yours', 'Cyril’s') : null,
         h('span.wt-opt-tick', { html: TICK }));
-      onTap(b, () => ctx.client.act('wt-keep', { optionId: o.id }, { kept: o.id }), { sound: 'select', buzz: 'select' });
+      onTap(b, () => {
+        // tap to keep, tap again to drop; the oldest drops when you pick one too many
+        let k = (ctx.mine.game.kept || []).slice();
+        if (k.includes(o.id)) k = k.filter((x) => x !== o.id);
+        else { k.push(o.id); if (k.length > need) k.shift(); }
+        if (k.length) ctx.client.act('wt-keep', { ids: k }, { kept: k });
+        else { ctx.mine.game.kept = []; sync(ctx); }
+      }, { sound: 'select', buzz: 'select' });
       return b;
     });
+    const need = p.keep || 1;
     const hint = h('div.wt-hint');
     sheet.append(h('div.wt-sheet.wt-picksheet.wt-choosesheet.wt-in.final',
-      h('div.wt-pickhead', h('div.wt-title', 'Keep one lie'), h('div.wt-sub', 'It stands beside your answer. Pick the one they’ll believe is you.')),
+      h('div.wt-pickhead', h('div.wt-title', need > 1 ? 'Keep two lies' : 'Keep one lie'), h('div.wt-sub', 'They stand beside your answer. Pick the ones that sound like you.')),
       truth,
       h('div.wt-opts', btns),
       hint));
     const sync = (c) => {
-      const k = c.mine.game.kept;
-      btns.forEach((b, i) => b.setAttribute('aria-pressed', String(k === p.fakes[i].id)));
-      hint.textContent = k ? 'Kept. You can still change your mind.' : 'Every juror you fool pays you double.';
-      hint.classList.toggle('locked', !!k);
+      const k = c.mine.game.kept || [];
+      btns.forEach((b, i) => b.setAttribute('aria-pressed', String(k.includes(p.fakes[i].id))));
+      hint.textContent = k.length >= need ? 'Kept. You can still change your mind.' : k.length ? `Pick ${need - k.length} more.` : `Every juror you fool pays you +${500 * (p.mult || 3)}.`;
+      hint.classList.toggle('locked', k.length >= need);
     };
     sync(ctx);
     const cancel = sayLater(ctx, ctx.line('wtChoose'), { delay: 600 });

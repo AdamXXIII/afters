@@ -1,6 +1,7 @@
 // Character Witness: one of you is in the dock with a question about themselves. They answer
 // truthfully; everyone else writes a fake in their voice; the table picks the real one.
-// Finale: Cross-examination (last place takes the stand, one fake beside the truth, double points).
+// Halfway on, every round pays double. Finale: Cross-examination (last place takes the stand, keeps
+// two fakes beside the truth; fooled jurors pay them, triple points).
 // Rules + screens: ./DESIGN.md. AI-generated (Claude, Character Witness builder, 2026-11-13).
 import { WitnessHost } from './host.js';
 import { HOUSE } from './content/questions.js';
@@ -59,7 +60,7 @@ export default {
       }
       case 'witness-choose': {
         if (p.defendant !== me) return true;
-        later(rand(1500, 6000), () => { if (still() && !mine().kept && p.fakes.length) { const o = p.fakes[Math.floor(rng() * p.fakes.length)]; client.act('wt-keep', { optionId: o.id }, { kept: o.id }); } });
+        later(rand(1500, 6000), () => { if (still() && !mine().kept && p.fakes.length) { const ids = p.fakes.map((o) => o.id).sort(() => rng() - 0.5).slice(0, p.keep || 1); client.act('wt-keep', { ids }, { kept: ids }); } });
         return true;
       }
       default:
@@ -118,8 +119,9 @@ export default {
       wtFifth: [['{name} pleaded the fifth. That was a lie too. In their own handwriting.']],
       wtSilent: [['{name} said nothing. Contempt of court. Nobody scores.']],
       wtScores: [['The standings. Last place takes the stand for the final sitting.']],
-      wtCross: [['Cross-examination! One truth, one lie, double points.'], ['The final sitting. Two answers. One is real. Everything doubles.']],
-      wtChoose: [['Keep the lie you want beside your truth. Pick a convincing one.']],
+      wtCross: [['Cross-examination! One truth, two lies, triple points.'], ['The final sitting. Three answers. One is real. Everything triples.']],
+      wtDouble: [['Halfway. From now on every point counts double. Do try to keep up.']],
+      wtChoose: [['Pick the two lies that sound most like you. Then hold your nerve.']],
       wtRecess: [['Short recess. {name} is choosing which lie to keep.']],
     },
     adult: {

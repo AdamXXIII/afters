@@ -2,7 +2,8 @@
 // One player is in the dock each round: they answer a question about themselves (or plead the
 // fifth once and lie), everyone else writes a fake in their voice, the table picks the real one.
 // Finale "Cross-examination": the last-placed player takes the stand, keeps ONE fake beside
-// their answer, and the table bets on which is real, for double points. See ./DESIGN.md.
+// their answer, and the table finds the real one, for triple points. From the halfway dock on,
+// every round pays double. See ./DESIGN.md.
 // Bluff-and-pick ideas adapted from Afters Classic's Porkies (copied, not imported).
 import { QUESTIONS, HOUSE } from './content/questions.js';
 import { normalise, levenshtein } from '../../util/text.js';
@@ -111,9 +112,10 @@ export class WitnessHost {
         return;
       }
       case 'wt-keep': {
-        if (ph !== 'witness-choose' || p.id !== r.defendant) return;
-        if (!r.fakeOpts.some((o) => o.id === msg.optionId)) return;
-        r.kept = msg.optionId;
+        if (ph !== 'witness-choose' || p.id !== r.defendant || !Array.isArray(msg.ids)) return;
+        const ids = [...new Set(msg.ids)].filter((id) => r.fakeOpts.some((o) => o.id === id)).slice(0, this._keepN());
+        if (!ids.length) return;
+        r.kept = ids;
         this.api.ack(p);
         this.api.progress();
         return;
@@ -135,10 +137,18 @@ export class WitnessHost {
     return text;
   }
 
+  /** Stakes: x1 for the first half of the docks, x2 from halfway, x3 for cross-examination. */
+  _mult() {
+    const r = this.r;
+    if (r.final) return 3;
+    const regular = this.rounds.filter((x) => !x.final).length;
+    return this.i >= Math.ceil(regular / 2) ? 2 : 1;
+  }
+
   _base() {
     const r = this.r;
     const regular = this.rounds.filter((x) => !x.final).length;
-    return { index: r.final ? regular : this.i, count: regular, defendant: r.defendant, q: r.text, kind: r.q.k, final: r.final };
+    return { index: r.final ? regular : this.i, count: regular, defendant: r.defendant, q: r.text, kind: r.q.k, final: r.final, mult: this._mult() };
   }
 
   _write() {
@@ -178,25 +188,27 @@ export class WitnessHost {
     r.fakeOpts = all.filter((o) => o.kind !== 'truth').map((o, i) => ({ ...o, id: `k${i}` }));
     this.api.enter('witness-choose', WT.choose, {
       ...this._base(), truth: r.truth,
-      fakes: r.fakeOpts.map((o) => ({ id: o.id, text: o.text, house: o.kind === 'house' })),
+      fakes: r.fakeOpts.map((o) => ({ id: o.id, text: o.text, house: o.kind === 'house' })), keep: this._keepN(),
     }, {
-      progress: () => ({ done: { [r.defendant]: !!r.kept }, counts: {} }),
+      progress: () => ({ done: { [r.defendant]: (r.kept?.length || 0) >= this._keepN() }, counts: {} }),
     });
   }
+
+  _keepN() { return Math.min(2, this.r.fakeOpts?.length || 0); }
 
   _pick() {
     const r = this.r;
     let options;
     if (r.final) {
-      let kept = r.fakeOpts.find((o) => o.id === r.kept);
-      if (!kept) {
-        // the defendant dithered: Cyril keeps a player's fake for them if there is one
-        const players = r.fakeOpts.filter((o) => o.kind === 'fake');
-        const list = players.length ? players : r.fakeOpts;
-        kept = list[Math.floor(this.api.sub('keep')() * list.length)];
+      const kept = (r.kept || []).map((id) => r.fakeOpts.find((o) => o.id === id)).filter(Boolean);
+      if (kept.length < this._keepN()) {
+        // the defendant dithered: Cyril tops up with players' fakes (house ones last)
+        const rest = shuffle(r.fakeOpts.filter((o) => !kept.includes(o)), this.api.sub('keep'))
+          .sort((a, b) => (a.kind === 'house') - (b.kind === 'house'));
+        while (kept.length < this._keepN() && rest.length) kept.push(rest.shift());
         r.autoKept = true;
       }
-      options = [r.all[0], kept];
+      options = [r.all[0], ...kept];
     } else options = this._build();
     const rng = this.api.sub(`opts-${r.q.id}`);
     r.options = shuffle(options, rng).map((o, i) => ({ kind: o.kind, text: o.text, authors: o.authors, id: `o${i}` }));
@@ -223,7 +235,7 @@ export class WitnessHost {
   _reveal() {
     const r = this.r;
     const api = this.api;
-    const m = r.final ? 2 : 1;
+    const m = this._mult();
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
     const add = (id, n) => { if (id in deltas) deltas[id] += n; };
 
@@ -246,10 +258,11 @@ export class WitnessHost {
       if (o.kind === 'truth') ps.forEach((pid) => add(pid, PTS.truth * m));
       else {
         missed += ps.length;
-        if (o.kind === 'fake') o.authors.forEach((a) => add(a, PTS.perFooled * m * ps.length));
+        // in cross-examination the fakes are the defendant's picks: fooled jurors pay the defendant
+        if (o.kind === 'fake' && !r.final) o.authors.forEach((a) => add(a, PTS.perFooled * m * ps.length));
       }
     }
-    add(r.defendant, PTS.defendant * m * missed);
+    add(r.defendant, (r.final ? PTS.perFooled : PTS.defendant) * m * missed);
     // expert witness: whoever found the truth fastest
     const found = pickers[truth.id].slice().sort((a, b) => r.picks[a].at - r.picks[b].at);
     const expert = found[0] || null;
@@ -264,7 +277,7 @@ export class WitnessHost {
     const zero = fakes.filter((o) => !pickers[o.id].length);
     const picked = fakes.filter((o) => pickers[o.id].length).sort((a, b) => pickers[a.id].length - pickers[b.id].length);
     if (zero.length) {
-      if (r.final) { steps.push({ kind: 'fake', optionId: zero[0].id, at: t }); t += BEAT.fake; }
+      if (r.final) for (const o of zero) { steps.push({ kind: 'fake', optionId: o.id, at: t }); t += BEAT.fake; }
       else { steps.push({ kind: 'nobody', optionIds: zero.map((o) => o.id), at: t }); t += BEAT.nobody; }
     }
     for (const o of picked) { steps.push({ kind: 'fake', optionId: o.id, at: t }); t += BEAT.fake; }
@@ -287,7 +300,7 @@ export class WitnessHost {
 
   _scores() {
     const rows = this._rows();
-    // the final defendant: last place (ties broken by seed). Catch-up: the stand pays double.
+    // the final defendant: last place (ties broken by seed). Catch-up: fooled jurors pay them, x3.
     const low = rows[rows.length - 1].score;
     const tied = rows.filter((x) => x.score === low);
     const def = tied[Math.floor(this.api.sub('cross')() * tied.length)].id;
@@ -297,7 +310,7 @@ export class WitnessHost {
 
   _crossIntro() {
     const next = this.rounds[this.rounds.length - 1];
-    this.api.enter('witness-cross-intro', WT.crossIntro, { defendant: next.defendant, mult: 2 });
+    this.api.enter('witness-cross-intro', WT.crossIntro, { defendant: next.defendant, mult: 3 });
   }
 
   _doneMap(fn) {

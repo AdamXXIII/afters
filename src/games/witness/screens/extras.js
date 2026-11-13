@@ -33,7 +33,7 @@ const intro = {
         'Everyone else writes a fake answer in that person’s voice.',
         'Find the real one. Fool the table to score.',
       ],
-      foot: `${ctx.payload.rounds} in the dock, then a cross-examination for double`,
+      foot: `${ctx.payload.rounds} in the dock. Points double halfway, then a cross-examination for triple.`,
     });
     show.append(h('div.wt-dim'), h('div.wt-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -60,7 +60,7 @@ const scores = {
     show.append(h('div.wt-scores',
       h('div.wt-scores-h', 'The standings'),
       h('div.wt-slist', list),
-      h('div.wt-nextup', dock(next, { size: 46 }), h('div', h('b', ctx.payload.next === ctx.meId ? 'You take the stand next' : `${next?.name || '?'} takes the stand next`), h('small', 'Last place. Cross-examination pays double.')))));
+      h('div.wt-nextup', dock(next, { size: 46 }), h('div', h('b', ctx.payload.next === ctx.meId ? 'You take the stand next' : `${next?.name || '?'} takes the stand next`), h('small', 'Last place. Fooled jurors pay them, triple.')))));
     if (!ctx.frozen) ctx.audio.sfx('fanfare');
     ctx.cyril.react('delight', { duration: ctx.frozen ? 60000 : 1200 });
     const cancel = sayLater(ctx, ctx.line('wtScores'), { delay: 900 });
@@ -78,11 +78,11 @@ const crossIntro = {
     const card = summons({
       title: 'Cross-examination',
       cls: '.cross',
-      art: h('div.wt-cross-art', dock(def, { size: 92 }), h('div.wt-cross-nm', me ? 'You' : def?.name || '?'), h('span.wt-x2.big', 'Double points')),
+      art: h('div.wt-cross-art', dock(def, { size: 92 }), h('div.wt-cross-nm', me ? 'You' : def?.name || '?'), h('span.wt-x2.big', 'Triple points')),
       rules: [
         `${me ? 'You answer' : `${def?.name || '?'} answers`} one last question, honestly.`,
-        `${me ? 'You keep' : 'They keep'} one fake to stand beside it.`,
-        'Truth or lie? Everything pays double.',
+        `${me ? 'You keep' : 'They keep'} two fakes to stand beside it.`,
+        'Find the real one. Everything pays triple.',
       ],
     });
     show.append(h('div.wt-dim'), h('div.wt-cardwrap', card));
