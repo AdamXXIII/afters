@@ -34,8 +34,7 @@ export default {
       av(owner, { size: 36 }),
       h('div.tp-al-head-t',
         h('div.tp-al-title', `${owner?.name || 'Someone'}'s ${flip ? 'flipbook' : 'rumour'}`),
-        h('div.tp-al-sub', `Rumour ${p.index + 1} of ${p.count}`, h('i', '·'), pageNo)),
-      pips);
+        h('div.tp-al-sub', h('span', `Rumour ${p.index + 1} of ${p.count}`), pips, pageNo)));
 
     // ---- the feed
     const list = h('div.tp-al-list');
@@ -178,7 +177,7 @@ export default {
         }
       }
       shownPage = page;
-      pageNo.textContent = page >= steps.length ? (flip ? 'the film' : 'the verdict') : `page ${page + 1} of ${steps.length}`;
+      pageNo.textContent = page >= steps.length ? (flip ? 'the film' : 'the verdict') : `page ${page + 1}`;
       [...pips.children].forEach((pip, i) => { pip.classList.toggle('on', i <= page); pip.classList.toggle('cur', i === page); });
       nextLbl.textContent = page >= steps.length ? 'Vote for the best bit' : page === steps.length - 1 ? (flip ? 'Roll the film' : 'Show the verdict') : 'Next page';
       root.classList.toggle('last', page >= steps.length);
@@ -190,12 +189,17 @@ export default {
     // clear for Cyril (the stage frames him into free space). Scroll back up and they all come back.
     const clearTop = () => {
       const top = feed.getBoundingClientRect().top;
-      const atBottom = feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 8;
+      // (landscape: Cyril has his own column, so nothing needs hiding)
+      const atBottom = !document.body.classList.contains('land') && feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 8;
+      let first = null;
       for (const r of rows) {
         if (!r) continue;
-        const off = atBottom && r.row.getBoundingClientRect().top < top - 2;
+        const off = atBottom && r.row !== list.lastElementChild && r.row.getBoundingClientRect().top < top - 2;
         if (r.row.classList.contains('off') !== off) r.row.classList.toggle('off', off);
+        if (!off && !first) first = r.row;
       }
+      // the cord starts at the first page still on show
+      list.style.setProperty('--spine-top', `${first ? first.offsetTop + 17 : 34}px`);
     };
     feed.addEventListener('scroll', clearTop, { passive: true });
 

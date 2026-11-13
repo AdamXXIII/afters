@@ -783,3 +783,35 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
 .tp-pg.k-guess .tp-pg-card { margin-bottom: 8px; }
 .tp-pg-stamp { top: auto; bottom: -15px; right: -6px; transform: rotate(-4deg); }
 @keyframes tpPgStamp { from { transform: scale(1.9) rotate(-10deg); opacity: 0; } to { transform: rotate(-4deg); opacity: 1; } }
+.tp-al-sub { align-items: center; gap: 8px; white-space: nowrap; }
+.tp-al-sub .tp-al-pips { max-width: none; flex-wrap: nowrap; gap: 3px; }
+.tp-al-sub .tp-al-pips i { width: 7px; height: 7px; }
+.tp-al-pg { overflow: hidden; text-overflow: ellipsis; }
+.tp-al-list::before { top: var(--spine-top, 34px); transition: top 300ms var(--ease-out-quint); }
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-pg-card.k-draw { width: min(170px, 100%, calc(100vh - 190px)); }
+  .tp-al-list { gap: 10px; padding-top: 16px; }
+  .tp-pg-txt { font-size: calc(var(--fs, 32px) * .85); }
+}
+/* landscape album: everything in the right-hand column, Cyril gets the whole left side */
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-al { padding: calc(var(--safe-t) + 8px) calc(var(--safe-r) + 8px) 0 44%; }
+  .tp-al-head { position: relative; left: auto; top: auto; width: auto; margin: 0 52px 0 0; padding: 6px 12px 6px 6px; }
+  .tp-al-title { font-size: 18px; }
+  .tp-al-feed { position: relative; right: auto; top: auto; bottom: auto; width: auto; margin: 4px 0 0; }
+  .tp-al-bar { position: relative; left: auto; bottom: auto; width: auto; padding: 6px 0 8px; justify-content: center; }
+  .tp-al::before { left: 38%; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-al-bar { position: absolute; left: calc(var(--safe-l) + 12px); bottom: 8px; width: 34%; padding: 0; }
+  .tp-al-feed { margin-bottom: 4px; }
+  .tp-end-card { padding: 24px 12px 10px; margin-top: 16px; }
+  .tp-end-stamp { font-size: 19px; padding: 7px 12px 6px; }
+  .tp-end-txt { font-size: 22px; }
+  .tp-end-cord { height: 14px; margin: 2px 0; }
+  .tp-end-foot { margin-top: 6px; padding-top: 6px; font-size: 13px; }
+  .tp-end-film { width: min(150px, 100%); }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-pg-card.k-draw { width: min(150px, 100%); }
+}
