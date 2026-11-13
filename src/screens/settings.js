@@ -17,6 +17,10 @@ const ICON = {
   motion: I('<path d="M7.5 3.5h9c0 5-1.6 8-4.5 8s-4.5-3-4.5-8z"/><path d="M8 7.5h8" /><path d="M12 11.5V20M8.5 20.5h7"/>'),
   text: I('<path d="M3.5 18 8 6l4.5 12M5.2 14h5.6"/><path d="M14.5 18l3-8 3 8M15.6 15.4h3.8"/>'),
   leave: I('<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>'),
+  // a cloche lid coming down: stop
+  stop: I('<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>'),
+  // a round table with chairs: the lobby
+  lobby: I('<circle cx="12" cy="12" r="4.5"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/>'),
   flame: '<svg viewBox="0 0 24 40" aria-hidden="true"><path d="M12 1.5c1.4 6.2 9.5 11.6 9.5 22.3A9.5 9.5 0 0 1 2.5 23.8C2.5 15.6 8 12.4 9.2 6.8c1.6 2.4 1.6 5 1.2 7.3C12.6 11.6 13 6.4 12 1.5z" fill="#E0A526"/><path d="M12 21c.8 3 4.6 5 4.6 9a4.6 4.6 0 0 1-9.2 0c0-3.6 3.8-5.4 4.6-9z" fill="#FFC86B"/></svg>',
 };
 
@@ -50,15 +54,43 @@ export default {
     const close = iconButton('close', { label: 'Close settings', onClick: () => ctx.actions.closeOverlay() });
     close.classList.add('settings-close');
     let leave = null;
+    let hostCard = null;
     if (inGame) {
       leave = h('button.st-leave', { type: 'button' }, h('span.st-ico', { html: ICON.leave }), 'Leave the table');
       onTap(leave, () => { ctx.actions.closeOverlay(); ctx.actions.leave(); });
+      // Host controls: stop the game mid-way, or go back to the lobby. Two taps, so nobody ends a game by accident.
+      const phaseId = ctx.phase?.id;
+      const playing = !!phaseId && !['lobby', 'menu', 'results'].includes(phaseId) && !ctx.phase?.final;
+      if (ctx.isHost && phaseId && phaseId !== 'lobby') {
+        const confirmBtn = (icon, label, confirmLabel, e2e, run) => {
+          const text = h('span', label);
+          const b = h('button.st-host', { type: 'button', 'data-e2e': e2e }, h('span.st-ico', { html: ICON[icon] }), text);
+          let armed = null;
+          onTap(b, () => {
+            if (!armed) {
+              text.textContent = confirmLabel; b.classList.add('armed');
+              armed = setTimeout(() => { armed = null; text.textContent = label; b.classList.remove('armed'); }, 3500);
+              return;
+            }
+            clearTimeout(armed); ctx.actions.closeOverlay(); run();
+          });
+          return b;
+        };
+        hostCard = h('div.st-group.st-hostgroup',
+          h('div.st-label', 'You’re hosting'),
+          h('div.st-hosts',
+            playing ? confirmBtn('stop', 'End this game', 'Tap again to end it for everyone', 'end-game', () => ctx.client.endGame()) : null,
+            confirmBtn('lobby', 'Back to the lobby', 'Tap again: everyone back to the lobby', 'to-lobby', () => ctx.client.toLobby()),
+          ),
+          h('div.st-note', playing ? 'Ending a game takes everyone back to the games menu. Tonight’s scores stay.' : 'Tonight’s scores stay.'));
+      }
     }
     const sheet = h('div.settings-sheet.st-sheet', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Settings' },
       h('div.st-grab', { 'aria-hidden': 'true' }),
       h('div.st-head', h('div', h('div.t-eyebrow', 'Settings'), h('h2.st-title', 'House rules')), close),
       h('div.st-cyril', h('span.st-cyril-candle', { 'aria-hidden': 'true' }, h('span.st-cyril-flame', { html: ICON.flame }), h('b'), h('u')), h('p', 'Adjust to taste. I’ll be here, melting.', h('small', '— Cyril'))),
-      h('div.st-group',
+      hostCard,
+      h('div.st-group.st-sound',
         h('div.st-label', 'Sound'),
         h('div.st-card',
           row('music', 'Music', 'The house band', { checked: a.settings.music, onChange: (v) => a.set('music', v), e2e: 'set-music' }),

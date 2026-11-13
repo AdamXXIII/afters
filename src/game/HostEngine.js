@@ -12,7 +12,7 @@ import { mulberry32, shuffle, subSeed } from '../util/rng.js';
 import { cleanInput, familySafe } from '../util/text.js';
 import { GAMES, gameById } from '../games/index.js';
 
-const BOX_MSGS = new Set(['profile', 'settings', 'start', 'choose', 'focus', 'fancy', 'skip', 'again', 'menu', 'newTable', 'kick', 'react', 'leave']);
+const BOX_MSGS = new Set(['profile', 'settings', 'start', 'choose', 'focus', 'fancy', 'skip', 'again', 'menu', 'newTable', 'kick', 'react', 'leave', 'endGame', 'toLobby']);
 const JOINABLE = new Set(['lobby', 'menu', 'results']);
 
 export class HostEngine {
@@ -107,6 +107,8 @@ export class HostEngine {
         case 'again': if (isHost && this._isFinal()) this.again(); return;
         case 'menu': if (isHost && this._isFinal()) this.toMenu(); return;
         case 'newTable': if (isHost && (this._isFinal() || this.phase.id === 'menu')) this.newTable(); return;
+        case 'endGame': if (isHost && this.game) this.toMenu(); return; // stop mid-game, no cherries
+        case 'toLobby': if (isHost && this.phase.id !== 'lobby') this.toLobby(); return;
         case 'kick': if (isHost) this._kick(msg.playerId); return;
         case 'react': return this._react(p, msg);
         case 'leave': return this.onPeerLeave(peerId);
@@ -181,6 +183,16 @@ export class HostEngine {
     this.menu = { focus: null, fancy: {} };
     this._enter('menu', null, { night: this._nightRows(), history: this.history.slice(-6), last: this.lastGameId }, null,
       () => ({ done: {}, counts: {}, focus: this.menu.focus, fancy: { ...this.menu.fancy } }));
+    this._broadcastLobby();
+  }
+
+  /** Host: back to the lobby (new people can sit down, avatars change), keeping tonight's scores. */
+  toLobby() {
+    try { this.game?.host?.dispose?.(); } catch { /* ignore */ }
+    this.game = null;
+    this.players = this.players.filter((p) => p.connected);
+    this.menu = { focus: null, fancy: {} };
+    this._enter('lobby', null, {});
     this._broadcastLobby();
   }
 

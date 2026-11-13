@@ -233,6 +233,10 @@ export class GameClient extends Emitter {
   focusGame(gameId) { this.transport?.send({ type: 'focus', gameId }); }
   fancyGame(gameId) { this.transport?.send({ type: 'fancy', gameId }); }
   toMenu() { this.transport?.send({ type: 'menu' }); }
+  /** Host only: stop the game now and go back to the games menu (no cherries for it). */
+  endGame() { this.transport?.send({ type: 'endGame' }); }
+  /** Host only: back to the lobby, keeping tonight's scores. */
+  toLobby() { this.transport?.send({ type: 'toLobby' }); }
 
   /**
    * Generic game action for game modules: sends {type, ...data, seq} to the host's game.
