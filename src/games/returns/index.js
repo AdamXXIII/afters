@@ -57,7 +57,8 @@ export default {
   hint: 'Draw a cake, you’re out',
   tagline: 'Draw a card. Pray it isn’t cake.',
   blurb: 'Take turns drawing from the pile. Draw a birthday cake and you’re out, unless you’ve a Big Breath to blow it out. Dodge, peek and stitch up your mates. Last one in wins.',
-  players: [3, 8],
+  players: [2, 8],
+  duo: 'A duel over one hidden birthday cake: draw it without a Big Breath and you lose.',
   minutes: 10,
   steps: [
     'Take turns drawing a card. Draw a birthday cake and you’re out; last one in wins.',
@@ -86,7 +87,9 @@ export default {
         let card = null; let target = null;
         const others = (p.alive || []).filter((id) => id !== me && (p.counts?.[id] || 0) > 0);
         if (mem.plays < 3) {
-          if (known?.[0] === 'cake') card = has('skip') || has('plate') || has('shuffle');
+          // someone just tucked a cake back: with two of you it's probably on top, so dodge
+          const tucked = p.last?.kind === 'tucked' && p.last.by !== me && (p.alive || []).length === 2;
+          if (known?.[0] === 'cake' || (tucked && !known && rng() < 0.7)) card = has('skip') || has('plate') || has('shuffle');
           else if (!known && rng() < risk * 1.6) card = (rng() < 0.5 ? has('plate') : null) || has('skip') || has('plate');
           if (!card && !known && has('peek') && rng() < 0.45) card = has('peek');
           if (!card && has('pinch') && others.length && rng() < 0.3) {
@@ -231,6 +234,16 @@ export default {
     'returns-out-me': {
       match: rig((e) => e.phase.id === 'returns-out', (h, me) => { strip(h, me, 'breath'); topOf(h, 'cake'); h._draw(me, false); h._afterCake(); }),
       me: 'idle', bots: 'idle', t: 2600,
+    },
+    // two of you (shoot with --players 2): the deal and the tuck read differently
+    'returns-duo-intro': { match: (e) => e.phase.id === 'returns-intro', t: 3200 },
+    'returns-duo-myturn': {
+      match: rig((e, me) => isTurn(e) && e.phase.payload.turn === me, (h, me) => { give(h, me, 'pinch'); give(h, me, 'skip'); h.last = { kind: 'tucked', by: other(h, me) }; h._turn(); }),
+      me: 'idle', bots: 'idle', t: 7000,
+    },
+    'returns-duo-tuck': {
+      match: rig((e) => e.phase.id === 'returns-tuck', (h, me) => { give(h, me, 'breath'); topOf(h, 'cake'); h._draw(me, false); h._afterCake(); }),
+      me: 'idle', bots: 'idle', t: 2500,
     },
     'returns-win': {
       match: rig((e) => e.phase.id === 'returns-win', (h, me) => {

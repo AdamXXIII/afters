@@ -20,8 +20,9 @@ export default {
   hint: 'Trivia climb',
   tagline: 'Climb the drinks cabinet, one right answer at a time.',
   blurb: 'Quiz your way up Cyril\'s drinks cabinet. Quick answers climb two shelves, wrong ones slip. Whoever is lowest picks the next category.',
-  players: [3, 8],
+  players: [2, 8],
   minutes: 10,
+  duo: 'Head to head up the cabinet; in the port round the leader answers alone and the other calls it.',
   steps: [
     'Answer on your phone. Right climbs a shelf, wrong slips one.',
     'Right inside five seconds climbs two.',
@@ -88,6 +89,10 @@ export default {
     'topshelf-q-final': { match: mode('final'), me: 'idle', bots: 'some', t: 4000 },
     'topshelf-reveal-final': { match: rvMode('final'), t: moveT },
     'topshelf-summit': { match: ph('topshelf-summit'), t: 3200 },
+    // two of you (shoot with --players 2): the port round has no vote
+    'topshelf-duo-port-intro': { match: (e) => e.phase.id === 'topshelf-round-intro' && e.phase.payload.kind === 'port', t: 2200 },
+    'topshelf-duo-q-alone': { match: (e, me) => mode('port')(e) && e.phase.payload.victim === me, me: 'idle', bots: 'some', t: 3200 },
+    'topshelf-duo-reveal-port': { match: rvMode('port'), t: moveT },
   },
 
   lines: {
@@ -111,6 +116,7 @@ export default {
       tsHeld: [['The leader held on. Hands off the cabinet.'], ['Steady nerves at the top. Nobody steals tonight.']],
       tsNobodyStole: [['Nobody nicked anything. Honest folk. Disappointing.']],
       tsPortIntro: [['Pass the Port! You choose who answers the next one alone.', 'Right, they climb two. Wrong, they slip two. Everyone else bets.']],
+      tsPortIntroDuo: [['No vote with two of you. The leader\'s on their own.', 'You down there: gets it, or fluffs it?'], ['Make them answer! Top bottle, nowhere to hide.', 'The other one calls it. Choose cruelly.']],
       tsPort: [['Who gets the port? Point the decanter.'], ['Pick someone. Pick a friend. Pick an enemy.']],
       tsPortRight: [['{name} gets it. The port is in safe hands.'], ['Right! {name} climbs two. The doubters weep.']],
       tsPortWrong: [['Oh dear, {name}. The port goes down, and so do you.'], ['Wrong, {name}. Two shelves down. The bettors cheer.']],
@@ -125,6 +131,7 @@ export default {
         ['Top Shelf. A quiz for people who swear at the telly during University Challenge.'],
       ],
       tsPick: [['{name} is at the bottom. Again. You pick, darling.'], ['{name} is lowest. Choose your poison.']],
+      tsPortIntroDuo: [['Make them answer! The leader goes alone. No hiding.', 'You down there: call it. Smugly.']],
       tsPickMe: [['You\'re lowest. Choose your poison.'], ['Rock bottom. Lovely view. Pick a bottle.']],
       tsAll: [['Every one of you. Bloody hell. Who\'s been revising?']],
       tsNone: [['Nobody. Not one. Have you all been at the cooking sherry?'], ['Not a single one of you. Fucking hell, and I\'m the one melting.']],

@@ -50,3 +50,9 @@ Depth: streaks (three right in a row = a **Steady Hand**, a brass collar on your
 - Content: **won r1**, lost r2 on a different sample (too many gimmes); 30 half-known questions added and 11 give-aways swapped, then stopped.
 - Whole-game arc: **won r1**.
 - Fact-check: 60 random questions, 56 clean; 2 doubtful dropped, 2 reworded.
+
+## Two of you (2026-11-13)
+- Head to head. Pass the Port becomes **Make Them Answer**: no vote (it would always tie), the leader answers alone (+2 / -2) and the one below calls it, Gets it / Fluffs it (+1). A catch-up shot, not a coin flip. `topshelf-port` is skipped.
+- Steal at 2: get it right while the leader gets it wrong and you swap shelves (banner and round card say so).
+- Demos: `topshelf-duo-port-intro`, `topshelf-duo-q-bet`, `topshelf-duo-q-alone`, `topshelf-duo-reveal-port`.
+- Blind critic (2026-11-13) vs the port vote played as-is at 2: ours won 8 v 4.

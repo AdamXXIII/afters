@@ -280,6 +280,9 @@ export class ReturnsHost {
     const d = this.drawn;
     if (!d || this.api.phase.id !== 'returns-tuck') return;
     let at;
+    // Two of you: no "on top". Straight back on top means a cake ping-pong that ends the duel in
+    // three draws; third from the top still lands on them, but after a turn they can react in.
+    if (this.order.length === 2 && pos === 0) pos = 2;
     if (pos === 'bottom') at = this.pile.length;
     else if (Number.isInteger(pos) && pos >= 0 && pos <= 2) at = Math.min(pos, this.pile.length);
     else at = Math.floor(this.api.sub(`tuck-${this.turnNo}`)() * (this.pile.length + 1));

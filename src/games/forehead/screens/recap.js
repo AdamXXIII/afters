@@ -54,6 +54,14 @@ export default {
     show.append(root);
 
     const paintShout = () => {
+      if (p.clue) {
+        // two of you: the describer's clue points land as the stamp (no shouter vote)
+        if (shout.dataset.built) return;
+        shout.dataset.built = '1';
+        const cp = ctx.player(p.clue.id);
+        shout.append(h('div.fh-shout-stamp', disc(cp, { size: 34 }), h('span', h('small', 'Clue points'), h('b', cp?.id === ctx.meId ? 'You' : cp?.name || '?')), h('em', `+${p.clue.pts}`)));
+        return;
+      }
       const sid = ctx.progress.shout;
       if (sid) {
         if (shout.dataset.done === sid) return;

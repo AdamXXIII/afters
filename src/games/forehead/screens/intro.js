@@ -27,7 +27,9 @@ export default {
     const p = ctx.payload;
     const head = h('i.fh-po-head', { html: CYRIL_BONCE_SVG });
     const title = h('div.fh-po-title', 'Bonce');
-    const rules = h('div.fh-po-rule', 'Phone on your head. ', h('em', 'The sofa shouts.'));
+    const rules = p.duo
+      ? h('div.fh-po-rule', 'Phone on your head. ', h('em', 'Your mate describes.'), h('br'), 'Swap every go.')
+      : h('div.fh-po-rule', 'Phone on your head. ', h('em', 'The sofa shouts.'));
     const setup = () => ({ ...(ctx.progress.setup || { mode: 'ffa', goes: 1 }), ...(ctx.mine.game.setup || {}) });
     const bar = h('div.fh-po-bar');
     const root0 = h('div.fh-poster.fh-burst');

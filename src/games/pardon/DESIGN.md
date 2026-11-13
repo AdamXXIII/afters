@@ -47,3 +47,10 @@ Order: Say What? -> Mishearing -> Hum Along (the arc critic: end on the loud, sh
 
 ## Messages (phone -> host)
 `pd-got {id|'none'}` (reader only), `pd-tune {id}`, `pd-write {text}`, `pd-vote {key}`. Progress extras: `got` (read), `order` (tune: who's in, fastest first).
+
+## Two of you (2026-11-13)
+- Say What? alternates readers, **three cards each**. No steal at 30 s (the only other person is the guesser); the clue still opens at 10 s. The reader's sheet asks "Did Sam get it?" with "Not a chance".
+- **Mishearing is skipped**: a vote between two always splits one each, so it would be a coin toss. The game is Say What? then Hum Along (round cards read "Round one of two", "Round two of two"); the intro uses `stepsDuo`.
+- Hum Along is unchanged: a straight race.
+- Demos: `pardon-duo-intro`, `pardon-duo-round`, `pardon-duo-round-tunes`, `pardon-duo-read`, `pardon-duo-listen`.
+- Blind critic (2026-11-13) vs keeping the Mishearing vote at 2: ours won 8 v 5. Open idea: show the reader the answer in small type at 2 (kept behind Hold for now, the guesser sits beside them).

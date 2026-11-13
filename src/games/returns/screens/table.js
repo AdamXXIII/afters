@@ -131,6 +131,8 @@ const myturn = {
       hint.textContent = K.rule;
       if (K.target) {
         const others = (ctx.payload.alive || []).filter((id) => id !== ctx.meId);
+        // only one person to pinch from (two of you, or two left): pick them already
+        if (!target && others.length === 1 && ctx.payload.counts?.[others[0]]) target = others[0];
         targets.hidden = false;
         targets.append(h('span.rt-targets-l', target ? 'Pinch from' : 'Tap who to pinch from:'), ...others.map((id) => {
           const n = ctx.payload.counts?.[id] || 0;
@@ -323,6 +325,13 @@ const SLOTS = [
   { pos: 'random', t: 'Somewhere random', s: 'Even you won’t know' },
   { pos: 'bottom', t: 'At the very bottom', s: 'Nobody sees it for ages' },
 ];
+// Two of you: no "on top" (see host _tuck); the slots say whose draw it lands on.
+const SLOTS_DUO = [
+  { pos: 1, t: 'Second from the top', s: 'Lands on you. Brave.' },
+  { pos: 2, t: 'Third from the top', s: 'Lands on them, unless they dodge' },
+  { pos: 'random', t: 'Somewhere random', s: 'Even you won’t know' },
+  { pos: 'bottom', t: 'At the very bottom', s: 'Nobody sees it for ages' },
+];
 const tuck = {
   id: 'returns-tuck',
   layout: 'split',
@@ -331,7 +340,7 @@ const tuck = {
     const p = ctx.payload;
     const b = top(show, ctx, { label: 'You survived!', sub: 'Now hide the cake. Only you see where.', line: null });
     const n = p.pile || 0;
-    const slots = SLOTS.filter((s) => !(Number.isInteger(s.pos) && s.pos > n));
+    const slots = ((p.order || []).length === 2 ? SLOTS_DUO : SLOTS).filter((s) => !(Number.isInteger(s.pos) && s.pos > n));
     const list = h('div.rt-slots', slots.map((s, i) => {
       const el = h(`button.rt-slot.s${i}`, { type: 'button', 'data-e2e': `rt-tuck-${s.pos}` },
         h('span.rt-slot-pile', { html: slotArt(s.pos) }),

@@ -91,13 +91,22 @@ export const CAKES = {
   ]),
 };
 
+/**
+ * Two-player tuning (see deckPlan). Measured with bots over 24 seeds each, human-ish phase times:
+ * 20 action cards (pile of 12 + the cake + 2 spare Big Breaths) and no tucking on top runs about
+ * 6.5 minutes median. Two cakes swung from 1.5 to 9 minutes, so a duel has one.
+ */
+export const DUO = { total: 20, cakes: 1, spare: 2 };
+
 /** How many of each card. Draw pile ends at roughly 3n+4 safe cards plus the cakes. */
 export function deckPlan(n) {
-  const total = 7 * n + 4; // 4 dealt per player + about 3n+4 left in the pile
+  // Two of you (a duel): a deeper pile so it lasts 5-8 minutes (see DUO).
+  const duo = n === 2;
+  const total = duo ? DUO.total : 7 * n + 4; // 4 dealt per player + about 3n+4 left in the pile
   const w = { peek: 0.17, skip: 0.18, shuffle: 0.12, pinch: 0.16, plate: 0.15, steady: 0.22 };
   const counts = {};
   let sum = 0;
   for (const k of ACTION_KINDS) { counts[k] = Math.max(2, Math.round(total * w[k])); sum += counts[k]; }
   counts.steady += total - sum; // round-off lands on Steady On
-  return { counts, cakes: n - 1, spareBreaths: n <= 4 ? 2 : 1, hand: 4 };
+  return { counts, cakes: duo ? DUO.cakes : n - 1, spareBreaths: duo ? DUO.spare : n <= 4 ? 2 : 1, hand: 4 };
 }

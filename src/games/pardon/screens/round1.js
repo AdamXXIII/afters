@@ -4,7 +4,7 @@ import { h, onTap, timerRing } from '../../../ui/components.js';
 import { say, disc, colourOf, gibCard, skipBtn, standings, HINT, TRUMPET, EYE, MOUTH, easeOut } from './kit.js';
 
 const ROUNDS = {
-  1: { name: 'Say What?', rule: 'One reads nonsense aloud. The rest shout what it really says.', pts: 'Guess it: 1000 · Reader: up to 500' },
+  1: { name: 'Say What?', rule: 'One reads nonsense aloud. The rest shout what it really says.', duo: 'Take turns. One reads nonsense aloud, the other says what it really says.', pts: 'Guess it: 1000 · Reader: up to 500' },
   2: { name: 'Mishearing', rule: 'Write your own misheard version of a famous line. Vote the funniest.', pts: '300 a vote · 500 for the funniest' },
   3: { name: 'Hum Along', rule: 'Cyril plays a tune. Tap its name. Faster is more.', pts: 'Up to 1200 a tune · last two count double' },
 };
@@ -15,7 +15,7 @@ const intro = {
   layout: 'show',
   shot: 'intro',
   mount({ show }, ctx) {
-    const steps = ctx.game?.steps || [];
+    const steps = (ctx.payload.duo && ctx.game?.stepsDuo) || ctx.game?.steps || [];
     const card = h('div.pd-card',
       h('div.pd-card-art', { html: TRUMPET }),
       h('div.pd-card-title', 'Pardon?'),
@@ -23,7 +23,7 @@ const intro = {
     show.append(h('div.pd-dim'), h('div.pd-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-3deg) scale(.92)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
-    const cancel = say(ctx, ctx.line(ctx.payload.plays > 1 ? 'pdIntroAgain' : 'pdIntro'), { hold: 2800 }, 900);
+    const cancel = say(ctx, ctx.line(ctx.payload.plays > 1 ? 'pdIntroAgain' : ctx.payload.duo ? 'pdIntroDuo' : 'pdIntro'), { hold: 2800 }, 900);
     return { frame: (c) => sk?.(c), unmount: cancel };
   },
 };
@@ -37,9 +37,9 @@ const round = {
     const p = ctx.payload;
     const r = ROUNDS[p.round];
     const card = h(`div.pd-card.r${p.round}`,
-      h('div.pd-card-num', ['Round one', 'Round two', 'Round three'][p.round - 1]),
+      h('div.pd-card-num', `Round ${['one', 'two', 'three'][(p.num || p.round) - 1]}${p.of && p.of !== 3 ? ` of ${['one', 'two', 'three'][p.of - 1]}` : ''}`),
       h('div.pd-card-title', r.name),
-      h('div.pd-card-rule', r.rule),
+      h('div.pd-card-rule', (p.duo && r.duo) || r.rule),
       h('div.pd-card-pts', r.pts),
       p.rows ? standings(ctx, p.rows) : null);
     show.append(h('div.pd-dim'), h('div.pd-cardwrap', card));
@@ -89,25 +89,26 @@ const read = {
       grid.classList.add('sent');
     };
     const grid = h(`div.pd-grid.n${Math.min(others.length, 7)}`, others.map((pl) => {
-      const b = h('button.pd-who', { type: 'button', 'data-e2e': `pd-got-${pl.id}`, style: { '--pc': colourOf(pl) } }, disc(pl, { size: 44 }), h('span.nm', pl.name));
+      const b = h('button.pd-who', { type: 'button', 'data-e2e': `pd-got-${pl.id}`, style: { '--pc': colourOf(pl) } }, disc(pl, { size: 44 }), h('span.nm', p.duo ? `${pl.name} got it` : pl.name));
       onTap(b, () => send(pl.id, b), { sound: 'select', buzz: 'select' });
       return b;
     }));
-    const nobody = h('button.pd-nobody', { type: 'button', 'data-e2e': 'pd-got-none' }, 'Nobody got it');
+    const nobody = h('button.pd-nobody', { type: 'button', 'data-e2e': 'pd-got-none' }, p.duo ? 'Not a chance' : 'Nobody got it');
     onTap(nobody, () => send('none', nobody));
     const stealNote = h('div.pd-stealnote');
     sheet.append(h('div.pd-sheet.pd-in',
       peek,
-      h('div.pd-ask', 'Who said it first?'),
+      h('div.pd-ask', p.duo ? `Did ${others[0]?.name || 'they'} get it?` : 'Who said it first?'),
       grid,
       h('div.pd-sheet-foot', stealNote, nobody)));
     if (sent) grid.classList.add('sent');
-    const cancel = say(ctx, ctx.line('pdRead'), { hold: 2200 }, 500);
+    const cancel = say(ctx, ctx.line(p.duo ? 'pdReadDuo' : 'pdRead'), { hold: 2200 }, 500);
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1200 });
     return {
       update(c) { if (c.mine.game.sent) { sent = true; grid.classList.add('sent'); } },
       frame(c) {
         timer.set(c.remaining(), c.duration);
+        if (p.stealAt == null) { stealNote.textContent = c.elapsed() < p.quick ? `They get a clue in ${Math.ceil((p.quick - c.elapsed()) / 1000)}s` : 'They have the clue now'; return; }
         const left = Math.ceil((p.stealAt - c.elapsed()) / 1000);
         stealNote.textContent = left > 0 ? `Everyone sees the card in ${left}s` : 'Everyone can see it now. Steals score 500.';
         stealNote.classList.toggle('hot', left <= 0);
@@ -137,8 +138,8 @@ const listen = {
     const bar = h('div.pd-wait-bar', h('i'));
     const waitBox = h('div.pd-shout',
       h('div.pd-shout-ic', { html: TRUMPET }),
-      h('div.pd-shout-t', 'Shout what you hear'),
-      h('div.pd-shout-s', 'Out loud. First to say the real phrase scores 1000.'),
+      h('div.pd-shout-t', p.duo ? 'Say what you hear' : 'Shout what you hear'),
+      h('div.pd-shout-s', p.duo ? 'Out loud. Say the real phrase and it’s 1000.' : 'Out loud. First to say the real phrase scores 1000.'),
       h('div.pd-wait', h('span.pd-wait-l'), bar));
     const stealBox = h('div.pd-stealbox',
       h('div.pd-stealbox-t', 'Your turn to read it'),
@@ -146,14 +147,15 @@ const listen = {
       h('div.pd-shout-s', 'Mutter it. First to shout the answer still gets 500.'));
     sheet.append(h('div.pd-sheet.pd-in', waitBox, stealBox));
     let stole = false;
-    const cancel = say(ctx, ctx.line('pdListen', { name: reader?.name || 'Someone' }), { hold: 2200 }, 500);
+    const cancel = say(ctx, ctx.line(p.duo ? 'pdListenDuo' : 'pdListen', { name: reader?.name || 'Someone' }), { hold: 2200 }, 500);
     const frame = (c) => {
       timer.set(c.remaining(), c.duration);
       const t = c.elapsed();
-      const k = Math.min(1, t / p.stealAt);
+      const until = p.stealAt ?? p.quick; // two of you: no steal, the bar runs to the clue
+      const k = Math.min(1, t / until);
       bar.firstChild.style.transform = `scaleX(${k})`;
-      waitBox.querySelector('.pd-wait-l').textContent = t < p.stealAt ? `Stuck? Everyone sees the card in ${Math.ceil((p.stealAt - t) / 1000)}s` : '';
-      const s = t >= p.stealAt;
+      waitBox.querySelector('.pd-wait-l').textContent = p.stealAt == null ? (t < p.quick ? `Stuck? Clue in ${Math.ceil((p.quick - t) / 1000)}s` : 'Clue’s up. Keep guessing.') : t < p.stealAt ? `Stuck? Everyone sees the card in ${Math.ceil((p.stealAt - t) / 1000)}s` : '';
+      const s = p.stealAt != null && t >= p.stealAt;
       if (s !== stole) {
         stole = s;
         sheet.firstChild.classList.toggle('stolen', s);

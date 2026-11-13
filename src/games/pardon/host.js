@@ -53,7 +53,10 @@ export class PardonHost {
     const rng = api.sub('pd-plan');
     // Round 1: everyone reads once (twice each with 3 players, so the round isn't over in a blink).
     const order = ps.map((p) => p.id).sort(() => rng() - 0.5);
-    const readers = ps.length <= 3 ? [...order, ...order.slice().sort(() => rng() - 0.5)] : order;
+    // Two of you: you take turns reading, three cards each (the Mishearing is skipped, see advance).
+    this.duo = ps.length === 2;
+    const readers = this.duo ? [...order, ...order, ...order]
+      : ps.length <= 3 ? [...order, ...order.slice().sort(() => rng() - 0.5)] : order;
     const cards = api.take(GIBBERISH, 'pd-gib', readers.length, rng);
     const accents = ACCENTS[api.adult ? 'adult' : 'family'].slice().sort(() => rng() - 0.5);
     const accentAt = rng() < 0.5 ? 1 : 2;
@@ -64,7 +67,9 @@ export class PardonHost {
     this.tunes = picked.map((t, i) => ({ tune: t, mode: i === nT - 1 ? 'backwards' : i === nT - 2 ? 'wonky' : 'normal' }));
     // Round 3: one line to mishear.
     this.line = api.take({ family: LINES, adult: LINES }, 'pd-line', 1, rng)[0];
-    this.api.enter('pardon-intro', PD.intro, { plays: api.plays, reads: this.reads.length, tunes: this.tunes.length });
+    // rounds actually played, in order (Mishearing is a vote, and a vote between two is a coin toss)
+    this.rounds = this.duo ? [1, 3] : [1, 2, 3];
+    this.api.enter('pardon-intro', PD.intro, { plays: api.plays, reads: this.reads.length, tunes: this.tunes.length, duo: this.duo });
   }
 
   advance(id) {
@@ -78,7 +83,7 @@ export class PardonHost {
       case 'pardon-read': return this._said();
       case 'pardon-said':
         this.i += 1;
-        return this.i < this.reads.length ? this._read() : this._round(2);
+        return this.i < this.reads.length ? this._read() : this._round(this.duo ? 3 : 2);
       case 'pardon-write': return this._vote();
       case 'pardon-vote': return this._verdict();
       case 'pardon-verdict': return this._round(3);
@@ -162,6 +167,7 @@ export class PardonHost {
     this.roundNo = n;
     this.api.enter('pardon-round', PD.round, {
       round: n,
+      num: this.rounds.indexOf(n) + 1, of: this.rounds.length, duo: this.duo,
       count: n === 1 ? this.reads.length : n === 3 ? this.tunes.length : 1,
       rows: n > 1 ? this._standings() : null,
     });
@@ -176,7 +182,8 @@ export class PardonHost {
     this.api.enter('pardon-read', PD.read, {
       index: this.i, count: this.reads.length, reader: r.reader,
       say: r.card.say, hint: r.card.hint, accent: r.accent,
-      stealAt: d(PD.steal), quick: d(PD.quick),
+      // two of you: no steal (the only other person is the guesser), just the clue
+      stealAt: this.duo ? null : d(PD.steal), quick: d(PD.quick), duo: this.duo,
     }, {
       priv: (pl) => (pl.id === r.reader ? { real: r.card.real } : null),
       progress: () => ({ done: { [r.reader]: r.done }, counts: {}, got: r.got }),
@@ -185,7 +192,7 @@ export class PardonHost {
 
   _said() {
     const r = this.reads[this.i];
-    const steal = this.api.dur(PD.steal);
+    const steal = this.duo ? Infinity : this.api.dur(PD.steal);
     const quick = this.api.dur(PD.quick);
     const deltas = {};
     for (const p of this.api.players) deltas[p.id] = 0;
