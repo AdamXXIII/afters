@@ -1,6 +1,6 @@
 // Shared game constants (DESIGN section 2). Durations in ms at speed 1.
 
-export const MIN_PLAYERS = 3;
+export const MIN_PLAYERS = 2; // two can play (2026-11-13); each game sets its own range in `players`
 export const MAX_PLAYERS = 8;
 
 // Afters Classic durations, tightened 2026-11-09 after Adam's "kind of boring" playtest:

@@ -23,7 +23,7 @@ export const LINES_ADULT = {
     ['In you come. Shoes off, coat on the bed, code in the box.'],
   ],
   lobbyWaiting: [
-    ['We need at least three. Two of you is just a sad pint.'],
+    ['Just you. Drinking alone is a cry for help. Get one more.'],
     ['Not enough of you yet. Text the flaky one. You know who.'],
     ['Waiting for more. Somebody\'s "five minutes away". They\'re in the shower.'],
   ],

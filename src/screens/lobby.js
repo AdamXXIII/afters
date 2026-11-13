@@ -33,6 +33,7 @@ const FREE_SLOTS = [FULL[3], FULL[4], FULL[2], FULL[5], FULL[1], FULL[6], FULL[0
 const AVATAR_NAMES = ['Jelly', 'Sprout', 'Teacup', 'Cheese', 'Pepper', 'Pudding', 'Egg', 'Bourbon'];
 const CYRIL_SCALE = 1.5;
 const HOST_LINES = {
+  2: 'Two of you. Cosy. I\'ll show you the games made for two.',
   3: 'Three. Intimate. Someone will have to laugh at everything.',
   4: 'Four. Like a bridge club, but louder. Ring when ready.',
   5: 'Five. A respectable number. Nobody has to share a fork.',

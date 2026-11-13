@@ -7,7 +7,7 @@ export const LINES = {
   title: ['Good evening. Do sit. Not you, the cat.'],
   create: ['A new table! I\'ll fetch my good holder.'],
   join: ['Come in, come in. Mind the step. What\'s the code on the door?'],
-  lobbyWaiting: ['We need at least three. Two is a date, and I\'m not a chaperone.'],
+  lobbyWaiting: ['Just you? Even I need company. One more, please.'],
   lobbyReady: ['That\'s a table. Whenever you\'re ready, host.'],
   lobbyFull: ['Eight. Splendid. Someone\'s going to get the wobbly chair.'],
   tableFull: ['Table\'s full. Pull up a pouffe and wait for the next game.'],
