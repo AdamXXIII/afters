@@ -36,7 +36,7 @@ export default {
       h('span.bt-crowns', Array.from({ length: Math.min(r.score, 6) }, () => h('i')), r.score > 6 ? h('b', `${r.score}`) : null, r.score ? null : h('span.z', '0')))));
     const note = p.cyrilChose ? h('div.bt-note', `${critic} ran out of time. Cyril picked one.`)
       : mine ? h('div.bt-note.you', `${critic} crowned yours.`) : null;
-    const wrap = h(`div.bt-win${house ? '.house' : ''}`, h('div.bt-wincard', pc, rosette), note, owner, restBox, tally);
+    const wrap = h(`div.bt-win${house ? '.house' : ''}${p.cards.length > 5 ? '.many' : ''}`, h('div.bt-wincard', pc, rosette), note, owner, restBox, tally);
     show.append(wrap);
 
     const beats = [

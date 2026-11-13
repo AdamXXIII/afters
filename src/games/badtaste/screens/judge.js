@@ -45,7 +45,7 @@ export default {
     sheet.append(h(`div.bt-sheet.bt-judgesheet${isCritic ? '.critic' : ''}`,
       h('div.bt-sheethead', title, sub),
       grid,
-      h('div.bt-actions', hint, btn)));
+      isCritic ? h('div.bt-actions', btn) : hint));
 
     function primary() {
       const pr = ctx.progress;
@@ -75,18 +75,18 @@ export default {
         const slot = pc.set(focus >= 0 ? p.cards[focus].text : null);
         if (focus >= 0 && !c.frozen) slot.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.22,1,.36,1)' });
       }
-      counter.textContent = flipped ? `Card ${Math.max(focus, 0) + 1} of ${p.cards.length}` : `${p.cards.length} cards, face down`;
+      counter.textContent = !flipped ? `${p.cards.length} cards, face down` : all ? `All ${p.cards.length} turned` : `Card ${focus + 1} of ${p.cards.length} · ${p.cards.length - flipped} face down`;
       if (isCritic) {
         title.textContent = all ? 'Crown your favourite' : 'Read them out loud';
-        sub.textContent = all ? 'Tap a card to read it again, then crown it.' : 'Turn each card, then read the whole line to the table.';
+        sub.textContent = all ? 'Tap one to read it again. No take-backs.' : 'Turn a card, then read the whole line to the table.';
         btn.disabled = all ? focus < 0 : false;
         btn.innerHTML = all ? `${CROWN}<span>Crown card ${focus + 1}</span>` : `<span>${flipped ? `Turn card ${flipped + 1}` : 'Turn the first card'}</span>`;
         btn.classList.toggle('crown', all);
-        hint.textContent = all ? 'No take-backs once it’s crowned.' : `${p.cards.length - flipped} still face down.`;
+        
       } else {
         title.textContent = `${critic} is reading`;
         sub.textContent = own >= 0 ? 'Keep a straight face. Yours is in there.' : 'Listen. They pick one.';
-        hint.textContent = all ? `${critic} is choosing…` : `${p.cards.length - flipped} still face down.`;
+        hint.textContent = all ? `${critic} is choosing…` : '';
       }
     };
     sync(ctx);

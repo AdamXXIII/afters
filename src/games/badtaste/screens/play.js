@@ -2,7 +2,7 @@
 // hand    (pick a card from your seven, or write your own; the prompt previews your joke)
 // critic  (the Critic waits: the prompt, and the face-down pile growing as people play)
 // played  (your card is in the pile, face down, anonymous)
-import { h, onTap, button, textField } from '../../../ui/components.js';
+import { h, onTap, button, textField, timerRing } from '../../../ui/components.js';
 import { promptCard, answerCard, cardBack, criticBadge, playedRow, sayLater, nameOf, tilt } from './kit.js';
 
 const PEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.2-4.6L15.6 5a2.2 2.2 0 0 1 3.1 3.1L8.3 18.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13.8 6.8l3.3 3.3" stroke="currentColor" stroke-width="1.8"/></svg>';
@@ -41,11 +41,10 @@ const hand = {
 
     const grid = h('div.bt-hand', tiles, blank);
     const btn = button('Play this card', { onClick: () => play(), e2e: 'submit' });
-    const hint = h('div.bt-hint');
     const page = h('div.bt-sheet.bt-handsheet',
-      h('div.bt-sheethead', h('div.bt-title', 'Pick your funniest card'), h('div.bt-sub', `${nameOf(ctx, p.critic)} picks the winner. Nobody sees who played what.`)),
+      h('div.bt-sheethead', h('div.bt-title', `Play a card to ${nameOf(ctx, p.critic)}`), h('div.bt-sub', 'Tap one to try it in the blank. Nobody sees who played what.')),
       grid, writeBox,
-      h('div.bt-actions', hint, btn));
+      h('div.bt-actions', btn));
     sheet.append(page);
 
     function current() {
@@ -77,7 +76,6 @@ const hand = {
       }
       btn.disabled = !a;
       btn.textContent = writing ? 'Play my card' : 'Play this card';
-      hint.textContent = a ? 'Read it on the card up top. Happy?' : writing ? 'Type it. It shows up on the card.' : 'Tap a card to try it in the blank.';
     }
     if (ctx.frozen && ctx.demo && cards[2]) sel = cards[2].id;
     sync();
@@ -105,12 +103,13 @@ const critic = {
   mount({ show }, ctx) {
     const p = ctx.payload;
     const seed = ctx.phase?.seed || 1;
-    const pc = promptCard(ctx, p, { size: 'big' });
+    const pc = promptCard(ctx, p, { size: 'big', head: false, timer: false });
+    const ring = timerRing();
     const ids = others(ctx);
     const pile = h('div.bt-pile');
     const row = playedRow(ctx, ids);
     show.append(h('div.bt-criticwrap',
-      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', 'Sit back. When the cards are in, read each one out loud, then crown the best.'))),
+      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', `Round ${p.round} of ${p.of}. Wait for the cards, then read each one out.`)), ring),
       pc, pile, row));
     let n = -1;
     const sync = (c) => {
@@ -130,7 +129,7 @@ const critic = {
     sync(ctx);
     const cancel = sayLater(ctx, ctx.line('btCritic'), { delay: 700 });
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1200 });
-    return { update: sync, frame(c) { pc.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
+    return { update: sync, frame(c) { ring.set(c.remaining(), c.duration); }, unmount: cancel };
   },
 };
 
