@@ -346,3 +346,55 @@
 @media (orientation: landscape) and (max-height: 600px) {
   .bt-chair { padding-right: 64px; }
 }
+
+/* ---------- win, beat one: the moment ---------- */
+.bt-moment { position: absolute; inset: 0; padding: 0 calc(var(--safe-r) + 16px) 0 calc(var(--safe-l) + 16px); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; padding-bottom: 22%; }
+.bt-m-critic { display: inline-flex; align-items: center; gap: 10px; padding: 6px 16px 6px 6px; border-radius: 999px; background: rgba(42,20,14,.78); color: var(--c-linen); font: 700 17px var(--f-ui); box-shadow: 0 8px 18px rgba(20,8,5,.35); opacity: 0; transform: translateY(-10px); }
+.bt-m-critic .bt-pen { box-shadow: 0 0 0 2px rgba(42,20,14,.9); }
+.bt-m-card { position: relative; width: 100%; max-width: 380px; min-height: 190px; padding: 26px 24px 34px; border-radius: 20px; display: flex; align-items: center;
+  background-color: #FFFDF8; background-image: var(--paper); color: var(--c-ink);
+  box-shadow: 0 0 0 4px var(--c-brass), 0 3px 0 rgba(42,26,23,.12), 0 24px 48px rgba(20,8,5,.5);
+  opacity: 0; transform: translateY(40px) rotate(4deg) scale(.9); }
+.bt-m-t { font-family: var(--f-display); font-weight: 760; font-size: 40px; line-height: 1.08; letter-spacing: -.01em; text-wrap: balance; font-variation-settings: "SOFT" 40, "WONK" 0, "opsz" 72; }
+.bt-m-card.long .bt-m-t { font-size: 32px; }
+.bt-m-card .bt-rosette { right: -10px; top: -26px; bottom: auto; width: 74px; height: 74px; }
+.bt-m-owner { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; border-radius: 999px; background-color: #FFFBF4; box-shadow: var(--sh-3); opacity: 0; transform: translateY(20px) scale(.9); }
+.bt-m-owner .bt-av { box-shadow: 0 0 0 3px var(--c-linen), 0 4px 10px rgba(30,12,8,.3); }
+.bt-m-owner .nm { font-family: var(--f-display); font-weight: 800; font-size: 30px; line-height: 1; color: var(--c-ink); font-variation-settings: "SOFT" 100, "WONK" 1; max-width: 9ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bt-win.house .bt-m-owner .nm { font-size: 20px; max-width: none; }
+.bt-win.s-card .bt-m-critic { opacity: 1; transform: none; transition: opacity 300ms, transform 420ms var(--ease-out-quint); }
+.bt-win.s-card .bt-m-card { opacity: 1; transform: rotate(-1deg); transition: opacity 300ms, transform 620ms var(--ease-out-back); }
+.bt-win.s-owner .bt-m-owner { opacity: 1; transform: none; transition: opacity 300ms, transform 520ms var(--ease-out-back); }
+.bt-win.s-rest .bt-moment { opacity: 0; transform: scale(.94); pointer-events: none; transition: opacity 260ms, transform 320ms var(--ease-out-quint); }
+/* beat two: the summary */
+.bt-summary { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; opacity: 0; visibility: hidden; padding: 0 calc(var(--safe-r) + 12px) 0 calc(var(--safe-l) + 12px); }
+.bt-win.s-rest .bt-summary { opacity: 1; visibility: visible; transition: opacity 360ms 120ms; }
+.bt-win.s-rest .bt-summary .bt-wincard, .bt-win.s-rest .bt-summary .bt-owner { opacity: 1; transform: none; }
+.bt-summary .bt-owner { margin-top: 0; padding: 8px 12px; }
+.bt-summary .bt-owner .bt-av { width: 40px !important; height: 40px !important; }
+.bt-summary .bt-owner .nm { font-size: 24px; }
+.bt-summary .bt-owner-line { display: none; }
+.bt-summary .bt-prompt.win { padding-bottom: 18px; }
+.bt-win .bt-summary .bt-prompt.win .bt-ptext { font-size: 23px; }
+.bt-win.many .bt-summary .bt-prompt.win .bt-ptext { font-size: 20px; }
+.bt-win { padding: 0; }
+@media (orientation: landscape) and (max-height: 600px) {
+  .bt-moment { padding-bottom: 4%; gap: 10px; }
+  .bt-m-card { min-height: 120px; padding: 16px 20px 22px; max-width: 460px; }
+  .bt-m-t { font-size: 30px; }
+  .bt-m-card.long .bt-m-t { font-size: 25px; }
+  .bt-m-card .bt-rosette { width: 58px; height: 58px; top: -18px; }
+  .bt-m-owner .nm { font-size: 24px; }
+  .bt-m-owner .bt-av { width: 40px !important; height: 40px !important; }
+  .bt-win .bt-summary .bt-prompt.win .bt-ptext { font-size: 18px; }
+  .bt-summary { gap: 6px; }
+}
+
+/* judge: the prompt card up top is just a header; the line lives in the hero */
+.bt-prompt.headonly { padding: 8px 14px 8px; }
+.bt-prompt.headonly .bt-phead { margin-bottom: 0; }
+.bt-hero-gap { border-bottom: 3px solid var(--c-mustard); }
+.bt-hero.blank { box-shadow: inset 0 0 0 1.5px rgba(122,74,42,.2), 0 8px 18px rgba(59,31,24,.16); }
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-layout="split"] .bt-top .bt-prompt.headonly { flex: none; }
+}

@@ -1,12 +1,13 @@
-// badtaste-win: the crowned card fills the blank, a brass rosette lands, the player behind it is
-// named. Then the rest of the pile turns its owners' names over, and the crowns tally.
-// A pure function of ctx.elapsed() so frozen shots and sync both work.
+// badtaste-win, in two beats. The moment: the crowned answer alone, big, on its own card, with the
+// Critic's name and a brass rosette, then the player behind it. The summary: the whole line, who
+// played the rest, and the crowns so far. A pure function of ctx.elapsed() (frozen shots, sync).
 import { h } from '../../../ui/components.js';
-import { promptCard, disc, cyrilDisc, nameOf } from './kit.js';
+import { promptCard, disc, cyrilDisc, criticBadge, nameOf } from './kit.js';
+import { cap } from '../content/index.js';
 
 const CROWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.5l4.3 3.6L12 5l4.2 7.1 4.3-3.6-1.7 9.5H5.2z" fill="currentColor"/><rect x="5.2" y="19.2" width="13.6" height="2.3" rx="1" fill="currentColor"/></svg>';
 
-const AT = { card: 300, rosette: 1300, owner: 2100, rest: 3600, restStep: 450, tally: 5600 };
+const AT = { card: 300, rosette: 1100, owner: 1900, rest: 4600, tally: 5600 };
 
 export default {
   id: 'badtaste-win',
@@ -41,11 +42,22 @@ export default {
       disc(ctx.player(r.id), { size: 24 }),
       h('span.nm', r.id === ctx.meId ? 'You' : nameOf(ctx, r.id)),
       h('b', String(r.score))))));
-    const note = p.cyrilChose ? h('div.bt-note', `${critic} ran out of time. Cyril picked one.`)
-      : p.decider ? h('div.bt-note', 'The decider') : null;
+    const note = p.decider ? h('div.bt-note', 'The decider') : null;
     const next = h('div.bt-next');
     tally.append(next);
-    const wrap = h(`div.bt-win${house ? '.house' : ''}${p.cards.length > 5 ? '.many' : ''}`, h('div.bt-wincard', pc, rosette), note, owner, restBox, tally);
+    // beat one: the winner alone
+    const momentOwner = h('div.bt-m-owner',
+      house ? cyrilDisc(52) : disc(pl, { size: 52 }),
+      h('span.nm', house ? 'Cyril’s own card' : mine ? 'You' : pl?.name || '?'),
+      house ? h('span.bt-plus.none', 'Nobody scores') : h('span.bt-plus', { html: `${CROWN}<b>+${p.deltas[win.by] || 1}</b>` }));
+    const moment = h('div.bt-moment',
+      h('div.bt-m-critic', p.cyrilChose ? cyrilDisc(30) : criticBadge(ctx.player(p.critic), { size: 30 }),
+        h('span', p.cyrilChose ? `${critic} ran out of time. Cyril picked` : p.critic === ctx.meId ? 'You crowned' : `${critic} crowned`)),
+      h(`div.bt-m-card${win.text.length > 30 ? '.long' : ''}`, h('span.bt-m-t', cap(win.text)), rosette),
+      momentOwner);
+    // beat two: the summary
+    const summary = h('div.bt-summary', h('div.bt-wincard', pc), note, owner, restBox, tally);
+    const wrap = h(`div.bt-win${house ? '.house' : ''}${p.cards.length > 5 ? '.many' : ''}`, moment, summary);
     show.append(wrap);
 
     const beats = [

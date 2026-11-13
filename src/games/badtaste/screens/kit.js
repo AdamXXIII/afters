@@ -43,7 +43,7 @@ export function criticBadge(player, { size = 44 } = {}) {
  * The prompt card: claret, linen type, a brass blank. `answer` fills the blank (preview, focus,
  * winner); without one the blank is an empty line.
  */
-export function promptCard(ctx, p, { answer = null, timer = true, size = '', head = true } = {}) {
+export function promptCard(ctx, p, { answer = null, timer = true, size = '', head = true, body = true } = {}) {
   const critic = ctx.player(p.critic);
   const meCritic = p.critic === ctx.meId;
   const t = timer ? timerRing() : null;
@@ -54,7 +54,8 @@ export function promptCard(ctx, p, { answer = null, timer = true, size = '', hea
       h('span.bt-pwho', meCritic ? 'You’re the Critic' : `Critic: ${critic?.name || '?'}`),
       h(`span.bt-pround${p.double ? '.double' : ''}`, p.decider ? 'Decider' : p.double ? 'Last round: 2 crowns' : `${p.round} of ${p.of}`),
       t) : null,
-    text);
+    body ? text : null);
+  if (!body) card.classList.add('headonly');
   card.timer = t;
   card.set = (a) => {
     const { before, answer: ans, after } = fillText(p.prompt, a || '');

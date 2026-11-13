@@ -20,7 +20,8 @@ export default {
     const ownSet = new Set([].concat(ctx.priv?.own ?? []).filter((k) => k >= 0));
     const isOwn = (i) => ownSet.has(i);
     const critic = nameOf(ctx, p.critic);
-    const pc = promptCard(ctx, p);
+    // the prompt shows once: the hero below carries the whole line; up top just who, which round, the clock
+    const pc = promptCard(ctx, p, { body: false });
     show.append(h('div.bt-top', pc));
 
     // reading view: hero card + strip of numbered tabs
@@ -87,8 +88,16 @@ export default {
       rows.forEach((r, i) => r.setAttribute('aria-pressed', String(all && i === focus)));
       if (focus !== lastFocus || flipped !== lastFlip || (focus >= 0 && !heroText.textContent)) {
         const turned = focus >= 0;
-        hero.classList.toggle('on', turned);
-        heroBack.classList.toggle('on', !turned);
+        hero.classList.add('on');
+        heroBack.classList.remove('on');
+        hero.classList.toggle('blank', !turned);
+        if (!turned) {
+          const f = fillText(p.prompt, '');
+          heroText.replaceChildren(f.before, h('span.bt-hero-gap', '\u2003\u2003\u2003\u2003'), f.after);
+          heroNum.textContent = `${n} cards face down`;
+          heroYours.style.display = 'none';
+          heroText.classList.toggle('long', p.prompt.length > 80);
+        }
         if (turned) {
           const t = texts[focus] || '';
           const f = fillText(p.prompt, t);

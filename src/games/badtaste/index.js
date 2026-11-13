@@ -18,8 +18,7 @@ const turn = (e, n) => {
 export default {
   id: 'badtaste',
   title: 'Bad Taste',
-  dish: 'cheeseboard',    // menu illustration (src/screens/menu-art.js; falls back to the cloche until drawn)
-  dishNotes: 'A cheeseboard with one dubious blue cheese and a little brass flag stuck in it reading "pick". Claret board, linen crackers.',
+  dish: 'badtaste',       // menu illustration (src/screens/menu-art.js on box-v2; cloche fallback here)
   mood: ['talky', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'The cheeseboard. Some of it is questionable.',
   hint: 'Play cards, one judges',
