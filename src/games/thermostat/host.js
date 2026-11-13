@@ -7,8 +7,18 @@
 import { SCALES } from './content/scales.js';
 
 export const TH = {
-  intro: 9000, clue: 45000, dial: 60000, reveal: 8400, scores: 7000, hotIntro: 7500,
+  intro: 9000, clue: 45000, dial: 60000, reveal: 8400, scores: 7000, hotIntro: 7500, verdict: 9000,
 };
+/** Two players play together: three clues each, a hot one, against Cyril's target. */
+export const DUO = { rounds: 6, target: 1200, raise: 200, cap: 1800 };
+/** Cyril's verdict on a two-player game, best first (share of the target). */
+export const DUO_LADDER = [
+  { at: 1.5, key: 'central', title: 'Central heating', sub: 'One brain, four thumbs.' },
+  { at: 1, key: 'toasty', title: 'Toasty', sub: 'You beat my number. I’m warm all over.' },
+  { at: 0.66, key: 'luke', title: 'Lukewarm', sub: 'Close. Not close enough.' },
+  { at: 0, key: 'draughty', title: 'Draughty', sub: 'Have you two actually met?' },
+];
+export const duoRank = (total, target) => DUO_LADDER.find((r) => total >= r.at * target) || DUO_LADDER[DUO_LADDER.length - 1];
 /** Half-widths of the bands (dial runs 0..100). The final round halves them. */
 export const BANDS = { spot: 4, warm: 9, luke: 14 };
 export const PTS = { spot: 300, warm: 200, luke: 100 };
@@ -42,8 +52,13 @@ export class ThermostatHost {
     const api = this.api;
     const rng = api.sub('th-plan');
     const ids = api.players.map((p) => p.id);
+    // two of you: co-op, take turns (three clues each), then a hot one, against Cyril's target
+    this.duo = ids.length === 2;
+    this.target = Math.min(DUO.cap, DUO.target + DUO.raise * Math.max(0, (api.plays || 1) - 1));
+    const first = shuffle(ids, rng);
     // small tables give two clues each so the game has some length
-    const order = ids.length <= 4 ? [...shuffle(ids, rng), ...shuffle(ids, rng)] : shuffle(ids, rng);
+    const order = this.duo ? Array.from({ length: DUO.rounds }, (_, k) => first[k % 2])
+      : ids.length <= 4 ? [...shuffle(ids, rng), ...shuffle(ids, rng)] : shuffle(ids, rng);
     for (let k = 1; k < order.length; k++) {
       if (order[k] === order[k - 1]) { const j = (k + 1) % order.length; [order[k], order[j]] = [order[j], order[k]]; }
     }
@@ -53,7 +68,7 @@ export class ThermostatHost {
     this.rounds = order.map((id, n) => ({ giver: id, scales: [at(n * 2), at(n * 2 + 1)], final: false }));
     this.finalScales = [at(order.length * 2), at(order.length * 2 + 1)];
     this.i = 0;
-    api.enter('thermostat-intro', TH.intro, { rounds: order.length, plays: api.plays });
+    api.enter('thermostat-intro', TH.intro, { rounds: order.length, plays: api.plays, duo: this.duo, goal: this.target, first: order[0] });
   }
 
   get r() { return this.rounds[this.i]; }
@@ -65,11 +80,13 @@ export class ThermostatHost {
       case 'thermostat-clue': return this._dial();
       case 'thermostat-dial': return this._reveal();
       case 'thermostat-reveal':
+        if (r.final && this.duo) return this._verdict();
         if (r.final) return this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
         if (this.i + 1 < this.rounds.length) { this.i += 1; return this._clue(); }
         return this._scores();
       case 'thermostat-scores': return this._hotIntro();
       case 'thermostat-hot': this.i += 1; return this._clue();
+      case 'thermostat-verdict': return this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
       default:
     }
   }
@@ -144,6 +161,7 @@ export class ThermostatHost {
     return {
       index: r.final ? regular : this.i, count: regular, giver: r.giver, final: r.final, mult: this._mult(),
       scale: { id: r.s.id, l: r.s.l, r: r.s.r },
+      ...(this.duo ? { duo: true, total: this._total(), goal: this.target } : {}),
     };
   }
 
@@ -192,9 +210,11 @@ export class ThermostatHost {
       this.demoLand = null;
     }
     const band = bandOf(r.dial, r.target, r.final);
+    r.band = band;
     const base = band === 'cold' ? 0 : PTS[band];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
-    for (const p of api.players) deltas[p.id] = base * m * (p.id === r.giver ? 2 : 1);
+    // co-op at two: you both score the same; otherwise the Clue-giver scores double
+    for (const p of api.players) deltas[p.id] = base * m * (p.id === r.giver && !this.duo ? 2 : 1);
     api.addScores(deltas);
     const steps = { open: api.dur(1400), verdict: api.dur(3200), points: api.dur(4500) };
     api.enter('thermostat-reveal', TH.reveal, {
@@ -202,6 +222,9 @@ export class ThermostatHost {
       moves: r.moves, hands: r.hands.length, scores: this._rows(),
     });
   }
+
+  /** The pair's running total (both players hold the same score at two). */
+  _total() { return this.api.players[0]?.score ?? 0; }
 
   _rows() {
     const rows = this.api.players.map((p) => ({ id: p.id, score: p.score })).sort((a, b) => b.score - a.score);
@@ -212,15 +235,33 @@ export class ThermostatHost {
 
   _scores() {
     const rows = this._rows();
-    const low = rows[rows.length - 1].score;
-    const tied = rows.filter((x) => x.score === low);
-    const giver = tied[Math.floor(this.api.sub('hot')() * tied.length)].id;
+    let giver;
+    if (this.duo) {
+      // at two, the turns carry on: whoever didn't give the last clue gives the hot one
+      const lastGiver = this.rounds[this.rounds.length - 1].giver;
+      giver = this.api.players.find((p) => p.id !== lastGiver)?.id || lastGiver;
+    } else {
+      const low = rows[rows.length - 1].score;
+      const tied = rows.filter((x) => x.score === low);
+      giver = tied[Math.floor(this.api.sub('hot')() * tied.length)].id;
+    }
     this.rounds.push({ giver, scales: this.finalScales, final: true });
-    this.api.enter('thermostat-scores', TH.scores, { rows, next: giver });
+    this.api.enter('thermostat-scores', TH.scores, { rows, next: giver, ...(this.duo ? { duo: true, total: this._total(), goal: this.target, best: 300 * DUO.rounds } : {}) });
+  }
+
+  /** Two players: the total against Cyril's target, and his verdict on the pair. */
+  _verdict() {
+    const total = this._total();
+    const rank = duoRank(total, this.target);
+    const spots = this.rounds.filter((x) => x.band === 'spot').length;
+    this.api.enter('thermostat-verdict', TH.verdict, {
+      duo: true, total, goal: this.target, beat: total >= this.target, rank: rank.key, title: rank.title, sub: rank.sub,
+      spots, rounds: this.rounds.length, bands: this.rounds.map((x) => x.band || 'cold'),
+    });
   }
 
   _hotIntro() {
     const next = this.rounds[this.rounds.length - 1];
-    this.api.enter('thermostat-hot', TH.hotIntro, { giver: next.giver, mult: 3 });
+    this.api.enter('thermostat-hot', TH.hotIntro, { giver: next.giver, mult: 3, ...(this.duo ? { duo: true, total: this._total(), goal: this.target } : {}) });
   }
 }

@@ -4,12 +4,19 @@
 // AI-generated (Claude, Same Here builder, 2026-11-13).
 import { h, onTap, button, textField } from '../../../ui/components.js';
 import { QUESTIONS } from '../content/questions.js';
+import { obvious } from '../group.js';
 import { disc, pips, questionCard, answerCard, sayLater, chairNote, nameOf } from './kit.js';
 
 const TIPS = [
   'Say the obvious thing. The obvious thing wins.',
   'First answer that pops into your head. Go with it.',
   'Not the best answer. The most common one.',
+];
+
+const DUO_TIPS = [
+  'Not the best answer. The one they’d say.',
+  'First thing that pops into your head. They’re doing the same.',
+  'Obvious is good. Obvious is how you match.',
 ];
 
 const demoText = (q) => {
@@ -19,6 +26,7 @@ const demoText = (q) => {
 };
 
 function scoreLine(ctx, p) {
+  if (p.duo) return h('div.sh-score', h('span.sh-score-l', `Together: ${p.total ?? 0} of ${p.target}`), pips(p.total ?? 0, p.target));
   const mine = (p.standings || []).find((r) => r.id === ctx.meId)?.score ?? ctx.me?.score ?? 0;
   return h('div.sh-score', h('span.sh-score-l', `Your points: ${mine}`), pips(mine, p.target));
 }
@@ -35,26 +43,39 @@ const write = {
     function send() {
       const t = field.input.value.trim();
       if (!t) { field.error(); return; }
+      if (p.meld && (obvious(t, p.meld.a) || obvious(t, p.meld.b))) {
+        field.error();
+        ctx.say(ctx.line('shDuoRepeat'), { compact: true, placement: 'side', hold: 2600 });
+        return;
+      }
       ctx.audio.sfx('plated'); ctx.haptic('submit');
       ctx.client.act('sh-answer', { text: t }, { sent: t });
     }
-    const tip = TIPS[(p.round || 1) % TIPS.length];
-    sheet.append(h(`div.sh-sheet.sh-write.sh-in`,
-      h('div.sh-row', h('span.sh-qn', `Question ${p.round}`), scoreLine(ctx, p)),
-      h('div.sh-ask', h(`div.sh-sheetq${p.q.length > 44 ? '.long' : ''}`, p.q), field),
-      h('div.sh-rule', tip),
-      chairNote(ctx, p.chair),
+    const tip = p.duo ? DUO_TIPS[(p.round || 1) % DUO_TIPS.length] : TIPS[(p.round || 1) % TIPS.length];
+    const m = p.meld;
+    const ask = m
+      ? h('div.sh-ask.sh-middle',
+        h('div.sh-mid-l', 'Meet in the middle'),
+        h('div.sh-mid-pair', answerCard(m.a, { cls: '.mini', seed: ctx.phase?.seed || 1, key: 'ma' }), h('span.sh-mid-plus', '+'), answerCard(m.b, { cls: '.mini', seed: ctx.phase?.seed || 1, key: 'mb' })),
+        h('div.sh-mid-q', 'Something new that fits both, like Columbo + Morse = Detective. Match for 1 point.'),
+        field)
+      : h('div.sh-ask', h(`div.sh-sheetq${p.q.length > 44 ? '.long' : ''}`, p.q), field);
+    sheet.append(h(`div.sh-sheet.sh-write.sh-in${m ? '.meld' : ''}`,
+      h('div.sh-row', h('span.sh-qn', p.duo ? `Question ${p.round} of ${p.count}` : `Question ${p.round}`), scoreLine(ctx, p)),
+      ask,
+      m ? null : h('div.sh-rule', tip),
+      p.duo ? null : chairNote(ctx, p.chair),
       h('div.sh-actions', btn)));
-    if (ctx.frozen && ctx.demo) { field.input.value = demoText(p.q); field.input.dispatchEvent(new Event('input')); }
+    if (ctx.frozen && ctx.demo) { field.input.value = m ? 'The Bea' : demoText(p.q); field.input.dispatchEvent(new Event('input')); }
     if (!ctx.frozen) setTimeout(() => field.input.focus({ preventScroll: true }), 450);
-    const cancel = sayLater(ctx, ctx.line('shWrite'), { delay: 700 });
+    const cancel = sayLater(ctx, ctx.line(m ? 'shDuoMiddle' : p.duo ? 'shDuoWrite' : 'shWrite'), { delay: 700 });
     let autoSent = false;
     return {
       frame(c) {
         if (autoSent || c.frozen || !c.duration || c.remaining() > 500) return;
         autoSent = true;
         const t = field.input.value.trim();
-        if (t) c.client.act('sh-answer', { text: t }, { sent: t });
+        if (t && !(p.meld && (obvious(t, p.meld.a) || obvious(t, p.meld.b)))) c.client.act('sh-answer', { text: t }, { sent: t });
       },
       unmount: cancel,
     };
@@ -82,8 +103,8 @@ const wait = {
     };
     sync(ctx);
     sheet.append(h('div.sh-sheet.sh-waitsheet.sh-in',
-      h('div.sh-head', h('div.sh-title', 'Locked in.'), h('div.sh-sub', 'Now hope everyone else said it too.')),
-      h('div.sh-waitq', p.q),
+      h('div.sh-head', h('div.sh-title', 'Locked in.'), h('div.sh-sub', p.duo ? 'Now hope they said it too.' : 'Now hope everyone else said it too.')),
+      h('div.sh-waitq', p.meld ? `Meet in the middle: “${p.meld.a}” + “${p.meld.b}”` : p.q),
       answerCard(text, { cls: '.big.mine', seed: ctx.phase?.seed || 1, key: ctx.meId }),
       box));
     const cancel = sayLater(ctx, ctx.line('shWait'), { delay: 500 });
@@ -156,29 +177,36 @@ const sort = {
     const opener = h('button.sh-opener', { type: 'button', 'data-e2e': 'sh-open-pairs' }, 'Two other answers match?');
     const pairbox = h('div.sh-pairbox.closed', opener, pickHint, picker);
     onTap(opener, () => pairbox.classList.remove('closed'));
+    if (p.duo) pairbox.style.display = 'none';
     sheet.append(h('div.sh-sheet.sh-sortsheet.sh-in', head, list, pairbox, h('div.sh-actions', doneN, done)));
 
     const sync = (c) => {
       const ds = (c.progress.disputes || []).map((d) => ({ ...d, a: textOf(d.a), b: textOf(d.b) }));
       head.replaceChildren(
         h('div.sh-title', ds.length ? 'Same answer?' : 'Any two answers the same?'),
-        h('div.sh-sub', ds.length ? 'Argue out loud. Whoever didn’t write them votes.' : 'Tap both. The table then votes.'));
-      if (!ds.length) pairbox.classList.remove('closed');
+        h('div.sh-sub', p.duo ? 'Be honest. It only counts if you both tap Same.' : ds.length ? 'Argue out loud. Whoever didn’t write them votes.' : 'Tap both. The table then votes.'));
+      if (!ds.length && !p.duo) pairbox.classList.remove('closed');
       for (const d of ds) {
         if (!rows.has(d.id)) { const r = row(d); rows.set(d.id, r); list.append(r); }
         const r = rows.get(d.id).parts;
         const judge = !d.judges || d.judges.includes(c.meId);
         rows.get(d.id).classList.toggle('author', !judge);
         r.same.disabled = !judge; r.diff.disabled = !judge;
-        r.verdict.parentElement.querySelector('.sh-dby').textContent = judge ? (d.by ? `${nameOf(c, d.by)} says these match` : '') : 'You wrote one of these. The others decide.';
+        r.verdict.parentElement.querySelector('.sh-dby').textContent = p.duo ? '' : judge ? (d.by ? `${nameOf(c, d.by)} says these match` : '') : 'You wrote one of these. The others decide.';
         const my = c.mine.game.votes?.[d.id];
         r.same.setAttribute('aria-pressed', String(my === true));
         r.diff.setAttribute('aria-pressed', String(my === false));
         r.same.querySelector('.sh-vavs').replaceChildren(...d.same.map((id) => disc(c.player(id), { size: 22 })));
         r.diff.querySelector('.sh-vavs').replaceChildren(...d.diff.map((id) => disc(c.player(id), { size: 22 })));
         const s = d.same.length; const n = d.diff.length;
-        r.verdict.textContent = s > n ? 'So far: same' : s || n ? 'So far: different' : '';
-        r.verdict.className = `sh-dverdict${s > n ? ' on' : ''}`;
+        if (p.duo) {
+          const all = s >= c.players.length;
+          r.verdict.textContent = all ? 'You both say same' : n ? 'Not the same' : s ? 'Waiting for the other vote' : '';
+          r.verdict.className = `sh-dverdict${all ? ' on' : ''}`;
+        } else {
+          r.verdict.textContent = s > n ? 'So far: same' : s || n ? 'So far: different' : '';
+          r.verdict.className = `sh-dverdict${s > n ? ' on' : ''}`;
+        }
       }
       list.classList.toggle('empty', !ds.length);
       const full = ds.length >= (p.maxDisputes || 5);

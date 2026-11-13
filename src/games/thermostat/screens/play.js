@@ -123,7 +123,7 @@ function liveDial(ctx, d, { status, canDrag }) {
     if (names.length > 2) txt = `${names.length} of you are fighting over it`;
     else if (names.length === 2) txt = `${names[0]} and ${names[1]} are fighting over it`;
     else if (names.length === 1) txt = names[0] === 'You' ? 'You’re turning it' : `${names[0]} is turning it`;
-    else if (!pr.moves) txt = canDrag ? 'Grab the needle and drag. Everyone can.' : 'Nobody’s touched it yet';
+    else if (!pr.moves) txt = canDrag ? (p.duo ? 'Grab the needle and drag.' : 'Grab the needle and drag. Everyone can.') : 'Nobody’s touched it yet';
     else txt = `${nameOf(c, pr.by)} moved it last`;
     status.textContent = txt;
     status.classList.toggle('fight', names.length >= 2);
@@ -155,6 +155,17 @@ function locksRow(ctx) {
   return el;
 }
 
+/** Two players: one line saying whether the other one has locked in yet. */
+function duoLock(ctx, other) {
+  const el = h('div.th-locks', disc(other, { size: 30 }), h('span.th-locks-l'));
+  el.sync = (c) => {
+    const on = !!c.progress?.done?.[other?.id];
+    el.firstChild.classList.toggle('in', on);
+    el.lastChild.textContent = on ? `${other?.name || 'They'}’s locked in` : `${other?.name || 'They'} hasn’t locked in yet`;
+  };
+  return el;
+}
+
 const dialScreen = {
   id: 'thermostat-dial',
   layout: 'split',
@@ -165,13 +176,14 @@ const dialScreen = {
     show.append(h('div.th-top', card));
     const d = dial({ cls: '.drag' });
     const status = h('div.th-status');
-    const locks = locksRow(ctx);
+    const duo = !!p.duo;
+    const locks = duo ? null : locksRow(ctx);
     const lockBtn = h('button.th-lock', { type: 'button', 'data-e2e': 'lock' }, h('i', { html: LOCK }), h('span.t', 'Lock it in'));
     sheet.append(h(`div.th-sheet.th-dialsheet.th-in${p.final ? '.final' : ''}`,
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
       h('div.th-lockrow', lockBtn, locks),
-      h('div.th-hint', 'One dial for everyone. Drag it, argue, then all lock in.')));
+      h('div.th-hint', duo ? 'Drag the needle to their clue, then lock it in.' : 'One dial for everyone. Drag it, argue, then all lock in.')));
     const live = liveDial(ctx, d, { status, canDrag: true });
     let state = 'open';
     onTap(lockBtn, () => {
@@ -180,7 +192,7 @@ const dialScreen = {
     }, { sound: 'select', buzz: 'select' });
     const sync = (c) => {
       live.sync(c);
-      locks.sync(c);
+      locks?.sync(c);
       const done = !!c.progress?.done?.[c.meId];
       const g = c.mine.game;
       const moved = g.locked && !done && g.lockedAt != null && Math.abs((c.progress?.dial ?? 0) - g.lockedAt) > LOCK_SLOP;
@@ -193,7 +205,7 @@ const dialScreen = {
     };
     lockBtn.dataset.state = 'open';
     sync(ctx);
-    const cancel = sayLater(ctx, ctx.line(p.final ? 'thHot' : 'thDial'), { delay: 700 });
+    const cancel = sayLater(ctx, ctx.line(p.final ? 'thHot' : duo ? 'thDuoDial' : 'thDial'), { delay: 700 });
     return {
       update: sync,
       frame(c, dt) { live.frame(c, dt); card.timer?.set(c.remaining(), c.duration); },
@@ -214,16 +226,18 @@ const squirm = {
     d.bands(ctx.priv?.target ?? 50, p.final);
     d.heat(1);
     const status = h('div.th-status');
-    const locks = locksRow(ctx);
+    const duo = !!p.duo;
+    const other = duo ? ctx.players.find((pl) => pl.id !== ctx.meId) : null;
+    const locks = duo ? duoLock(ctx, other) : locksRow(ctx);
     sheet.append(h(`div.th-sheet.th-dialsheet.th-squirm.th-in${p.final ? '.final' : ''}`,
-      h('div.th-head.center', h('div.th-title', 'Your clue is out. Keep quiet.'), h('div.th-sub', 'They’re dragging the dial. You score double what they score.')),
+      h('div.th-head.center', h('div.th-title', 'Your clue is out. Keep quiet.'), h('div.th-sub', duo ? `${other?.name || 'They'}’s turning the dial. Whatever they score, you both score.` : 'They’re dragging the dial. You score double what they score.')),
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
       h('div.th-lockrow.solo', locks)));
     const live = liveDial(ctx, d, { status, canDrag: false });
     const sync = (c) => { live.sync(c); locks.sync(c); };
     sync(ctx);
-    const cancel = sayLater(ctx, ctx.line('thSquirm', { name: ctx.me?.name || 'you' }), { delay: 700 });
+    const cancel = sayLater(ctx, ctx.line(duo ? 'thDuoSquirm' : 'thSquirm', { name: ctx.me?.name || 'you' }), { delay: 700 });
     return {
       update: sync,
       frame(c, dt) { live.frame(c, dt); card.timer?.set(c.remaining(), c.duration); },
