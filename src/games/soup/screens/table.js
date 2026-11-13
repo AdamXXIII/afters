@@ -147,7 +147,8 @@ const banish = {
         h('div.sp-rcwrap', h('div.sp-rc-back', h('span', 'They were…'), h('b', '?')), h(`div.sp-rolecard.${pois ? 'pois' : 'faith'}`, h('div.sp-rc-q', 'They were…'), h('div.sp-rc-a', h('span.ic', { html: pois ? VIAL : SPOON }), pois ? 'a Poisoner' : 'Faithful')))].filter(Boolean));
     } else verdict.append(h('div.sp-vd-nm', 'Nobody leaves.'), h('div.sp-vd-tie', 'The table couldn’t decide. The Poisoners are delighted.'));
     const card = h('div.sp-card.sp-banish', h('div.sp-banish-t', p.final ? 'Banish again' : 'The vote'), list, verdict);
-    show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));
+    const flash = h(`div.sp-flash.${p.role === 'poisoner' ? 'pois' : 'faith'}`);
+    show.append(h('div.sp-dim'), flash, h('div.sp-cardwrap', card));
     let shown = -1; let stamped = false; let revealed = false;
     let cancel = () => {};
     return {
@@ -173,6 +174,7 @@ const banish = {
         if (!revealed && t >= p.roleAt) {
           revealed = true;
           card.classList.add('revealed');
+          if (!c.frozen && p.banished) flash.classList.add('go');
           const pois = p.role === 'poisoner';
           if (!c.frozen) { c.audio.sfx(pois ? 'truth' : 'groan'); c.cyril.react(pois ? 'delight' : 'sad'); c.stage.shake(0.006, 220); c.haptic(pois ? 'win' : 'stamp'); }
           const extra = p.landslide ? c.line('spLandslide') : p.tie ? c.line('spTie') : null;

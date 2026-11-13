@@ -433,3 +433,12 @@ body.sp-night #sheet::after { box-shadow: inset 0 1px 0 rgba(243,230,207,.12); }
 .sp-clue .who { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; font-size: 18px; color: var(--c-ink); }
 .sp-clue .s { font-size: 14px; line-height: 18px; color: var(--c-toffee); font-weight: 600; text-align: center; }
 @media (orientation: landscape) and (max-height: 600px) { .sp-clue { grid-column: 2; padding: 6px 10px; } }
+
+/* banish: the whole screen washes the role colour on the flip */
+.sp-flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; z-index: 1; }
+.sp-flash.faith { background: radial-gradient(80% 60% at 50% 35%, rgba(127,154,116,.85), rgba(63,90,54,.6)); }
+.sp-flash.pois { background: radial-gradient(80% 60% at 50% 35%, rgba(149,40,58,.9), rgba(78,15,26,.7)); }
+.sp-flash.go { animation: spFlash 1100ms var(--ease-out-quint) both; }
+@keyframes spFlash { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+.sp-banish.revealed .sp-rolecard { animation: spSlam 380ms var(--ease-out-back) 120ms both; }
+@keyframes spSlam { from { transform: scale(1.12); } to { transform: none; } }
