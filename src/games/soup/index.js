@@ -143,6 +143,7 @@ export default {
     'soup-table': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-table'; }, me: 'idle', bots: 'act', t: 30000 },
     'soup-vote': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-vote'; }, me: 'idle', bots: 'some', t: 9000 },
     'soup-banish': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-banish'; }, t: (ph) => ph.payload.roleAt + 900 },
+    'soup-banish-wait': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-banish'; }, t: (ph) => ph.payload.stampAt + 900 },
     'soup-night': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-night'; }, me: 'idle', bots: 'some', t: 6000 },
     'soup-morning': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-morning' && !!e.phase.payload.victim; }, t: 4200 },
     'soup-ghost': {
