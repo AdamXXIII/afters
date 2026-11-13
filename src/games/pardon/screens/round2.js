@@ -67,6 +67,9 @@ const tune = {
       ctx.audio.unlock?.();
       stop = play(ctx.audio, tuneObj, p.mode, p.seed, from);
     };
+    // everyone at the table, greyed until they lock in, then lit with their time (never what they picked)
+    const raceDiscs = new Map(ctx.players.map((pl) => [pl.id, h('span.pd-racer', { style: { '--pc': colourOf(pl) } }, disc(pl, { size: 36 }), h('b.pd-racer-n'), h('span.pd-racer-nm', pl.name))]));
+    const race = h('div.pd-race', [...raceDiscs.values()]);
     const here = h('button.pd-here', { type: 'button', 'data-e2e': 'pd-play-here' }, h('span.ic', { html: SPEAKER }), h('span', iAmSpeaker ? 'Playing here' : 'Play here too'));
     if (!iAmSpeaker) onTap(here, () => { here.classList.add('on'); startPlay(); });
     else here.classList.add('on');
@@ -95,9 +98,7 @@ const tune = {
     const status = h('div.pd-status');
     const watch = h('div.pd-watch', h('b', '0.0'), h('span', 'sec'));
     // everyone at the table, greyed until they lock in, then stamped 1st, 2nd... (not what they picked)
-    const raceDiscs = new Map(ctx.players.map((pl) => [pl.id, h('span.pd-racer', disc(pl, { size: 34 }), h('b.pd-racer-n'), h('span.pd-racer-nm', pl.name))]));
-    const race = h('div.pd-race', [...raceDiscs.values()]);
-    sheet.append(h('div.pd-sheet.pd-in', h('div.pd-askrow', h('div.pd-ask', 'What’s the tune?'), watch), list, status, race));
+    sheet.append(h('div.pd-sheet.pd-in', h('div.pd-askrow', h('div.pd-ask', 'What’s the tune?'), watch), list, status));
     const render = (c) => {
       const early = c.elapsed() < p.playAt - 250;
       for (const [id, b] of btns) {
@@ -113,12 +114,15 @@ const tune = {
       for (const [id, d] of raceDiscs) {
         const k = order.indexOf(id);
         d.classList.toggle('in', k >= 0);
-        d.querySelector('.pd-racer-n').textContent = k >= 0 ? ['1st', '2nd', '3rd'][k] || `${k + 1}th` : '';
+        const sec = c.progress.secs?.[id];
+        d.querySelector('.pd-racer-n').textContent = k >= 0 ? (sec != null ? `${sec.toFixed(1)}s` : 'in') : '';
+        d.classList.toggle('first', k === 0);
       }
     };
     render(ctx);
     const hush = iAmSpeaker ? hushMusic(ctx.audio) : null;
-    const cancel = say(ctx, ctx.line(p.mode === 'wonky' ? 'pdTuneWonky' : p.mode === 'backwards' ? 'pdTuneBack' : 'pdTune'), { hold: 1500, compact: true }, 100);
+    // Cyril says his line before the music starts, then gets out of the way
+    const cancel = ctx.frozen ? () => {} : say(ctx, ctx.line(p.mode === 'wonky' ? 'pdTuneWonky' : p.mode === 'backwards' ? 'pdTuneBack' : 'pdTune'), { hold: 1200, compact: true }, 0);
     let playing = false;
     let lastOrder = 0;
     return {

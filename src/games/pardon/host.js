@@ -226,6 +226,7 @@ export class PardonHost {
         counts: { in: Object.keys(t.answers).length },
         // who's in, fastest first (not what they said) so the table feels the race
         order: Object.entries(t.answers).sort((a, b) => a[1].ms - b[1].ms).map(([id]) => id),
+        secs: Object.fromEntries(Object.entries(t.answers).map(([id, a]) => [id, Math.round((a.ms * (this.api.speed || 1)) / 100) / 10])),
       }),
     });
   }
