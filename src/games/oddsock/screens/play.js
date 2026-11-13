@@ -78,9 +78,9 @@ function tally(ctx, order) {
   const cells = new Map(order.map((id) => {
     const n = h('b.os-tn', '0');
     const by = h('div.os-by');
-    return [id, { el: h('div.os-tcell', { style: { '--pc': colourOf(ctx, id) } }, h('div.os-tav', disc(ctx, id, { size: 40 }), n), h('span.nm', you(ctx, id)), by), n, by }];
+    return [id, { el: h('div.os-tcell', { style: { '--pc': colourOf(ctx, id) } }, h('div.os-tav', disc(ctx, id, { size: 34 }), n), h('span.nm', you(ctx, id)), by), n, by }];
   }));
-  const el = h('div.os-tally', { style: { '--cols': order.length > 4 ? Math.ceil(order.length / 2) : order.length } }, [...cells.values()].map((c) => c.el));
+  const el = h('div.os-tally', { style: { '--cols': order.length > 5 ? Math.ceil(order.length / 2) : order.length } }, [...cells.values()].map((c) => c.el));
   el.sync = (votes = {}) => {
     const counts = {};
     for (const to of Object.values(votes)) counts[to] = (counts[to] || 0) + 1;
@@ -103,7 +103,7 @@ const vote = {
   shot: 'vote',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const hd = header(ctx, { title: 'Who’s the Odd Sock?', line: 'Argue it out loud. Votes show live.', tone: 'claret' });
+    const hd = header(ctx, { title: 'Who’s the Odd Sock?', line: 'Argue out loud. Votes show live.', tone: 'claret' });
     const tl = tally(ctx, p.order);
     show.append(h('div.os-top', hd, tl));
     const btns = p.order.filter((id) => id !== ctx.meId).map((id) => {
