@@ -28,7 +28,11 @@ export function sameWord(a, b) {
   return levenshtein(x, y) <= (long > 9 ? 2 : 1);
 }
 
-export const roundsFor = (n) => (n <= 5 ? 4 : 3);
+// everyone is the Odd Sock once (seven rounds at eight players keeps the game near 15 minutes)
+export const roundsFor = (n) => Math.min(n, 7);
+/** Clue turns get shorter at big tables. */
+export const clueFor = (n) => (n >= 7 ? 11000 : n >= 6 ? 12000 : 15000);
+export const MAX_WRONG = 2;
 export const lapsFor = (n) => (n <= 5 ? 2 : 1);
 
 export class OddSockHost {
@@ -166,7 +170,7 @@ export class OddSockHost {
   _clue() {
     const r = this.r;
     const speaker = this._speaker();
-    this.api.enter('oddsock-clue', OS.clue, {
+    this.api.enter('oddsock-clue', clueFor(this.api.players.length), {
       ...this._base(), order: r.order, turn: r.turn, lap: Math.floor(r.turn / r.order.length) + 1, laps: r.laps,
       speaker, total: r.order.length * r.laps,
     }, {
@@ -202,7 +206,8 @@ export class OddSockHost {
     r.tie = leaders.length > 1;
     r.caught = r.accused === r.sock;
     // wrong sock: they drop off the line and the rest go again, until only three are left
-    r.again = !!r.accused && !r.caught && r.order.length - 1 >= 3;
+    // two wrong picks in a round and the Odd Sock escapes
+    r.again = !!r.accused && !r.caught && r.out.length + 1 < MAX_WRONG && r.order.length - 1 >= 3;
     if (r.accused && !r.caught) r.out.push(r.accused);
     // the votes, one by one: biggest pile last so the drama builds
     const order = Object.entries(r.votes).sort((a, b) => (counts[a[1]] - counts[b[1]]) || (a[0] < b[0] ? -1 : 1));
