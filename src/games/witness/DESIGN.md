@@ -53,3 +53,12 @@ Everyone is in the dock once (shuffled order). Then the standings, and the last-
 
 ## Content
 `content/questions.js`: 160 family, 155 Adults 18+ (re-sharpened by three critic rounds), `kind|question` with `{name}` (the defendant) and `{other}` (another player). House fakes per kind and rating. No food or drink topics.
+
+## Builder report (2026-11-13)
+The subagent tool guard blocked creating `REPORT.md`, so the report lives here; the lead can move it.
+- **Done:** sim passes at 3/5/8; bots play every phase (write incl. the fifth, pick, choose two); a demo for every screen (`witness-intro, -dock, -write, -wait, -pick, -sweat, -reveal-fake, -reveal, -verdict, -scores, -cross-intro, -choose, -recess, -cross-pick, -cross-reveal`); portrait and landscape shot; 160 Family + 155 Adults prompts; `hidden` removed.
+- **Blind A/B verdicts** (vs Fibbage 3 "Enough About You" Steam stills and Psych! App Store shots): onboarding, core action and reveal: **ours picked** in round 1. Content (3 rounds) and whole-game arc (3 rounds): still judged worse; stopped (same gap twice / critics flip-flopping). Content and arc were not truly blind.
+- **Fun:** questions about the people at the table; writing in someone's voice, shown as handwriting; FAKE stamp with forger and fooled named; claret seal on the truth; pleading the fifth; the verdict card says why everyone scored.
+- **Not fun yet:** at 8 players docks 3-6 are the same loop (x2 helps, middle still sags); 3 players is near a coin flip; reveal is calm (one card per beat); house fakes can look wrong when used.
+- **Gaps:** landscape reveal truncates the question; long fakes wrap tightly in the 2-column landscape pick; content kinds could be tighter.
+- **Shared changes:** none required. Nice: a box "Ready" tap on timed intro cards. `npm run build` rewrites `public/icons/icon-512.png` (restored each time).
