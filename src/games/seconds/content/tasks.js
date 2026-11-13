@@ -205,7 +205,7 @@ export const CATEGORIES = { family: Object.keys(FAMILY), adult: Object.keys(ADUL
 /** What the faker is told for each type: enough to move their body, nothing more. */
 export const FAKE_HINT = {
   hands: { act: 'Hand up, or keep it down?', kind: 'Hands up' },
-  number: { act: 'Hold up some fingers. Any number.', kind: 'Fingers' },
+  number: { act: 'Hold up 0 to 10 fingers.', kind: 'Fingers' },
   point: { act: 'Point at someone. Anyone.', kind: 'Point' },
   face: { act: 'Pull a face. Commit to it.', kind: 'Face' },
 };
