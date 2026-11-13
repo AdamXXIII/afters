@@ -13,7 +13,7 @@ export const WT = {
   scores: 7000, crossIntro: 7500, choose: 15000, crossPick: 14000,
 };
 export const MAX = 50; // characters per answer
-export const PTS = { truth: 1000, perFooled: 500, defendant: 250, expert: 250, echo: 750 };
+export const PTS = { truth: 1000, perFooled: 500, defendant: 250, expert: 250, echo: 750, crossDefendant: 1000 };
 // reveal beats (ms, before api.dur)
 const BEAT = { nobody: 2400, fake: 2900, truth: 3800, verdict: 3400, silent: 5000 };
 
@@ -261,7 +261,8 @@ export class WitnessHost {
         if (o.kind === 'fake') o.authors.forEach((a) => add(a, PTS.perFooled * m * ps.length));
       }
     }
-    add(r.defendant, PTS.defendant * m * missed);
+    // cross-examination: last place earns 1000 a fooled juror (a real comeback, not a coronation)
+    add(r.defendant, (r.final ? PTS.crossDefendant : PTS.defendant * m) * missed);
     // expert witness: whoever found the truth fastest
     const found = pickers[truth.id].slice().sort((a, b) => r.picks[a].at - r.picks[b].at);
     const expert = found[0] || null;

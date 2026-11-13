@@ -101,7 +101,7 @@ export default {
             ? h('div.wt-fooled.found', h('span.lbl', 'Found by'), h('span.list', found))
             : h('div.wt-fooled.none', h('span.lbl', 'Found by nobody. Not one of you.')),
           finders.length ? h('div.wt-ptsrow', pts, h('span.each', finders.length > 1 ? 'each' : `to ${isMe(finders[0]) ? 'you' : pl(finders[0])?.name || '?'}`), p.expert ? h('span.wt-xp', `+${250 * m} fastest`) : null) : null,
-          isMe(p.defendant) ? youLine(p.missed ? `You fooled ${p.missed}. +${250 * m * p.missed}.` : 'They know you too well.') : null));
+          isMe(p.defendant) ? youLine(p.missed ? `You fooled ${p.missed}. +${p.deltas[p.defendant] || 0}.` : 'They know you too well.') : null));
         if (finders.length) countTo(pts, 1000 * m, { frozen: quiet });
         sfx('truth');
         if (!quiet && finders.includes(ctx.meId)) ctx.haptic('win');
