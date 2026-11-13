@@ -42,7 +42,7 @@ export function dockCard(ctx, p, { timer = true, compact = false } = {}) {
   const t = timer ? timerRing() : null;
   const who = h('div.wt-who',
     h('span.wt-who-n', me ? 'You' : def?.name || '?'),
-    h('span.wt-who-s', p.final ? (me ? 'are under cross-examination' : 'under cross-examination') : (me ? 'are in the dock' : 'in the dock')));
+    h('span.wt-who-s', p.final ? (me ? 'are on the stand, ×2' : 'on the stand, ×2') : (me ? 'are in the dock' : 'in the dock')));
   const q = h('div.wt-q', p.q);
   const len = p.q.length;
   const card = h(`div.wt-dockcard${p.final ? '.final' : ''}${compact ? '.compact' : ''}${len > 58 ? '.long' : ''}${len > 80 ? '.xlong' : ''}`,

@@ -183,7 +183,7 @@ const pick = {
       const mine = c.mine.game.pick;
       btns.forEach((b, i) => b.setAttribute('aria-pressed', String(mine === p.options[i].id)));
       const i = p.options.findIndex((o) => o.id === mine);
-      hint.textContent = i >= 0 ? `Locked in on ${LETTERS[i]}. Change it till time’s up.` : 'Fastest to the real one gets +250.';
+      hint.textContent = i >= 0 ? `Locked in on ${LETTERS[i]}. Change it till time’s up.` : `Fastest to the real one gets +${p.final ? 500 : 250}.`;
       hint.classList.toggle('locked', i >= 0);
       row.sync(c);
     };

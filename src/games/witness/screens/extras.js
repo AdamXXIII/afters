@@ -11,10 +11,12 @@ function summons({ title, rules, art, cls = '', foot = null }) {
 }
 
 function fan(seed) {
-  const a = statement('the good scissors', { cls: '.mini', seed, key: 'a' });
-  const b = statement('my nan’s old radio', { cls: '.mini', seed, key: 'b' });
+  const a = statement('the photo albums', { cls: '.mini', seed, key: 'a' });
+  const b = statement('my nan’s radio', { cls: '.mini', seed, key: 'b' });
   const c = statement('a signed football', { cls: '.mini', seed, key: 'c' });
   b.append(seal('Sworn', '.sm'));
+  a.append(h('span.wt-ministamp', 'Fake'));
+  c.append(h('span.wt-ministamp', 'Fake'));
   return h('div.wt-fan', a, b, c);
 }
 
