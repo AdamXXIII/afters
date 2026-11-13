@@ -30,8 +30,9 @@ export default {
       house ? cyrilDisc(60) : disc(pl, { size: 60 }),
       h('div.bt-owner-t',
         h('span.lbl', house ? 'Cyril’s own card' : mine ? 'Your card won' : 'Played by'),
-        h('span.nm', house ? 'Cyril' : mine ? 'You' : pl?.name || '?')),
-      house ? h('span.bt-plus.none', 'Nobody scores') : h('span.bt-plus', { html: `${CROWN}<b>+1</b>` }));
+        h('span.nm', house ? 'Cyril' : mine ? 'You' : pl?.name || '?'),
+        h('span.bt-owner-line', `“${win.text[0].toUpperCase()}${win.text.slice(1)}”`)),
+      house ? h('span.bt-plus.none', 'Nobody scores') : h('span.bt-plus', { html: `${CROWN}<b>+${p.deltas[win.by] || 1}</b>` }));
     const rest = p.cards.filter((_, i) => i !== p.winner).map((c, i) => h('div.bt-restrow', { style: { '--i': i } },
       h('span.bt-rest-t', c.text[0].toUpperCase() + c.text.slice(1)),
       c.by === 'house' ? h('span.bt-rest-by', cyrilDisc(24), 'Cyril') : h('span.bt-rest-by', disc(ctx.player(c.by), { size: 24 }), c.by === ctx.meId ? 'You' : nameOf(ctx, c.by))));

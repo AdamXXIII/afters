@@ -52,7 +52,7 @@ export function promptCard(ctx, p, { answer = null, timer = true, size = '', hea
     head ? h('div.bt-phead',
       criticBadge(critic, { size: 30 }),
       h('span.bt-pwho', meCritic ? 'You’re the Critic' : `Critic: ${critic?.name || '?'}`),
-      h('span.bt-pround', p.decider ? 'Decider' : `${p.round} of ${p.of}`),
+      h(`span.bt-pround${p.double ? '.double' : ''}`, p.decider ? 'Decider' : p.double ? 'Last round: 2 crowns' : `${p.round} of ${p.of}`),
       t) : null,
     text);
   card.timer = t;
@@ -104,7 +104,7 @@ export function playedRow(ctx, ids) {
   el.sync = (c) => {
     let n = 0;
     for (const [id, d] of avs) { const on = !!c.progress.done?.[id]; d.classList.toggle('in', on); if (on) n++; }
-    lbl.textContent = n === avs.size ? 'Everyone’s played' : `${n} of ${avs.size} played`;
+    lbl.textContent = n === avs.size ? 'Everyone’s in' : `${n} of ${avs.size} players done`;
   };
   el.sync(ctx);
   return el;

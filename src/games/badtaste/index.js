@@ -102,7 +102,7 @@ export default {
         ['Think about what makes {name} laugh. Then aim lower.'],
         ['Pick one. Try it in the blank. Commit.'],
       ],
-      btLast: [['Last round. Play the card you’ve been saving.']],
+      btLast: [['Last round. Two crowns on this one. Play the card you’ve been saving.']],
       btCritic: [['You’re the Critic. Look unimpressed. It helps.'], ['Sit back. Let them work for it.']],
       btPlayed: [['Face down. Deny everything.'], ['In the pile. Nobody knows it’s yours. Yet.']],
       btJudge: [['Read every one out loud. Do the voices.'], ['Turn them over. Slowly. Make them sweat.']],

@@ -40,7 +40,7 @@ export default {
     const rows = p.cards.map((c, i) => {
       const r = h(`button.bt-pick${isOwn(i) ? '.own' : ''}`, { type: 'button', 'aria-pressed': 'false', 'data-e2e': `bt-pick-${i}`, style: { '--i': i } },
         h('span.bt-pick-n', String(i + 1)),
-        h(`span.bt-pick-t${c.text.length > 34 ? '.long' : ''}`, cap(c.text)),
+        h('span.bt-pick-t'),
         isOwn(i) ? h('span.bt-yours', 'Yours') : h('span.bt-pick-tick', { html: CROWN }));
       if (isCritic) onTap(r, () => tap(i), { sound: 'select', buzz: 'select' }); else r.tabIndex = -1;
       return r;
@@ -76,15 +76,21 @@ export default {
       const flipped = pr.flipped ?? 0;
       const focus = pr.focus ?? -1;
       const all = flipped >= n;
+      const texts = pr.texts || [];
+      rows.forEach((r, i) => {
+        const t = texts[i] || '';
+        const el = r.querySelector('.bt-pick-t');
+        if (el.textContent !== cap(t)) { el.textContent = cap(t); el.classList.toggle('long', t.length > 34); }
+      });
       page.classList.toggle('choosing', all);
       tabs.forEach((t, i) => { t.classList.toggle('up', i < flipped); t.classList.toggle('focus', i === focus);  });
       rows.forEach((r, i) => r.setAttribute('aria-pressed', String(all && i === focus)));
-      if (focus !== lastFocus || flipped !== lastFlip) {
+      if (focus !== lastFocus || flipped !== lastFlip || (focus >= 0 && !heroText.textContent)) {
         const turned = focus >= 0;
         hero.classList.toggle('on', turned);
         heroBack.classList.toggle('on', !turned);
         if (turned) {
-          const t = p.cards[focus].text;
+          const t = texts[focus] || '';
           const f = fillText(p.prompt, t);
           heroText.replaceChildren(f.before, h('span.bt-hero-a', f.answer), f.after);
           const len = p.prompt.length + t.length;

@@ -37,6 +37,7 @@ export class BadTasteHost {
     const ids = shuffle(api.players.map((p) => p.id), rng);
     const n = roundsFor(ids.length);
     this.order = Array.from({ length: n }, (_, k) => ids[k % ids.length]);
+    this.regular = n;
     this.prompts = api.take(PROMPTS, 'bt-p', n, rng);
     this.hands = {};
     for (const p of api.players) this.hands[p.id] = api.take(ANSWERS, 'bt-a', HAND, rng);
@@ -138,7 +139,11 @@ export class BadTasteHost {
   // ---------- phases ----------
 
   _critic() {
-    if (this.decider && this.i === this.order.length - 1 && this.api.connected.some((p) => p.id === this.order[this.i])) return this.order[this.i];
+    if (this.decider && this.i === this.order.length - 1) {
+      if (this.api.connected.some((p) => p.id === this.order[this.i])) return this.order[this.i];
+      const alt = this.api.connected.find((p) => !this.decider.has(p.id));
+      if (alt) return alt.id;
+    }
     // skip a Critic who has left the table
     const connected = new Set(this.api.connected.map((p) => p.id));
     for (let k = 0; k < this.order.length; k++) {
@@ -146,6 +151,11 @@ export class BadTasteHost {
       if (connected.has(id)) return id;
     }
     return this.order[this.i];
+  }
+
+  /** The last regular round is worth two crowns (a deciding round is worth one). */
+  _double() {
+    return this.i === this.regular - 1 && this.order.length >= 3;
   }
 
   /** In a decider only the tied players play. */
@@ -156,7 +166,7 @@ export class BadTasteHost {
   _base() {
     const r = this.r;
     const decider = !!this.decider && this.i === this.order.length - 1;
-    return { round: this.i + 1, of: this.order.length, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length, decider, tied: decider ? [...this.decider] : [] };
+    return { round: this.i + 1, of: this.regular, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length, decider, tied: decider ? [...this.decider] : [], double: this._double() };
   }
 
   _play() {
@@ -197,7 +207,8 @@ export class BadTasteHost {
     const entries = Object.entries(r.played).flatMap(([pid, list]) => list.map((pl) => ({ by: pid, text: pl.text, written: pl.written })));
     // too few answers for a real choice (a three-player table): Cyril slips his own in for cover
     let tries = 0;
-    while (entries.length < 3 && tries++ < 6) {
+    const want = r.per > 1 ? entries.length + 1 : 3; // two answering: Cyril always slips one in for cover
+    while (entries.length < want && tries++ < 6) {
       const [c] = api.take(ANSWERS, 'bt-a', 1, rng);
       if (c && !entries.some((e) => e.text === c.text)) entries.push({ by: 'house', text: c.text, written: false });
     }
@@ -206,12 +217,12 @@ export class BadTasteHost {
     const n = r.cards.length;
     const dur = Math.min(DUR.judgeMax, DUR.judgeBase + n * DUR.judgePer);
     api.enter('badtaste-judge', dur, {
-      ...this._base(), count: n, cards: r.cards.map((c) => ({ id: c.id, text: c.text })),
+      ...this._base(), count: n, cards: r.cards.map((c) => ({ id: c.id })),
     }, {
       priv: (p) => ({ role: p.id === r.critic ? 'critic' : 'player', own: r.cards.map((c, k) => (c.by === p.id ? k : -1)).filter((k) => k >= 0) }),
       progress: () => ({
         done: this._doneMap((p) => p.id !== r.critic || r.crowned != null),
-        counts: {}, flipped: r.flipped, focus: r.focus, crowned: r.crowned,
+        counts: {}, flipped: r.flipped, focus: r.focus, crowned: r.crowned, texts: r.cards.slice(0, r.flipped).map((c) => c.text),
       }),
     });
   }
@@ -225,7 +236,7 @@ export class BadTasteHost {
     if (cyrilChose) k = Math.floor(api.sub(`cyril-${this.i}`)() * Math.max(1, r.flipped || r.cards.length));
     const win = r.cards[k];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
-    if (win && win.by !== 'house' && win.by in deltas) deltas[win.by] = 1;
+    if (win && win.by !== 'house' && win.by in deltas) deltas[win.by] = this._double() ? 2 : 1;
     api.addScores(deltas);
     api.enter('badtaste-win', DUR.win + r.cards.length * DUR.winPer, {
       ...this._base(), winner: k, cyrilChose, deltas,

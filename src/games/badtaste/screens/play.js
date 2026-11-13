@@ -93,7 +93,7 @@ const hand = {
     }
     if (ctx.frozen && ctx.demo && cards[2]) sel = cards[2].id;
     sync();
-    const cancel = sayLater(ctx, ctx.line(p.last ? 'btLast' : 'btHand', { name: nameOf(ctx, p.critic) }), { delay: 800 });
+    const cancel = sayLater(ctx, ctx.line(p.double ? 'btLast' : 'btHand', { name: nameOf(ctx, p.critic) }), { delay: 800 });
     let autoSent = false;
     return {
       update: () => sync(),
@@ -173,8 +173,9 @@ const played = {
     const pc = promptCard(ctx, p, { answer: mineList.length > 1 ? null : text || null });
     const row = playedRow(ctx, others(ctx));
     show.append(h('div.bt-top', pc, row));
+    const two = mineList.length > 1;
     sheet.append(h('div.bt-sheet.bt-playedsheet',
-      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', `Face down. ${nameOf(ctx, p.critic)} won’t know ${mineList.length > 1 ? 'they’re' : 'it’s'} yours.`)),
+      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', two ? `Both your cards are in, face down. Only two of you are playing, so two each.` : `Face down. ${nameOf(ctx, p.critic)} won’t know it’s yours.`)),
       mineList.length > 1
         ? h('div.bt-mine.two', mineList.map((x, i) => answerCard(x.text, { cls: '.big.mine', seed, key: `mine${i}` })))
         : h('div.bt-mine', cardBack({ cls: '.under', seed, key: 'u1' }), answerCard(text || 'Played', { cls: '.big.mine', seed, key: 'mine' }))));
