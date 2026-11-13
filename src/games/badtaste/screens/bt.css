@@ -300,3 +300,18 @@
 .bt-win.many .bt-rest-t { font-size: 15px; line-height: 1.15; }
 .bt-win.many .bt-rest-by { font-size: 13px; }
 .bt-mine .bt-back.big { position: relative; min-height: 150px; transform: rotate(2deg); }
+
+.bt-picklist.n6 .bt-pick, .bt-picklist.n7 .bt-pick { min-height: 42px; }
+.bt-picklist.n7 .bt-pick-t { font-size: 15px; line-height: 1.1; }
+.bt-picklist.n7 .bt-pick-n { width: 24px; height: 24px; line-height: 24px; font-size: 13px; }
+.bt-picklist.n7 .bt-pick-tick { width: 24px; height: 24px; }
+.bt-win.many .bt-prompt.win .bt-ptext { font-size: 24px; }
+@media (orientation: landscape) and (max-height: 600px) {
+  .bt-win .bt-rest { display: none; }
+  .bt-owner { margin-top: 14px; padding: 8px 10px; gap: 10px; }
+  .bt-owner .bt-av { width: 44px !important; height: 44px !important; }
+  .bt-owner .nm { font-size: 24px; }
+  .bt-tally { padding: 6px 8px; }
+  .bt-tally-h { display: none; }
+  .bt-picklist.n6, .bt-picklist.n7 { grid-template-columns: 1fr 1fr; }
+}

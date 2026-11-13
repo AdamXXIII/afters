@@ -51,8 +51,8 @@ export function promptCard(ctx, p, { answer = null, timer = true, size = '', hea
   const card = h(`div.bt-prompt${size ? `.${size}` : ''}`,
     head ? h('div.bt-phead',
       criticBadge(critic, { size: 30 }),
-      h('span.bt-pwho', meCritic ? 'You’re the Critic' : `${critic?.name || '?'} is the Critic`),
-      h('span.bt-pround', p.decider ? 'Decider' : `Round ${p.round}/${p.of}`),
+      h('span.bt-pwho', meCritic ? 'You’re the Critic' : `Critic: ${critic?.name || '?'}`),
+      h('span.bt-pround', p.decider ? 'Decider' : `${p.round}/${p.of}`),
       t) : null,
     text);
   card.timer = t;

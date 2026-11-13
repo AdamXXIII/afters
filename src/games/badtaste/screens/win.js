@@ -53,7 +53,7 @@ export default {
         if (!ctx.frozen) { ctx.audio.sfx(house ? 'groan' : 'truth'); if (mine) ctx.haptic('win'); }
         ctx.cyril.react(house ? 'smug' : 'delight', { duration: ctx.frozen ? 60000 : 1500 });
         const key = house ? 'btHouse' : p.cyrilChose ? 'btCyrilChose' : 'btWin';
-        ctx.say(ctx.line(key, { name: nameOf(ctx, win.by), critic }), { hold: 2400, placement: 'side' });
+        if (p.cards.length <= 5) ctx.say(ctx.line(key, { name: nameOf(ctx, win.by), critic }), { hold: 2400, placement: 'side' });
       }],
       ['rest', () => wrap.classList.add('s-rest')],
       ['tally', () => { wrap.classList.add('s-tally'); if (!ctx.frozen) ctx.audio.sfx('countup', { ticks: 4 }); }],
