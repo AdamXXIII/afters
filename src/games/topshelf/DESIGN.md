@@ -36,3 +36,9 @@ Depth: streaks (three right in a row = a **Steady Hand**, a brass collar on your
 
 ## Content
 `content/*.js`: nine categories (Pop culture, Music, Telly, Film, Odd facts, Sport, Words, Science and nature, History) with ~490 questions, plus **Bedroom** (28, Adults 18+ tables only). Family and adult share the questions; the adult table adds the Bedroom bottle and ruder Cyril lines. Evergreen facts only: no current holders, records, prices or ages; no food topics. `!` marks hard questions (used only for the Last Drop, 6-9 per category).
+
+## Known gaps (2026-11-13)
+- Content is still easier than the bar in places (about a third are gimmes); rewriting easy items into half-known ones would help most.
+- No catch-up beyond lowest-picks and the Steal; a runaway leader can settle rounds 3-6. Idea: a "floor bonus" (+1 extra for the lowest bottle's right answer).
+- Ties at the top share the win: the box results only see whole shelves. Needs an `api.finish` rank/tiebreak (shared change).
+- Menu tile uses the fallback `cloche` dish; a drinks-cabinet dish in `src/screens/menu-art.js` is a shared change.

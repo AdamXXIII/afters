@@ -4,7 +4,7 @@ export default [
   'On the classic UK Monopoly board, which is the most expensive property?|Mayfair|Park Lane|Bond Street|Oxford Street',
   'Which plumber is Nintendo\'s most famous character?|Mario|Luigi|Wario|Toad',
   'What is the name of Mario\'s taller brother?|Luigi|Wario|Yoshi|Toad',
-  'What colour is Sonic the Hedgehog?|Blue|Red|Green|Purple',
+  'What is the name of Sonic the Hedgehog\'s two-tailed fox friend?|Tails|Knuckles|Shadow|Amy',
   'Which of these is NOT one of the ghosts in Pac-Man?|Sparky|Blinky|Inky|Clyde',
   'The puzzle game Tetris was created in which country?|The Soviet Union|Japan|The United States|Finland',
   'What type of Pokémon is Pikachu?|Electric|Fire|Water|Grass',

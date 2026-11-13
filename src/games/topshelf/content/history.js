@@ -43,7 +43,7 @@ export default [
   'In which country did the Industrial Revolution begin?|Britain|Germany|France|The United States',
   'Which Roman town was buried by Mount Vesuvius in AD 79?|Pompeii|Ostia|Verona|Ravenna',
   'Where did the Vikings come from?|Scandinavia|Germany|Ireland|Iceland only',
-  'Which ancient people built pyramids at Giza?|The Egyptians|The Greeks|The Persians|The Romans',
+  'The Great Pyramid of Giza was built for which pharaoh?|Khufu|Tutankhamun|Ramesses II|Cleopatra',
   'The Tower of London was begun by which king?|William the Conqueror|Henry VIII|Alfred the Great|Richard III',
   'What was the name of the ship the Pilgrims sailed to America in 1620?|The Mayflower|The Golden Hind|The Endeavour|The Mary Rose',
   'Which English king was nicknamed "the Lionheart"?|Richard I|Henry V|Edward III|William II',
