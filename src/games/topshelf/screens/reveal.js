@@ -3,7 +3,7 @@
 // Pure function of ctx.elapsed() so frozen screenshots and phone sync both work.
 import { h } from '../../../ui/components.js';
 import { ICONS } from '../../../ui/icons.js';
-import { cabinet, disc, qCard, moveFrame, LETTERS } from './kit.js';
+import { cabinet, shelfRange, leaders, disc, qCard, moveFrame, LETTERS } from './kit.js';
 
 const FLAME = '<svg viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 .5 2 1.5 3 2.5 3 0-3-1-5.5.5-8z" fill="currentColor"/></svg>';
 
@@ -85,7 +85,8 @@ export default {
     const mine = h('div.ts-mine', h('span.ts-mine-t', myLine(p, ctx.meId)));
     const after = {};
     for (const id of ids) after[id] = p.moves[id].to;
-    const cab = cabinet(ctx, { top: p.top, size: 'full' });
+    const cab = cabinet(ctx, { top: p.top, size: 'full', ...shelfRange([p.before, after], p.top, 5) });
+    const leadAfter = leaders(after);
     const note = h('div.ts-note', h('span.ts-note-f', { html: FLAME }), h('span.ts-note-t'));
     show.append(h(`div.ts-rv.m-${p.mode}`,
       h('div.ts-rv-a', card, h('div.ts-ropts', opts), mine, note),
@@ -98,7 +99,7 @@ export default {
       for (const id of ids) {
         const m = p.moves[id];
         const f = moved ? (FLAG[m.tag] || FLAG.none)(m) : {};
-        ex[id] = { ...f, shield: moved ? !!(p.moves[id].earned || (p.shields?.[id])) : !!(p.shields?.[id] || m.tag === 'saved'), dim: false };
+        ex[id] = { ...f, lead: moved && leadAfter.has(id), shield: moved ? !!(p.moves[id].earned || (p.shields?.[id])) : !!(p.shields?.[id] || m.tag === 'saved'), dim: false };
       }
       return ex;
     };

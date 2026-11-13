@@ -22,8 +22,8 @@ export default {
   players: [3, 8],
   minutes: 10,
   steps: [
-    'Answer each question on your phone. Right climbs a shelf.',
-    'Answer right in the first five seconds to climb two. Wrong slips one.',
+    'Answer on your phone. Right climbs a shelf, wrong slips one.',
+    'Right inside five seconds climbs two.',
     'Whoever is lowest picks the category, and the last question is a bet.',
   ],
   hasAdult: true,
@@ -93,8 +93,8 @@ export default {
   lines: {
     family: {
       tsIntro: [
-        ['My drinks cabinet. Fifteen shelves. The good stuff lives at the top.', 'Answer right to climb. Answer fast to climb faster.'],
-        ['Top Shelf. A quiz, but with altitude.', 'Right answers climb. Wrong ones slip. Mind the step.'],
+        ['My drinks cabinet. The good stuff lives on the top shelf.', 'Nobody has ever reached it sober. Off you go.'],
+        ['Top Shelf. A quiz, but with altitude.', 'Mind the step. I\'ve lost guests that way.'],
       ],
       tsIntroAgain: [['Back up the cabinet? Splendid. I\'ve dusted.'], ['Same cabinet, new questions. Nobody touch the sherry.']],
       tsPick: [['{name} is lowest, so {name} chooses. Every cloud.'], ['Down on the floor, {name}? Then you pick the bottle.'], ['{name} picks. The view from the bottom is very good for choosing.']],
@@ -121,7 +121,7 @@ export default {
     },
     adult: {
       tsIntro: [
-        ['My drinks cabinet, after dark. The good stuff is on the top shelf, obviously.', 'Right answers climb. Wrong ones slide down. Like most of my evenings.'],
+        ['My drinks cabinet, after dark. The good stuff is on the top shelf, obviously.', 'Some of you will slide down. Like most of my evenings.'],
       ],
       tsPick: [['{name} is at the bottom. Again. You pick, darling.'], ['{name} is lowest. Choose your poison.']],
       tsPickMe: [['You\'re lowest. Choose your poison.']],

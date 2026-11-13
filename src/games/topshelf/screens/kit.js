@@ -50,49 +50,57 @@ export function qCard(p, { timer = true, compact = false } = {}) {
   return card;
 }
 
+/** The shelf window worth showing: the occupied range plus a little air, at least `min` rows. */
+export function shelfRange(maps, top, min = 6) {
+  const vals = maps.flatMap((m) => Object.values(m || {}));
+  let lo = Math.max(0, Math.min(...vals, top) - 1);
+  let hi = Math.min(top, Math.max(...vals, 0) + 1);
+  while (hi - lo < min) { if (hi < top) hi += 1; else if (lo > 0) lo -= 1; else break; }
+  return { lo, hi };
+}
+
 /**
- * The drinks cabinet. rows = top shelf number; bottles sit on their shelf, side by side.
- * cab.place(map {id: shelfFloat}, {focus, glow}) positions every bottle (pure function).
+ * The drinks cabinet, showing shelves lo..hi (the rest of the climb is implied by the numbers).
+ * Every player has their own lane, so bottles never pile up or jump sideways. Each bottle
+ * carries its owner's name; a flag above it says what just happened.
  */
-export function cabinet(ctx, { top = 12, size = 'full', labels = true } = {}) {
+export function cabinet(ctx, { top = 15, lo = 0, hi = top, size = 'full' } = {}) {
   const ids = ctx.players.map((p) => p.id);
   const n = ids.length;
   const planks = [];
-  for (let s = 0; s <= top; s++) {
-    planks.push(h(`div.ts-plank${s === top ? '.top' : ''}${s === 0 ? '.floor' : ''}`, { style: { '--s': String(s) } },
-      labels ? h('span.ts-plank-n', s === top ? 'Top' : s === 0 ? '' : String(s)) : null));
+  for (let s = lo; s <= hi; s++) {
+    planks.push(h(`div.ts-plank${s === top ? '.top' : ''}${s === 0 ? '.floor' : ''}`, { style: { '--s': String(s - lo) } },
+      h('span.ts-plank-n', s === top ? 'Top shelf' : s === 0 ? 'Floor' : String(s))));
   }
-  // every player has their own lane, so bottles never pile up or jump sideways
   const toks = new Map();
-  const names = new Map();
   ctx.players.forEach((pl, lane) => {
     const me = pl.id === ctx.meId;
     const tok = h(`div.ts-tok${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl), '--x': String(lane) } },
-      h('div.ts-tok-b', { html: bottleSvg(colourOf(pl), pl.avatar) }),
-      h('span.ts-tok-flag'));
+      h('div.ts-tok-tag', h('span.ts-tok-flag'), h('span.ts-tok-n', me ? 'You' : pl.name)),
+      h('div.ts-tok-crown', { html: '<svg viewBox="0 0 48 32"><path d="M4 28 2 6l12 10L24 2l10 14L46 6l-2 22z" fill="#FFD27A" stroke="#8A5A10" stroke-width="3" stroke-linejoin="round"/></svg>' }),
+      h('div.ts-tok-b', { html: bottleSvg(colourOf(pl), pl.avatar) }));
     tok.title = pl.name;
     toks.set(pl.id, tok);
-    names.set(pl.id, h(`span.ts-lane-n${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl) } }, me ? 'You' : pl.name));
   });
   const shelves = h('div.ts-shelves', planks, [...toks.values()]);
-  const el = h(`div.ts-cab.${size}`, { style: { '--top': String(top), '--n': String(n) } },
-    h('div.ts-cab-crown', h('span', 'Cyril\u2019s cabinet')),
-    h('div.ts-cab-in', shelves),
-    h('div.ts-lanes', [...names.values()]));
-  /** pos: {id: shelfFloat}; extra: {id: {flag, kind, shield, hot, dim}} */
+  const toTop = top - hi;
+  const el = h(`div.ts-cab.${size}`, { style: { '--rows': String(hi - lo), '--n': String(n) } },
+    h('div.ts-cab-crown', h('span', toTop > 0 ? `Top shelf: ${top} \u00b7 ${toTop} above` : 'Cyril\u2019s cabinet')),
+    h('div.ts-cab-in', shelves));
+  /** pos: {id: shelfFloat}; extra: {id: {flag, kind, shield, hot, lead, dim}} */
   el.place = (pos, extra = {}) => {
     for (const [id, tok] of toks) {
       const s = pos[id];
       if (s === undefined) { tok.style.display = 'none'; continue; }
       tok.style.display = '';
-      tok.style.setProperty('--s', s.toFixed(3));
+      tok.style.setProperty('--s', (Math.max(lo - 0.6, Math.min(hi + 0.6, s)) - lo).toFixed(3));
       const e = extra[id] || {};
       tok.querySelector('.ts-tok-flag').textContent = e.flag || '';
       tok.dataset.flag = e.kind || '';
       tok.classList.toggle('shield', !!e.shield);
       tok.classList.toggle('dim', !!e.dim);
       tok.classList.toggle('hot', !!e.hot);
-      names.get(id)?.classList.toggle('hot', !!e.hot);
+      tok.classList.toggle('lead', !!e.lead);
     }
   };
   el.still = (shelves, extra) => {
@@ -101,6 +109,12 @@ export function cabinet(ctx, { top = 12, size = 'full', labels = true } = {}) {
     el.place(pos, extra);
   };
   return el;
+}
+
+/** Leader(s) of a {id: shelf} map, for the crown. */
+export function leaders(shelves) {
+  const max = Math.max(...Object.values(shelves));
+  return max > 0 ? new Set(Object.keys(shelves).filter((id) => shelves[id] === max)) : new Set();
 }
 
 /** Bottles from `before` to `after` shelves at time t, staggered per player, with a little hop. */

@@ -1,6 +1,6 @@
 // Top Shelf: intro card, special-round cards (Steal, Pass the Port, The Last Drop), the summit.
 import { h } from '../../../ui/components.js';
-import { cabinet, disc, skipBtn, say } from './kit.js';
+import { cabinet, shelfRange, disc, skipBtn, say } from './kit.js';
 
 const STEAL_ART = '<svg viewBox="0 0 120 70" aria-hidden="true"><path d="M30 52V22M30 22l-9 9M30 22l9 9" stroke="#FFC86B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M90 18v30M90 48l-9-9M90 48l9-9" stroke="#E2553B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M44 14c10-8 22-8 32 0" stroke="#FBF4EA" stroke-width="3" stroke-dasharray="4 5" fill="none"/><path d="M76 56c-10 8-22 8-32 0" stroke="#FBF4EA" stroke-width="3" stroke-dasharray="4 5" fill="none"/></svg>';
 const PORT_ART = '<svg viewBox="0 0 120 70" aria-hidden="true"><path d="M52 4h16v6H52z" fill="#C89B3C"/><path d="M54 10h12v10c0 3 3 5 7 8 6 4 10 9 10 17 0 13-10 22-23 22S37 58 37 45c0-8 4-13 10-17 4-3 7-5 7-8z" fill="#7A1E2C" stroke="#FBF4EA" stroke-width="2.5"/><path d="M44 44c0-6 3-10 7-13" stroke="rgba(255,255,255,.5)" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M90 40h22M104 32l8 8-8 8" stroke="#FFC86B" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -12,16 +12,16 @@ const intro = {
   shot: 'intro',
   mount({ show }, ctx) {
     const p = ctx.payload;
-    const cab = cabinet(ctx, { top: p.top, size: 'tiny', labels: false });
+    const cab = cabinet(ctx, { top: p.top, size: 'tiny', lo: 0, hi: 4 });
     cab.still(Object.fromEntries(ctx.players.map((x) => [x.id, 0])));
     const steps = [
-      'Answer on your phone. Right climbs a shelf; quick and right climbs two.',
-      'Wrong slips one. Whoever is lowest picks the next category.',
-      'The last question is a bet. Highest bottle wins.',
+      'Right answer: up one shelf.',
+      'Right inside five seconds: up two. Wrong: down one.',
+      'Lowest player picks the next category.',
     ];
     const card = h('div.ts-card',
       h('div.ts-card-title', 'Top Shelf'),
-      h('div.ts-card-lede', ctx.adult ? 'A quiz with altitude. After dark.' : 'A quiz with altitude.'),
+      h('div.ts-card-goal', 'Climb the cabinet.', h('br'), 'Highest bottle wins.'),
       h('div.ts-card-body', cab, h('ol.ts-steps', steps.map((s, i) => h('li', h('span.n', String(i + 1)), h('span', s))))));
     show.append(h('div.ts-dim'), h('div.ts-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(30px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -71,9 +71,10 @@ const summit = {
     const rows = p.rows || [];
     const best = rows[0]?.shelf ?? 0;
     const winners = rows.filter((r) => r.rank === 1);
-    const cab = cabinet(ctx, { top: p.top, size: 'full' });
+    const fin = Object.fromEntries(rows.map((r) => [r.id, r.shelf]));
+    const cab = cabinet(ctx, { top: p.top, size: 'full', ...shelfRange([fin], p.top, 5) });
     const ex = {};
-    for (const r of rows) ex[r.id] = { hot: r.rank === 1, flag: r.rank === 1 ? 'Winner' : '', kind: r.rank === 1 ? 'win' : '' };
+    for (const r of rows) ex[r.id] = { hot: r.rank === 1, lead: r.rank === 1, flag: r.rank === 1 ? 'Winner' : '', kind: r.rank === 1 ? 'win' : '' };
     cab.still(Object.fromEntries(rows.map((r) => [r.id, r.shelf])), ex);
     const names = winners.map((w) => ctx.player(w.id)?.name || '?');
     const title = best >= p.top ? (winners.length > 1 ? 'Sharing the top shelf' : 'On the top shelf') : (winners.length > 1 ? 'Sharing the highest shelf' : 'Highest bottle');

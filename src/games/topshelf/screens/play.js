@@ -2,7 +2,7 @@
 // or bet on the port-holder), port (choose who answers alone), wager (the Last Drop bet).
 import { h, onTap } from '../../../ui/components.js';
 import { ICONS } from '../../../ui/icons.js';
-import { cabinet, catChip, qCard, disc, cat, say, colourOf, LETTERS, CAT_BOTTLE, bottleSvg } from './kit.js';
+import { cabinet, shelfRange, leaders, catChip, qCard, disc, cat, say, colourOf, LETTERS, CAT_BOTTLE, bottleSvg } from './kit.js';
 
 const nameOf = (ctx, id) => ctx.player(id)?.name || 'Someone';
 
@@ -19,8 +19,9 @@ const pick = {
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
     const mePick = p.picker === ctx.meId;
-    const cab = cabinet(ctx, { top: p.top, size: 'mini', labels: false });
-    cab.still(p.shelves, { [p.picker]: { hot: true, flag: 'Picks' }, ...Object.fromEntries(Object.keys(p.shields || {}).map((id) => [id, { shield: true, hot: id === p.picker, flag: id === p.picker ? 'Picks' : '' }])) });
+    const cab = cabinet(ctx, { top: p.top, size: 'mini', ...shelfRange([p.shelves], p.top, 4) });
+    const lead = leaders(p.shelves);
+    cab.still(p.shelves, Object.fromEntries(ctx.players.map((x) => [x.id, { hot: x.id === p.picker, flag: x.id === p.picker ? 'Picks' : '', kind: x.id === p.picker ? 'saved' : '', shield: !!p.shields?.[x.id], lead: lead.has(x.id) }])));
     show.append(h('div.ts-stand', standHead(`Round ${p.round + 1} of ${p.of}`, mePick ? 'You’re lowest, so you choose' : `${nameOf(ctx, p.picker)} is lowest, so they choose`), cab));
     const btns = new Map();
     const choose = (id) => {
@@ -94,11 +95,8 @@ const q = {
     }
 
     // speed meter (normal questions): the fast pour drains over the first five seconds
-    let meter = null;
-    if (p.mode === 'normal' && p.fast) {
-      meter = h('div.ts-pour', h('div.ts-pour-bar', h('i')), h('div.ts-pour-l', h('span.lb'), h('span.you', h('span.ts-mini', { html: bottleSvg(colourOf(ctx.me), ctx.me?.avatar) }), `Shelf ${myShelf}`)));
-    }
-
+    // the fuse: drains over the quick window (two shelves), then over the rest of the clock
+    const meter = h('div.ts-pour', h('div.ts-pour-bar', h('i'), h('span.lb'), h('span.sec')), h('span.ts-pour-you', h('span.ts-mini', { html: bottleSvg(colourOf(ctx.me), ctx.me?.avatar) }), `Shelf ${myShelf}`));
     const opts = p.options.map((t, i) => {
       const b = h('button.ts-opt', { type: 'button', 'data-e2e': `ts-opt-${i}`, disabled: betting },
         h('span.ts-opt-k', LETTERS[i]), h('span.ts-opt-t', t), h('span.ts-opt-tick', { html: ICONS.tick }));
@@ -122,7 +120,7 @@ const q = {
       bets = h('div.ts-betrow', mk(true), mk(false));
     }
     const status = h('div.ts-status');
-    sheet.append(h(`div.ts-sheet.ts-qsheet.ts-in${betting ? '.betting' : ''}`, banner, meter, h(`div.ts-opts${betting ? '.ro' : ''}`, opts), bets, status));
+    sheet.append(h(`div.ts-sheet.ts-qsheet.ts-in${betting ? '.betting' : ''}`, banner, betting ? null : meter, h(`div.ts-opts${betting ? '.ro' : ''}`, opts), bets, status));
 
     if (p.n === 1 || p.mode !== 'normal') ctx.cyril.react(p.mode === 'normal' ? 'smug' : 'drumroll', { duration: ctx.frozen ? 60000 : 1200 });
     const cancel = p.mode === 'normal' ? say(ctx, ctx.line(p.n === 1 ? 'tsQ' : 'tsQ2'), { hold: 2200, compact: true }, 300) : () => {};
@@ -154,18 +152,22 @@ const q = {
       sheet.querySelector('.ts-qsheet')?.classList.toggle('locked', mine !== undefined || c.mine.game.yes !== undefined);
     };
     update(ctx);
-    let lastQuick = null;
+    let lastTxt = '';
     const frame = (c) => {
       card.timer?.set(c.remaining(), c.duration);
-      if (meter) {
-        const k = Math.max(0, 1 - c.elapsed() / p.fast);
-        meter.querySelector('i').style.transform = `scaleX(${k.toFixed(3)})`;
-        const quick = k > 0;
-        if (quick !== lastQuick) {
-          lastQuick = quick;
-          meter.classList.toggle('over', !quick);
-          meter.querySelector('.lb').textContent = quick ? 'Quick answer: two shelves' : 'Right answer: one shelf';
-        }
+      const el = c.elapsed();
+      const quick = p.mode === 'normal' && p.fast && el < p.fast;
+      const k = quick ? 1 - el / p.fast : Math.max(0, c.remaining() / Math.max(1, c.duration - (quick ? 0 : (p.fast || 0))));
+      meter.querySelector('i').style.transform = `scaleX(${Math.min(1, k).toFixed(3)})`;
+      const secs = Math.ceil((quick ? p.fast - el : c.remaining()) / 1000);
+      const lbl = p.mode !== 'normal' ? 'Time left' : quick ? 'Quick: two shelves' : 'Right: one shelf';
+      const txt = `${lbl}|${secs}|${quick}`;
+      if (txt !== lastTxt) {
+        lastTxt = txt;
+        meter.querySelector('.lb').textContent = lbl;
+        meter.querySelector('.sec').textContent = `${Math.max(0, secs)}s`;
+        meter.classList.toggle('quick', !!quick);
+        meter.classList.toggle('late', !quick && c.remaining() < 4000 / (c.phase?.speed || 1));
       }
     };
     frame(ctx);
@@ -180,8 +182,9 @@ const port = {
   shot: 'scores',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const cab = cabinet(ctx, { top: p.top, size: 'mini', labels: false });
-    cab.still(p.shelves);
+    const cab = cabinet(ctx, { top: p.top, size: 'mini', ...shelfRange([p.shelves], p.top, 4) });
+    const lead = leaders(p.shelves);
+    cab.still(p.shelves, Object.fromEntries([...lead].map((id) => [id, { lead: true }])));
     show.append(h('div.ts-stand', standHead('Pass the Port', h('span', 'Next question: ', catChip(p.cat))), cab));
     const others = ctx.players.filter((x) => x.id !== ctx.meId);
     const tiles = new Map();
@@ -221,8 +224,9 @@ const wager = {
   shot: 'scores',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const cab = cabinet(ctx, { top: p.top, size: 'mini', labels: false });
-    cab.still(p.shelves, { [ctx.meId]: { hot: true } });
+    const cab = cabinet(ctx, { top: p.top, size: 'mini', ...shelfRange([p.shelves], p.top, 4) });
+    const lead = leaders(p.shelves);
+    cab.still(p.shelves, Object.fromEntries(ctx.players.map((x) => [x.id, { hot: x.id === ctx.meId, lead: lead.has(x.id) }])));
     show.append(h('div.ts-stand', standHead('The Last Drop', h('span', 'One hard question: ', catChip(p.cat))), cab));
     const s = p.shelves[ctx.meId] ?? 0;
     const btns = [1, 2, 3].map((n) => {
