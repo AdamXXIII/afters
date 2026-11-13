@@ -142,7 +142,7 @@ export class ForeheadHost {
     this.turn = { guesserId, team: this._teamOf(guesserId), modifier: null };
     this.api.enter('forehead-pick', FH.pick, {
       turn: this.turnIndex + 1, of: this.order.length, guesserId, team: this.turn.team, teams: this.teams,
-      decks: this.offer.map(({ id, name, blurb, icon, colour }) => ({ id, name, blurb, icon, colour })),
+      decks: this.offer.map(({ id, name, hint, icon, colour, examples }) => ({ id, name, hint, icon, colour, examples })),
       scores: this._standings(),
     }, {
       progress: () => {
@@ -177,7 +177,7 @@ export class ForeheadHost {
     const rng = this.api.sub('deck');
     const deck = pool[Math.floor(rng() * pool.length)];
     this.usedDecks.add(deck.id);
-    // House rule: picked AFTER the deck so it always fits (no mime on Shout at the Telly).
+    // House rule: picked AFTER the deck so it always fits (no mime on Singalong).
     let modifier = null;
     const fits = MODIFIERS.filter((m) => !(m.not || []).includes(deck.id));
     if (this.turnIndex > 0 && this.lastMod === null && fits.length && rng() < 0.4) modifier = fits[Math.floor(rng() * fits.length)];

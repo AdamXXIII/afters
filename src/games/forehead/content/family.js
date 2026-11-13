@@ -1,173 +1,146 @@
-// Bonce family decks (AI-generated content, Claude, 2026-11-09). 10 decks x 40 cards.
+// Bonce family decks (AI-generated content, Claude, 2026-11-13). 14 decks x 64+ cards.
+// Bar: Heads Up! (one thing everyone in the room knows, describable or actable in seconds).
+// Written for a UK table of 30-somethings. The first three cards of each deck are its examples on
+// the deck picker, so they are the most obvious, most "oh, THAT kind of deck" cards.
+import { deck } from './deck.js';
+
 export const FAMILY_DECKS = [
-  {
-    id: 'films',
-    name: 'Silver Screen',
-    blurb: 'Films you fell asleep in front of',
-    icon: 'film',
-    colour: '#7A1E2C',
-    cards: [
-      'Titanic', 'Jaws', 'Home Alone', 'The Lion King', 'Star Wars',
-      'Jurassic Park', 'Mary Poppins', 'Toy Story', 'Finding Nemo', 'Frozen',
-      'Ghostbusters', 'Back to the Future', 'The Wizard of Oz', 'E.T.', 'Shrek',
-      'Mrs Doubtfire', 'Love Actually', 'Grease', 'Dirty Dancing', 'The Sound of Music',
-      'Harry Potter', 'The Matrix', 'Rocky', 'Paddington', 'Babe',
-      'Chicken Run', 'Notting Hill', 'The Full Monty', 'Pirates of the Caribbean', 'Indiana Jones',
-      'Top Gun', 'King Kong', 'The Italian Job', 'Mamma Mia!', 'Jumanji',
-      'Up', 'The Lord of the Rings', 'Gladiator', 'Free Willy', "Singin' in the Rain",
-    ],
-  },
-  {
-    id: 'roles',
-    name: 'Famous-ish Types',
-    blurb: 'Celebrities, minus the lawyers',
-    icon: 'monocle',
-    colour: '#2F5D7C',
-    cards: [
-      'A grumpy TV chef', 'Weather presenter in a gale', 'Panto dame', 'Football pundit', 'Strict dance judge',
-      'Tearful baking contestant', 'Nature presenter whispering', 'Wildlife documentary voice', 'Shopping channel presenter', 'Darts commentator',
-      'Talent show judge', 'Boy band member', 'Opera singer', 'Cruise ship magician', 'Aerobics instructor',
-      "Kids' TV presenter", 'Breakfast TV host', 'Game show host', 'Tennis umpire', 'Snooker referee',
-      'Horse racing commentator', 'Stunt double', 'Action film hero', 'Ventriloquist', 'Mime artist',
-      'Lollipop lady', 'Antiques expert', 'Influencer filming lunch', 'Holiday rep', 'Air steward safety demo',
-      'Stand-up comedian', 'Living statue', 'Busker', 'Lottery winner', 'Gardening presenter',
-      'Snooty restaurant critic', 'Rock star on stage', 'Red carpet reporter', 'Over-excited quiz host', 'Prima ballerina',
-    ],
-  },
-  {
-    id: 'nostalgia',
-    name: 'Rewind',
-    blurb: 'The 90s and 00s, lovingly dusted off',
-    icon: 'cassette',
-    colour: '#B5527E',
-    cards: [
-      'Tamagotchi', 'Dial-up internet', 'Pogs', 'Turkey Twizzlers', 'Game Boy',
-      'Furby', 'Beanie Babies', 'Slap bracelet', 'Tazos', 'Push Pop',
-      'Sunny D', 'Nokia brick phone', 'Snake on a mobile', 'MSN Messenger', 'Bebo',
-      'Floppy disk', 'Mixtape', 'Walkman', 'Rewinding a VHS', 'Video shop Friday night',
-      'Polly Pocket', 'Crazy Bones', 'Yo-yo craze', 'Razor scooter', 'Slush Puppie',
-      'Frosted tips', 'Butterfly clips', 'Teletext', 'Pokémon cards', 'Disposable camera',
-      'Polyphonic ringtone', 'Sticker album swaps', 'Mr Frosty', 'Crimped hair', 'Dunkaroos',
-      'Buffalo trainers', 'Burning a CD', 'Lava lamp', 'Inflatable chair', 'Dance mat',
-    ],
-  },
-  {
-    id: 'telly',
-    name: 'Shout at the Telly',
-    blurb: 'They cannot hear you. Shout anyway.',
-    icon: 'megaphone',
-    colour: '#E2553B',
-    cards: [
-      "He's behind you!", 'Offside!', 'Just kiss already!', 'Phone a friend!', "Don't open that door!",
-      'Go on, my son!', 'Ref, are you blind?', 'Answer the question!', 'Spoilers!', 'Higher! Higher!',
-      'Cut the red wire!', 'Run, you idiot!', 'Turn around!', "It's raw in the middle!", 'Shoot!',
-      'Penalty!', 'I know him from something!', 'Oh, come on!', 'Get in!', "That's a dive!",
-      "It's Paris, you plank!", "He's the murderer!", "Don't trust her!", 'Bin him off!', 'Turn it up!',
-      "Where's the remote?", "I'd have got that!", 'Easy, that one!', 'Marry him!', 'Look out!',
-      'Get off the stage!', 'Take the money!', 'Hide in the wardrobe!', 'Bring on the sub!', 'Too much fake tan!',
-      "He's not dead!", 'Check the back seat!', 'Never split up the group!', "It's a trap!", "Don't go in the cellar!",
-    ],
-  },
-  {
-    id: 'jobs',
-    name: 'Odd Jobs',
-    blurb: 'Somebody has to do it. Badly.',
-    icon: 'spanner',
-    colour: '#8C5A3C',
-    cards: [
-      'Wedding photographer', 'Lifeguard', 'Air traffic controller', 'Window cleaner', 'Traffic warden',
-      'Parking attendant', 'Lion tamer', 'Bin man', 'Hypnotist', 'Plumber under the sink',
-      'Driving instructor', 'Dentist', 'Bomb disposal expert', 'Tightrope walker', 'Taxidermist',
-      'Beekeeper', 'Chimney sweep', 'Bouncer', 'Fortune teller', 'Puppeteer',
-      'Removal man with a piano', 'Yoga teacher', 'Brain surgeon', 'Weather forecaster', 'Tattoo artist',
-      'Astronaut', 'Sheepdog trainer', 'Shark diver', 'Hairdresser gossiping', 'Lighthouse keeper',
-      'Sheep shearer', 'Archaeologist', 'Sign language interpreter', 'Orchestra conductor', 'Zookeeper',
-      'Night watchman', 'Ice sculptor', 'Crossword setter', 'Professional mourner', 'Personal trainer',
-    ],
-  },
-  {
-    id: 'accents',
-    name: 'Do the Voice',
-    blurb: 'Accents, impressions and no shame at all',
-    icon: 'mask',
-    colour: '#5B6ABF',
-    cards: [
-      'Posh newsreader reads a menu', 'Pirate orders a latte', 'Robot in love', 'Scouse sat-nav', 'Royal opens a chip shop',
-      'Cowboy at a garden centre', 'Yoda orders a kebab', 'Geordie weather forecast', 'Dalek on a first date', 'Dracula orders a pizza',
-      'Commentator at a chess game', 'Thespian reads a Post-it', 'Brummie air traffic control', 'Trailer voice orders chips', 'Toddler gives a lecture',
-      'Sergeant major at a spa', 'Nan leaves a voicemail', 'Cockney estate agent', 'Scottish ghost at a hen do', 'Welsh rugby coach team talk',
-      'Very rude French waiter', 'Texan sells a used car', 'Alien learning English', 'Hypnotist reads the news', 'Teen asked to tidy room',
-      'Yorkshire farmer on Mars', 'Operatic train announcer', 'Baby voice to the dog', 'Gollum at a job interview', 'Smooth radio DJ at 3am',
-      'Auctioneer at a christening', "Kids' presenter dumps you", 'Hostage talk with a cat', 'Aussie surfer does tax', 'Wizard who forgot the spell',
-      'Mafia boss at a bake sale', 'US tourist at Stonehenge', "Bond villain at parents' eve", 'Vicar who loves heavy metal', 'Knight uses a smartphone',
-    ],
-  },
-  {
-    id: 'actout',
-    name: 'Act It Out',
-    blurb: 'No words. Just dignity, briefly lost.',
-    icon: 'theatre',
-    colour: '#3E8E8A',
-    cards: [
-      'Parallel parking', 'Building flat-pack furniture', 'Walking on Lego', 'Wrestling a deckchair', 'Putting on a duvet cover',
-      'Stepping into a cold sea', 'Getting out of a hammock', 'Untangling fairy lights', 'Opening a stuck jar', 'Catching a wasp in a glass',
-      'Searching for your keys', 'Running for the bus', 'Carrying ten shopping bags', 'Stubbing your toe', 'Dancing at a wedding',
-      'Arguing with self-checkout', 'Hiding from a neighbour', 'Changing a nappy', 'Eating very hot pizza', 'Brain freeze',
-      'Tightrope walking', 'Folding a fitted sheet', 'Herding cats', 'Putting up a tent', 'Swatting a fly',
-      'Walking a stroppy dog', 'Air guitar solo', 'Holding in a sneeze', 'Doing the limbo', 'Ironing a shirt',
-      'Taking a selfie', 'Skydiving', 'Carrying a sofa upstairs', 'Paddling a canoe', 'Stuck in a revolving door',
-      'Stepping on a rake', 'Wobbly roller skating', 'Hula hooping', 'Losing at musical chairs', 'Silent disco dancing',
-    ],
-  },
-  {
-    id: 'beasts',
-    name: 'Beastly',
-    blurb: 'Creatures great, small and a bit daft',
-    icon: 'paw',
-    colour: '#7F9A74',
-    cards: [
-      'Flamingo', 'Seagull nicking chips', 'Penguin waddle', 'Sloth', 'Kangaroo',
-      'Gorilla beating its chest', 'Cat knocking over a mug', 'Dog chasing its tail', 'Peacock showing off', 'Crab walking sideways',
-      'Octopus', 'Giraffe', 'Elephant spraying water', 'T. rex with tiny arms', 'Chicken crossing the road',
-      'Snake charmer', 'Frog catching flies', 'Meerkat on lookout', 'Sea lion clapping', 'Hedgehog',
-      'Owl turning its head', 'Pigeon bobbing', 'Lion roaring', 'Monkey grooming', 'Show pony',
-      'Bumblebee', 'Goldfish with no memory', 'Squirrel hiding nuts', 'Ostrich head in sand', 'Duck taking off',
-      'Crocodile', 'Bear catching salmon', 'Camel', 'Spider', 'Shark circling',
-      'Rooster at dawn', 'Excited puppy', 'Sheepdog herding sheep', 'Pelican', 'Hippo yawning',
-    ],
-  },
-  {
-    id: 'christmas',
-    name: "Christmas at Nan's",
-    blurb: 'Paper hats, sprouts and a long nap',
-    icon: 'cracker',
-    colour: '#E0A526',
-    cards: [
-      'Paper crown', 'Brussels sprouts', "The King's speech", 'Charades', 'Boxing Day walk',
-      'Tin of chocolates', 'Pulling a cracker', 'Cracker joke', 'Pigs in blankets', 'Carving the turkey',
-      'Nan asleep in the chair', 'Mince pies', 'Flaming Christmas pudding', 'Tinsel', 'Advent calendar',
-      'Christmas stocking', 'Mistletoe', 'Carol singers', 'Nativity play', 'Snowman',
-      'Wrapping presents', 'Socks as a present', 'Board game row', 'Leftover turkey sandwich', 'Eggnog',
-      'Reindeer', 'Christmas jumper', 'Elf on the shelf', 'Santa stuck in a chimney', 'Sledging',
-      'Bread sauce', 'Christmas number one', 'Panto trip', 'Snow globe', 'Real tree shedding needles',
-      'Kids up at 5am', 'Gravy boat', 'Silent Night', 'Batteries not included', 'Fairy on the tree',
-    ],
-  },
-  {
-    id: 'sportsday',
-    name: 'Sports Day',
-    blurb: 'Glory, grass stains and a dads\' race',
-    icon: 'trophy',
-    colour: '#C89B3C',
-    cards: [
-      'Egg and spoon race', 'Sack race', 'Synchronised swimming', 'Darts', 'Wimbledon',
-      'Three-legged race', 'Tug of war', "Dads' race", 'Hurdles', 'Javelin',
-      'Shot put', 'High jump', 'Long jump', 'Triple jump', 'Relay baton drop',
-      'Penalty shootout', 'Curling', 'Figure skating', 'Snooker', 'Crazy golf',
-      'Cricket', 'Rugby scrum', 'Boxing', 'Weightlifting', 'Rowing',
-      'Fencing', 'Gymnastics', 'Ski jumping', 'Bobsleigh', 'Sumo wrestling',
-      'Horse racing', 'Marathon', 'Bowls', 'Table tennis', 'Archery',
-      'Belly flop', 'Mexican wave', 'Wheelbarrow race', 'Medal ceremony', 'Photo finish',
-    ],
-  },
+  deck('films', 'Blockbusters', 'Films everyone\'s seen', 'film', '#7A1E2C', `
+    Titanic|Jurassic Park|Home Alone|Jaws|The Lion King|Star Wars|Mary Poppins|Toy Story|Finding Nemo|Frozen|
+    Ghostbusters|Back to the Future|The Wizard of Oz|E.T.|Shrek|Mrs Doubtfire|Love Actually|Grease|Dirty Dancing|
+    The Sound of Music|Harry Potter|The Matrix|Rocky|Paddington|Notting Hill|The Full Monty|Pirates of the Caribbean|
+    Indiana Jones|Top Gun|Mamma Mia!|Jumanji|Gladiator|The Lord of the Rings|Bridget Jones's Diary|
+    Four Weddings and a Funeral|Mean Girls|Legally Blonde|Ghost|The Godfather|Forrest Gump|The Shawshank Redemption|
+    Pulp Fiction|Avatar|Barbie|Oppenheimer|The Avengers|Spider-Man|Batman|James Bond|Mission: Impossible|
+    Fast & Furious|Twilight|The Hunger Games|Despicable Me|Up|Inside Out|Monsters, Inc.|The Incredibles|Elf|
+    Bend It Like Beckham|Billy Elliot|Shaun of the Dead|The Greatest Showman|Free Willy|Babe|Chicken Run`),
+
+  deck('telly', 'Telly', 'TV shows from the sofa', 'tv', '#2F5D7C', `
+    EastEnders|Friends|Doctor Who|Coronation Street|The Office|Only Fools and Horses|Gavin & Stacey|
+    Strictly Come Dancing|The Great British Bake Off|Love Island|I'm a Celebrity|Big Brother|The X Factor|
+    Britain's Got Talent|Top Gear|Blue Peter|Match of the Day|Countdown|Deal or No Deal|
+    Who Wants to Be a Millionaire?|The Chase|Pointless|Mastermind|Gladiators|Blind Date|Peep Show|
+    The Inbetweeners|Fawlty Towers|Mr Bean|Blackadder|Downton Abbey|Line of Duty|Peaky Blinders|Sherlock|
+    Game of Thrones|Breaking Bad|The Simpsons|SpongeBob SquarePants|Teletubbies|Neighbours|Home and Away|
+    Hollyoaks|Emmerdale|The Crown|Stranger Things|Squid Game|Bridgerton|Gogglebox|Dragons' Den|The Apprentice|
+    Come Dine with Me|Grand Designs|Antiques Roadshow|Top of the Pops|Saturday Night Takeaway|Taskmaster|
+    Would I Lie to You?|Have I Got News for You|Grange Hill|The Fresh Prince of Bel-Air|Saved by the Bell|
+    The Traitors|Ted Lasso|Tweenies`),
+
+  deck('famous', 'Famous Faces', 'Famous people, alive or not', 'star', '#E0A526', `
+    David Beckham|Taylor Swift|David Attenborough|Gordon Ramsay|Jamie Oliver|Adele|Ed Sheeran|Beyoncé|
+    Elton John|Paul McCartney|Freddie Mercury|Madonna|Michael Jackson|Elvis Presley|Marilyn Monroe|
+    Albert Einstein|William Shakespeare|Winston Churchill|King Charles|Harry Styles|Kylie Minogue|Dolly Parton|
+    Lionel Messi|Cristiano Ronaldo|Marcus Rashford|Usain Bolt|Serena Williams|Andy Murray|Lewis Hamilton|
+    Tom Daley|Tom Cruise|Brad Pitt|Leonardo DiCaprio|Keanu Reeves|Arnold Schwarzenegger|Dwayne Johnson|
+    Daniel Craig|Emma Watson|Daniel Radcliffe|Judi Dench|Kate Winslet|Hugh Grant|Mary Berry|Simon Cowell|
+    Ant and Dec|Graham Norton|Stephen Fry|Peter Kay|Dawn French|Joanna Lumley|Oprah Winfrey|Bill Gates|
+    Steve Jobs|Charles Darwin|Isaac Newton|Leonardo da Vinci|Cleopatra|Henry VIII|Napoleon|Mo Farah|
+    Rihanna|Lady Gaga|Stormzy|Bear Grylls|Joe Wicks|Marie Curie`),
+
+  deck('music', 'Singalong', 'Songs everyone can sing', 'note', '#B5527E', `
+    Bohemian Rhapsody|Happy Birthday|Wonderwall|Mr Brightside|Sweet Caroline|Don't Look Back in Anger|Hey Jude|
+    Yellow Submarine|Let It Go|Wannabe|...Baby One More Time|Livin' on a Prayer|Don't Stop Me Now|I Will Survive|
+    Dancing Queen|YMCA|Macarena|Agadoo|Twinkle Twinkle Little Star|Thriller|Billie Jean|Africa|
+    Total Eclipse of the Heart|I Will Always Love You|My Heart Will Go On|Rolling in the Deep|Someone Like You|
+    Shape of You|Shake It Off|Uptown Funk|Happy|Despacito|Gangnam Style|Single Ladies|Crazy in Love|Umbrella|
+    Toxic|Hey Ya!|Seven Nation Army|Angels|Back for Good|Never Gonna Give You Up|Come On Eileen|
+    I'm Gonna Be (500 Miles)|Sweet Child o' Mine|Smells Like Teen Spirit|Hotel California|Imagine|Yesterday|
+    Stayin' Alive|Rock DJ|Ice Ice Baby|U Can't Touch This|Barbie Girl|Mambo No. 5|Cotton Eye Joe|Tragedy|
+    Last Christmas|All I Want for Christmas Is You|Do They Know It's Christmas?|Three Lions|Jerusalem|
+    Super Trouper|Hips Don't Lie`),
+
+  deck('animals', 'Animals', 'Animals. Do the noise.', 'paw', '#7F9A74', `
+    Elephant|Penguin|Kangaroo|Giraffe|Monkey|Gorilla|Lion|Tiger|Zebra|Hippo|Crocodile|Snake|Frog|Duck|Chicken|
+    Cow|Pig|Sheep|Horse|Donkey|Goat|Dog|Cat|Rabbit|Hamster|Goldfish|Shark|Dolphin|Whale|Octopus|Crab|Lobster|
+    Jellyfish|Seagull|Pigeon|Owl|Parrot|Flamingo|Peacock|Eagle|Bat|Spider|Bee|Butterfly|Snail|Worm|Ant|
+    Mosquito|Squirrel|Hedgehog|Fox|Badger|Deer|Bear|Panda|Koala|Sloth|Camel|Ostrich|Polar bear|Seal|Walrus|
+    Tortoise|Llama|T. rex`),
+
+  deck('actout', 'Act It Out', 'Everyday things to mime', 'theatre', '#3E8E8A', `
+    Brushing your teeth|Walking the dog|Treading on Lego|Riding a horse|Surfing|Skiing|Bowling|Changing a nappy|
+    Ironing a shirt|Doing the washing up|Hoovering|Building a snowman|Making a cup of tea|Eating spaghetti|
+    Blowing up a balloon|Taking a selfie|Milking a cow|Juggling|Riding a bike|Rowing a boat|Fishing|
+    Changing a tyre|Climbing a ladder|Opening a stuck jar|Putting up a tent|Doing yoga|Lifting weights|
+    Playing the drums|Playing the guitar|Conducting an orchestra|Directing traffic|Walking a tightrope|
+    Dancing like a robot|Walking like a zombie|Sneezing|Getting hiccups|Stubbing your toe|Getting brain freeze|
+    Waiting for a bus in the rain|Parallel parking|Swatting a fly|Popping bubble wrap|Wrapping a present|
+    Blowing out birthday candles|Flipping a pancake|Feeding the ducks|Bobbing for apples|Moonwalking|
+    Doing the floss|Paddling in a cold sea|Bungee jumping|Skydiving|Riding a rollercoaster|Hailing a taxi|
+    Texting with one thumb|Peeling a banana|Shaving|Putting on make-up|Bathing a baby|Carrying too much shopping|
+    Building flat-pack furniture|Losing your keys|Bowling a cricket ball|Getting out of a hammock`),
+
+  deck('accents', 'Do the Voice', 'Accents and famous voices', 'mask', '#5B6ABF', `
+    Scouse|Geordie|Darth Vader|Brummie|Cockney|Glaswegian|Welsh|Irish|Yorkshire|Cornish|Posh King's English|
+    Australian|Texan cowboy|New Yorker|Valley girl|French|Italian|German|Russian|South African|Canadian|Swedish|
+    Yoda|Gollum|Homer Simpson|Scooby-Doo|Kermit the Frog|Mickey Mouse|Donald Duck|The Terminator|
+    David Attenborough|Mr Bean|Alan Partridge|A Dalek|A sat nav|A robot|A newsreader|A football commentator|
+    A weather presenter|A pirate|A toddler|A posh estate agent|A train announcer|A radio DJ|A fitness instructor|
+    A hypnotist|A sergeant major|An opera singer|An auctioneer|A monster truck advert|Count Dracula|A witch|
+    The King's Christmas speech|Peppa Pig|Shrek|Donkey from Shrek|Michael Caine|Elvis|Marilyn Monroe|
+    Joey from Friends|Gordon Ramsay|Sean Connery|A golf commentator|A whispering ASMR video`),
+
+  deck('jobs', 'Jobs', 'Jobs people do', 'spanner', '#8C5A3C', `
+    Firefighter|Dentist|Lollipop lady|Doctor|Nurse|Vet|Teacher|Police officer|Paramedic|Builder|Plumber|
+    Electrician|Chef|Waiter|Barista|Bartender|Hairdresser|Postman|Bin collector|Bus driver|Taxi driver|Pilot|
+    Air steward|Astronaut|Scientist|Farmer|Fisherman|Butcher|Baker|Florist|Gardener|Window cleaner|Mechanic|
+    Lifeguard|Footballer|Referee|Judge|Lawyer|Estate agent|Accountant|Journalist|Photographer|
+    Weather presenter|DJ|Magician|Clown|Ballet dancer|Personal trainer|Driving instructor|Traffic warden|
+    Librarian|Archaeologist|Zookeeper|Beekeeper|Tattoo artist|Surgeon|Optician|Pharmacist|Soldier|Spy|
+    Detective|Tour guide|Car salesman|Supermarket cashier|Delivery driver|Influencer`),
+
+  deck('places', 'Places', 'Countries, cities, landmarks', 'globe', '#2F5D7C', `
+    The Eiffel Tower|Australia|Blackpool|France|Spain|Italy|Germany|Greece|America|Japan|China|India|Egypt|
+    Brazil|Mexico|Canada|Ireland|Scotland|Wales|Jamaica|Iceland|Switzerland|Russia|New Zealand|Turkey|Paris|
+    London|New York|Las Vegas|Rome|Venice|Amsterdam|Barcelona|Dublin|Edinburgh|Liverpool|Manchester|Brighton|
+    Hollywood|Dubai|Tokyo|Big Ben|Stonehenge|The Pyramids|The Great Wall of China|The Statue of Liberty|
+    The Leaning Tower of Pisa|Buckingham Palace|The Grand Canyon|Niagara Falls|Mount Everest|The North Pole|
+    The Sahara Desert|The Amazon rainforest|Disneyland|Loch Ness|Benidorm|Ibiza|Hawaii|The Moon|Antarctica|
+    Tower Bridge|The London Eye|Sydney Opera House|The Taj Mahal|Mount Rushmore`),
+
+  deck('sport', 'Sport', 'Sports and big moments', 'ball', '#C89B3C', `
+    Football|Darts|Penalty shootout|Rugby|Cricket|Tennis|Golf|Snooker|Boxing|Wrestling|Swimming|Diving|
+    Gymnastics|Ice skating|Skiing|Snowboarding|Surfing|Skateboarding|Cycling|Formula One|Horse racing|
+    The Grand National|Wimbledon|The Olympics|The World Cup|Marathon|Hurdles|High jump|Long jump|Pole vault|
+    Javelin|Shot put|Relay race|Rowing|Sailing|Fencing|Archery|Badminton|Table tennis|Basketball|Baseball|
+    American football|Ice hockey|Volleyball|Netball|Ten-pin bowling|Crazy golf|Sumo wrestling|Karate|Judo|
+    Synchronised swimming|Curling|Bobsleigh|Rock climbing|Red card|Offside|Hole in one|Slam dunk|Mexican wave|
+    Egg and spoon race|Sack race|Tug of war|Three-legged race|Dodgeball|Parkrun`),
+
+  deck('rewind', 'Rewind', 'Stuff from the 90s and 00s', 'cassette', '#E2553B', `
+    Tamagotchi|Nokia 3310|Spice Girls|Dial-up internet|Pogs|Turkey Twizzlers|Game Boy|Furby|Beanie Babies|
+    Slap bracelet|Tazos|Sunny D|Snake on your phone|MSN Messenger|Bebo|MySpace|Floppy disk|Mixtape|Walkman|
+    Discman|VHS tape|Blockbuster video|Polly Pocket|Crazy Bones|Razor scooter|Slush Puppie|Frosted tips|
+    Butterfly clips|Teletext|Pokémon cards|Disposable camera|Steps|S Club 7|Take That|Westlife|Busted|
+    Britney Spears|Backstreet Boys|Crimped hair|Dunkaroos|Buffalo trainers|Burning a CD|Lava lamp|
+    Inflatable chair|Dance mat|PlayStation|Nintendo 64|Sega Mega Drive|Crash Bandicoot|Super Mario|
+    Sonic the Hedgehog|Tetris|iPod|BlackBerry|Motorola Razr|Rollerblades|Scrunchie|Shell suit|Millennium Bug|
+    Pop Idol|Bucket hat|Yo-yo|Sticker album|Mr Frosty`),
+
+  deck('brands', 'Brands', 'Shops, apps and brands', 'bag', '#E2553B', `
+    McDonald's|IKEA|Greggs|KFC|Nando's|Subway|Starbucks|Costa|Pret|Tesco|Sainsbury's|Asda|Aldi|Lidl|
+    Marks & Spencer|Waitrose|Argos|Primark|Boots|Amazon|Apple|Google|Netflix|Spotify|YouTube|TikTok|Instagram|
+    Facebook|WhatsApp|Uber|Deliveroo|Coca-Cola|Pepsi|Irn-Bru|Ribena|Lucozade|Heinz|Marmite|Walkers|Pringles|
+    Cadbury|Mars bar|KitKat|Haribo|Nutella|Kellogg's|Lego|Nintendo|PlayStation|Nike|Adidas|Ferrari|Mini|
+    Rolex|Ryanair|easyJet|Royal Mail|BBC|Specsavers|Dyson|Duracell|Yorkshire Tea|PG Tips|Domino's`),
+
+  deck('characters', 'Characters', 'Cartoon and film characters', 'monocle', '#5B6ABF', `
+    Mickey Mouse|Peppa Pig|Spider-Man|Darth Vader|Hermione Granger|Sherlock Holmes|James Bond|Batman|Superman|
+    Wonder Woman|The Hulk|Iron Man|Shrek|Buzz Lightyear|Woody|Elsa|Simba|Dory|SpongeBob|Homer Simpson|
+    Bart Simpson|Postman Pat|Bob the Builder|Fireman Sam|Thomas the Tank Engine|Winnie the Pooh|Paddington|
+    Super Mario|Sonic|Pikachu|Lara Croft|Scooby-Doo|Tom and Jerry|Bugs Bunny|Garfield|Snoopy|Kermit the Frog|
+    Miss Piggy|Cookie Monster|Wallace and Gromit|Shaun the Sheep|Dracula|Frankenstein's monster|
+    Father Christmas|The Tooth Fairy|The Easter Bunny|Cinderella|Snow White|Little Red Riding Hood|Peter Pan|
+    Captain Hook|Robin Hood|King Arthur|Willy Wonka|Gollum|Yoda|Jack Sparrow|Indiana Jones|Wednesday Addams|
+    Barbie|The Grinch|Rudolph|Del Boy|David Brent|Mr Blobby`),
+
+  deck('grub', 'Grub', 'Food and drink', 'pie', '#E0A526', `
+    Fish and chips|Full English|Sunday roast|Yorkshire pudding|Bangers and mash|Shepherd's pie|Beans on toast|
+    Cheese on toast|Chip butty|Bacon sandwich|Sausage roll|Pork pie|Scotch egg|Cornish pasty|Toad in the hole|
+    Spaghetti bolognese|Pizza|Lasagne|Chicken tikka masala|Kebab|Burger|Hot dog|Sushi|Tacos|Fajitas|
+    Pot Noodle|Crumpets|Scones|Victoria sponge|Trifle|Jelly and ice cream|Sticky toffee pudding|Apple crumble|
+    Custard|Rice pudding|Christmas pudding|Mince pie|Brussels sprouts|Haggis|Black pudding|Crisp sandwich|
+    Fish finger sandwich|Jaffa Cakes|Custard creams|Hobnobs|Pancakes|Waffles|Porridge|Cornflakes|
+    Boiled egg and soldiers|Prawn cocktail|Cheese board|Fondue|Smoothie|Cup of tea|Hot chocolate|Ice lolly|
+    Ninety-nine with a Flake|Candy floss|Doughnut|Battenberg|Spaghetti hoops|Chicken nuggets|Roast potatoes`),
 ];

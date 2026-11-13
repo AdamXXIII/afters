@@ -63,6 +63,7 @@ export default {
   demos: {
     'forehead-intro': { match: (e) => e.phase.id === 'forehead-intro', me: 'idle', bots: 'idle', t: 2600 },
     'forehead-pick': { match: (e, me) => e.phase.id === 'forehead-pick' && !isGuesser(e, me), me: 'idle', bots: 'some', t: 4200 },
+    'forehead-pick-adult': { adult: true, match: (e, me) => e.phase.id === 'forehead-pick' && !isGuesser(e, me), me: 'idle', bots: 'some', t: 4200 },
     'forehead-pick-guesser': { match: (e, me) => e.phase.id === 'forehead-pick' && isGuesser(e, me), me: 'idle', bots: 'act', t: 4200 },
     'forehead-countdown': { match: (e, me) => e.phase.id === 'forehead-turn' && !isGuesser(e, me), me: 'idle', bots: 'idle', t: 1400 },
     'forehead-turn': {
@@ -121,15 +122,22 @@ export default {
     },
     adult: {
       fhIntro: [
-        ['Bonce! Phone on your forehead. Not anywhere else. I\'ve seen hen dos.', 'Tip down if you got it, up to pass. Sixty seconds of filth.'],
+        ['Bonce! Phone on your forehead, screen out. Yes, you look a twat. Everyone does.', 'Tip down if you got it, up to pass. Sixty seconds. Go on.'],
+        ['Phone on the bonce. Everyone else, shout like the pub\'s on fire.', 'Down for got it, up to pass. Don\'t overthink it. You\'re not capable tonight.'],
       ],
-      fhPick: [['Pick {name}\'s poison. Make it filthy.'], ['Choose {name}\'s deck. Your mother isn\'t watching.']],
-      fhPickMe: [['They\'re choosing your deck. Brace yourself, darling.']],
-      fhMod_mime: [['Mime only. Hands where I can see them. Mostly.']],
-      fhMod_posh: [['Posh voices. Say the rude ones like a duchess.']],
-      fhRecap0: [['Nought. Like a wedding night at a Travelodge.'], ['None. Embarrassing for everyone. Mostly you.']],
-      fhRecapHigh: [['{n}! Steady. You\'ve clearly done this before.']],
-      fhFoul: [['FOUL! Said it out loud. Filthy and illegal.']],
+      fhPick: [['Pick {name}\'s poison. Make it hurt.'], ['Choose {name}\'s deck. Something they\'ll be shit at.']],
+      fhPickMe: [['They\'re choosing your deck. Brace yourself, sunshine.'], ['They\'re picking for you. They don\'t like you. Phone up.']],
+      fhMod_mime: [['Mime only. Not a fucking peep.']],
+      fhMod_oneword: [['One word clues. One. Count it on one finger.']],
+      fhMod_posh: [['Posh voices. Swear like a duchess at a gymkhana.']],
+      fhGo: [['Go on then!'], ['Bonce on! Shout, you bastards!']],
+      fhStreak: [['Three on the bounce! Who are you and what have you done with the idiot?'], ['Hat-trick! Bloody hell.']],
+      fhTimeUp: [['Time! Put the phone down and have a drink.']],
+      fhRecap0: [['Nought. Not one. Absolutely fuck all.'], ['None. Shit for everyone. Mostly you.']],
+      fhRecapLow: [['{n}. Bollocks, but honest bollocks.']],
+      fhRecapHigh: [['{n}! Steady. Somebody check that phone for cheats.'], ['{n}! Fucking hell. Have a crisp.']],
+      fhShout: [['Top shouter: {name}. Lost their voice, gained my respect.']],
+      fhFoul: [['FOUL! You said it. Out loud. You absolute melon.']],
     },
   },
 };

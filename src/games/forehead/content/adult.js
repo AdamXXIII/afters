@@ -1,93 +1,95 @@
-// Bonce Adults 18+ decks (AI-generated content, Claude, 2026-11-09). 6 decks x 40 cards.
+// Bonce Adults 18+ decks (AI-generated content, Claude, 2026-11-13). 7 decks x 64+ cards.
+// Grown-up, never sexual: pub life, hangovers, work, bad decisions, bills, nights out, holidays.
+// The swearing lives in the deck names and Cyril's lines; the cards stay concrete things everyone knows.
+// The first three cards of each deck are its examples on the deck picker.
+import { deck } from './deck.js';
+
 export const ADULT_DECKS = [
-  {
-    id: 'firstdate', name: 'First Date Don\'ts', blurb: 'Say these and you\'re getting the bill', icon: 'heart', colour: '#B5527E',
-    cards: [
-      'My ex would love this', 'Do you want kids? Tonight?', 'I\'ve named our dog already', 'My mum\'s waiting in the car',
-      'Can I borrow a tenner?', 'I\'m sort of still married', 'Is your sister single?', 'I\'ve got a court date Monday',
-      'My therapist says hi', 'You look better online', 'I know where you live', 'Split it? I had water',
-      'I still live with my mum', 'My feet are webbed', 'Shall we skip to the snog?', 'I\'ve booked us a mini break',
-      'You\'ve got your dad\'s nose', 'Selfie for my mum?', 'I\'m only here for the chips', 'My cat will judge you',
-      'Is the loo free? It\'s urgent', 'I\'ve got a rash, it\'s fine', 'What\'s your credit score?', 'I don\'t own a toothbrush',
-      'Fancy a threesome?', 'I sleep in a onesie', 'This is my fifth date today', 'I keep my toenail clippings',
-      'Want to meet my nan?', 'I\'m a bit of a crier', 'Want to see my swords?', 'My ex is sat over there',
-      'I\'m on day release', 'Want to hear me rap?', 'I do my own Botox', 'I\'ve had six already',
-      'I\'ve packed an overnight bag', 'You\'ll do', 'I\'ve stalked your ex', 'Your place or my mum\'s?',
-    ],
-  },
-  {
-    id: 'hendo', name: 'Hen & Stag Do', blurb: 'What happens on tour stays in the group chat', icon: 'tiara', colour: '#E2553B',
-    cards: [
-      'Inflatable willy', 'Pole dancing class', 'Learner plates', 'Pub crawl in a tutu',
-      'Willy straws', 'Sash and tiara', 'Stripper dressed as a cop', 'Cocktail making class',
-      'Mankini on the plane', 'Shaving off his eyebrows', 'Handcuffed to a lamppost', 'Willy-shaped cake',
-      'Mr & Mrs quiz', 'Life drawing a naked man', 'Matching T-shirts', 'List of dares',
-      'Paintball bruises', 'Go-karting', 'Mechanical bull', 'Losing the groom',
-      'Bride-to-be veil', 'Karaoke power ballad', 'Prosecco on the train', 'Butler in the buff',
-      'Hungover brunch', 'Willy pasta', 'Hen party conga', 'Nan joins the shots',
-      'Stag dressed as a nun', 'Strip poker', 'Shot roulette', 'Booze cruise',
-      'Burlesque class', 'Sambuca shots', 'Group chat drama', 'Kitty money',
-      'Blow-up doll', 'Groom\'s baby photos', 'Toyboy waiter', 'Naughty party games',
-    ],
-  },
-  {
-    id: 'innuendo', name: 'Innuendo', blurb: 'Perfectly innocent. Honest, Vicar.', icon: 'banana', colour: '#E0A526',
-    cards: [
-      'Spotted dick', 'Stiff breeze', 'Tossing the salad', 'A nice pair of jugs',
-      'Cock-a-leekie soup', 'Knob of butter', 'Great tits', 'Moist sponge',
-      'Cream horn', 'Polishing the knob', 'Stuffing the turkey', 'Oiling the hinges',
-      'Trimming the bush', 'Hole in one', 'Beaver dam', 'Pussy willow',
-      'Shuttlecock', 'Hot cross buns', 'Fluffing the pillows', 'Whipping cream',
-      'Laying the pipes', 'Pole vault', 'Ballcock', 'Dickie bow',
-      'Fanny pack', 'Blowing the whistle', 'Cracking the nuts', 'Hardwood floor',
-      'Giant sausage roll', 'Coming from behind', 'Sword swallower', 'Bangers and mash',
-      'Stroking the pussycat', 'Woodpecker', 'Nice firm melons', 'Rubbing the lamp',
-      'Pumping iron', 'Juicy plums', 'Playing the organ', 'Back door\'s a bit stiff',
-    ],
-  },
-  {
-    id: 'aftermidnight', name: 'After Midnight', blurb: 'The bits you\'ll deny at brunch', icon: 'moon', colour: '#2F5D7C',
-    cards: [
-      'Kebab shop queue', 'Walk of shame', 'Drunk text to your ex', 'Losing a shoe',
-      'Crying in the toilets', 'Last orders', 'Snogging a stranger', 'Cheesy chips at 3am',
-      'Asleep on the night bus', 'Missed your stop', 'Weeing in a bush', 'Bouncer says no',
-      'Phone on 1%', 'Taxi surge pricing', 'Locked out, no keys', 'Sleeping in the bath',
-      'Dancing on a table', 'Fighting a seagull', 'Tequila shots', 'Hugging the toilet',
-      'Ringing your mum at 2am', 'Doing the worm', 'Fry-up at dawn', 'Sticky dancefloor',
-      'Stolen traffic cone', 'Afters at a stranger\'s', 'Spilt pint down yourself', 'Waking up in a hedge',
-      'Drunk online shopping', 'I love you, mate', 'Holding her hair back', 'Glitter everywhere',
-      'Lost the group', 'Accidental tattoo', 'Heels in your hand', 'Shouting at pigeons',
-      'Proposing to a bouncer', 'Smoking area best mate', 'Pizza in bed at 4am', 'Who\'s got my coat?',
-    ],
-  },
-  {
-    id: 'saucytelly', name: 'Saucy Acting', blurb: 'Act it out. Fully committed. No shame.', icon: 'lips', colour: '#7A1E2C',
-    cards: [
-      'Steamy shower scene', 'Bodice ripper', 'Lap dance for a plant', 'Sexy fireman calendar',
-      'Slow-mo beach run', 'Striptease in a duffel coat', 'Romance novel cover pose', 'Seductive pizza delivery',
-      'Sexy plumber arrives', 'Smouldering pottery class', 'Feeding grapes to a lover', 'Rolling in the hay',
-      'Ravished by a pirate', 'Seducing the butler', 'Saucy French maid', 'Sultry tango with a rose',
-      'Whipped cream bikini', 'Sexy car wash', 'The big dance lift', 'Seductive glove removal',
-      'Bubble bath with a rose', 'Pouty underwear advert', 'Emerging from a lake', 'Sexy vampire bite',
-      'Ripping open his shirt', 'Kissing in the rain', 'Oiling a bodybuilder', 'Snogging a mirror',
-      'Sexy librarian', 'Seductive eyebrow dance', 'Twerking in a kilt', 'Sensual massage',
-      'Lying sexily on a piano', 'Saucy postman', 'Sexy lumberjack', 'Seductive banana eating',
-      'Licking an ice lolly', 'Bedroom eyes', 'Jelly wrestling', 'Dropping the towel',
-    ],
-  },
-  {
-    id: 'bedroom', name: 'Closed Doors', blurb: 'What really goes on under the duvet', icon: 'cocktail', colour: '#3E8E8A',
-    cards: [
-      'Fluffy handcuffs', 'Pretending to be asleep', 'Morning breath', 'Snoring partner',
-      'Duvet hogging', 'Cold feet on your back', 'Leg cramp mid-action', 'Dutch oven',
-      'Creaky bed', 'Walls too thin', 'Neighbours bang on the wall', 'The dog is watching',
-      'Edible knickers', 'Massage oil spill', 'Candles everywhere', 'Role play gone wrong',
-      'Choosing a safe word', 'Not tonight, headache', 'Big spoon', 'Fake orgasm at a wedding',
-      'Lingerie with tags on', 'Barry White on repeat', 'Bedside drawer secrets', 'Nipple tassels',
-      'Matching pyjamas', 'Rose petals on the bed', 'Back went mid-romp', 'One sock left on',
-      'Bra that won\'t unhook', 'Sexy text sent to Mum', 'Quickie before guests', 'Feather tickler',
-      'Squeaky blow-up mattress', 'Love bites', 'Bath too small for two', 'Sleep talking',
-      'Lights off, please', 'Assembling a sex swing', 'Batteries ran out', 'Wobbly headboard',
-    ],
-  },
+  deck('pub', 'Pub Bollocks', 'Things down the pub', 'pint', '#8C5A3C', `
+    Pork scratchings|Pub quiz|Last orders|Fruit machine|Pool table|Dartboard|Jukebox|Dry roasted peanuts|
+    Pint of Guinness|Snakebite|Jägerbomb|Sambuca|Pint of bitter|Lager top|Shandy|Gin and tonic|Rosé|Prosecco|
+    Tray of shots|Your round|Lock-in|Beer garden|Smoking area|Sticky carpet|Karaoke night|Open mic night|
+    Wetherspoons|Landlord|Bouncer|Happy hour|Two-for-one cocktails|Pub dog|Football on the big screen|
+    Bar tab|Kitty|Card declined|Bar stool|Crisp packet split open|Steak night|Curry club|Bell for last orders|
+    Beer mat|Pickled egg|Scampi Fries|Ploughman's lunch|Real ale|Craft IPA|Cider|Old boy at the bar|
+    Pub toilets|Pub crawl|Pub golf|Ring of Fire|Beer pong|Aperol Spritz|Espresso martini|Vodka Red Bull|
+    Tequila slammer|Baby Guinness|Quiz machine|Meat raffle|Darts on the telly|Sunday roast at the pub|
+    Designated driver|Lost the quiz by one point`),
+
+  deck('hangover', 'Hungover as Fuck', 'The grim morning after', 'fizz', '#7A1E2C', `
+    Paracetamol|Full English|Pint of water|Berocca|Bacon sandwich|Lucozade|Irn-Bru|Dioralyte|
+    McDonald's breakfast|Greasy spoon cafe|Sunglasses indoors|Hair of the dog|Bloody Mary|Duvet day|
+    Calling in sick|Scrolling your sent messages|Checking your bank balance|The fear|Pounding headache|
+    Bathroom floor nap|Kebab in the bed|Waking up on the sofa|Phone on 1%|Lost your keys|
+    Lost your coat|Mystery bruise|Stamp on your hand|Taxi receipt|Never drinking again|Netflix all day|
+    Takeaway pizza|Hangover nap|Cold shower|Sunday scaries|Dry January|Sober October|Pot Noodle|Cheesy chips|
+    Hash browns|Full-fat Coke|Bloodshot eyes|Crisps for breakfast|Bucket by the bed|Sorry in the group chat|
+    Group chat photos|Missing brunch|Dodgy tummy|Sweating vodka|Ice pack on your head|Fry-up|Banana|
+    Dry toast|Curtains shut all day|Can't look at wine|Your mate still drunk|Chips and gravy|
+    Slept in your make-up|Slept in your jeans|Shower sitting down|Wearing yesterday's clothes|
+    Cold kebab for breakfast|Lying very still|Hangxiety|Cancelling plans|Bin bag of bottles|
+    Who took my phone charger?`),
+
+  deck('work', 'Fucking Work', 'Office life, the shit bits', 'briefcase', '#2F5D7C', `
+    Reply all|You're on mute|Secret Santa|Team building day|Zoom call|Fire drill|Out of office|
+    Performance review|Office Christmas party|Hot desking|Printer jam|Stapler|Spreadsheet|PowerPoint|
+    Microsoft Teams|Monday morning meeting|Pointless meeting|Leaving card|Leaving drinks|
+    Birthday cake in the kitchen|Someone stole my lunch|Passive-aggressive Post-it|Tea round|Coffee machine|
+    Lanyard|Payday|Expenses|Overtime|Commute|Rush hour|Train cancelled|Working from home|
+    Pyjamas on a video call|Sick day|Annual leave|Bank holiday|Pay rise|Promotion|Getting sacked|
+    Redundancy|Job interview|CV|LinkedIn|Boss|Middle manager|Intern|HR|IT support|Turn it off and on again|
+    Password expired|Open-plan office|Swivel chair|Fire warden|Pension|P45|Payslip|Clocking in|Friday drinks|
+    Office gossip|Hi-vis vest|Desk plant|Sad desk lunch|Email at 11pm|Two weeks' notice|Awkward lift chat|
+    Laughing at the boss's joke`),
+
+  deck('decisions', 'Shit Decisions', 'Things you\'ll regret', 'dice', '#E2553B', `
+    Texting your ex|Cutting your own fringe|Tattoo of a name|Drunk online shopping|Payday loan|Timeshare|
+    Impulse puppy|One more tequila|Quitting by email|Buying crypto|School night out|Christmas Eve shopping|
+    Home hair bleach|Buying a boat|January gym membership|Marathon, no training|Petrol station sushi|
+    Hottest chilli challenge|3am takeaway|Drunk holiday booking|Going out for one|Snoozing the alarm|
+    Lending your mate money|Lending your mate your car|Getting back with your ex|Moving in after a week|
+    Speed camera|Parking in the boss's space|Accumulator bet|Binning your Pokémon cards|Midlife crisis car|
+    Learning the bagpipes|Being best man|Helping a mate move|Camping in Wales|Flat-pack, no instructions|
+    DIY electrics|Climbing on the roof|Ignoring the engine light|Hand luggage for two weeks|
+    Wearing white to a wedding|Pet snake|Hot tub|DJing at forty|Starting a podcast|Buying a Peloton|
+    Solo karaoke|Group holiday|Arguing online|Mystery meat|Starting a band|Dyeing your own eyebrows|
+    Running in heels|Buying an e-scooter|Fourth slice of cake|Telling the boss what you think|
+    Second-hand mattress|IKEA on a Saturday|Selling your mate your car|Reply all|Sixth espresso martini|
+    Fancy dress as a banana|Sky-high heels|Shots before the wedding speech|Leaving the hob on`),
+
+  deck('adulting', 'Grown-Up Crap', 'Bills, bins and boilers', 'house', '#7F9A74', `
+    Council tax|Bin day|Boiler breaking|Mortgage|Rent|Deposit|Landlord|Recycling|Leaking roof|Damp|Mould|IKEA|
+    Flat-pack wardrobe|Allen key|Washing machine|Dishwasher|Ironing pile|Tax return|Pension|Credit score|
+    Overdraft|Direct debit|Car insurance|MOT|Petrol prices|Energy bill|Smart meter|TV licence|Broadband down|
+    Calling customer service|Hold music|Parents' evening|School run|Nappies|Childcare costs|
+    Doctor's appointment at 8am|Prescription|Wedding invite|Wedding gift list|Christening|Baby shower|
+    Dinner party|Book club|Garden centre|B&Q|Lawnmower|Nosy neighbour|Parking permit|Pothole|
+    Group holiday planning|Budget spreadsheet|Meal prep|The big shop|Tupperware drawer|Bag of bags|Junk drawer|
+    Fridge clear-out|Defrosting the freezer|Changing a duvet cover|Changing a light bulb|Putting up shelves|
+    Painting the hallway|Bleeding the radiators|Dentist bill|Waiting in for a delivery|Bulk-buying loo roll|
+    Sorting the loft`),
+
+  deck('nightout', 'Big Night Out', 'Out out, start to chips', 'cocktail', '#B5527E', `
+    Pre-drinks|Kebab shop|Queue outside the club|Getting ready playlist|Taxi rank|Uber surge pricing|ID check|
+    Bouncer|Cloakroom ticket|Sticky dancefloor|DJ booth|Smoking area|Strobe lights|Foam party|Silent disco|
+    Glow sticks|Sambuca shots|Shots tray|VIP area|Dancing on a podium|Losing your mates|Losing your phone|
+    Heels in your hand|Chippy|Cheesy chips|Night bus|Walking home in the rain|Missed the last train|Drunk text|
+    Crying in the toilets|New best mate in the toilets|Hen do|Stag do|Karaoke bar|Cocktail bar|
+    Fancy dress party|Mr Brightside|Lights up at 3am|After party|Spilt drink down your top|Glitter|Cash machine|
+    Wristband|Dance-off|Doing the worm|Conga|Dad dancing|Bar staff ignoring you|Waving a tenner at the bar|
+    Fishbowl cocktail|Pitcher|Vodka and Coke|McDonald's at 2am|Burger van|Pizza slice|Club mirror selfie|
+    Sore feet|Cocktail umbrella|Birthday sash|Group photo|Where's my coat?|Tequila|Shoes off on the walk home|
+    Fight over the aux cable|Booking the taxi home`),
+
+  deck('holiday', 'Holiday Hell', 'Holidays gone wrong', 'suitcase', '#3E8E8A', `
+    Delayed flight|Sunburn|Lost luggage|Ryanair|easyJet|Hand luggage only|Passport control|Airport security|
+    Liquids in a plastic bag|Duty free|Pint at the airport at 6am|Neck pillow|Window seat|Middle seat|
+    Crying baby on the plane|Seat kicker|Turbulence|Clapping when the plane lands|All-inclusive|Wristband|
+    Towel on a sunbed|Aftersun|Factor 50|Lilo|Pedalo|Banana boat|Jet ski|Waterpark|Pool bar|Hotel buffet|
+    Full English abroad|Benidorm|Magaluf|Tenerife|Butlin's|Center Parcs|Caravan holiday|Camping in the rain|
+    Tent pegs|Wasps|Mosquito bites|Food poisoning|Travel insurance|Phrasebook|Speaking English loudly|
+    Welcome meeting with the rep|Timeshare salesman|Souvenir sombrero|Sangria|Booking.com|Airbnb|Hire car|
+    Driving on the right|Coach transfer|Late check-out|Fire alarm at 3am|Lads' holiday|Girls' holiday|
+    Hotel karaoke|Kids' club|Mini disco|Flip-flops|Socks and sandals|Bum bag|Currency exchange|
+    Overweight suitcase|Gate change|Running for the gate|Passport out of date`),
 ];

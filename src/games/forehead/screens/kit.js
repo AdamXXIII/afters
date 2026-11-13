@@ -26,6 +26,18 @@ export const DECK_ICONS = {
   banana: s('<path d="M10 14c-2 14 8 26 26 24 3 0 5-2 4-4-14 2-22-6-24-18"/><path d="M10 14l-2-5 6 2"/><path d="M17 22c3 7 9 11 17 12" stroke-width="1.8"/>'),
   moon: s('<path d="M30 7a17 17 0 1 0 11 27A14 14 0 0 1 30 7z"/><path d="M34 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="currentColor" stroke-width="1"/>'),
   lips: s('<path d="M5 24c6-8 11-11 15-9 2 1 3 1 4 0 1 1 2 1 4 0 4-2 9 1 15 9-5 8-11 12-19 12S10 32 5 24z"/><path d="M5 24c8 2 30 2 38 0"/>'),
+  tv: s('<rect x="6" y="13" width="36" height="24" rx="4"/><path d="M17 5l7 8 7-8M17 42h14"/><path d="M12 19c2-1 4-1 6 0" stroke-width="1.8"/>'),
+  star: s('<path d="M24 6l4.4 11.9 12.7.5-10 7.9 3.5 12.3L24 31.5l-10.6 7.1 3.5-12.3-10-7.9 12.7-.5z"/>'),
+  note: s('<path d="M18 34V11l20-5v23"/><ellipse cx="13" cy="34" rx="5.5" ry="4.5" fill="currentColor"/><ellipse cx="33" cy="29" rx="5.5" ry="4.5" fill="currentColor"/><path d="M18 17l20-5" stroke-width="1.8"/>'),
+  globe: s('<circle cx="24" cy="24" r="17"/><ellipse cx="24" cy="24" rx="7" ry="17"/><path d="M7 24h34M10 15h28M10 33h28"/>'),
+  ball: s('<circle cx="24" cy="24" r="17"/><path d="M24 17l6.5 4.7-2.5 7.6h-8l-2.5-7.6z" fill="currentColor"/><path d="M24 17V7M30.5 21.7l9.5-3M28 29.3l5.5 8.5M20 29.3l-5.5 8.5M17.5 21.7 8 18.7"/>'),
+  bag: s('<path d="M10 16h28l-2 25H12z"/><path d="M18 20v-7a6 6 0 0 1 12 0v7"/>'),
+  pint: s('<path d="M13 9h22l-3 31H16z"/><path d="M13 15c4-3 7 2 11-1s7 2 11-1"/><circle cx="21" cy="26" r="1.4" fill="currentColor"/><circle cx="27" cy="31" r="1.4" fill="currentColor"/><circle cx="24" cy="21" r="1.4" fill="currentColor"/>'),
+  fizz: s('<path d="M13 14h22l-3 27H16z"/><path d="M14 22h20"/><circle cx="21" cy="30" r="1.6" fill="currentColor"/><circle cx="27" cy="34" r="1.6" fill="currentColor"/><circle cx="25" cy="27" r="1.6" fill="currentColor"/><path d="M20 9l1-3M28 9l-1-3M24 8V4" stroke-width="1.8"/>'),
+  briefcase: s('<rect x="6" y="15" width="36" height="24" rx="4"/><path d="M18 15v-4h12v4M6 25h36"/><rect x="21" y="22" width="6" height="6" rx="1.5"/>'),
+  dice: s('<rect x="8" y="8" width="32" height="32" rx="7"/><circle cx="16" cy="16" r="2.6" fill="currentColor"/><circle cx="32" cy="16" r="2.6" fill="currentColor"/><circle cx="24" cy="24" r="2.6" fill="currentColor"/><circle cx="16" cy="32" r="2.6" fill="currentColor"/><circle cx="32" cy="32" r="2.6" fill="currentColor"/>'),
+  house: s('<path d="M7 23 24 9l17 14"/><path d="M12 19v21h24V19"/><path d="M20 40V29h8v11"/><path d="M33 12v-4h4v8"/>'),
+  suitcase: s('<rect x="8" y="14" width="32" height="24" rx="4"/><path d="M19 14v-4h10v4M16 14v24M32 14v24"/><circle cx="14" cy="41" r="2" fill="currentColor"/><circle cx="34" cy="41" r="2" fill="currentColor"/>'),
   cocktail: s('<path d="M8 9h32L24 27z"/><path d="M24 27v13M16 41h16"/><path d="M30 9l6-6" /><circle cx="37" cy="4" r="2" fill="currentColor"/><path d="M14 15h20" stroke-width="1.8"/>'),
 };
 

@@ -626,3 +626,27 @@ body[data-screen="forehead-intro"] #show, body[data-screen="forehead-pick"] #sho
   .fh-rc-pile .fh-rc-tile .fh-rc-txt { font-size: 15px !important; line-height: 17px !important; }
   .fh-plate { height: min(100%, 330px); }
 }
+
+/* ------------------------------------------------------------------ fix round: the deck says what's in it */
+/* Hint line + three example cards (the deck's first three) fanned out of the tile, like a peek at the pack. */
+.fh-pk-fan .fh-pk-tile { height: auto; min-height: 300px; padding: 12px 8px 22px; gap: 8px; }
+.fh-pk-fan .fh-pk-face { gap: 8px; width: 100%; }
+.fh-pk-fan .fh-pk-icon { width: 58px; height: 58px; margin-top: 2px; }
+.fh-pk-fan .fh-pk-icon svg { width: 42px; height: 42px; }
+.fh-pk-fan .fh-pk-txt { gap: 5px; }
+.fh-pk-fan .fh-pk-txt b { font-size: 21px; line-height: 22px; text-wrap: balance; }
+.fh-pk-fan .fh-pk-txt small { font: 650 12.5px/15px var(--f-ui); opacity: 1; color: var(--c-linen); text-wrap: pretty; }
+.fh-pk-tile.light .fh-pk-txt small { color: var(--c-ink); }
+.fh-pk-ex { display: flex; flex-direction: column; align-items: stretch; gap: 5px; width: 100%; margin-top: 2px; }
+.fh-pk-ex span {
+  display: block; padding: 6px 6px 7px; border-radius: 8px; background: var(--c-linen); color: var(--c-ink);
+  font: 700 13px/15px var(--f-ui); text-align: center; text-wrap: balance; overflow-wrap: anywhere;
+  box-shadow: 0 2px 0 rgba(42,26,23,.28), 0 4px 8px rgba(20,8,6,.18);
+}
+.fh-pk-ex span:nth-child(1) { rotate: -2deg; }
+.fh-pk-ex span:nth-child(2) { rotate: 1.5deg; }
+.fh-pk-ex span:nth-child(3) { rotate: -1deg; }
+.fh-pk-tile.on .fh-pk-ex span { box-shadow: 0 2px 0 rgba(42,26,23,.28), 0 0 0 2px var(--c-candle); }
+.fh-pk-fan .fh-pk-tile { margin: 0 -3px; width: 126px; max-width: 126px; min-height: 320px; }
+.fh-pk-fan .fh-pk-txt b { font-size: clamp(16px, 4.9vw, 20px); line-height: 1.1; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.fh-pk-fan .fh-pk-txt small { font-size: 13px; line-height: 16px; }

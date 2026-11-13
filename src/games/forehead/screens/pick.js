@@ -4,6 +4,12 @@ import './forehead.css';
 import { h, button, timerRing } from '../../../ui/components.js';
 import { deckIcon, disc, teamOf, TEAMS, armGuesser, HEAD_SVG, CYRIL_BADGE } from './kit.js';
 
+// Mid-bright deck colours (mustard, brass, sage, teal, tomato) take ink for small text, dark ones linen.
+const lightDeck = (hex) => {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2] > 0.18;
+};
+
 export default {
   id: 'forehead-pick',
   layout: 'show',
@@ -27,8 +33,11 @@ export default {
 
     const tiles = p.decks.map((d, i) => {
       const votes = h('span.fh-pk-votes');
-      const tile = h(`${canVote ? 'button' : 'div'}.fh-pk-tile`, { type: canVote ? 'button' : undefined, 'data-e2e': canVote ? 'fh-deck' : undefined, style: { '--dc': d.colour, '--i': i } },
-        h('span.fh-pk-face', h('i.fh-pk-icon', { html: deckIcon(d.icon) }), h('span.fh-pk-txt', h('b', d.name))),
+      const tile = h(`${canVote ? 'button' : 'div'}.fh-pk-tile`, { type: canVote ? 'button' : undefined, 'data-e2e': canVote ? 'fh-deck' : undefined, style: { '--dc': d.colour, '--i': i }, class: lightDeck(d.colour) ? 'light' : undefined },
+        h('span.fh-pk-face',
+          h('i.fh-pk-icon', { html: deckIcon(d.icon) }),
+          h('span.fh-pk-txt', h('b', d.name), d.hint ? h('small', d.hint) : null),
+          d.examples?.length ? h('span.fh-pk-ex', d.examples.map((e) => h('span', e))) : null),
         h('span.fh-pk-back', h('b', '?'), h('small', 'Bonce')),
         votes);
       tile.votes = votes;
