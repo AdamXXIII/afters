@@ -66,6 +66,9 @@
 @keyframes rtSlamBar { 0% { opacity: 0; transform: scaleY(.2); } 12% { opacity: 1; transform: none; } 80% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes rtSlamText { 0% { transform: scale(2.2) rotate(-4deg); opacity: 0; } 18% { transform: scale(1) rotate(-2deg); opacity: 1; } 80% { transform: scale(1.04) rotate(-2deg); opacity: 1; } 100% { transform: scale(.9) rotate(-2deg); opacity: 0; } }
 
+.rt-slam.hold, .rt-slam.hold span { animation: none; }
+.rt-slam.hold span { transform: rotate(-2deg); }
+
 /* ---------- the sheet ---------- */
 .rt-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; padding: 18px calc(var(--safe-r) + 18px) max(16px, var(--safe-b)) calc(var(--safe-l) + 18px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
 .rt-sheet::-webkit-scrollbar { display: none; }

@@ -68,6 +68,7 @@ const myturn = {
     // a one-second "Your turn!" slam across the table, then it gets out of the way
     if (!ctx.frozen || ctx.elapsed() < 1400) {
       const slam = h('div.rt-slam', { 'aria-hidden': 'true' }, h('span', p.turnsLeft > 1 ? 'Your turn ×2' : 'Your turn!'));
+      if (ctx.frozen) slam.classList.add('hold');
       document.body.append(slam);
       setTimeout(() => slam.remove(), ctx.frozen ? 60000 : 1500);
     }
@@ -222,7 +223,7 @@ const play = {
     top(show, ctx, { who: last.by, label, sub, timer: false, line: null });
     const at = first.target ? h('div.rt-at', 'on ', disc(ctx, first.target, { size: 26 }), h('b', isMe(ctx, first.target) ? 'you' : ownName(ctx, first.target))) : null;
     const plateNext = first.k === 'plate' ? p.alive[(p.alive.indexOf(p.turn) + 1) % p.alive.length] : null;
-    const effect = first.k === 'plate' ? `${isMe(ctx, plateNext) ? 'You' : ownName(ctx, plateNext)} would take two turns.` : null;
+    const effect = first.k === 'plate' && !p.cancelled ? `${isMe(ctx, plateNext) ? 'You' : ownName(ctx, plateNext)} would take two turns.` : null;
     const stack = h('div.rt-stack',
       cardFace(ctx, first, { size: 'big', cls: '.played' }),
       ...chain.slice(1).map((x, i) => {
