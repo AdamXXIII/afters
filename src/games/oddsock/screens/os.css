@@ -29,7 +29,7 @@
 .os-tape::before { top: 6px; }
 .os-tape::after { bottom: 6px; }
 .os-tape-l { font: 700 13px/16px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--c-toffee); }
-.os-tape-w { font-family: var(--f-display); font-weight: 800; color: var(--c-claret); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 144; letter-spacing: -0.01em; overflow-wrap: anywhere; text-wrap: balance; }
+.os-tape-w { font-family: var(--f-display); font-weight: 800; color: var(--c-claret); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 144; letter-spacing: -0.01em; overflow-wrap: break-word; hyphens: manual; text-wrap: balance; }
 .os-tape.big { align-self: stretch; padding: 22px 22px 24px; transform: rotate(-1.2deg); }
 .os-tape.big .os-tape-w { font-size: 54px; line-height: 56px; }
 .os-tape.big.long .os-tape-w { font-size: 42px; line-height: 46px; }
@@ -103,6 +103,7 @@
 .os-say-s b { color: var(--c-claret); }
 .os-next { text-align: center; font-size: 17px; line-height: 22px; color: var(--c-toffee); }
 .os-next b { color: var(--c-ink); }
+.os-nudge { margin-top: auto; }
 .os-ghost { align-self: center; min-height: 48px; padding: 0 16px; border: 0; background: none; color: var(--c-toffee); font: 650 15px var(--f-ui); text-decoration: underline; text-underline-offset: 3px; margin-top: auto; }
 
 /* vote */

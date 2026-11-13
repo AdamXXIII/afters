@@ -44,7 +44,7 @@ export function sockSvg({ body = '#3E8E8A', accent = '#FBF4EA', pattern = 'strip
 /** The secret word as a woven name tape. size: 'big' | 'small'. */
 export function nameTape(word, { size = 'big', label = 'Your word', cls = '' } = {}) {
   const len = String(word || '').length;
-  return h(`div.os-tape.${size}${cls}${len > 12 ? '.long' : ''}${len > 18 ? '.xlong' : ''}`,
+  return h(`div.os-tape.${size}${cls}${len > (size === 'big' ? 12 : 9) ? '.long' : ''}${len > (size === 'big' ? 18 : 14) ? '.xlong' : ''}`,
     label ? h('span.os-tape-l', label) : null,
     h('span.os-tape-w', word || '?'));
 }
@@ -76,7 +76,7 @@ export function washingLine(ctx, { order, turn = -1, lap = 1, laps = 1 } = {}) {
       h('span.nm', you(ctx, id)));
   });
   return h('div.os-line-wrap',
-    laps > 1 ? h('div.os-lap', `Lap ${lap} of ${laps}`) : null,
+    laps > 1 ? h('div.os-lap', `Clues: lap ${lap} of ${laps}`) : null,
     h('div.os-washing', { style: { '--n': n } }, h('span.os-rope'), h('div.os-pegs', items)));
 }
 

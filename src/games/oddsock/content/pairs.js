@@ -57,7 +57,7 @@ Television|Laptop
 Phone|Tablet
 Umbrella|Raincoat
 Scarf|Tie
-Gloves|Mittens
+Gloves|Bobble hat
 Wellies|Trainers
 Slippers|Flip-flops
 Sunglasses|Goggles
@@ -183,7 +183,7 @@ Wedding dress|Ballgown
 Earrings|Necklace
 Glasses|Contact lenses
 Roundabout|Traffic lights
-Car park|Multi-storey
+Car park|Bus station
 Petrol station|Car wash
 Hotel|B&B
 School|University
@@ -203,7 +203,7 @@ Lighthouse|Windmill
 Castle|Palace
 Bridge|Pier
 Igloo|Treehouse
-Statue|Scarecrow
+Statue|Waxwork
 Hot air balloon|Parachute
 Submarine|Speedboat
 Quad bike|Go-kart
@@ -228,148 +228,151 @@ Wheelchair|Crutches
 
 const ADULT = `
 Hangover|Jet lag
-Payday|Pension
+Pay rise|Bonus
 Mortgage|Rent
 Overdraft|Credit card
-Tax return|Parking fine
+Parking fine|Speeding ticket
 Divorce|Breakup
 Stag do|Hen do
 Night out|House party
-Pub quiz|Karaoke night
-Taxi queue|Night bus
+Pub quiz|Bingo night
+Taxi|Night bus
 Group chat|Email chain
 Zoom call|Team meeting
 Office Christmas party|Wedding reception
 Appraisal|Job interview
-Boss|Landlord
+Boss|Head teacher
 Redundancy|Resignation
 Monday morning|Sunday night
 Commute|School run
 In-laws|Neighbours
-Parents' evening|Job interview
-Funeral|Christening
+Parents' evening|School play
+Funeral|Wake
 Will|Prenup
 Midlife crisis|Retirement
 Sports car|Motorbike
 Tattoo|Piercing
-Speeding ticket|Parking ticket
-Breathalyser|Lie detector
 Casino|Bookies
 Lottery ticket|Scratchcard
 Poker|Blackjack
 Payday loan|Pawn shop
 Bailiff|Debt collector
 IKEA|B&Q
-Sunburn|Hangover
+Sunburn|Heatstroke
 Lads' holiday|Girls' trip
 Ibiza|Magaluf
-Benidorm|Blackpool
+Benidorm|Tenerife
 Cruise|All-inclusive
 Airport lounge|Duty free
 Hand luggage|Hold luggage
 Delayed flight|Cancelled train
-Rail replacement bus|Night bus
-Smart meter|Boiler
-Boiler|Damp
+Rail replacement bus|Coach trip
+Smart meter|Thermostat
+Boiler|Radiator
 Estate agent|Car salesman
 Council tax|TV licence
 HMRC|DVLA
 Jury service|Speed awareness course
-Driving test|Job interview
+Driving test|Theory test
 A&E|Walk-in centre
 Therapist|Life coach
 Self-checkout|Cash machine
-Phone contract|Gym membership
+Phone contract|Broadband deal
 Unfollow|Block
 Voicemail|Read receipt
 Wedding speech|Eulogy
-Best man|Godparent
-Divorce lawyer|Estate agent
-Funeral|Wake
-Mid-life crisis|Quarter-life crisis
+Best man|Chief bridesmaid
+Solicitor|Accountant
 Grey hair|Reading glasses
-Hot tub|Sauna
 Smoking area|Pub garden
 Vape|Cigarette
 Lock-in|After-party
-Bouncer|Bar staff
+Bouncer|Bar manager
 Bank holiday|Sick day
-Rent day|Payday
-Credit score|Overdraft
-Unpaid invoice|Parking fine
+Pension pot|ISA
+Invoice|Expenses claim
 Spreadsheet|PowerPoint
-Out of office|Sick day
-Reply all|Group chat
-Performance review|School report
-Middle manager|Head teacher
-HR|Head teacher's office
+Out of office|Annual leave
+Reply all|CC
+Performance review|Disciplinary
+Middle manager|Team leader
+HR|Payroll
 Leaving do|Retirement party
 Secret Santa|Office raffle
-Team-building day|School trip
+Team-building day|Away day
 Hot desk|Open-plan office
 LinkedIn|Facebook
 Instagram|TikTok
 Netflix|YouTube
-Wetherspoons|Premier Inn
+Premier Inn|Travelodge
 Primark|Poundland
 Argos|eBay
 Speed camera|Traffic warden
-Neighbours' party|Barking dog
+Barking dog|Car alarm
 Toddler|Teenager
-Nursery fees|Mortgage
-Wedding list|Christening present
-Hen do|Wedding
-Stag do|Lads' holiday
-Pub crawl|Wedding reception
+Nursery|After-school club
+Wedding list|Baby shower
 Taxi home|Walk home
-Phone at 1%|Lost wallet
-Kicking-out time|Last orders
-Bar tab|Round
-Dance floor|Smoking area
-Hungover Sunday|Bank holiday Monday
-6am alarm|Monday morning
+Phone at 1%|Lost keys
+Last orders|Closing time
+Dance floor|Mosh pit
+Hungover Sunday|Lazy Sunday
+6am alarm|Snooze button
 Ex|Old boss
 Mother-in-law|Landlady
 Family WhatsApp|Work WhatsApp
-Christmas with the in-laws|Christmas at work
-Flat-pack wardrobe|Self-assessment
-Wedding seating plan|Office rota
-First day at work|Job interview
-Stag do in Prague|Hen do in Dublin
+Boxing Day|New Year's Day
+Seating plan|Guest list
+First day at work|First day at school
+Prague|Amsterdam
 Glastonbury|Download
-Festival toilet|Train toilet
-Mosh pit|Dance floor
+Festival tent|Campervan
 Sat nav|Back-seat driver
-MOT|Dentist check-up
+MOT|Car service
 Wedding fund|House deposit
-House deposit|Pension
 Student loan|Car loan
 Gap year|Career break
 Payslip|Bank statement
-Overtime|Night shift
-Night shift|Hangover
+Overtime|Weekend working
 Freelancer|Contractor
 Startup|Side hustle
 Crypto|Premium Bonds
-Stock market|Bookies
+Stock market|Fantasy football
 Landlord|Letting agent
-Moving house|Divorce
+Moving house|Packing for holiday
 Removal van|Skip
-Car boot sale|eBay
-Neighbour from hell|Flatmate from hell
+Car boot sale|Jumble sale
 Flatmate|Lodger
 Wedding DJ|Karaoke host
 Fancy dress party|Murder mystery night
-Escape room|Pub quiz
+Escape room|Bowling night
 Paintball|Laser tag
 Golf day|Spa day
-Football manager|Head teacher
-Referee|Traffic warden
-Tax man|Bailiff
+Football manager|Rugby coach
+Referee|Linesman
+Tax return|Census form
 Jobcentre|Post office queue
-GP waiting room|Airport gate
-Fire alarm test|Car alarm
+GP waiting room|Dentist waiting room
+Fire alarm test|Fire drill
 Smoke alarm|Baby monitor
+Taxi rank|Bus stop
+Uber|Black cab
+Gym membership|Personal trainer
+Marathon|Tough Mudder
+Dad dancing|Air guitar
+Christmas jumper|Onesie
+Leaving card|Birthday card
+Group photo|Selfie
+School reunion|Class WhatsApp
+Pension|Savings account
+Promotion|New job
+Railcard|Oyster card
+Learner driver|Taxi driver
+Speed bump|Pothole
+Traffic jam|Roadworks
+Boy band|Girl band
+Tribute act|Cover band
+Night shift|Early shift
 `;
 
 const parse = (txt, pre) => txt.trim().split('\n').map((line, i) => {

@@ -28,7 +28,7 @@ const intro = {
       h('div.os-intro-title', 'Odd Sock'),
       pairArt(),
       h('ol.os-rules', rules.map(([b, t], i) => h('li', h('span.n', String(i + 1)), h('span.t', h('b', b), t)))),
-      h('div.os-foot', `${p.rounds} rounds · ${p.laps > 1 ? 'two laps of clues' : 'one lap of clues'} · last round double`));
+      h('div.os-foot', `Most votes is accused. A tie lets the Odd Sock off. ${p.rounds} rounds, last one double.`));
     show.append(h('div.os-dim'), h('div.os-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
@@ -65,7 +65,7 @@ const reveal = {
     }
     const truth = p.caught
       ? h('div.os-truth.caught', h('span.os-truth-sock', { html: sockSvg({ body: ODD, pattern: 'spot' }) }),
-        h('div', h('div.os-truth-h', 'Odd Sock!'), h('div.os-truth-s', p.sock === ctx.meId ? 'Your word was ' : 'Their word was ', h('b', p.oddWord), '. One guess to steal it back.')))
+        h('div', h('div.os-truth-h', 'Odd Sock!'), h('div.os-truth-s', p.sock === ctx.meId ? 'Your word was ' : 'Their word was ', h('b', p.oddWord), '. Now one guess at everyone else’s word.')))
       : h('div.os-truth.escaped', h('div.os-truth-av', disc(ctx, p.sock, { size: 52 }), h('span.os-truth-mini', { html: sockSvg({ body: ODD, pattern: 'spot' }) })),
         h('div', h('div.os-truth-h', accused ? 'Wrong sock.' : 'Got away.'), h('div.os-truth-s', p.sock === ctx.meId ? 'The Odd Sock was ' : 'The Odd Sock was ', h('b', p.sock === ctx.meId ? 'you' : sockName), '. They walk free.')));
     const card = h(`div.os-card.os-reveal${p.caught ? '.caught' : '.escaped'}`, h('div.os-reveal-t', 'The vote'), list, verdict, truth);
@@ -100,7 +100,7 @@ const reveal = {
           if (p.sock === c.meId) c.haptic('fooled');
         }
         c.cyril.react(p.caught ? 'delight' : 'shock', { duration: c.frozen ? 60000 : 1400 });
-        const line = p.caught ? c.line('osCaught', { name: sockName }) : accused ? c.line('osWrong', { name: nameOf(c, accused) }) : c.line('osEscaped', { name: sockName });
+        const line = p.caught ? c.line('osCaught', { name: you(c, p.sock) }) : accused ? (accused === c.meId ? c.line('osWrongYou') : c.line('osWrong', { name: nameOf(c, accused) })) : c.line('osEscaped', { name: sockName });
         cancel = sayLater(c, line, { delay: c.frozen ? 0 : 500, hold: 2600 });
       }
     };
@@ -121,13 +121,13 @@ const round = {
     const sub = {
       stolen: `${sockName} guessed “${p.guess}”. The round is theirs.`,
       caught: p.guess ? `${sockName} guessed “${p.guess}”. Wrong. The table wins.` : `${sockName} didn’t guess. The table wins.`,
-      escaped: p.accused ? `You voted out ${you(ctx, p.accused, false)}. ${sockName} slipped away.` : `Nobody was voted out. ${sockName} slipped away.`,
+      escaped: p.accused ? `The table picked ${p.accused === ctx.meId ? 'you' : nameOf(ctx, p.accused)}. Wrong sock. ${sockName} slipped away.` : `Nobody got the most votes. ${sockName} slipped away.`,
     }[p.outcome];
     const pair = h('div.os-pair',
       h('div.os-pw.common', h('span.os-pw-sock', { html: sockSvg({ body: TEAL, pattern: 'stripe' }) }), nameTape(p.common, { size: 'small', label: 'Everyone' })),
       h('div.os-pw.odd', h('span.os-pw-sock', { html: sockSvg({ body: ODD, pattern: 'spot', mirror: true }) }), nameTape(p.odd, { size: 'small', label: `Odd Sock · ${sockName}` })));
     const rows = Object.entries(p.deltas).filter(([, d]) => d > 0).sort((a, b) => b[1] - a[1]);
-    const why = (id) => (id === p.sock ? (p.outcome === 'stolen' ? 'guessed the word' : 'got away with it') : 'spotted the Odd Sock');
+    const why = (id) => (id === p.sock ? (p.outcome === 'stolen' ? 'guessed the word' : 'got away with it') : 'voted for the Odd Sock');
     const pts = [];
     const list = rows.length
       ? rows.map(([id, d], i) => { const n = h('span.os-rpts', '+0'); pts.push([n, d]); return h(`div.os-rrow${id === ctx.meId ? '.me' : ''}`, { style: { '--i': i } }, disc(ctx, id, { size: 32 }), h('span.nm', h('b', you(ctx, id)), h('small', why(id))), n); })

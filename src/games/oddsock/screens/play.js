@@ -59,7 +59,7 @@ const clue = {
       const next = h('div.os-next', nextId
         ? (nextId === ctx.meId ? h('b', 'You’re next. Think of a word.') : ['Next: ', h('b', nameOf(ctx, nextId))])
         : h('b', 'Last clue. Then the vote.'));
-      const nudge = ctx.isHost ? h('button.os-ghost', { type: 'button', 'data-e2e': 'os-next' }, `${name} has said it`) : null;
+      const nudge = ctx.isHost ? h('button.btn.block.btn-secondary.os-nudge', { type: 'button', 'data-e2e': 'os-next' }, `${name} said it. Next.`) : null;
       if (nudge) onTap(nudge, () => ctx.client.act('os-said', {}, { said: true }));
       body = h('div.os-sheet.os-cluesheet.os-in',
         tape,
@@ -125,7 +125,7 @@ const vote = {
       const mine = c.mine.game.vote !== undefined ? c.mine.game.vote : votes[c.meId] ?? null;
       for (const b of btns) b.setAttribute('aria-pressed', String(b.dataset.id === mine));
       const n = Object.keys(votes).length;
-      hint.textContent = mine ? `Voted ${nameOf(c, mine)}. Change it any time. ${n} of ${c.players.length} voted.` : `Can’t be you, if you’re wondering. ${n} of ${c.players.length} voted.`;
+      hint.textContent = mine ? `Voted ${nameOf(c, mine)}. Change it any time. ${n} of ${c.players.length} voted.` : `You can’t vote for yourself. ${n} of ${c.players.length} voted.`;
       hint.classList.toggle('locked', !!mine);
     };
     sync(ctx);
@@ -173,7 +173,7 @@ const guess = {
         unmount: cancel,
       };
     }
-    const hd = header(ctx, { title: `${name} gets one guess`, line: 'At your word. Faces still. Nobody help.', tone: 'claret' });
+    const hd = header(ctx, { title: `${name} is guessing`, line: 'They’re guessing your word. Keep a straight face.', tone: 'claret' });
     show.append(h('div.os-top', hd));
     sheet.append(h('div.os-sheet.os-guesswait.os-in',
       h('div.os-caughtrow', h('div.os-caughtav', disc(ctx, p.sock, { size: 72 }), h('span.os-caught-sock', { html: sockSvg({ body: '#E2553B', pattern: 'spot' }) })),
