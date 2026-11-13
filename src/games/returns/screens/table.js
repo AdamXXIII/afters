@@ -73,6 +73,7 @@ const myturn = {
       setTimeout(() => slam.remove(), ctx.frozen ? 60000 : 1500);
     }
     let sel = null;
+    let body = null;
     let target = null;
     const pz = pile(ctx, { onTap: true });
     pz.stack.setAttribute('role', 'button');
@@ -115,6 +116,7 @@ const myturn = {
       actions.replaceChildren();
       targets.replaceChildren();
       targets.hidden = true;
+      body?.classList.toggle('targeting', !!sel && !!KINDS[sel.k].target);
       if (!sel) {
         hint.textContent = (ctx.priv?.hand || []).some((c) => KINDS[c.k].act) ? 'Tap a card to play it. Or just draw.' : 'Nothing to play. Draw and hope.';
         actions.append(button('Draw a card', { e2e: 'rt-draw', onClick: draw }));
@@ -148,7 +150,7 @@ const myturn = {
       actions.append(h('div.rt-actrow', back, go));
     }
 
-    const body = h('div.rt-sheet.mine.rt-in',
+    body = h('div.rt-sheet.mine.rt-in',
       news(ctx),
       pz.el,
       h('div.rt-handhead', h('span.rt-handhead-t', 'Your hand'), hint),
@@ -260,7 +262,8 @@ const play = {
       if (first.target === ctx.meId && chain.length === 1) buzz([60, 40, 60]);
     }
     ctx.cyril.react(chain.length > 1 ? 'guffaw' : 'shock', { duration: ctx.frozen ? 60000 : 800 });
-    const cancel = sayLater(ctx, ctx.line(chain.length > 1 ? 'rtSteadied' : 'rtPlay'), { delay: 300, hold: 1800 });
+    const land = document.body.classList.contains('land');
+    const cancel = land ? () => {} : sayLater(ctx, ctx.line(chain.length > 1 ? 'rtSteadied' : 'rtPlay'), { delay: 300, hold: 1800 });
     const bar = fuse.firstChild;
     return {
       update(c) { body.classList.toggle('sent', !!c.mine.game.steadied); },

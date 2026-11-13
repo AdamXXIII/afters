@@ -72,6 +72,7 @@
 /* ---------- the sheet ---------- */
 .rt-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; padding: 18px calc(var(--safe-r) + 18px) max(16px, var(--safe-b)) calc(var(--safe-l) + 18px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
 .rt-sheet::-webkit-scrollbar { display: none; }
+.rt-sheet.targeting .rt-pilezone { display: none; }
 .rt-sheet.sent .rt-hand, .rt-sheet.sent .rt-actions, .rt-sheet.sent .rt-pile { pointer-events: none; }
 .rt-sheet.sent .rt-actions { opacity: .55; }
 
