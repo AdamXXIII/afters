@@ -16,7 +16,8 @@ const GUESS_FOR = {
   pig: ['A pig in love', 'Pig with ears', 'A posh pig'], person: ['A man waving', 'Bloke with a balloon', 'A person having a moment'],
 };
 
-function bot({ ph, client, later, rng, rand, still, answer }) {
+function bot(b) {
+  const { ph, client, later, rng, rand, still, answer } = b;
   if (!ph.id.startsWith('telephone-')) return false;
   const pv = ph.private || {};
   const rating = client.state.settings?.rating === 'adult' ? 'adult' : 'family';
@@ -48,12 +49,25 @@ function bot({ ph, client, later, rng, rand, still, answer }) {
       later(rand(1200, 5000), () => send('vote', { key: pickM.key }, { vote: pickM.key }));
       return true;
     }
+    case 'telephone-reveal': {
+      // the host bot turns the album's pages (realtime only: instant mode would spin)
+      if (!client.isHost || b.mode !== 'realtime') return true;
+      const turn = () => later(rand(1800, 3600), () => {
+        if (!still()) return;
+        client.act('next', { page: client.state.progress?.page ?? 0 });
+        turn();
+      });
+      turn();
+      return true;
+    }
     default:
-      return true; // intro, reveal, awards: watch
+      return true; // intro, awards: watch
   }
 }
 
 const at = (n) => (e) => e.phase.id === n;
+/** Album demo: the reveal of the first rumour, on page k (or its last page if shorter). */
+const page = (k) => (e) => { const h = e.game?.host; if (e.phase.id !== 'telephone-reveal' || !h) return false; return h.page >= Math.min(k, h.chains[h.revealIndex].steps.length - 1); };
 
 export default {
   id: 'telephone',
@@ -66,7 +80,7 @@ export default {
   blurb: 'Your sentence goes round the table: drawn, guessed, drawn again. Then we watch it fall apart, stroke by stroke.',
   players: [3, 8],
   minutes: 12,
-  steps: ['Write a silly sentence.', 'It goes round: draw it, guess it.', 'Watch every chain fall apart.'], // menu "How it plays"
+  steps: ['Everyone writes a sentence.', 'Each one goes round the table: draw it, describe it, draw that.', 'Turn the pages together and watch it drift.'], // menu "How it plays"
   hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#2F5D7C',
   tags: ['Drawing', 'Guessing', 'Chaos'],
@@ -86,14 +100,16 @@ export default {
     'telephone-draw': { match: at('telephone-draw'), me: 'idle', bots: 'some', t: 21000 },
     'telephone-guess': { match: at('telephone-guess'), me: 'idle', bots: 'some', t: 9000 },
     'telephone-wait': { match: at('telephone-draw'), me: 'act', bots: 'some', t: 26000 },
-    'telephone-reveal': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => { const b = ph.payload.beats[1]; return b.at + b.replay + 400; } },
-    'telephone-reveal-guess': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => { const b = ph.payload.beats[2]; return b.at + b.dur * 0.8; } },
-    'telephone-reveal-end': { match: (e) => e.phase.id === 'telephone-reveal', t: (ph) => ph.payload.end.at + 2400 },
+    // album pages: the demo runner calls advance(), which turns one page at a time
+    'telephone-reveal': { match: page(1), t: 60000 },
+    'telephone-reveal-guess': { match: page(4), t: 60000 },
+    'telephone-reveal-mid': { match: page(3), t: 1400 },
+    'telephone-reveal-end': { match: (e) => e.phase.id === 'telephone-reveal' && e.game?.host && e.game.host.page >= e.game.host.chains[e.game.host.revealIndex].steps.length, t: 60000 },
     'telephone-vote': { match: at('telephone-vote'), me: 'idle', bots: 'some', t: 4000 },
     'telephone-awards': { match: at('telephone-awards'), t: 6500 },
     'telephone-flip': {
-      match: (e) => { if (e.phase.id === 'telephone-intro' && e.game?.host) e.game.host.mode = 'flip'; return e.phase.id === 'telephone-reveal'; },
-      t: (ph) => ph.payload.end.flipAt + 1800,
+      match: (e) => { if (e.phase.id === 'telephone-intro' && e.game?.host) e.game.host.mode = 'flip'; const h = e.game?.host; return e.phase.id === 'telephone-reveal' && h.page >= h.chains[h.revealIndex].steps.length; },
+      t: 61800,
     },
   },
 };

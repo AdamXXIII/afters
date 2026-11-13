@@ -13,7 +13,7 @@ const vote = {
     const p = ctx.payload;
     const owner = ctx.player(p.ownerId);
     const top = h('div.tp-vote-head',
-      h('div', h('div.t-eyebrow', `Line ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s rumour`), h('div.tp-vote-q', 'Best bit?')),
+      h('div', h('div.t-eyebrow', `Rumour ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s`), h('div.tp-vote-q', 'Best bit?')),
       h('div.tp-vote-sub', h('b', '+500'), h('span', 'a vote')));
     const views = [];
     const rank = (m) => (m.authorId === ctx.meId ? 2 : 0) + (m.kind === 'draw' ? 0 : 1);
