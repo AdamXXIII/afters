@@ -90,9 +90,8 @@ export function banner(ctx, { who = ctx.payload.turn, label = null, sub = null, 
   const two = ctx.payload.turnsLeft > 1 && who === ctx.payload.turn;
   const text = label || (me ? 'Your turn' : `${ownName(ctx, who)}’s turn`);
   const el = h(`div.rt-banner${me ? '.mine' : ''}${cls}`, { style: { '--pc': colourOf(ctx, who) } },
-    disc(ctx, who, { size: 44, cls: '.ring' }),
+    h('span.rt-banner-av', disc(ctx, who, { size: 44, cls: '.ring' }), two ? h('span.rt-two', { title: 'Two turns' }, '×2') : null),
     h('div.rt-banner-t', h('div.rt-banner-n', text), sub ? h('div.rt-banner-s', sub) : null),
-    two ? h('span.rt-two', { title: 'Two turns' }, '×2') : null,
     t);
   el.timer = t;
   return el;

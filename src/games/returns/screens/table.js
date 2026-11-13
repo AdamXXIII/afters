@@ -186,7 +186,8 @@ const watch = {
       : next === ctx.meId ? 'You’re next. Start sweating.' : 'Play cards, then draw. Watch their face.'));
     const body = h(`div.rt-sheet.watch.rt-in${out ? '.ghost' : ''}`,
       news(ctx),
-      h('div.rt-watchhead', pz.el, status),
+      status,
+      pz.el,
       out ? null : h('div.rt-handhead', h('span.rt-handhead-t', 'Your hand'), h('div.rt-hint', hasSteady ? 'Got a Steady On? Use it when they play a card.' : 'Wait for your turn.')),
       out ? h('div.rt-ghostnote', disc(ctx, ctx.meId, { size: 40, cls: '.gone' }), h('span', 'Your candles are out. You can still throw bread rolls.')) : handRow(ctx, { ready: (c) => c.k === 'steady' }));
     sheet.append(body);
@@ -207,8 +208,12 @@ const play = {
     const first = chain[0];
     const last = chain[chain.length - 1];
     const K = KINDS[first.k];
-    const label = chain.length > 1 ? `${nameOf(ctx, last.by)} ${isMe(ctx, last.by) ? 'say' : 'says'} Steady On!` : `${nameOf(ctx, first.by)} ${isMe(ctx, first.by) ? 'play' : 'plays'} ${K.name}`;
-    top(show, ctx, { who: last.by, label, timer: false, line: null });
+    const label = chain.length > 1 ? 'Steady On!' : `${K.name}!`;
+    const tgt = first.target ? ` on ${isMe(ctx, first.target) ? 'you' : ownName(ctx, first.target)}` : '';
+    const sub = chain.length > 1
+      ? `${nameOf(ctx, last.by)} ${p.cancelled ? 'cancelled' : 'put back'} ${possessive(ctx, first.by).toLowerCase() === 'your' ? 'your' : possessive(ctx, first.by)} ${K.name}`
+      : `${isMe(ctx, first.by) ? 'You played it' : `${ownName(ctx, first.by)} played it`}${tgt}`;
+    top(show, ctx, { who: last.by, label, sub, timer: false, line: null });
     const at = first.target ? h('div.rt-at', 'on ', disc(ctx, first.target, { size: 26 }), h('b', isMe(ctx, first.target) ? 'you' : ownName(ctx, first.target))) : null;
     const plateNext = first.k === 'plate' ? p.alive[(p.alive.indexOf(p.turn) + 1) % p.alive.length] : null;
     const effect = first.k === 'plate' ? `${isMe(ctx, plateNext) ? 'You' : ownName(ctx, plateNext)} would take two turns.` : null;
