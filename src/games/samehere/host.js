@@ -231,9 +231,17 @@ export class SameHereHost {
   }
 
   _finish() {
-    // the chair can't win: if its holder has the top score, the bill shows them one behind
-    const best = this.best ?? 0;
-    this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.id === this.chair && p.score >= best ? Math.max(0, best - 1) : p.score })));
+    // The chair can't win: pass explicit places. Everyone off the chair is ranked by score
+    // (ties share a place); the chair holder comes last, with their real score on the bill.
+    const off = this.api.players.filter((p) => p.id !== this.chair).sort((a, b) => b.score - a.score);
+    const rows = [];
+    off.forEach((p, i) => {
+      const rank = i > 0 && p.score === off[i - 1].score ? rows[i - 1].rank : i + 1;
+      rows.push({ id: p.id, score: p.score, rank });
+    });
+    const chairP = this.api.player(this.chair);
+    if (chairP) rows.push({ id: chairP.id, score: chairP.score, rank: rows.length + 1 });
+    this.api.finish(rows);
   }
 
   _doneMap(fn) {

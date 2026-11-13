@@ -395,11 +395,15 @@ export class HostEngine {
   _record(rows) {
     if (!this.game || this.game.recorded) return null;
     this.game.recorded = true;
-    const sorted = rows.slice().sort((a, b) => b.score - a.score);
+    // A game may pass explicit places (`rank` on every row) when score alone doesn't decide
+    // (e.g. Same Here: the Wobbly Chair holder can't win even with the top score).
+    const explicit = rows.length > 0 && rows.every((r) => Number.isFinite(r.rank));
+    const sorted = rows.slice().sort((a, b) => (explicit ? a.rank - b.rank : 0) || b.score - a.score);
     const out = [];
     let rank = 0;
     sorted.forEach((r, i) => {
-      if (i === 0 || r.score !== sorted[i - 1].score) rank = i + 1;
+      if (explicit) rank = r.rank;
+      else if (i === 0 || r.score !== sorted[i - 1].score) rank = i + 1;
       const pts = rank <= NIGHT_POINTS.length ? NIGHT_POINTS[rank - 1] : 1;
       out.push({ id: r.id, score: r.score, rank, cherries: pts });
     });
