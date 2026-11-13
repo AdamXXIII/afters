@@ -78,7 +78,8 @@ const tune = {
         h('div.pd-tunehead-t', h('b', mode ? mode.t : 'Name that tune'), h('span', mode ? mode.s : KIND[p.kind] || '')),
         pips(p.index, p.count)),
       box,
-      h('div.pd-tunefoot', h('span.pd-from', iAmSpeaker || !speaker ? 'Turn this phone up' : `Listen to ${speaker.name}’s phone`), here)));
+      h('div.pd-tunefoot', h('span.pd-from', iAmSpeaker || !speaker ? 'Turn this phone up' : `Listen to ${speaker.name}’s phone`), here),
+      race));
     if (mode) show.firstChild.classList.add('weird');
 
     const btns = new Map();
