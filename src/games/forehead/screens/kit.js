@@ -38,6 +38,7 @@ export const DECK_ICONS = {
   dice: s('<rect x="8" y="8" width="32" height="32" rx="7"/><circle cx="16" cy="16" r="2.6" fill="currentColor"/><circle cx="32" cy="16" r="2.6" fill="currentColor"/><circle cx="24" cy="24" r="2.6" fill="currentColor"/><circle cx="16" cy="32" r="2.6" fill="currentColor"/><circle cx="32" cy="32" r="2.6" fill="currentColor"/>'),
   house: s('<path d="M7 23 24 9l17 14"/><path d="M12 19v21h24V19"/><path d="M20 40V29h8v11"/><path d="M33 12v-4h4v8"/>'),
   suitcase: s('<rect x="8" y="14" width="32" height="24" rx="4"/><path d="M19 14v-4h10v4M16 14v24M32 14v24"/><circle cx="14" cy="41" r="2" fill="currentColor"/><circle cx="34" cy="41" r="2" fill="currentColor"/>'),
+  blocks: s('<rect x="7" y="25" width="16" height="16" rx="2"/><rect x="25" y="25" width="16" height="16" rx="2"/><rect x="16" y="8" width="16" height="16" rx="2" transform="rotate(8 24 16)"/><path d="M12 30l6 6M18 30l-6 6M29 33h8M33 29v8"/>'),
   cocktail: s('<path d="M8 9h32L24 27z"/><path d="M24 27v13M16 41h16"/><path d="M30 9l6-6" /><circle cx="37" cy="4" r="2" fill="currentColor"/><path d="M14 15h20" stroke-width="1.8"/>'),
 };
 

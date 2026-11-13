@@ -1,4 +1,4 @@
-// Bonce family decks (AI-generated content, Claude, 2026-11-13). 14 decks x 64+ cards.
+// Bonce family decks (AI-generated content, Claude, 2026-11-13). 14 decks x 64+ cards. No food or drink cards (Adam's rule).
 // Bar: Heads Up! (one thing everyone in the room knows, describable or actable in seconds).
 // Written for a UK table of 30-somethings. The first three cards of each deck are its examples on
 // the deck picker, so they are the most obvious, most "oh, THAT kind of deck" cards.
@@ -17,23 +17,23 @@ export const FAMILY_DECKS = [
 
   deck('telly', 'Telly', 'TV shows from the sofa', 'tv', '#2F5D7C', `
     EastEnders|Friends|Doctor Who|Coronation Street|The Office|Only Fools and Horses|Gavin & Stacey|
-    Strictly Come Dancing|The Great British Bake Off|Love Island|I'm a Celebrity|Big Brother|The X Factor|
+    Strictly Come Dancing|The Weakest Link|Love Island|I'm a Celebrity|Big Brother|The X Factor|
     Britain's Got Talent|Top Gear|Blue Peter|Match of the Day|Countdown|Deal or No Deal|
     Who Wants to Be a Millionaire?|The Chase|Pointless|Mastermind|Gladiators|Blind Date|Peep Show|
     The Inbetweeners|Fawlty Towers|Mr Bean|Blackadder|Downton Abbey|Line of Duty|Peaky Blinders|Sherlock|
     Game of Thrones|Breaking Bad|The Simpsons|SpongeBob SquarePants|Teletubbies|Neighbours|Home and Away|
     Hollyoaks|Emmerdale|The Crown|Stranger Things|Squid Game|Bridgerton|Gogglebox|Dragons' Den|The Apprentice|
-    Come Dine with Me|Grand Designs|Antiques Roadshow|Top of the Pops|Saturday Night Takeaway|Taskmaster|
+    Wheel of Fortune|Grand Designs|Antiques Roadshow|Top of the Pops|Saturday Night Takeaway|Taskmaster|
     Would I Lie to You?|Have I Got News for You|Grange Hill|The Fresh Prince of Bel-Air|Saved by the Bell|
     The Traitors|Ted Lasso|Tweenies`),
 
   deck('famous', 'Famous Faces', 'Famous people, alive or not', 'star', '#E0A526', `
-    David Beckham|Taylor Swift|David Attenborough|Gordon Ramsay|Jamie Oliver|Adele|Ed Sheeran|Beyoncé|
+    David Beckham|Taylor Swift|David Attenborough|Robbie Williams|Victoria Beckham|Adele|Ed Sheeran|Beyoncé|
     Elton John|Paul McCartney|Freddie Mercury|Madonna|Michael Jackson|Elvis Presley|Marilyn Monroe|
     Albert Einstein|William Shakespeare|Winston Churchill|King Charles|Harry Styles|Kylie Minogue|Dolly Parton|
     Lionel Messi|Cristiano Ronaldo|Marcus Rashford|Usain Bolt|Serena Williams|Andy Murray|Lewis Hamilton|
     Tom Daley|Tom Cruise|Brad Pitt|Leonardo DiCaprio|Keanu Reeves|Arnold Schwarzenegger|Dwayne Johnson|
-    Daniel Craig|Emma Watson|Daniel Radcliffe|Judi Dench|Kate Winslet|Hugh Grant|Mary Berry|Simon Cowell|
+    Daniel Craig|Emma Watson|Daniel Radcliffe|Judi Dench|Kate Winslet|Hugh Grant|Billy Connolly|Simon Cowell|
     Ant and Dec|Graham Norton|Stephen Fry|Peter Kay|Dawn French|Joanna Lumley|Oprah Winfrey|Bill Gates|
     Steve Jobs|Charles Darwin|Isaac Newton|Leonardo da Vinci|Cleopatra|Henry VIII|Napoleon|Mo Farah|
     Rihanna|Lady Gaga|Stormzy|Bear Grylls|Joe Wicks|Marie Curie`),
@@ -59,15 +59,15 @@ export const FAMILY_DECKS = [
 
   deck('actout', 'Act It Out', 'Everyday things to mime', 'theatre', '#3E8E8A', `
     Brushing your teeth|Walking the dog|Treading on Lego|Riding a horse|Surfing|Skiing|Bowling|Changing a nappy|
-    Ironing a shirt|Doing the washing up|Hoovering|Building a snowman|Making a cup of tea|Eating spaghetti|
-    Blowing up a balloon|Taking a selfie|Milking a cow|Juggling|Riding a bike|Rowing a boat|Fishing|
+    Ironing a shirt|Doing the washing up|Hoovering|Building a snowman|Making the bed|Doing press-ups|
+    Blowing up a balloon|Taking a selfie|Shearing a sheep|Juggling|Riding a bike|Rowing a boat|Fishing|
     Changing a tyre|Climbing a ladder|Opening a stuck jar|Putting up a tent|Doing yoga|Lifting weights|
     Playing the drums|Playing the guitar|Conducting an orchestra|Directing traffic|Walking a tightrope|
     Dancing like a robot|Walking like a zombie|Sneezing|Getting hiccups|Stubbing your toe|Getting brain freeze|
     Waiting for a bus in the rain|Parallel parking|Swatting a fly|Popping bubble wrap|Wrapping a present|
-    Blowing out birthday candles|Flipping a pancake|Feeding the ducks|Bobbing for apples|Moonwalking|
+    Blowing out birthday candles|Mowing the lawn|Feeding the ducks|Hula hooping|Moonwalking|
     Doing the floss|Paddling in a cold sea|Bungee jumping|Skydiving|Riding a rollercoaster|Hailing a taxi|
-    Texting with one thumb|Peeling a banana|Shaving|Putting on make-up|Bathing a baby|Carrying too much shopping|
+    Texting with one thumb|Painting a wall|Shaving|Putting on make-up|Bathing a baby|Carrying too much shopping|
     Building flat-pack furniture|Losing your keys|Bowling a cricket ball|Getting out of a hammock`),
 
   deck('accents', 'Do the Voice', 'Accents and famous voices', 'mask', '#5B6ABF', `
@@ -78,12 +78,12 @@ export const FAMILY_DECKS = [
     A weather presenter|A pirate|A toddler|A posh estate agent|A train announcer|A radio DJ|A fitness instructor|
     A hypnotist|A sergeant major|An opera singer|An auctioneer|A bingo caller|Count Dracula|A witch|
     The King's Christmas speech|Peppa Pig|Shrek|Donkey from Shrek|Michael Caine|Elvis|Marilyn Monroe|
-    Joey from Friends|Gordon Ramsay|Sean Connery|A golf commentator|A whispering ASMR video`),
+    Joey from Friends|Ozzy Osbourne|Sean Connery|A golf commentator|A whispering ASMR video`),
 
   deck('jobs', 'Jobs', 'Jobs people do', 'spanner', '#8C5A3C', `
     Firefighter|Dentist|Lollipop lady|Doctor|Nurse|Vet|Teacher|Police officer|Paramedic|Builder|Plumber|
-    Electrician|Chef|Waiter|Barista|Bartender|Hairdresser|Postman|Bin collector|Bus driver|Taxi driver|Pilot|
-    Air steward|Astronaut|Scientist|Farmer|Fisherman|Butcher|Baker|Florist|Gardener|Window cleaner|Mechanic|
+    Electrician|Roofer|Cleaner|Receptionist|Bouncer|Hairdresser|Postman|Bin collector|Bus driver|Taxi driver|Pilot|
+    Air steward|Astronaut|Scientist|Farmer|Fisherman|Carpenter|Locksmith|Florist|Gardener|Window cleaner|Mechanic|
     Lifeguard|Footballer|Referee|Judge|Lawyer|Estate agent|Accountant|Journalist|Photographer|
     Weather presenter|DJ|Magician|Clown|Ballet dancer|Personal trainer|Driving instructor|Traffic warden|
     Librarian|Archaeologist|Zookeeper|Beekeeper|Tattoo artist|Surgeon|Optician|Pharmacist|Soldier|Spy|
@@ -105,42 +105,42 @@ export const FAMILY_DECKS = [
     Javelin|Shot put|Relay race|Rowing|Sailing|Fencing|Archery|Badminton|Table tennis|Basketball|Baseball|
     American football|Ice hockey|Volleyball|Netball|Ten-pin bowling|Crazy golf|Sumo wrestling|Karate|Judo|
     Synchronised swimming|Curling|Bobsleigh|Rock climbing|Red card|Offside|Hole in one|Slam dunk|Mexican wave|
-    Egg and spoon race|Sack race|Tug of war|Three-legged race|Dodgeball|Parkrun`),
+    Wheelbarrow race|Sack race|Tug of war|Three-legged race|Dodgeball|Parkrun`),
 
   deck('rewind', 'Rewind', 'Stuff from the 90s and 00s', 'cassette', '#E2553B', `
-    Tamagotchi|Nokia 3310|Spice Girls|Dial-up internet|Pogs|Turkey Twizzlers|Game Boy|Furby|Beanie Babies|
-    Slap bracelet|Tazos|Sunny D|Snake on your phone|MSN Messenger|Bebo|MySpace|Floppy disk|Mixtape|Walkman|
-    Discman|VHS tape|Blockbuster video|Polly Pocket|Crazy Bones|Razor scooter|Slush Puppie|Frosted tips|
+    Tamagotchi|Nokia 3310|Spice Girls|Dial-up internet|Pogs|Gel pens|Game Boy|Furby|Beanie Babies|
+    Slap bracelet|Tazos|Light-up trainers|Snake on your phone|MSN Messenger|Bebo|MySpace|Floppy disk|Mixtape|Walkman|
+    Discman|VHS tape|Blockbuster video|Polly Pocket|Crazy Bones|Razor scooter|Heelys|Frosted tips|
     Butterfly clips|Teletext|Pokémon cards|Disposable camera|Steps|S Club 7|Take That|Westlife|Busted|
-    Britney Spears|Backstreet Boys|Crimped hair|Dunkaroos|Buffalo trainers|Burning a CD|Lava lamp|
+    Britney Spears|Backstreet Boys|Crimped hair|Nintendo DS|Buffalo trainers|Burning a CD|Lava lamp|
     Inflatable chair|Dance mat|PlayStation|Nintendo 64|Sega Mega Drive|Crash Bandicoot|Super Mario|
     Sonic the Hedgehog|Tetris|iPod|BlackBerry|Motorola Razr|Rollerblades|Scrunchie|Shell suit|Millennium Bug|
-    Pop Idol|Bucket hat|Yo-yo|Sticker album|Mr Frosty`),
+    Pop Idol|Bucket hat|Yo-yo|Sticker album|Nintendo Wii`),
 
-  deck('brands', 'Brands', 'Shops, apps and brands', 'bag', '#E2553B', `
-    McDonald's|IKEA|Greggs|KFC|Nando's|Subway|Starbucks|Costa|Pret|Tesco|Sainsbury's|Asda|Aldi|Lidl|
-    Marks & Spencer|Waitrose|Argos|Primark|Boots|Amazon|Apple|Google|Netflix|Spotify|YouTube|TikTok|Instagram|
-    Facebook|WhatsApp|Uber|Deliveroo|Coca-Cola|Pepsi|Irn-Bru|Ribena|Lucozade|Heinz|Marmite|Walkers|Pringles|
-    Cadbury|Mars bar|KitKat|Haribo|Nutella|Kellogg's|Lego|Nintendo|PlayStation|Nike|Adidas|Ferrari|Mini|
-    Rolex|Ryanair|easyJet|Royal Mail|BBC|Specsavers|Dyson|Duracell|Yorkshire Tea|PG Tips|Domino's`),
+  deck('brands', 'Brands', 'Shops, apps and big brands', 'bag', '#E2553B', `
+    IKEA|Nike|Apple|Argos|Primark|Boots|Amazon|Google|Netflix|Spotify|YouTube|TikTok|Instagram|Facebook|
+    WhatsApp|Uber|Lego|Nintendo|PlayStation|Adidas|Ferrari|Mini|Rolex|Ryanair|easyJet|Royal Mail|BBC|
+    Specsavers|Dyson|Duracell|Puma|Converse|Dr. Martens|Ray-Ban|Gucci|Chanel|Levi's|JD Sports|John Lewis|
+    Currys|Halfords|Samsung|Microsoft|Xbox|Tesla|BMW|Land Rover|Ford|Harley-Davidson|Airbnb|Zoom|Snapchat|
+    eBay|Vinted|Disney|Sellotape|Post-it|Tipp-Ex|Crayola|Kodak|Polaroid|Sony|GoPro|Fitbit|Pandora`),
 
   deck('characters', 'Characters', 'Cartoon and film characters', 'monocle', '#5B6ABF', `
     Mickey Mouse|Peppa Pig|Spider-Man|Darth Vader|Hermione Granger|Sherlock Holmes|James Bond|Batman|Superman|
     Wonder Woman|The Hulk|Iron Man|Shrek|Buzz Lightyear|Woody|Elsa|Simba|Dory|SpongeBob|Homer Simpson|
     Bart Simpson|Postman Pat|Bob the Builder|Fireman Sam|Thomas the Tank Engine|Winnie the Pooh|Paddington|
     Super Mario|Sonic|Pikachu|Lara Croft|Scooby-Doo|Tom and Jerry|Bugs Bunny|Garfield|Snoopy|Kermit the Frog|
-    Miss Piggy|Cookie Monster|Wallace and Gromit|Shaun the Sheep|Dracula|Frankenstein's monster|
+    Miss Piggy|Big Bird|Wallace and Gromit|Shaun the Sheep|Dracula|Frankenstein's monster|
     Father Christmas|The Tooth Fairy|The Easter Bunny|Cinderella|Snow White|Little Red Riding Hood|Peter Pan|
-    Captain Hook|Robin Hood|King Arthur|Willy Wonka|Gollum|Yoda|Jack Sparrow|Indiana Jones|Wednesday Addams|
+    Captain Hook|Robin Hood|King Arthur|Mary Poppins|Gollum|Yoda|Jack Sparrow|Indiana Jones|Wednesday Addams|
     Barbie|The Grinch|Rudolph|Del Boy|David Brent|Mr Blobby`),
 
-  deck('grub', 'Grub', 'Food and drink', 'pie', '#E0A526', `
-    Fish and chips|Full English|Sunday roast|Yorkshire pudding|Bangers and mash|Shepherd's pie|Beans on toast|
-    Cheese on toast|Chip butty|Bacon sandwich|Sausage roll|Pork pie|Scotch egg|Cornish pasty|Toad in the hole|
-    Spaghetti bolognese|Pizza|Lasagne|Chicken tikka masala|Kebab|Burger|Hot dog|Sushi|Tacos|Fajitas|
-    Pot Noodle|Crumpets|Scones|Victoria sponge|Trifle|Jelly and ice cream|Sticky toffee pudding|Apple crumble|
-    Custard|Rice pudding|Christmas pudding|Mince pie|Brussels sprouts|Haggis|Black pudding|Crisp sandwich|
-    Fish finger sandwich|Jaffa Cakes|Custard creams|Hobnobs|Pancakes|Waffles|Porridge|Cornflakes|
-    Boiled egg and soldiers|Prawn cocktail|Cheese board|Fondue|Smoothie|Cup of tea|Hot chocolate|Ice lolly|
-    Ninety-nine with a Flake|Candy floss|Doughnut|Battenberg|Spaghetti hoops|Chicken nuggets|Roast potatoes`),
+  deck('toys', 'Toys and Games', 'Toys, board games, playground games', 'blocks', '#E0A526', `
+    Monopoly|Jenga|Rubik's Cube|Scrabble|Cluedo|Twister|Hungry Hippos|Operation|Buckaroo|Kerplunk|Connect 4|
+    Guess Who?|Mouse Trap|Snakes and Ladders|Chess|Draughts|Uno|Top Trumps|Pictionary|Trivial Pursuit|
+    Battleship|Etch A Sketch|Play-Doh|Slinky|Spinning top|Kite|Frisbee|Skipping rope|Hula hoop|Space hopper|
+    Pogo stick|Rocking horse|Teddy bear|Action Man|Sylvanian Families|My Little Pony|Care Bears|Transformers|
+    Power Rangers|Hot Wheels|Scalextric|Nerf gun|Water pistol|Remote control car|Marbles|Jigsaw|Kaleidoscope|
+    Magic 8 Ball|Bop It|Spirograph|Duplo|Meccano|K'Nex|Jack-in-the-box|Doll's house|Toy soldiers|
+    Fidget spinner|Loom bands|Beyblade|Pin the tail on the donkey|Musical chairs|Pass the parcel|Hide and seek|
+    Hopscotch|Conkers|Snap`),
 ];
