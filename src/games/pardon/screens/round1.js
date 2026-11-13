@@ -64,7 +64,7 @@ const read = {
     const timer = timerRing();
     const head = h('div.pd-readhead',
       timer,
-      h('div.pd-readhead-t', h('b', 'Read this out loud'), h('span', HINT[p.hint] || p.hint)),
+      h('div.pd-readhead-t', h('b', 'Read this out loud'), h('span', `Clue at 10s: ${(HINT[p.hint] || p.hint).toLowerCase()}`)),
       h('span.pd-count', `${p.index + 1}/${p.count}`));
     const accent = p.accent ? h('div.pd-accent', h('span.ic', { html: MOUTH }), h('span', 'Do it as ', h('b', p.accent))) : null;
     const card = h('div.pd-readcard', head, gibCard(p.say), accent);
@@ -130,7 +130,7 @@ const listen = {
     const hero = h('div.pd-listen', { style: { '--pc': colourOf(reader) } },
       h('div.pd-listen-av', rings, disc(reader, { size: 92 })),
       h('div.pd-listen-t', h('b', reader?.name || '?'), ' is reading'),
-      h('div.pd-listen-hint', h('span', HINT[p.hint] || p.hint)),
+      h('div.pd-listen-hint', h('span.pd-clue', 'Clue in 10s')),
       p.accent ? h('div.pd-accent.small', h('span.ic', { html: MOUTH }), h('span', 'in the voice of ', h('b', p.accent))) : null);
     show.append(h('div.pd-top.row', timer, h('span.pd-count.on-dark', `${p.index + 1}/${p.count}`)), hero);
 
@@ -159,6 +159,10 @@ const listen = {
         sheet.firstChild.classList.toggle('stolen', s);
         if (s && !c.frozen) { ctx.audio.sfx('page'); ctx.haptic('select'); ctx.say(ctx.line('pdSteal'), { hold: 2000, placement: 'side' }); }
       }
+      const clue = hero.querySelector('.pd-clue');
+      const open = t >= p.quick;
+      if (clue.classList.contains('on') !== open) { clue.classList.toggle('on', open); clue.textContent = open ? (HINT[p.hint] || p.hint) : `Clue in ${Math.ceil((p.quick - t) / 1000)}s`; if (open && !c.frozen) c.audio.sfx('pop'); }
+      else if (!open) clue.textContent = `Clue in ${Math.max(1, Math.ceil((p.quick - t) / 1000))}s`;
       [...rings.children].forEach((r, i) => r.style.setProperty('--k', String(((t / 1600) + i / 3) % 1)));
     };
     frame(ctx);

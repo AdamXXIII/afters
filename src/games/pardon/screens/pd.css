@@ -128,6 +128,7 @@
 .pd-rings i { position: absolute; inset: 14px; border-radius: 50%; border: 3px solid var(--pc); transform: scale(calc(1 + var(--k) * .9)); opacity: calc(1 - var(--k)); }
 .pd-listen-t { margin-top: 6px; font: 600 20px var(--f-ui); color: var(--c-linen); text-shadow: var(--shadow-on-dark); }
 .pd-listen-t b { font: 900 30px var(--f-display); color: #FFE3A3; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.pd-listen-hint .pd-clue:not(.on) { background: rgba(42,20,14,.6); color: #CFE0EA; font-style: normal; font-family: var(--f-ui); font-size: 15px; }
 .pd-listen-hint span { display: inline-block; margin-top: 6px; padding: 5px 14px; border-radius: 999px; background: #FFFBF4; color: var(--c-willow); font: italic 750 17px var(--f-display); box-shadow: 0 3px 0 rgba(20,8,5,.3); }
 .pd-shout { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; flex: 1; justify-content: center; }
 .pd-shout-ic { width: 128px; height: 86px; transform: rotate(-12deg); filter: drop-shadow(0 8px 10px rgba(59,31,24,.25)); }
