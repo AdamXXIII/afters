@@ -304,3 +304,19 @@
   .sh-menu-foot { margin-top: 8px; }
   .sh-crown-avs .sh-av { width: 52px !important; height: 52px !important; }
 }
+
+/* round 2 fixes */
+.sh-art { align-items: flex-start; gap: 18px; }
+.sh-art-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sh-art-row .sh-ans { width: 112px; }
+.sh-art-cap { font: 600 13px/16px var(--f-ui); text-align: center; color: rgba(251,244,234,.92); }
+.sh-art-cap b { font-weight: 800; color: var(--c-linen); }
+.sh-art-odd { gap: 4px; }
+.sh-verdict-n { display: block; margin-top: 2px; font-size: 14px; color: var(--c-toffee); }
+.sh-plus { grid-column: 5; grid-row: 1; justify-self: end; margin-right: -30px; font: 800 14px var(--f-ui); color: var(--c-linen); background: var(--teal); border-radius: 999px; padding: 2px 7px; animation: shPop 420ms 300ms var(--ease-out-back) both; }
+.sh-srow { grid-template-columns: 30px minmax(0, 1fr) auto auto 26px; padding-right: 40px; position: relative; }
+.sh-srow .sh-plus { position: absolute; right: 4px; margin: 0; }
+.sh-board-foot { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px; font: 600 13px var(--f-ui); color: var(--c-claret); }
+.sh-opener { align-self: flex-start; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--c-willow); font: 700 16px var(--f-ui); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.sh-pairbox.closed .sh-pairs-l, .sh-pairbox.closed .sh-pairs { display: none; }
+.sh-pairbox:not(.closed) .sh-opener { display: none; }

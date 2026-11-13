@@ -6,12 +6,14 @@ import { disc, chair, pips, questionCard, answerCard, sayLater, skipBtn, nameOf 
 
 // ---------- intro ----------
 function introArt(seed) {
-  const row = h('div.sh-art-row',
-    answerCard('Sherlock', { cls: '.mini.herd', seed, key: 'i1' }),
-    answerCard('Sherlock', { cls: '.mini.herd', seed, key: 'i2' }),
-    answerCard('Sherlock', { cls: '.mini.herd', seed, key: 'i3' }),
-    h('span.sh-art-n', '3'));
-  const odd = h('div.sh-art-odd', answerCard('Taggart', { cls: '.mini', seed, key: 'i4' }), chair({ size: 46, cls: '.rock' }));
+  const row = h('div.sh-art-stack',
+    h('div.sh-art-row',
+      answerCard('Telly', { cls: '.mini.herd', seed, key: 'i1' }),
+      answerCard('Telly', { cls: '.mini.herd', seed, key: 'i2' }),
+      answerCard('Telly', { cls: '.mini.herd', seed, key: 'i3' })),
+    h('span.sh-art-cap', h('b', '3 said Telly'), h('br'), '+1 point each'));
+  const odd = h('div.sh-art-odd', answerCard('Tablet', { cls: '.mini', seed, key: 'i4' }), chair({ size: 40, cls: '.rock' }),
+    h('span.sh-art-cap', h('b', 'Only one said Tablet'), h('br'), 'Wobbly Chair'));
   return h('div.sh-art', row, odd);
 }
 
@@ -25,7 +27,7 @@ const intro = {
       h('div.sh-menu-title', 'Same Here'),
       h('div.sh-menu-art', introArt(ctx.phase?.seed || 1)),
       h('ol.sh-rules', steps.map((r, i) => h('li', h('span.n', String(i + 1)), h('span.t', r)))),
-      h('div.sh-menu-foot', `First to ${ctx.payload.target} points wins.`));
+      h('div.sh-menu-foot', `Question: Name something with a screen. First to ${ctx.payload.target} points wins.`));
     show.append(h('div.sh-dim'), h('div.sh-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
     const sk = skipBtn(ctx, show);
@@ -46,9 +48,11 @@ function standingsBoard(ctx, p) {
       h('span.nm', me ? 'You' : pl?.name || '?'),
       r.id === p.chair ? chair({ size: 26, cls: '.rock' }) : null,
       pips(r.score, p.target),
-      h('span.sc', String(r.score)));
+      h('span.sc', String(r.score)),
+      up ? h('span.sh-plus', '+1') : null);
   });
-  return h('div.sh-board', h('div.sh-board-h', h('span', 'First to '), h('b', String(p.target))), rows);
+  return h('div.sh-board', h('div.sh-board-h', h('span', 'Points. First to '), h('b', String(p.target)), h('span', ' wins')), rows,
+    p.chair ? h('div.sh-board-foot', chair({ size: 20 }), `${nameOf(ctx, p.chair)} can’t win while on the Wobbly Chair.`) : null);
 }
 
 const reveal = {
@@ -65,11 +69,11 @@ const reveal = {
       const herd = g.gid === p.herd;
       const lone = g.pids.length === 1;
       const el = h(`div.sh-grp${herd ? '.herd' : ''}${lone ? '.lone' : ''}`, { style: { '--tilt': '0deg' } },
-        answerCard(g.text, { cls: herd ? '.herd' : '', seed, key: g.gid }),
+        answerCard([g.text, ...(g.also || [])].join(' / '), { cls: herd ? '.herd' : '', seed, key: g.gid }),
         h(`div.sh-grp-who${g.pids.length > 3 ? '.two' : ''}`, g.pids.map((id, i) => h('span.sh-grp-p', { style: { '--i': i } }, disc(ctx.player(id), { size: herd ? 34 : 28 }), h('span.nm', nameOf(ctx, id))))),
         h(`span.sh-grp-n${herd ? '.big' : ''}`, String(g.pids.length)),
         herd ? h('span.sh-stamp', 'Same here! +1') : null,
-        g.also?.length ? h('span.sh-also', `Counted with: ${g.also.join(', ')}`) : null);
+        g.also?.length ? h('span.sh-also', 'The table voted these the same') : null);
       el.gid = g.gid;
       return el;
     });
@@ -80,7 +84,9 @@ const reveal = {
     else if (p.outcome === 'split') verdictText = h('span', h('b', 'Split table.'), ' A tie at the top, so nobody scores.');
     else if (p.outcome === 'scattered') verdictText = h('span', h('b', 'All different.'), ' Nobody matched. Nobody scores.');
     else verdictText = h('span', h('b', 'No answers.'), ' Nobody scores.');
-    const verdict = h(`div.sh-verdict.${p.outcome}`, verdictText);
+    const alone = p.groups.filter((g) => g.pids.length === 1).length;
+    const verdict = h(`div.sh-verdict.${p.outcome}`, verdictText,
+      !p.lone && alone > 1 ? h('span.sh-verdict-n', `${alone} people on their own, so nobody gets the Wobbly Chair.`) : null);
 
     let chairEl = null;
     if (p.lone) {
@@ -143,8 +149,8 @@ const crown = {
     const wname = names.join(' & ') || 'Nobody';
     const card = h('div.sh-crown',
       h('div.sh-crown-avs', p.winners.map((id) => disc(ctx.player(id), { size: 76 }))),
-      h('div.sh-crown-name', wname),
-      h('div.sh-crown-sub', p.winners.length > 1 ? 'think exactly like the table' : p.winners[0] === ctx.meId ? 'think exactly like the table' : 'thinks exactly like the table'),
+      h('div.sh-crown-name', `${wname} ${p.winners.length > 1 || p.winners[0] === ctx.meId ? 'win' : 'wins'}`),
+      h('div.sh-crown-sub', `${(p.standings.find((r) => r.id === p.winners[0])?.score) ?? 0} points. Thinks exactly like the table.`),
       p.chair ? h(`div.sh-crown-chair${p.robbed ? '.robbed' : ''}`, chair({ size: 46, cls: '.rock' }),
         h('div', h('b', p.chair === ctx.meId ? 'You finished on the Wobbly Chair' : `${nameOf(ctx, p.chair)} finished on the Wobbly Chair`),
           h('small', p.robbed ? `${p.chairScore} points, and still can’t win from there.` : 'Never mind. There’s always the next game.'))) : null,

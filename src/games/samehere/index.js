@@ -112,7 +112,7 @@ export default {
     'samehere-write': { match: (e) => e.phase.id === 'samehere-write', me: 'idle', bots: 'some', t: 9000 },
     'samehere-wait': { match: (e) => e.phase.id === 'samehere-write', me: 'act', bots: 'some', t: 14000 },
     'samehere-sort': { match: sortDemo, me: 'idle', bots: 'some', t: 8000 },
-    'samehere-reveal': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.outcome === 'herd' && e.phase.payload.groups.length >= 3, t: stepAt('group', 700) },
+    'samehere-reveal': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.outcome === 'herd' && e.phase.payload.groups.length >= 2, t: stepAt('group', 700) },
     'samehere-chair': { match: (e) => e.phase.id === 'samehere-reveal' && !!e.phase.payload.lone && e.phase.payload.outcome === 'herd', t: stepAt('chair', 1900) },
     'samehere-standings': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.round >= 3, t: stepAt('standings', 1600) },
     'samehere-crown': { match: (e) => e.phase.id === 'samehere-crown', t: 3000 },

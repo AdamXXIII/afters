@@ -20,7 +20,7 @@ const demoText = (q) => {
 
 function scoreLine(ctx, p) {
   const mine = (p.standings || []).find((r) => r.id === ctx.meId)?.score ?? ctx.me?.score ?? 0;
-  return h('div.sh-score', h('span.sh-score-l', `You: ${mine} of ${p.target}`), pips(mine, p.target));
+  return h('div.sh-score', h('span.sh-score-l', `Your points: ${mine}`), pips(mine, p.target));
 }
 
 // ---------- write ----------
@@ -110,7 +110,7 @@ const sort = {
     const list = h('div.sh-disputes');
     const picker = h('div.sh-pairs');
     const pickHint = h('div.sh-pairs-l');
-    const done = button('Done arguing', { e2e: 'sh-done', onClick: () => {
+    const done = button('Show the answers', { e2e: 'sh-done', onClick: () => {
       const now = !ctx.mine.game.done;
       ctx.client.act('sh-done', { done: now }, { done: now });
     } });
@@ -124,12 +124,12 @@ const sort = {
           sel = null;
         }
         chips.forEach((x, i) => x.setAttribute('aria-pressed', String(p.groups[i].gid === sel)));
-        pickHint.textContent = sel ? `Now tap the one that matches “${textOf(sel)}”.` : 'Spot two more that are the same? Tap both.';
+        pickHint.textContent = sel ? `Now tap the one that matches “${textOf(sel)}”.` : 'Tap both answers.';
       }, { sound: 'select', buzz: 'select' });
       return b;
     });
     picker.append(...chips);
-    pickHint.textContent = 'Spot two more that are the same? Tap both.';
+    pickHint.textContent = 'Tap both answers.';
 
     const rows = new Map();
     function row(d) {
@@ -147,19 +147,23 @@ const sort = {
       const el = h('div.sh-dispute',
         h('div.sh-dq', h('span.sh-dans', d.a), h('span.sh-deq', '='), h('span.sh-dans', d.b), h('span.sh-deq.q', '?')),
         h('div.sh-dvotes', same, diff),
-        h('div.sh-dfoot', d.by ? h('span.sh-dby', `${nameOf(ctx, d.by)} reckons so`) : h('span.sh-dby', 'Close call'), verdict));
+        d.by ? h('div.sh-dfoot', h('span.sh-dby', `${nameOf(ctx, d.by)} says these match`), verdict) : h('div.sh-dfoot', h('span'), verdict));
       el.parts = { same, diff, verdict };
       return el;
     }
 
     const head = h('div.sh-head');
-    sheet.append(h('div.sh-sheet.sh-sortsheet.sh-in', head, list, h('div.sh-pairbox', pickHint, picker), h('div.sh-actions', doneN, done)));
+    const opener = h('button.sh-opener', { type: 'button', 'data-e2e': 'sh-open-pairs' }, 'Two other answers match?');
+    const pairbox = h('div.sh-pairbox.closed', opener, pickHint, picker);
+    onTap(opener, () => pairbox.classList.remove('closed'));
+    sheet.append(h('div.sh-sheet.sh-sortsheet.sh-in', head, list, pairbox, h('div.sh-actions', doneN, done)));
 
     const sync = (c) => {
       const ds = (c.progress.disputes || []).map((d) => ({ ...d, a: textOf(d.a), b: textOf(d.b) }));
       head.replaceChildren(
-        h('div.sh-title', ds.length ? 'Same answer?' : 'Anything the same?'),
-        h('div.sh-sub', ds.length ? 'Vote. Most votes wins. Argue out loud.' : 'If two answers mean the same thing, tap both below.'));
+        h('div.sh-title', ds.length ? 'Same answer?' : 'Any two answers the same?'),
+        ds.length ? null : h('div.sh-sub', 'Tap both. The table votes.'));
+      if (!ds.length) pairbox.classList.remove('closed');
       for (const d of ds) {
         if (!rows.has(d.id)) { const r = row(d); rows.set(d.id, r); list.append(r); }
         const r = rows.get(d.id).parts;
@@ -169,15 +173,15 @@ const sort = {
         r.same.querySelector('.sh-vavs').replaceChildren(...d.same.map((id) => disc(c.player(id), { size: 22 })));
         r.diff.querySelector('.sh-vavs').replaceChildren(...d.diff.map((id) => disc(c.player(id), { size: 22 })));
         const s = d.same.length; const n = d.diff.length;
-        r.verdict.textContent = s > n ? 'Counts as one' : s || n ? 'Kept apart' : 'No votes yet';
+        r.verdict.textContent = s > n ? 'So far: same' : s || n ? 'So far: different' : '';
         r.verdict.className = `sh-dverdict${s > n ? ' on' : ''}`;
       }
       list.classList.toggle('empty', !ds.length);
       const full = ds.length >= (p.maxDisputes || 5);
       picker.parentElement.classList.toggle('off', full);
       const dn = c.players.filter((pl) => c.progress.done[pl.id]).length;
-      doneN.textContent = `${dn} of ${c.players.length} done`;
-      done.textContent = c.mine.game.done ? 'Wait, still arguing' : 'Done arguing';
+      doneN.textContent = `${dn} of ${c.players.length} ready to see the answers`;
+      done.textContent = c.mine.game.done ? 'Wait, still arguing' : 'Show the answers';
       done.classList.toggle('btn-secondary', !!c.mine.game.done);
     };
     sync(ctx);
