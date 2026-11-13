@@ -29,7 +29,7 @@ export default {
   tagline: 'Everyone has the same word. Almost everyone.',
   blurb: 'Everyone gets the same secret word, except the Odd Sock, who gets a close one and doesn\'t know. One word each, out loud. Then vote out the Odd Sock.',
   players: [4, 8],
-  minutes: 12,
+  minutes: 14,
   steps: [
     'Everyone gets the same secret word. One of you gets a slightly different one, and doesn’t know.',
     'Take turns saying one word about your word, out loud. Then vote for the Odd Sock.',
