@@ -40,7 +40,9 @@
 @keyframes lcTile { from { opacity: 0; transform: translateY(-10px) scale(.6); } }
 
 /* place cards over seated avatars */
-.lc-tags { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 300ms; }
+/* z-index 0 keeps the cards' own z-order (back row under front row) inside this layer, so Cyril's
+   bubble (#bubbles, z 5) always reads on top of them; at two players the cards sat right where it lands */
+.lc-tags { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 300ms; }
 .lc-tags.on { opacity: 1; }
 .lc-tag {
   position: absolute; left: 0; top: 0; will-change: transform;
