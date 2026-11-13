@@ -343,3 +343,6 @@
 
 .bt-pround.double { background: var(--c-brass); color: var(--c-ink); }
 .bt-owner-line { display: block; margin-top: 2px; font: 650 15px/1.2 var(--f-display); color: var(--c-toffee); font-variation-settings: "SOFT" 30, "WONK" 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (orientation: landscape) and (max-height: 600px) {
+  .bt-chair { padding-right: 64px; }
+}
