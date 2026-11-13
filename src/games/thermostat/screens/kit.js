@@ -102,6 +102,8 @@ export function dial({ cls = '', needle = true } = {}) {
     const parts = [
       ['luke', BANDS.luke * k], ['warm', BANDS.warm * k], ['spot', BANDS.spot * k],
     ].map(([c, w]) => `<path class="b-${c}" d="${wedge(target - w, target + w, 26, 146)}"/>`);
+    const [mx, my] = pt(target, 146); const [ix, iy] = pt(target, 104);
+    parts.push(`<line class="b-mark" x1="${f(mx)}" y1="${f(my)}" x2="${f(ix)}" y2="${f(iy)}"/>`);
     bandsG.innerHTML = parts.join('');
     bandsG.style.transformOrigin = `${CX}px ${CY}px`;
   };

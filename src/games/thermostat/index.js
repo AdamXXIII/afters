@@ -129,7 +129,7 @@ export default {
       thIntroAgain: [['Back to the dial. Someone always wants it warmer.'], ['Another go. I\'ve given the dial a polish.']],
       thGive: [['One clue. Make it count.'], ['Think. Then say it out loud.']],
       thListen: [['Listen to {name}. No peeking at their phone.'], ['{name} is thinking. Give them a moment. Or heckle.']],
-      thDial: [['One dial between you. Do try to share.'], ['Argue it out. Politely. Then lock it in.'], ['Everybody grab it at once. Splendid. Chaos.']],
+      thDial: [['One dial between you. Do try to share.'], ['Argue it out. Politely. Then lock it in.'], ['One dial. Several opinions. Splendid.']],
       thSquirm: [['Not a word, {name}. Not even a face.'], ['Hands in your lap, {name}. You\'ve said your piece.']],
       thSpot: [['Spot on! Frankly, mind-reading.'], ['Bang on the money. I\'m slightly unnerved.']],
       thWarm: [['Warm. Very warm. Nearly there.'], ['Close enough to feel the heat.']],

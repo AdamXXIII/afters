@@ -21,7 +21,7 @@ const give = {
     const d = dial({ cls: '.give', needle: false });
     d.bands(target, p.final);
     d.heat(1);
-    const field = textField({ max: p.max || 40, placeholder: 'Type it too, if you like', onSubmit: () => send(), e2e: 'clue-input', enterkeyhint: 'done' });
+    const field = textField({ max: p.max || 40, placeholder: 'Type it too, so it shows on every phone', onSubmit: () => send(), e2e: 'clue-input', enterkeyhint: 'done' });
     const btn = button('I’ve said my clue', { onClick: () => send(), e2e: 'said' });
     function send() {
       const clue = field.input.value.trim();
@@ -35,8 +35,8 @@ const give = {
     }
     const el = h(`div.th-sheet.th-give.th-in${p.final ? '.final' : ''}`,
       h('div.th-head',
-        h('div.th-title', p.final ? 'Hot seat: your clue' : 'You’re the Clue-giver'),
-        h('div.th-sub', 'Only you can see the target. Say one clue out loud that points to it.')),
+        h('div.th-title', p.final ? 'Hot seat: say one clue' : 'Say one clue out loud'),
+        h('div.th-sub', 'Only you can see the target (the dark red bit). Say something that sits right there.')),
       h('div.th-dialwrap', d, ends(p.scale)),
       h('div.th-rule', p.final ? 'The target is half as wide. Every point triples.' : 'One clue. No numbers, no pointing, no faces.'),
       h('div.th-field', field),
@@ -74,7 +74,7 @@ const listen = {
     show.append(h('div.th-top',
       h(`div.th-cluecard.listen${p.final ? '.final' : ''}`,
         h('div.th-cc-head', disc(giver, { size: 40 }),
-          h('div.th-cc-who', h('b', `${giver?.name || '?'} is the Clue-giver`), h('small', p.final ? 'Hot seat · triple points' : `Round ${(p.index ?? 0) + 1} of ${p.count ?? 1}`)), t),
+          h('div.th-cc-who', h('b', `${giver?.name || '?'}’s giving the clue`), h('small', p.final ? 'Hot seat · triple points' : `Round ${(p.index ?? 0) + 1} of ${p.count ?? 1}`)), t),
         h('div.th-cc-clue.wait', 'Thinking of a clue…'))));
     const d = dial({ cls: '.covered' });
     d.cover(true);
@@ -170,7 +170,8 @@ const dialScreen = {
     sheet.append(h(`div.th-sheet.th-dialsheet.th-in${p.final ? '.final' : ''}`,
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
-      h('div.th-lockrow', lockBtn, locks)));
+      h('div.th-lockrow', lockBtn, locks),
+      h('div.th-hint', 'One dial for everyone. Drag it, argue, then all lock in.')));
     const live = liveDial(ctx, d, { status, canDrag: true });
     let state = 'open';
     onTap(lockBtn, () => {
