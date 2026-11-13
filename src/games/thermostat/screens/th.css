@@ -36,14 +36,14 @@
 .th-dial .cover text { font: 800 64px var(--f-display); fill: rgba(122,74,42,.32); text-anchor: middle; dominant-baseline: middle; }
 .th-dial .cover { opacity: 0; transition: opacity 300ms; }
 .th-dial .cover.on { opacity: 1; }
-.th-dial .nd { fill: var(--c-claret); }
+.th-dial .nd { fill: var(--c-ink); stroke: #FFFBF4; stroke-width: 2; paint-order: stroke; }
 .th-dial .nd-shadow { fill: rgba(42,20,14,.22); }
 .th-dial .hub { filter: drop-shadow(0 3px 3px rgba(42,20,14,.4)); }
 .th-dial .knurl line { stroke: rgba(90,58,20,.55); stroke-width: 1.4; }
 .th-dial .hub-cap { fill: #F6DFA4; stroke: #8A6420; stroke-width: 1.5; }
 .th-dial.live { touch-action: none; cursor: grab; }
 .th-dial.live.grab { cursor: grabbing; }
-.th-dial.live.grab .nd { fill: #94283A; }
+.th-dial.live.grab .nd { fill: #4A2A22; }
 .th-dial.ghost .bands { opacity: .55 !important; }
 .th-dial.covered .needle { display: none; }
 .th-holds { position: absolute; inset: 0; pointer-events: none; }
@@ -104,7 +104,7 @@
 .th-swap:disabled { opacity: .4; }
 .th-swap:focus-visible, .th-lock:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
-.th-status { align-self: center; min-height: 34px; display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; background: rgba(122,74,42,.08); font: 700 16px/20px var(--f-ui); color: var(--c-ink); text-align: center; transition: background 200ms, color 200ms; }
+.th-status { align-self: center; min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 999px; background: rgba(122,74,42,.08); font: 750 18px/22px var(--f-ui); color: var(--c-ink); text-align: center; transition: background 200ms, color 200ms; }
 .th-status.fight { background: rgba(226,85,59,.14); color: #A8321D; }
 .th-dialsheet { gap: 10px; }
 .th-dialsheet .th-dialwrap { padding-top: 22px; }
@@ -200,6 +200,7 @@
 /* ---------- landscape ---------- */
 @media (orientation: landscape) and (max-height: 600px) {
   .th-top { bottom: 64px; display: flex; flex-direction: column; }
+  .th-cc-who b { white-space: normal; }
   body[data-layout="split"] .th-top .th-cluecard { flex: 1; display: flex; flex-direction: column; }
   body[data-layout="split"] .th-cc-clue { margin: auto 0; }
   .th-sheet { gap: 6px; }

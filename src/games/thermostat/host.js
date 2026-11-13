@@ -11,7 +11,7 @@ export const TH = {
 };
 /** Half-widths of the bands (dial runs 0..100). The final round halves them. */
 export const BANDS = { spot: 4, warm: 9, luke: 14 };
-export const PTS = { spot: 300, warm: 200, luke: 100, hand: 100 };
+export const PTS = { spot: 300, warm: 200, luke: 100 };
 export const CLUE_MAX = 40;
 export const LOCK_SLOP = 1.5; // a lock holds while the dial stays within this of where you locked
 
@@ -195,13 +195,10 @@ export class ThermostatHost {
     const base = band === 'cold' ? 0 : PTS[band];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
     for (const p of api.players) deltas[p.id] = base * m * (p.id === r.giver ? 2 : 1);
-    // last hand on the dial: a small bonus when it scores
-    const hand = base && r.by && r.by !== r.giver && r.by in deltas ? r.by : null;
-    if (hand) deltas[hand] += PTS.hand * m;
     api.addScores(deltas);
     const steps = { open: api.dur(1400), verdict: api.dur(3200), points: api.dur(4500) };
     api.enter('thermostat-reveal', TH.reveal, {
-      ...this._base(), clue: r.clue, dial: r.dial, target: r.target, band, base, hand, deltas, steps,
+      ...this._base(), clue: r.clue, dial: r.dial, target: r.target, band, base, deltas, steps,
       moves: r.moves, hands: r.hands.length, scores: this._rows(),
     });
   }

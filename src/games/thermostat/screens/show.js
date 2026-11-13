@@ -31,7 +31,7 @@ const intro = {
         'They say one clue out loud. Everyone else drags the same dial to it.',
         'Closer scores more. The Clue-giver scores double.',
       ],
-      foot: 'Everyone gives a clue. Last place takes the hot seat at the end.',
+      foot: 'Everyone gives a clue. Big final round at the end.',
     });
     show.append(h('div.th-dim'), h('div.th-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
@@ -74,14 +74,13 @@ const reveal = {
     const rows = [];
     if (p.base) {
       rows.push(h('div.th-prow', h('span.lbl', 'Everyone'), h('span.v', `+${tablePts}`)));
-      rows.push(h('div.th-prow.giver', disc(ctx.player(p.giver), { size: 26 }), h('span.lbl', `${nameOf(ctx, p.giver)} (clue, double)`), h('span.v', `+${giverPts}`)));
-      if (p.hand) rows.push(h('div.th-prow.hand', disc(ctx.player(p.hand), { size: 26 }), h('span.lbl', `${nameOf(ctx, p.hand)} (last hand)`), h('span.v', `+${100 * m} more`)));
+      rows.push(h('div.th-prow.giver', disc(ctx.player(p.giver), { size: 26 }), h('span.lbl', `${nameOf(ctx, p.giver)} gave the clue: double`), h('span.v', `+${giverPts}`)));
     } else {
       rows.push(h('div.th-prow.none', h('span.lbl', 'Nobody scores this round')));
     }
     pts.append(...rows);
-    const mine = p.deltas[ctx.meId] || 0;
-    you.textContent = p.base ? `You: +${mine}` : p.giver === ctx.meId ? 'Your clue. Their dial. Nobody’s fault. Probably.' : 'Not even close. Next one.';
+    you.textContent = p.base ? '' : p.giver === ctx.meId ? 'Your clue. Their dial. Nobody’s fault. Probably.' : 'Not even close. Next one.';
+    if (!you.textContent) you.style.display = 'none';
 
     let stage = -1;
     const render = (k) => {

@@ -120,10 +120,11 @@ function liveDial(ctx, d, { status, canDrag }) {
     d.holders(ids.map((id) => c.player(id)).filter(Boolean));
     const names = ids.map((id) => nameOf(c, id));
     let txt;
-    if (names.length >= 2) txt = `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} are fighting over it`;
-    else if (names.length === 1) txt = names[0] === 'You' ? 'You’ve got the dial' : `${names[0]} has the dial`;
+    if (names.length > 2) txt = `${names.length} of you are fighting over it`;
+    else if (names.length === 2) txt = `${names[0]} and ${names[1]} are fighting over it`;
+    else if (names.length === 1) txt = names[0] === 'You' ? 'You’re turning it' : `${names[0]} is turning it`;
     else if (!pr.moves) txt = canDrag ? 'Grab the needle and drag. Everyone can.' : 'Nobody’s touched it yet';
-    else txt = `Last hand on it: ${nameOf(c, pr.by)}`;
+    else txt = `${nameOf(c, pr.by)} moved it last`;
     status.textContent = txt;
     status.classList.toggle('fight', names.length >= 2);
   };
@@ -166,12 +167,10 @@ const dialScreen = {
     const status = h('div.th-status');
     const locks = locksRow(ctx);
     const lockBtn = h('button.th-lock', { type: 'button', 'data-e2e': 'lock' }, h('i', { html: LOCK }), h('span.t', 'Lock it in'));
-    const hint = h('div.th-hint', `Last hand on the dial gets +${100 * (p.mult || 1)} if it scores.`);
     sheet.append(h(`div.th-sheet.th-dialsheet.th-in${p.final ? '.final' : ''}`,
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
-      h('div.th-lockrow', lockBtn, locks),
-      hint));
+      h('div.th-lockrow', lockBtn, locks)));
     const live = liveDial(ctx, d, { status, canDrag: true });
     let state = 'open';
     onTap(lockBtn, () => {
@@ -216,11 +215,10 @@ const squirm = {
     const status = h('div.th-status');
     const locks = locksRow(ctx);
     sheet.append(h(`div.th-sheet.th-dialsheet.th-squirm.th-in${p.final ? '.final' : ''}`,
-      h('div.th-head.center', h('div.th-title', 'Not a word'), h('div.th-sub', 'Only you can see the target. Watch them.')),
+      h('div.th-head.center', h('div.th-title', 'Not a word'), h('div.th-sub', 'You score double whatever they score.')),
       status,
       h('div.th-dialwrap', d, ends(p.scale)),
-      h('div.th-lockrow.solo', locks),
-      h('div.th-hint', `You score double what they score.`)));
+      h('div.th-lockrow.solo', locks)));
     const live = liveDial(ctx, d, { status, canDrag: false });
     const sync = (c) => { live.sync(c); locks.sync(c); };
     sync(ctx);
