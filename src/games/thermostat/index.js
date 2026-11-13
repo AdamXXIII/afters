@@ -25,8 +25,8 @@ const hotGiver = (mine) => (e, me) => {
 /** Demo helper: land the dial `off` away from the target so the reveal shows a scoring band. */
 const landNear = (off) => (e) => {
   if (e.phase.id !== 'thermostat-dial') return;
-  const r = e.game?.host?.r;
-  if (r && r.target != null) { r.dial = Math.max(0, Math.min(100, r.target + off)); r.by = e.players.find((p) => p.id !== r.giver)?.id || null; }
+  const host = e.game?.host;
+  if (host) host.demoLand = off;
 };
 const at = (k, plus) => (p) => (p.payload?.steps?.[k] ?? 0) + plus;
 

@@ -64,8 +64,8 @@ const reveal = {
     const you = h('div.th-you');
     const panel = h(`div.th-rv${p.final ? '.final' : ''}`,
       card,
-      h('div.th-rv-dial', h('div.th-dialwrap', d, ends(p.scale)), stamp),
-      pts, you);
+      h('div.th-rv-dial', h('div.th-dialwrap', d, ends(p.scale))),
+      stamp, pts, you);
     show.append(panel);
 
     // points rows

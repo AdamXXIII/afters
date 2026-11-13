@@ -186,6 +186,11 @@ export class ThermostatHost {
     const r = this.r;
     const api = this.api;
     const m = this._mult();
+    if (this.demoLand != null) { // ?demo= only: land the dial near the target for the shots
+      r.dial = Math.max(0, Math.min(100, Math.round((r.target + this.demoLand) * 10) / 10));
+      r.by = this.api.players.find((p) => p.id !== r.giver)?.id || null;
+      this.demoLand = null;
+    }
     const band = bandOf(r.dial, r.target, r.final);
     const base = band === 'cold' ? 0 : PTS[band];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));

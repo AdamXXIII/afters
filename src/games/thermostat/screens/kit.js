@@ -159,8 +159,8 @@ export function dial({ cls = '', needle = true } = {}) {
 /** The two ends of the scale, under the dial. */
 export function ends(scale, { cls = '' } = {}) {
   return h(`div.th-ends${cls}`,
-    h(`span.th-end.l${scale.l.length > 16 ? '.long' : ''}`, h('i', { html: '<svg viewBox="0 0 24 24"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' }), h('span', scale.l)),
-    h(`span.th-end.r${scale.r.length > 16 ? '.long' : ''}`, h('span', scale.r), h('i', { html: '<svg viewBox="0 0 24 24"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' })));
+    h(`span.th-end.l${scale.l.length > 12 ? '.long' : ''}`, h('i', { html: '<svg viewBox="0 0 24 24"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' }), h('span', scale.l)),
+    h(`span.th-end.r${scale.r.length > 12 ? '.long' : ''}`, h('span', scale.r), h('i', { html: '<svg viewBox="0 0 24 24"><path d="M10 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' })));
 }
 
 /** The clue card for the show layer: who gave it, what they said, a timer. */
