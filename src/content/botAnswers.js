@@ -9,7 +9,7 @@ const FAMILY = [
 
 // Adults 18+: swearing and grown-up life, never sexual (Adam, 2026-11-13).
 const ADULT = [
-  'Six pints and a bad idea', 'My ex, unfortunately', 'A fucking parking ticket', 'Reply-all to the whole company',
+  'Six pints and a bad idea', 'My ex, unfortunately', 'A parking ticket on the fucking wheel clamp', 'Reply-all to the whole company',
   'Accidentally texting my mum', 'A hangover with its own postcode', 'Gary from accounts, pissed', 'A tax return, again',
   'Crying in a Wetherspoons', 'Council tax, the bastards', 'A budget hotel in Swindon', 'Puking in a taxi',
   'Absolutely nothing, I\'m knackered', 'My mother-in-law\'s opinions', 'Wet wipes, everywhere', 'Shit happens',
@@ -19,7 +19,7 @@ const ADULT = [
   'An email in Comic Sans', 'A stag do in Prague', 'Flat-pack furniture and swearing', 'Bollocks, basically',
   'Calling my boss "Mum"', 'A hen do in Newquay', 'Texting my boss at 2am', 'A caravan in the rain',
   'My best friend\'s dad\'s jokes', 'Laughing at a funeral', 'Sod all', 'A hangover with legs',
-  'Crying at the bank', 'The fucking self-checkout',
+  'Crying at the bank', 'Unexpected item in my fucking life',
 ];
 export const BOT_ANSWERS = {
   family: FAMILY,

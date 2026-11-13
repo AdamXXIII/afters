@@ -127,7 +127,7 @@ export default {
       tsPick: [['{name} is at the bottom. Again. You pick, darling.'], ['{name} is lowest. Choose your poison.']],
       tsPickMe: [['You\'re lowest. Choose your poison.'], ['Rock bottom. Lovely view. Pick a bottle.']],
       tsAll: [['Every one of you. Bloody hell. Who\'s been revising?']],
-      tsNone: [['Nobody. Not one. Have you all been at the cooking sherry?'], ['Not a single one of you. Fucking hell.']],
+      tsNone: [['Nobody. Not one. Have you all been at the cooking sherry?'], ['Not a single one of you. Fucking hell, and I\'m the one melting.']],
       tsSome: [['Up you go, the clever ones. Down you come, the rest. Mind the step.']],
       tsStole: [['{name} has nicked the leader\'s shelf. Thieving little sod. Love it.']],
       tsHeld: [['The leader held on. Smug bastard.']],

@@ -69,7 +69,7 @@ const MORNINGS_ADULT = [
   '{name} has been poisoned. Their last words were "is this decaf?"',
   '{name} went upstairs with a nightcap and came down in a body bag. Metaphorically. Mostly.',
   '{name} has been poisoned. Their group chat has already moved on.',
-  '{name} is dead. Their search history is now a family matter. God help them.',
+  '{name} is dead. Their overdraft is now a family matter. God help them.',
   '{name} has been poisoned. They died as they lived: three sheets to the wind.',
   'We found {name} in the hot tub. Still bubbling. Not breathing.',
   '{name} drank something they shouldn\'t have. For once, it wasn\'t tequila.',

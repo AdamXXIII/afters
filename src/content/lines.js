@@ -108,7 +108,7 @@ export const LINES = {
     ['{name} leads. Somebody tread on their toe.'],
   ],
   scoresLast: [
-    ['{name}, bringing up the rear. Steady.'],
+    ['{name}, last. Chin up. It\'s a long night.'],
     ['{name} is last. Plenty of pudding left to play for.'],
   ],
   ratingAdult: [

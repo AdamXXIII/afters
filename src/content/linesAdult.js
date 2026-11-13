@@ -29,11 +29,11 @@ export const LINES_ADULT = {
   ],
   lobbyReady: [
     ['That\'s a table. Whenever you\'re ready, host. Today, ideally.'],
-    ['Enough of you. Host, press the bloody button.'],
+    ['Enough of you. Host, press the bloody button. It\'s the big one.'],
     ['Right, we\'re all here. Host, crack on before someone orders a taxi.'],
   ],
   lobbyFull: [
-    ['Eight. Splendid. Somebody\'s on the piano stool.'],
+    ['Eight. Splendid. Somebody\'s sitting on a bloody stepladder.'],
     ['A full house. Eight of you and one bottle opener. Good luck.'],
     ['Eight! The neighbours are going to fucking love us.'],
   ],
@@ -72,7 +72,7 @@ export const LINES_ADULT = {
   ],
   r1Clean: [
     ['Every single vote. Licked the plate clean.'],
-    ['A clean sweep. Unanimous. Bloody hell.'],
+    ['A clean sweep. Unanimous. You lot can\'t agree on a takeaway.'],
     ['Every vote! Somebody frame that.'],
   ],
   r1Tie: [
@@ -86,7 +86,7 @@ export const LINES_ADULT = {
   r1Normal: [
     ['Splendid. The table has spoken. Harshly.'],
     ['There we are. One of you can be smug now.'],
-    ['Delicious. Shit, that was good.'],
+    ['Delicious. Shit. Nearly blew myself out.'],
   ],
   r1NoVotes: [
     ['Nobody voted. Too busy topping up, I assume.'],
@@ -116,7 +116,7 @@ export const LINES_ADULT = {
   r2FooledMany: [
     ['You fooled {n} people. Smooth. Remind me never to lend you money.'],
     ['{n} people fell for it. You absolute charlatan. I\'m impressed.'],
-    ['{n} of them swallowed that. Every word. Christ alive.'],
+    ['{n} of them believed that. Christ alive. You could sell houses.'],
   ],
   r2Nobody: [
     ['Not one of you. The truth sits alone, like me on Valentine\'s.'],
@@ -156,7 +156,7 @@ export const LINES_ADULT = {
     ['Third. Second. Close, but no cigar.', 'And our winner. Take a bow. Not that far, you\'ll fall over.'],
   ],
   end: [
-    ['Same again? I\'ve got wick for one more. Just about.'],
+    ['Same again? I\'ve got an inch of wax left. Fuck it, go on.'],
     ['Another round? I\'m knackered, but go on.'],
     ['Again? Fuck it. Why not. Nobody\'s driving.'],
   ],
@@ -174,8 +174,8 @@ export const LINES_ADULT = {
   ],
   mindFlame: [
     ['Mind the flame. And the curtains.'],
-    ['Careful. I\'m hot, and you\'re pissed.'],
-    ['Oi. Hands off. I\'m not a lighter.'],
+    ['Careful. Open flame, drunk people. What could go wrong?'],
+    ['Oi. Hands off. I\'m a centrepiece, not a fucking lighter.'],
   ],
   wait: [
     ['Plated. Now we wait. Top up while you\'re at it.'],
@@ -183,7 +183,7 @@ export const LINES_ADULT = {
     ['Sent. Now the delicious agony of waiting.'],
   ],
   r2Wait: [
-    ['Porky told. Keep a straight face, you bastard.'],
+    ['Porky told. Straight face, you beautiful lying bastard.'],
     ['Lie submitted. Poker face, darling.'],
   ],
 
@@ -204,19 +204,19 @@ export const LINES_ADULT = {
     ['That one\'s not out yet. Don\'t rush it. Good things take time.'],
   ],
   menuServe: [
-    ['{game} it is. Loosen your belts.'],
+    ['{game} it is. Somebody top me up. I\'m running on fumes.'],
     ['Ooh, {game}. Somebody\'s feeling brave. Or drunk.'],
     ['{game}. Good choice. Fuck it, let\'s go.'],
   ],
   nightLead: [
     ['{name} is winning tonight. Insufferable already.'],
     ['{name} leads the night. Somebody knock their drink over.'],
-    ['Tonight\'s big winner so far: {name}. Smug little sod.'],
+    ['Tonight\'s big winner so far: {name}. Hide their phone before they post about it.'],
   ],
   resultsWin: [
     ['{name} wins! Smug, sweaty and very pleased with themselves.'],
     ['Victory to {name}. We\'ll never hear the end of it.'],
-    ['{name} takes it. Bloody hell. Didn\'t see that coming.'],
+    ['{name} takes it. Didn\'t see that coming. Neither did {name}, by the look of it.'],
   ],
   resultsLast: [
     ['{name} came last. Proper last. Spectacularly last.'],
@@ -227,7 +227,7 @@ export const LINES_ADULT = {
   // Banter
   everyoneDone: [
     ['Everyone\'s finished early. Keen. Or you just didn\'t try.'],
-    ['All done already? Bloody hell, look at you go.'],
+    ['All done already? Did any of you actually read it?'],
     ['Everyone\'s in. That was quick. Suspiciously quick.'],
   ],
   slowpoke: [
@@ -250,18 +250,18 @@ export const LINES_ADULT = {
     ['Plenty spotted the truth. Smart-arses, the lot of you.'],
   ],
   scoresLeader: [
-    ['{name} is on top. Comfortable up there, darling?'],
+    ['{name} is winning. Enjoy it. I\'ve seen leads blow out faster than me in a draught.'],
     ['{name} leads. Everyone else, pull your fingers out.'],
     ['{name} in front. Insufferable, but fair play.'],
   ],
   scoresLast: [
-    ['{name} is bringing up the rear. Steady.'],
+    ['{name} is last. Absolute shitshow. Lovely to watch.'],
     ['{name} is last. Don\'t worry, there\'s always the next game.'],
     ['Poor {name}. Bottom again. Someone get them a drink.'],
   ],
   ratingAdult: [
-    ['Adults only. Lovely. I can finally fucking swear.'],
+    ['Adults only. Thank Christ. I\'ve been biting my wick all evening.'],
     ['Eighteen plus! Somebody put the kids to bed and open the good gin.'],
-    ['Ooh, adult mode. No more biting my wick.'],
+    ['Ooh, adult mode. I\'ve been holding that in since the kids went up.'],
   ],
 };
