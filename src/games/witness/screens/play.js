@@ -276,9 +276,9 @@ const recess = {
     const card = dockCard(ctx, p);
     show.append(h('div.wt-top', card));
     sheet.append(h('div.wt-sheet.wt-recess.wt-in',
-      h('div.wt-head.center', h('div.wt-head-t', h('div.wt-title', 'Short recess'), h('div.wt-sub', `${name} is keeping one fake to stand beside the truth.`))),
+      h('div.wt-head.center', h('div.wt-head-t', h('div.wt-title', 'Short recess'), h('div.wt-sub', `${name} is keeping two fakes to stand beside the truth.`))),
       h('div.wt-recess-art', dock(ctx.player(p.defendant), { size: 88 }), h('span.wt-dots.big', h('i'), h('i'), h('i'))),
-      h('div.wt-recess-n', `${p.fakes.length} fakes on the table. One survives.`)));
+      h('div.wt-recess-n', `${p.fakes.length} fakes on the table. ${Math.min(2, p.fakes.length)} survive.`)));
     const cancel = sayLater(ctx, ctx.line('wtRecess', { name }), { delay: 600 });
     return { frame(c) { card.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
   },
