@@ -320,3 +320,10 @@
 .sh-opener { align-self: flex-start; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--c-willow); font: 700 16px var(--f-ui); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 .sh-pairbox.closed .sh-pairs-l, .sh-pairbox.closed .sh-pairs { display: none; }
 .sh-pairbox:not(.closed) .sh-opener { display: none; }
+.sh-grp.herd { grid-template-columns: 1fr auto; grid-template-areas: "card n" "who who"; margin-top: 16px; row-gap: 10px; }
+.sh-grp.herd > .sh-ans { grid-area: card; justify-self: start; min-width: 60%; max-width: 100%; }
+.sh-grp.herd > .sh-grp-n { grid-area: n; }
+.sh-grp.herd > .sh-grp-who { grid-area: who; display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.sh-grp.herd > .sh-also { grid-column: 1 / -1; }
+.sh-grp.herd .sh-grp-p .nm { max-width: 10ch; }
+@media (orientation: landscape) and (max-height: 600px) { .sh-grp.herd { row-gap: 4px; margin-top: 12px; } }

@@ -145,7 +145,7 @@ const sort = {
       onTap(diff, () => vote(false), { sound: 'select', buzz: 'select' });
       const verdict = h('span.sh-dverdict');
       const el = h('div.sh-dispute',
-        h('div.sh-dq', h('span.sh-dans', d.a), h('span.sh-deq', '='), h('span.sh-dans', d.b), h('span.sh-deq.q', '?')),
+        h('div.sh-dq', h('span.sh-dans', d.a), h('span.sh-deq', '='), h('span.sh-dans', d.b)),
         h('div.sh-dvotes', same, diff),
         d.by ? h('div.sh-dfoot', h('span.sh-dby', `${nameOf(ctx, d.by)} says these match`), verdict) : h('div.sh-dfoot', h('span'), verdict));
       el.parts = { same, diff, verdict };
@@ -162,7 +162,7 @@ const sort = {
       const ds = (c.progress.disputes || []).map((d) => ({ ...d, a: textOf(d.a), b: textOf(d.b) }));
       head.replaceChildren(
         h('div.sh-title', ds.length ? 'Same answer?' : 'Any two answers the same?'),
-        ds.length ? null : h('div.sh-sub', 'Tap both. The table votes.'));
+        ...(ds.length ? [] : [h('div.sh-sub', 'Tap both. The table votes.')]));
       if (!ds.length) pairbox.classList.remove('closed');
       for (const d of ds) {
         if (!rows.has(d.id)) { const r = row(d); rows.set(d.id, r); list.append(r); }
