@@ -167,7 +167,7 @@ Why it suits phones: rapid-fire typing, then a one-thumb swipe deck, which is th
 - Late join is refused after the lobby. Reconnect within 90 s restores a player by a `playerToken` in `localStorage`. If the host disconnects for 10 s, the longest-connected player is promoted (state is mirrored to all clients every phase change).
 - **Speaker phone:** only the host phone plays music and Cyril's babble by default (8 phones playing music out of sync is awful). Every phone plays its own UI SFX at 60% volume. Lobby toggle "Speaker: <name>" lets the table move it.
 - Room codes: 4 letters from `BCDFGHJKLMNPQRSTVWXZ` (no vowels, so no accidental words), avoiding a small blocklist.
-- Profanity: a lightweight family-safe filter on names and answers (masks with a cutlery glyph string "++++" ). Toggle "Adult table" in the lobby disables the filter only; content stays family-safe.
+- Profanity: a lightweight family-safe filter on names and answers (masks with a cutlery glyph string "++++" ). The Adults 18+ rating disables the filter and switches to the adult decks: grown-up comedy with uncensored swearing, **never sexual** (no sex acts, innuendo-as-the-joke, bedroom or body-part questions). Family is the same comedy without the swearing (Adam, 2026-11-13).
 
 ### 2.8 Content - Round 1 prompts (48, original, family-safe, British-friendly)
 1. The worst thing to say when meeting your partner's parents for the first time

@@ -213,7 +213,7 @@ export default {
 - `drawing.js`: `drawPad({onChange, prompt})` (touch drawing, 8 colours incl. a rubber, 4 sizes, undo, clear) -> `.drawing`; `drawingView(d).frame(t)` replays stroke by stroke as a pure function of `t`. `encodeDrawing`/`decodeDrawing` (validates untrusted data, caps points) and `replayDuration` are in Node-safe `drawing-data.js` for host logic. Coordinates are a 1000x1000 board.
 - Try them at `?demo=sandbox`; `node scripts/test-shared.mjs` checks them.
 
-**5. Content** - `src/games/<id>/content/*.js` exporting `{family: [...], adult: [...]}` with stable ids (`api.take` remembers them all night). Adults 18+ = cheeky, rude, innuendo-heavy; no hate, no real people, nothing involving minors.
+**5. Content** - `src/games/<id>/content/*.js` exporting `{family: [...], adult: [...]}` with stable ids (`api.take` remembers them all night). Adults 18+ = grown-up comedy with **uncensored swearing** (the filter is off; 'fuck', 'shit', 'bollocks' are fine in Cyril's lines and content). It is **not sexual**: no sex acts, no innuendo as the joke, no bedroom or body-part questions (Adam, 2026-11-13). No hate, nothing involving minors, never a real person as the butt of a joke. Famous people and titles are fine as answers in guessing games. Family = the same comedy without the swearing.
 
 **6. Tests** - `node scripts/sim.mjs 4 50 <id>` (Node, bots play your game through the menu), `node scripts/shoot.mjs --screens <demo ids>` and an e2e that clicks `[data-e2e=dish-<id>]` then `[data-e2e=serve-game]` on the menu (see `scripts/e2e.mjs`).
 
