@@ -33,7 +33,7 @@ const intro = {
         'Everyone else writes a fake answer in that person’s voice.',
         'Find the real one. Fool the table to score.',
       ],
-      foot: `${ctx.payload.rounds} in the dock. Points double halfway, then a cross-examination for triple.`,
+      foot: `Everyone takes a turn. Points double halfway.`,
     });
     show.append(h('div.wt-dim'), h('div.wt-cardwrap', card));
     if (!ctx.frozen) card.animate([{ transform: 'translateY(28px) rotate(-2deg) scale(.94)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 620, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });

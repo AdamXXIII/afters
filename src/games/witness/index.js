@@ -107,8 +107,8 @@ export default {
   lines: {
     family: {
       wtIntro: [
-        ['Character Witness. One of you takes the stand. The rest of you lie about them.', 'Under oath. Ish.'],
-        ['Order at the table! One of you answers about yourself. The others make it up.'],
+        ['Character Witness. How well do you really know this lot?', 'Under oath. Ish.'],
+        ['Order at the table! I\'ve always wanted to say that.'],
       ],
       wtIntroAgain: [['Back in court. The jury has had time to think. Worrying.'], ['Another sitting. I\'ve polished the gavel.']],
       wtDock: [['Honesty is the best policy. Usually.'], ['The court can\'t prove a thing. Answer anyway.']],

@@ -29,14 +29,18 @@ Everyone is in the dock once (shuffled order). Then the standings, and the last-
 - Your fake fools someone: **+500 per person**.
 - The defendant: **+250 per juror who picked a fake**.
 - Your fake is the defendant's answer word for word (give or take a typo): it merges into the real one, you get **+750** ("You wrote exactly what they wrote") and you can't pick it.
-- Cross-examination doubles everything. The defendant keeps one fake beside the truth (if they dither, Cyril keeps a player's fake for them).
+- **Stakes rise:** the first half of the docks pay x1, from halfway every point is x2 (Cyril announces it), and Cross-examination is x3.
+- **Cross-examination:** last place takes the stand and keeps **two** fakes beside their answer (three cards, not a coin flip; if they dither, Cyril tops up with players' fakes). Writers of the kept fakes earn 500 x3 per juror fooled; the defendant earns a flat **1000 per juror fooled** (a real comeback, not a coronation).
 - If the defendant writes nothing: "No comment. Contempt of court." Nobody scores that round.
-- Fewer than three answers: Cyril adds house fakes from a bank keyed by the question's kind (thing, place, person, number...), so even three players get three cards.
+- Fewer than three answers (only when someone doesn't write): Cyril adds house fakes from a bank keyed by the question's kind (thing, place, person, game, app, award, story, advice...).
 
-## Twists (depth)
-- **Plead the fifth** (once a game, not in the final): the defendant writes a lie instead. It still counts as "their" answer; the reveal seals it *Fifth* and says so. A comfort valve for Adults 18+ questions and a bluff in its own right.
-- **Cross-examination**: last place takes the stand, chooses the lie, double points. Catch-up and a different decision (the defendant picks the most convincing forgery).
-- **Expert witness**: speed matters when picking.
+## Changes from the critic loop
+- Content round 1 (worse): too many stock icebreakers and bare counts -> 37 prompts rewritten to concrete, odd-detail ones; food slipped out of house fakes.
+- Content round 2 (worse): hypotheticals have no true answer; house fakes didn't fit -> "would" prompts swapped for real facts, new house kinds (story, advice).
+- Content round 3 (worse): same gap (house fakes fit) -> more kinds (game, app, award); stopped here (two rounds on the same gap).
+- Arc round 1 (worse): flat, final a coin flip -> stakes double halfway, x3 final, two kept fakes.
+- Arc round 2 (worse): final overpaid last place -> writers paid again in the final.
+- Arc round 3 (worse): final underpaid last place -> defendant flat 1000 per fooled juror; stopped (critics flip-flopped).
 
 ## Look (one idea: the court sits at the dinner table)
 - Answers are **handwritten witness statements** (Caveat, ink blue) on ruled card with a claret margin line.
@@ -45,7 +49,7 @@ Everyone is in the dock once (shuffled order). Then the standings, and the last-
 - Accent willow (the game's dish colour) for the jury, claret for the stand and the final.
 
 ## Messages (phone -> host)
-`wt-answer {text, fifth}`, `wt-pick {optionId}` (changeable until time), `wt-keep {optionId}` (final, defendant only).
+`wt-answer {text, fifth}`, `wt-pick {optionId}` (changeable until time), `wt-keep {ids}` (final, defendant only, up to two).
 
 ## Content
-`content/questions.js`: 160 family, 155 Adults 18+, `kind|question` with `{name}` (the defendant) and `{other}` (another player). House fakes per kind and rating. No food or drink topics.
+`content/questions.js`: 160 family, 155 Adults 18+ (re-sharpened by three critic rounds), `kind|question` with `{name}` (the defendant) and `{other}` (another player). House fakes per kind and rating. No food or drink topics.
