@@ -60,7 +60,7 @@ export class SameHereHost {
       case 'sh-vote': {
         if (ph !== 'samehere-sort') return;
         const d = r.disputes.find((x) => x.id === msg.id);
-        if (!d) return;
+        if (!d || !this._mayVote(d, p.id)) return;
         if (msg.same === true || msg.same === false) d.votes[p.id] = msg.same;
         else delete d.votes[p.id];
         this.api.progress();
@@ -72,7 +72,9 @@ export class SameHereHost {
         const a = r.groups.find((g) => g.gid === msg.a); const b = r.groups.find((g) => g.gid === msg.b);
         if (!a || !b || a === b) return;
         if (r.disputes.some((d) => (d.a === a.gid && d.b === b.gid) || (d.a === b.gid && d.b === a.gid))) return;
-        r.disputes.push({ id: `d${r.disputes.length}`, a: a.gid, b: b.gid, by: p.id, votes: { [p.id]: true } });
+        const d = { id: `d${r.disputes.length}`, a: a.gid, b: b.gid, by: p.id, votes: {} };
+        if (this._mayVote(d, p.id)) d.votes[p.id] = true;
+        r.disputes.push(d);
         // a fresh argument: everyone gets a say again
         for (const k of Object.keys(r.done)) if (k !== p.id) r.done[k] = false;
         this.api.progress();
@@ -110,8 +112,8 @@ export class SameHereHost {
     const list = this.api.players.filter((p) => r.answers[p.id]).map((p) => ({ pid: p.id, text: r.answers[p.id] }));
     r.groups = autoGroup(list);
     r.disputes = suggestDisputes(r.groups, 3).map(([a, b], i) => ({ id: `d${i}`, a, b, by: null, votes: {} }));
-    // sort only when there's something to argue about (Cyril's close calls, or 3+ different answers to pair up)
-    if (r.disputes.length || r.groups.length >= 3) return this._sort();
+    // sort only when Cyril has spotted a close call: no heads-down phone time otherwise
+    if (r.disputes.length) return this._sort();
     return this._reveal();
   }
 
@@ -125,7 +127,7 @@ export class SameHereHost {
         done: this._doneMap((p) => !!r.done[p.id]),
         counts: {},
         disputes: r.disputes.map((d) => ({
-          id: d.id, a: d.a, b: d.b, by: d.by,
+          id: d.id, a: d.a, b: d.b, by: d.by, judges: this._judges(d),
           same: Object.keys(d.votes).filter((k) => d.votes[k]),
           diff: Object.keys(d.votes).filter((k) => !d.votes[k]),
         })),
@@ -133,14 +135,26 @@ export class SameHereHost {
     });
   }
 
+  /** Who decides a close call: everyone who didn't write either answer (everyone, if that's nobody). */
+  _judges(d) {
+    const r = this.cur;
+    const authors = new Set([d.a, d.b].flatMap((gid) => r.groups.find((g) => g.gid === gid)?.pids || []));
+    const others = this.api.players.filter((p) => !authors.has(p.id)).map((p) => p.id);
+    return others.length ? others : this.api.players.map((p) => p.id);
+  }
+
+  _mayVote(d, pid) { return this._judges(d).includes(pid); }
+
   _reveal() {
     const api = this.api;
     const r = this.cur;
     // settle the arguments: more "same" than "different" merges them
     const merged = [];
     const ruled = r.disputes.map((d) => {
-      const same = Object.values(d.votes).filter(Boolean).length;
-      const diff = Object.values(d.votes).length - same;
+      const judges = new Set(this._judges(d));
+      const vs = Object.entries(d.votes).filter(([pid]) => judges.has(pid)).map(([, v]) => v);
+      const same = vs.filter(Boolean).length;
+      const diff = vs.length - same;
       const ok = same > diff;
       if (ok) merged.push([d.a, d.b]);
       const A = r.groups.find((g) => g.gid === d.a); const B = r.groups.find((g) => g.gid === d.b);

@@ -137,6 +137,8 @@
 .sh-vavs .sh-av { margin-left: -5px; box-shadow: 0 0 0 1.5px var(--c-linen); animation: shPop 260ms var(--ease-out-back) both; }
 .sh-vavs .sh-av:first-child { margin-left: 0; }
 @keyframes shPop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+.sh-dispute.author .sh-vote { opacity: .55; cursor: default; }
+.sh-dispute.author .sh-dby { color: var(--c-claret); font-weight: 700; }
 .sh-dfoot { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font: 600 13px var(--f-ui); color: var(--c-toffee); }
 .sh-dverdict { font-weight: 750; }
 .sh-dverdict.on { color: var(--teal-ink); }
@@ -271,7 +273,7 @@
   .sh-dispute { padding: 6px 10px; }
   .sh-dans { font-size: 24px; }
   .sh-vote { min-height: 44px; }
-  .sh-dfoot { display: none; }
+  .sh-dispute:not(.author) .sh-dfoot { display: none; }
 
   .sh-rv { left: 40%; padding-left: 8px; gap: 6px; bottom: calc(var(--rail-h) + var(--safe-b) + 4px); }
   .sh-rv .sh-qcard.compact .sh-q { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

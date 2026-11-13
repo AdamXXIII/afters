@@ -147,7 +147,7 @@ const sort = {
       const el = h('div.sh-dispute',
         h('div.sh-dq', h('span.sh-dans', d.a), h('span.sh-deq', '='), h('span.sh-dans', d.b)),
         h('div.sh-dvotes', same, diff),
-        d.by ? h('div.sh-dfoot', h('span.sh-dby', `${nameOf(ctx, d.by)} says these match`), verdict) : h('div.sh-dfoot', h('span'), verdict));
+        h('div.sh-dfoot', h('span.sh-dby'), verdict));
       el.parts = { same, diff, verdict };
       return el;
     }
@@ -162,11 +162,15 @@ const sort = {
       const ds = (c.progress.disputes || []).map((d) => ({ ...d, a: textOf(d.a), b: textOf(d.b) }));
       head.replaceChildren(
         h('div.sh-title', ds.length ? 'Same answer?' : 'Any two answers the same?'),
-        h('div.sh-sub', ds.length ? 'Vote. Most votes decide. Argue out loud.' : 'Tap both. The table then votes.'));
+        h('div.sh-sub', ds.length ? 'Argue out loud. Whoever didn’t write them votes.' : 'Tap both. The table then votes.'));
       if (!ds.length) pairbox.classList.remove('closed');
       for (const d of ds) {
         if (!rows.has(d.id)) { const r = row(d); rows.set(d.id, r); list.append(r); }
         const r = rows.get(d.id).parts;
+        const judge = !d.judges || d.judges.includes(c.meId);
+        rows.get(d.id).classList.toggle('author', !judge);
+        r.same.disabled = !judge; r.diff.disabled = !judge;
+        r.verdict.parentElement.querySelector('.sh-dby').textContent = judge ? (d.by ? `${nameOf(c, d.by)} says these match` : '') : 'You wrote one of these. The others decide.';
         const my = c.mine.game.votes?.[d.id];
         r.same.setAttribute('aria-pressed', String(my === true));
         r.diff.setAttribute('aria-pressed', String(my === false));
