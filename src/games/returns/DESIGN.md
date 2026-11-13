@@ -45,3 +45,11 @@ The box's linen/claret/candle world. Cards are linen stock with a colour band an
 
 ## Gaps / shared asks
 - Menu dish art: `dish: 'cake'` is not in `src/screens/menu-art.js` yet (falls back to the cloche). Notes for the box team are in `index.js`.
+
+## Critic rounds (blind, A/B randomised, against Exploding Kittens app + EK2 store shots)
+- How it plays: ours won 8 vs 4 (theirs is a card catalogue, no goal). Fix taken: panel 3 now names the cards.
+- Core turn screen: ours won 7.5 vs 5.5 (clear whose turn, Draw button, cake odds). Weakness: cosy rather than dreadful; added the "Your turn!" slam and candle frame.
+- Reveals (cake, saved, Steady On): ours won 7.5 vs 5.
+- Content: zero sexual lines; "blow" jokes, a real-person butt and weak lines replaced.
+- Tired first-timer: two rounds. Fixed repeated messages, unclear odds, live-looking hand on others' turns, tuck wording, target chips that looked like labels.
+- Whole game at 3 and 8: reference won 8 vs 6. Gap left: players are a row of avatars, not characters sat round a table; that is the box's stage (3D seats), not this game. 8 seats fit but are small.
