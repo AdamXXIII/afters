@@ -14,7 +14,7 @@ const vote = {
     const owner = ctx.player(p.ownerId);
     const top = h('div.tp-vote-head',
       h('div', h('div.t-eyebrow', `Rumour ${p.index + 1} of ${p.count} · ${owner?.name || ''}'s`), h('div.tp-vote-q', 'Best bit?')),
-      h('div.tp-vote-sub', h('b', '+500'), h('span', 'a vote')));
+      (ctx.players.length === 2 ? h('div.tp-vote-sub', h('span', 'Pick their best page')) : h('div.tp-vote-sub', h('b', '+500'), h('span', 'a vote'))));
     const views = [];
     const rank = (m) => (m.authorId === ctx.meId ? 2 : 0) + (m.kind === 'draw' ? 0 : 1);
     const list = [...p.moments].sort((a, b) => rank(a) - rank(b) || a.step - b.step);
@@ -70,7 +70,7 @@ const awards = {
         h('div.tp-aw-ribbon', h('span', { html: TP_ICONS.star }), 'Moment of the night'),
         m.kind === 'draw' && m.prompt ? h('div.tp-aw-prompt', 'Asked to draw: ', h('b', `“${m.prompt}”`)) : null,
         body,
-        h('div.tp-aw-by', av(pl, { size: 46 }), h('div', h('div.tp-aw-name', pl?.name || '?'), h('div.tp-aw-votes', `${m.votes} vote${m.votes === 1 ? '' : 's'} from the table`)), h('span.tp-aw-pts', `+${m.votes * 500}`)));
+        h('div.tp-aw-by', av(pl, { size: 46 }), h('div', h('div.tp-aw-name', pl?.name || '?'), h('div.tp-aw-votes', `${m.votes} vote${m.votes === 1 ? '' : 's'} from the table`)), ctx.players.length === 2 ? null : h('span.tp-aw-pts', `+${m.votes * 500}`)));
       hero.view = view;
     } else {
       hero = h('div.tp-aw-hero.none', h('div.tp-aw-ribbon', 'Moment of the night'), h('div.tp-aw-txt', 'Nobody voted. I\'ll take that as stunned silence.'));

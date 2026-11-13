@@ -24,8 +24,9 @@ export default {
   hint: 'Play cards, one judges',
   tagline: 'Play your worst card. Please one person.',
   blurb: 'Each round one of you is the Critic. Everyone else plays the funniest answer from their hand to fill the blank. The Critic reads them out and crowns one.',
-  players: [3, 8],
+  players: [2, 8],
   minutes: 15,
+  duo: 'Take turns as the Critic. The other plays a card against one of Cyril’s and scores only by beating it. Together, keep Cyril’s crowns below yours.',
   steps: STEPS,
   hasAdult: true,
   colour: '#7A1E2C',
@@ -87,6 +88,12 @@ export default {
     'badtaste-judge-watch': { match: (e, me) => { seat(false)(e, me); if (e.phase.id === 'badtaste-judge') turn(e, 3); return e.phase.id === 'badtaste-judge' && !isCritic(e, me); }, me: 'idle', bots: 'idle', t: 12000 },
     'badtaste-win': { match: (e) => e.phase.id === 'badtaste-win', t: 6500 },
     'badtaste-win-owner': { match: (e) => e.phase.id === 'badtaste-win', t: 2600 },
+    // two players (shoot with --players 2): head to head with Cyril's card
+    'badtaste-duo-intro': { match: (e) => e.phase.id === 'badtaste-intro', t: 3500 },
+    'badtaste-duo-hand': { match: (e, me) => { seat(false)(e, me); return e.phase.id === 'badtaste-play' && !isCritic(e, me); }, me: 'idle', bots: 'some', t: 9000 },
+    'badtaste-duo-critic': { match: (e, me) => { seat(true)(e, me); return e.phase.id === 'badtaste-play' && isCritic(e, me); }, me: 'idle', bots: 'idle', t: 12000 },
+    'badtaste-duo-judge': { match: (e, me) => { seat(true)(e, me); if (e.phase.id === 'badtaste-judge') turn(e, 99); return e.phase.id === 'badtaste-judge' && isCritic(e, me); }, me: 'idle', bots: 'idle', t: 20000 },
+    'badtaste-duo-win': { match: (e) => e.phase.id === 'badtaste-win', t: 6500 },
   },
 
   lines: {
@@ -111,6 +118,8 @@ export default {
       btCyrilChose: [['Too slow. I picked. {name} gets the crown.']],
       btChoose: [['All turned. Now pick one. No pressure. Lots of pressure.'], ['Which one made you laugh? That one.']],
       btDecider: [['A tie at the top. One more round decides it.']],
+      btIntroDuo: [['Two of you. And me. I’ve got cards too, and they’re good.'], ['Just the two of you? Then you’re playing against me. Lovely.']],
+      btHandDuo: [['Beat my card. I’ve played a good one. Probably.'], ['One of these is mine. Make sure yours is funnier.']],
     },
     adult: {
       btIntro: [
@@ -131,6 +140,8 @@ export default {
       btHouse: [['That was my card, you lot. Nobody scores. Get fucked.'], ['Mine! Beaten by a candle. Shameful.']],
       btCyrilChose: [['Took too bloody long. I picked. {name}, lucky you.']],
       btChoose: [['Pick one. Don’t overthink it, you’re not a fucking High Court judge.'], ['Which one made you snort? Crown it.']],
+      btIntroDuo: [['Two of you and one candle. I play to win, you bastards.']],
+      btHandDuo: [['Beat my card. I’ve been saving it all bloody night.'], ['One of these is mine. Don’t let a fucking candle beat you.']],
     },
   },
 };

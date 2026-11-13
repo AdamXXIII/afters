@@ -14,7 +14,9 @@ export const LIMITS = { text: 70, points: 2200 };
  *  'twice' = it goes round the table twice (more drift at small tables), capped so a game stays ~15 min. */
 export const LENGTHS = ['once', 'twice'];
 export const MAX_STEPS = 10;
-export const stepsFor = (n, length) => (length === 'twice' ? Math.max(n, Math.min(2 * n, MAX_STEPS)) : n);
+/** Two players: the book goes round three times (6 steps) whatever the length, so it still has room to drift. */
+export const DUO_STEPS = 6;
+export const stepsFor = (n, length) => (n === 2 ? DUO_STEPS : length === 'twice' ? Math.max(n, Math.min(2 * n, MAX_STEPS)) : n);
 /** Small tables go round twice by default so a line has room to drift. */
 export const defaultLength = (n) => (n <= 4 ? 'twice' : 'once');
 

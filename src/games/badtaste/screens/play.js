@@ -44,7 +44,7 @@ const hand = {
     const subEl = h('div.bt-sub');
     const per = p.per || 1;
     const critic = nameOf(ctx, p.critic);
-    const title = h('div.bt-title', p.decider ? `The decider: play to ${critic}` : `Play a card to ${critic}`);
+    const title = h('div.bt-title', p.decider ? `The decider: play to ${critic}` : p.duo ? 'Beat Cyril’s card' : `Play a card to ${critic}`);
     const page = h('div.bt-sheet.bt-handsheet',
       h('div.bt-sheethead', title, subEl),
       grid, writeBox,
@@ -89,11 +89,11 @@ const hand = {
       }
       btn.disabled = !a;
       btn.textContent = writing ? 'Play my card' : 'Play this card';
-      subEl.textContent = writing ? 'Type it. It appears in the blank up top.' : per > 1 ? 'Only two of you are playing, so two cards each. Tap one to try it.' : 'Tap one to try it in the blank. Nobody sees who played what.';
+      subEl.textContent = writing ? 'Type it. It appears in the blank up top.' : p.duo ? `${critic} gets yours and Cyril’s, face down. Tap one to try it.` : per > 1 ? 'Only two of you are playing, so two cards each. Tap one to try it.' : 'Tap one to try it in the blank. Nobody sees who played what.';
     }
     if (ctx.frozen && ctx.demo && cards[2]) sel = cards[2].id;
     sync();
-    const cancel = sayLater(ctx, ctx.line(p.double ? 'btLast' : 'btHand', { name: nameOf(ctx, p.critic) }), { delay: 800 });
+    const cancel = sayLater(ctx, ctx.line(p.double ? 'btLast' : p.duo ? 'btHandDuo' : 'btHand', { name: nameOf(ctx, p.critic) }), { delay: 800 });
     let autoSent = false;
     return {
       update: () => sync(),
@@ -124,7 +124,7 @@ const critic = {
     const pile = h('div.bt-pile');
     const row = playedRow(ctx, ids);
     show.append(h('div.bt-criticwrap',
-      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', `Round ${p.round} of ${p.of}. Wait while they pick their cards.`)), ring),
+      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', p.duo ? `Round ${p.round} of ${p.of}. ${nameOf(ctx, ids[0])} is picking a card to beat Cyril’s.` : `Round ${p.round} of ${p.of}. Wait while they pick their cards.`)), ring),
       pc, pile, row));
     let n = -1;
     const sync = (c) => {
@@ -175,7 +175,7 @@ const played = {
     show.append(h('div.bt-top', pc, row));
     const two = mineList.length > 1;
     sheet.append(h('div.bt-sheet.bt-playedsheet',
-      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', two ? `Both your cards are in, face down. Only two of you are playing, so two each.` : `Face down. ${nameOf(ctx, p.critic)} won’t know it’s yours.`)),
+      h('div.bt-sheethead.center', h('div.bt-title', 'In the pile'), h('div.bt-sub', two ? `Both your cards are in, face down. Only two of you are playing, so two each.` : p.duo ? `Face down next to Cyril’s. ${nameOf(ctx, p.critic)} won’t know which is yours.` : `Face down. ${nameOf(ctx, p.critic)} won’t know it’s yours.`)),
       mineList.length > 1
         ? h('div.bt-mine.two', mineList.map((x, i) => answerCard(x.text, { cls: '.big.mine', seed, key: `mine${i}` })))
         : h('div.bt-mine', cardBack({ cls: '.under', seed, key: 'u1' }), answerCard(text || 'Played', { cls: '.big.mine', seed, key: 'mine' }))));

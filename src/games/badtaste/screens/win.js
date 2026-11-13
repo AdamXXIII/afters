@@ -38,10 +38,10 @@ export default {
       h('span.bt-rest-t', c.text[0].toUpperCase() + c.text.slice(1)),
       c.by === 'house' ? h('span.bt-rest-by', cyrilDisc(24), 'Cyril') : h('span.bt-rest-by', disc(ctx.player(c.by), { size: 24 }), c.by === ctx.meId ? 'You' : nameOf(ctx, c.by))));
     const restBox = h('div.bt-rest', h('div.bt-rest-h', 'Who played the rest'), rest);
-    const tally = h('div.bt-tally', h('div.bt-tally-h', { html: `${CROWN}<span>Crowns so far</span>` }), h('div.bt-tally-l', p.scores.map((r) => h(`div.bt-tallyi${r.id === win.by ? '.won' : ''}${r.id === ctx.meId ? '.me' : ''}`,
+    const tally = h('div.bt-tally', h('div.bt-tally-h', { html: p.duo ? `${CROWN}<span>Crowns so far · you two ${p.scores.reduce((n, r) => n + r.score, 0)}, Cyril ${p.house || 0}</span>` : `${CROWN}<span>Crowns so far</span>` }), h('div.bt-tally-l', p.scores.map((r) => h(`div.bt-tallyi${r.id === win.by ? '.won' : ''}${r.id === ctx.meId ? '.me' : ''}`,
       disc(ctx.player(r.id), { size: 24 }),
       h('span.nm', r.id === ctx.meId ? 'You' : nameOf(ctx, r.id)),
-      h('b', String(r.score))))));
+      h('b', String(r.score)))).concat(p.duo ? [h(`div.bt-tallyi.cyril${house ? '.won' : ''}`, cyrilDisc(24), h('span.nm', 'Cyril'), h('b', String(p.house || 0)))] : [])));
     const note = p.decider ? h('div.bt-note', 'The decider') : null;
     const next = h('div.bt-next');
     tally.append(next);

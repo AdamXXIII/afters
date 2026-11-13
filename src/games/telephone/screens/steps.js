@@ -160,7 +160,7 @@ const guess = {
       empty ? h('div.tp-blank', 'They drew nothing. Make something up.') : null);
     const field = textField({ max: ctx.payload.max || 70, placeholder: 'A dog stuck in a lift…', onSubmit: () => send() });
     const btn = iconBtn('Pass it on', 'send', { e2e: 'submit', onClick: () => send() });
-    const body = h('div.tp-sheet.tp-guess', head(ctx, null), h('div.tp-guess-q', 'Describe this drawing'), paper, field, btn);
+    const body = h('div.tp-sheet.tp-guess', head(ctx, null), h('div.tp-guess-q', 'Describe this drawing', pv.owner === ctx.meId ? h('small.tp-guess-own', 'Your own sentence, back again. Write what you see, not what you wrote.') : null), paper, field, btn);
     sheet.append(body);
     function send() {
       const text = field.input.value.trim();

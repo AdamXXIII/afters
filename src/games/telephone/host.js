@@ -194,9 +194,11 @@ export class TelephoneHost {
       }
       if (kind === 'guess') {
         const source = chain.steps[s - 2];
+        // your own sentence coming back to you (always at 2 players) is no test of the drawing: no points for keeping it
         entry.match = !entry.auto && !!source && kept(source.text, entry.text);
+        entry.own = chain.ownerId === id;
         const drawer = chain.steps[s - 1];
-        if (entry.match && !drawer.auto) this.api.addScores({ [id]: PTS.kept, [drawer.authorId]: PTS.kept });
+        if (entry.own) { /* nailed it still shows; no points */ } else if (entry.match && !drawer.auto) this.api.addScores({ [id]: PTS.kept, [drawer.authorId]: PTS.kept });
         else if (entry.match) this.api.addScores({ [id]: PTS.kept });
       }
       chain.steps[s] = entry;
@@ -278,7 +280,8 @@ export class TelephoneHost {
       const st = chain.steps[s];
       if (!st) continue;
       this.allVotes[key] = (this.allVotes[key] || 0) + 1;
-      deltas[st.authorId] = (deltas[st.authorId] || 0) + PTS.vote;
+      // two of you: the only page you can pick is the other's, so the vote names the moment but scores nothing
+      if (this.n > 2) deltas[st.authorId] = (deltas[st.authorId] || 0) + PTS.vote;
       st.votes = (st.votes || 0) + 1;
     }
     chain.votes = Object.keys(this.votes).length;

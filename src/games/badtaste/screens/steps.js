@@ -4,3 +4,10 @@ export const STEPS = [
   'Everyone else plays their funniest card, or writes one.',
   'The Critic reads them out and crowns the winner.',
 ];
+
+/** Two of you: the same game, head to head with Cyril's card. */
+export const STEPS_DUO = [
+  'Take turns being the Critic.',
+  'The other plays a card. Cyril plays one too.',
+  'The Critic crowns the funnier. Beat Cyril to score.',
+];

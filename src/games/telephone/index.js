@@ -78,8 +78,9 @@ export default {
   hint: 'Draw it, pass it on',
   tagline: 'Write it, draw it, guess it, ruin it.',
   blurb: 'Your sentence goes round the table: drawn, guessed, drawn again. Then we watch it fall apart, stroke by stroke.',
-  players: [3, 8],
+  players: [2, 8],
   minutes: 12,
+  duo: 'Your two sentences swap back and forth six times, drawn and described, and you watch them drift together.',
   steps: ['Everyone writes a sentence.', 'Each one goes round the table: draw it, describe it, draw that.', 'Turn the pages together and watch it drift.'], // menu "How it plays"
   hasAdult: true, // has 18+ content when the table picks Adults
   colour: '#2F5D7C',
@@ -99,6 +100,9 @@ export default {
     'telephone-write': { match: at('telephone-write'), me: 'idle', bots: 'some', t: 9000 },
     'telephone-draw': { match: at('telephone-draw'), me: 'idle', bots: 'some', t: 21000 },
     'telephone-guess': { match: at('telephone-guess'), me: 'idle', bots: 'some', t: 9000 },
+    // two players (shoot with --players 2): the intro without a length choice, and your own sentence coming back
+    'telephone-duo-intro': { match: at('telephone-intro'), t: 2600 },
+    'telephone-duo-guess': { match: at('telephone-guess'), me: 'idle', bots: 'some', t: 9000 },
     'telephone-wait': { match: at('telephone-draw'), me: 'act', bots: 'some', t: 26000 },
     // album pages: the demo runner calls advance(), which turns one page at a time
     'telephone-reveal': { match: page(1), t: 60000 },
