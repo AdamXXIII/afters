@@ -142,7 +142,7 @@
 .rt-hint { font-size: 14px; line-height: 18px; font-weight: 550; color: var(--c-toffee); text-wrap: balance; min-width: 0; }
 .rt-hand { display: flex; gap: 8px; overflow-x: auto; overflow-y: visible; padding: 14px 4px 10px; margin: -12px -18px 0; padding-left: 18px; padding-right: 18px; scroll-snap-type: x proximity; scrollbar-width: none; flex: none; }
 .rt-hand::-webkit-scrollbar { display: none; }
-.rt-hand > .rt-card { scroll-snap-align: start; animation: rtDeal 420ms var(--ease-out-back) calc(var(--i) * 45ms) both; }
+.rt-hand > .rt-card { scroll-snap-align: start; animation: rtDeal 420ms var(--ease-out-back) calc(var(--i) * 45ms) backwards; }
 @keyframes rtDeal { from { opacity: 0; transform: translateY(26px) rotate(4deg); } to { opacity: 1; transform: none; } }
 .rt-hand[role="listbox"] > .rt-card { cursor: pointer; }
 .rt-hand > .rt-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
