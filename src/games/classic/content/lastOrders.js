@@ -27,7 +27,7 @@ const ADULT = [
   'Rejected names for a stag do',
   'Things you shouldn\'t shout at a wedding',
   'Worst things to say on a first date',
-  'Excuses for why you\'re still in last night\'s clothes',
+  'Excuses for turning up to work still hungover',
   'Things that happen on every hen do',
   'Things that happen on every stag do',
   'Terrible things to say to a bouncer to get in',

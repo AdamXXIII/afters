@@ -121,7 +121,7 @@ export default {
     },
     adult: {
       tsIntro: [
-        ['My drinks cabinet, after dark. The good stuff is on the top shelf, obviously.', 'Some of you will slide down. Like most of my evenings.'],
+        ['My drinks cabinet, after hours. The good stuff is on the top shelf, obviously.', 'Some of you will slide down. Like most of my evenings.'],
         ['Top Shelf. A quiz for people who swear at the telly during University Challenge.'],
       ],
       tsPick: [['{name} is at the bottom. Again. You pick, darling.'], ['{name} is lowest. Choose your poison.']],
