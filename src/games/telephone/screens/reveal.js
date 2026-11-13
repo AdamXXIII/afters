@@ -33,8 +33,9 @@ export default {
     const header = h('div.tp-al-head',
       av(owner, { size: 36 }),
       h('div.tp-al-head-t',
-        h('div.tp-al-title', `${owner?.name || 'Someone'}'s ${flip ? 'flipbook' : 'rumour'}`),
-        h('div.tp-al-sub', h('span', `Rumour ${p.index + 1} of ${p.count}`), pips, pageNo)));
+        // the sentence it started as stays pinned, so every page plays against it
+        h('div.tp-al-title', `“${steps[0].text}”`),
+        h('div.tp-al-sub', h('span', `${owner?.name || 'Someone'} · ${p.index + 1} of ${p.count}`), pips, pageNo)));
 
     // ---- the feed
     const list = h('div.tp-al-list');
@@ -116,6 +117,10 @@ export default {
           h('div.tp-end-foot', `${frames.length} frames, ${frames.length} pairs of hands`));
       } else {
         const crosser = p.end.crossedAt > 0 ? ctx.player(steps[p.end.crossedAt].authorId) : null;
+        // the drawing that got misread: the page just before it went wrong
+        const dst = p.end.crossedAt > 0 ? steps[p.end.crossedAt - 1] : null;
+        const culprit = dst?.kind === 'draw' && dst.drawing?.strokes?.length ? { st: dst, view: drawingView(dst.drawing, { className: 'tp-end-did-view' }) } : null;
+        if (culprit) requestAnimationFrame(() => culprit.view.frame());
         card = h(`div.tp-end-card.${verdict}`,
           h('div.tp-end-stamp', verdict === 'straight' ? 'Straight through!' : 'Crossed wires!'),
           h('div.tp-end-k', 'Started as', who(first, { size: 18 })),
@@ -123,6 +128,7 @@ export default {
           h('div.tp-end-cord', { html: cordSvg(300, 20, { loops: 12, stroke: 2.4 }) }),
           h('div.tp-end-k', 'Ended as', who(lastBy, { size: 18 })),
           h('div.tp-end-txt.last', lastStep.text),
+          culprit ? h('div.tp-end-did', culprit.view.el, h('span', 'The drawing that did it, by ', who(ctx.player(culprit.st.authorId), { size: 16 }))) : null,
           verdict === 'crossed' && crosser ? h('div.tp-end-foot', h('span', 'It went wrong on ', h('b', `page ${p.end.crossedAt + 1}`), ', thanks to'), who(crosser, { size: 18 }))
             : verdict === 'straight' ? h('div.tp-end-foot', h('b', '+300'), ' to everyone on this one') : null);
       }
@@ -177,7 +183,7 @@ export default {
         }
       }
       shownPage = page;
-      pageNo.textContent = page >= steps.length ? (flip ? 'the film' : 'the verdict') : `page ${page + 1}`;
+      pageNo.textContent = page >= steps.length ? (flip ? 'the film' : 'verdict') : `page ${page + 1}`;
       [...pips.children].forEach((pip, i) => { pip.classList.toggle('on', i <= page); pip.classList.toggle('cur', i === page); });
       nextLbl.textContent = page >= steps.length ? 'Vote for the best bit' : page === steps.length - 1 ? (flip ? 'Roll the film' : 'Show the verdict') : 'Next page';
       root.classList.toggle('last', page >= steps.length);

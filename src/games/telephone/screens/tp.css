@@ -815,3 +815,22 @@ body.tp-nudged #sheet, body.tp-nudged #strip { animation: tpShake 520ms cubic-be
 @media (orientation: landscape) and (max-height: 600px) {
   .tp-pg-card.k-draw { width: min(150px, 100%); }
 }
+/* critic round 1: pinned first sentence, newest page biggest, stamps off the words, culprit drawing */
+.tp-al-title { font: 700 24px/1.05 var(--f-hand); font-variation-settings: normal; }
+.tp-al-sub { font-size: 12px; }
+.tp-pg-card.k-draw { width: min(300px, 100%, 38vh); }
+.tp-pg:not(:last-child) .tp-pg-card.k-draw { width: min(190px, 100%); }
+.tp-pg:not(:last-child) .tp-pg-txt { font-size: calc(var(--fs, 32px) * .82); }
+.tp-pg:last-child .tp-pg-txt { font-size: calc(var(--fs, 32px) * 1.15); }
+.tp-pg-card.k-guess { min-width: 170px; padding: 12px 18px 26px; }
+.tp-pg-stamp { bottom: -13px; right: -4px; }
+.tp-end-did { display: flex; align-items: center; gap: 10px; margin-top: 10px; font: 600 13px/1.3 var(--f-ui); color: var(--c-ink); }
+.tp-end-did .dp-view { width: 84px; flex: none; border-radius: 4px; box-shadow: 0 2px 6px rgba(42,26,23,.25); transform: rotate(-2deg); }
+.tp-end-did .tp-who { font-size: 13px; }
+@media (max-height: 740px) { .tp-pg-card.k-draw { width: min(250px, 100%, 34vh); } }
+@media (orientation: landscape) and (max-height: 600px) {
+  .tp-pg-card.k-draw, .tp-pg:not(:last-child) .tp-pg-card.k-draw { width: min(150px, 100%); }
+  .tp-al-title { font-size: 20px; }
+  .tp-end-did .dp-view { width: 56px; }
+}
+.tp-end-card { margin-top: 30px; }
