@@ -3,10 +3,8 @@
 import classic from './classic/index.js';
 import forehead from './forehead/index.js';
 import telephone from './telephone/index.js';
-import percentages from './percentages/index.js';
 import example from './example/index.js';
 import soup from './soup/index.js';
-import seconds from './seconds/index.js';
 import witness from './witness/index.js';
 import topshelf from './topshelf/index.js';
 import pardon from './pardon/index.js';
@@ -15,12 +13,10 @@ export const GAMES = [
   classic,
   forehead,
   telephone,
-  percentages,
-  soup, // batch 1 (hidden until finished)
-  seconds, // batch 1 (hidden until finished)
-  witness, // batch 1 (hidden until finished)
-  topshelf, // batch 1 (hidden until finished)
-  pardon, // batch 1 (hidden until finished)
+  soup,
+  witness,
+  topshelf,
+  pardon,
   example, // hidden: true - the documented example, not on the menu
 ];
 
