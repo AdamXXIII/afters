@@ -25,10 +25,10 @@ export const ADULT_DECKS = [
     Takeaway pizza|Hangover nap|Cold shower|Sunday scaries|Dry January|Sober October|Pot of tea|Chip shop chips|
     Hash browns|Full-fat Coke|Bloodshot eyes|Crisps for breakfast|Bucket by the bed|Group chat|
     Group chat photos|Missing brunch|Dodgy tummy|Sports drink|Ice pack on your head|Banana|
-    Dry toast|Curtains shut all day|Sunday roast|Drunk mate on the sofa|Chips and gravy|
+    Dry toast|Curtains shut all day|Toast and jam|Drunk mate on the sofa|Chips and gravy|
     Slept in your make-up|Slept in your jeans|Shower sitting down|Wearing yesterday's clothes|
     Cold kebab for breakfast|Ice lolly for breakfast|Two Alka-Seltzers|Cancelling plans|Bin bag of bottles|
-    Dead phone`),
+    Hunt for the phone charger`),
 
   deck('work', 'Fucking Work', 'Office life, the shit bits', 'briefcase', '#2F5D7C', `
     You're on mute|Secret Santa|Reply all|Team building day|Zoom call|Fire drill|Out of office|
@@ -98,5 +98,5 @@ export const ADULT_DECKS = [
     Mrs Brown's Boys|The Only Way Is Essex|Made in Chelsea|
     Top Boy|Happy Valley|Broadchurch|Luther|The Bodyguard|Killing Eve|Chernobyl|Narcos|
     Ozark|Better Call Saul|The Walking Dead|Dexter|True Detective|Mad Men|
-    Slow Horses|The Bear|Love Actually|Derry Girls|The Royle Family|The Inbetweeners Movie|Still Game|Stath Lets Flats|Detectorists|The Young Ones|Fawlty Towers|Only Fools and Horses|Spaced|Gavin & Stacey Christmas special|Black Books|The IT Crowd|Toast of London`),
+    Slow Horses|The Bear|Bad Education|Derry Girls|The Royle Family|The Inbetweeners Movie|Still Game|Stath Lets Flats|Detectorists|The Young Ones|Brooklyn Nine-Nine|Inside No. 9|Spaced|Gavin & Stacey Christmas special|Black Books|The IT Crowd|Toast of London`),
 ];
