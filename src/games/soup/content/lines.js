@@ -39,6 +39,9 @@ export const LINES = {
       ['Lights out. Tap someone. Everyone taps, so nobody can tell. Clever, isn\'t it?'],
     ],
     spMorning: [['Good morning. Mostly.']],
+    spTalkOnly: [['Small table. Today we just talk.', 'Point the finger all you like. The vote starts tomorrow.'], ['Only four of you. No banishing today. Just suspicion. My favourite.']],
+    spQuietNight: [['First night. Nobody dies. Tap a name anyway.'], ['Lights out. The soup isn\'t ready yet. The Poisoners are choosing.']],
+    spQuietMorning: [['Nobody died. Don\'t relax. Somebody already has a name in mind.'], ['Everyone\'s still here. For now. Somebody was chosen last night.']],
     spSaved: [['Nobody died! Someone had a Shield. Somebody\'s very lucky. Somebody else is very cross.']],
     spFinal: [
       ['The final table. Share the pot, or banish again.', 'Everyone must share, or nobody gets paid.'],
@@ -63,6 +66,8 @@ export const LINES = {
     spFaithful: [['Faithful. You\'ve banished an innocent. That\'s going in the group chat.'], ['Faithful. Oops. Somebody buy {name} a drink.']],
     spPoisoner: [['A Poisoner! Caught with their ladle out.'], ['Poisoner! Filthy. I love it. Get out.']],
     spNight: [['Night falls. Everyone taps a name. The Poisoners mean it. The rest of you just like tapping.']],
+    spTalkOnly: [['Four of you. No banishing today. Just stare at each other like it\'s a first date.']],
+    spQuietMorning: [['Nobody died. Somebody\'s been picked though. Sleep well.']],
     spLandslide: [['Every vote. Brutal. I\'d hate to be your ex.'], ['Unanimous. The table has a type, and it\'s guilty.']],
     spIntroAgain: [['Back for more? Some of you clearly enjoy lying to your friends.'], ['Round two. Fresh Poisoners. Same filthy liars.']],
     spWinPoisoners: [['The Poisoners win. They lied to your faces and took your money. Like a wedding.']],

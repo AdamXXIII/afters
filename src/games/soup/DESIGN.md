@@ -57,3 +57,9 @@ The tureen is the pot (willow-blue on bone china, brass label with the amount). 
 ## Changes from the roster
 - **Recruit** is not built: a Poisoner choosing "recruit" at night would need a control that only Poisoners see, which breaks the identical night screen. The Shield, the Séance, the hunch and the final table give the depth instead.
 - The Séance is a ghost vote in the banish vote (once per game), not a separate hint phase.
+
+## Small tables (2026-11-13, after play-test)
+Two players leave every day (one banished, one poisoned), so 4-5 player games reached the final after one day. Now:
+- 4-5 players: the first night is quiet. Everyone still taps on the identical dark screen, the Poisoners still choose, but nobody dies; the morning card says so.
+- 4 players: the first round table is talk only (no banish vote); night follows.
+Result: 4 and 5 player games last two days (about 10 minutes). 6-8 players are unchanged. Demos: `soup-table-talk`, `soup-morning-quiet` (shoot with `--players 4`).

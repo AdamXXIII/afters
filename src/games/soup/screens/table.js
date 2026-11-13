@@ -33,12 +33,14 @@ const table = {
   shot: 'vote',
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
-    const hd = header(ctx, { title: 'The round table', line: 'Talk it out loud. Point the finger.' });
+    const talkOnly = !!p.talkOnly;
+    const hd = header(ctx, { title: 'The round table', line: talkOnly ? 'Small table: talk only today. The vote starts tomorrow.' : 'Talk it out loud. Point the finger.' });
     const tl = tally(ctx);
     show.append(h('div.sp-top', hd, tl));
     let body;
     let btns = [];
-    const ready = h('button.btn.block.btn-secondary.sp-ready', { type: 'button', 'data-e2e': 'sp-ready' }, 'Ready to vote');
+    const readyLabel = talkOnly ? 'Done talking' : 'Ready to vote';
+    const ready = h('button.btn.block.btn-secondary.sp-ready', { type: 'button', 'data-e2e': 'sp-ready' }, readyLabel);
     const readyN = h('div.sp-readyn');
     if (isGhost(ctx)) {
       body = h('div.sp-sheet.sp-ghostsheet.sp-in', ghostRibbon(ctx), h('div.sp-ghost-b', 'Ghosts don’t talk. They do watch faces. Your séance vote comes in the banish vote.'), readyN);
@@ -59,7 +61,7 @@ const table = {
         h('div.sp-foot', ready, readyN));
     }
     sheet.append(body);
-    const cancel = say(ctx, ctx.line('spTable'), { hold: 3600 }, 600);
+    const cancel = say(ctx, ctx.line(talkOnly ? 'spTalkOnly' : 'spTable'), { hold: 3600 }, 600);
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1400 });
     const update = (c) => {
       tl.sync(c.progress.points || {});
@@ -67,9 +69,11 @@ const table = {
       for (const b of btns) b.setAttribute('aria-pressed', String(b.dataset.id === mine));
       const r = !!c.mine.game.ready;
       ready.classList.toggle('on', r);
-      ready.textContent = r ? 'Ready. Keep talking if you like.' : 'Ready to vote';
+      ready.textContent = r ? 'Ready. Keep talking if you like.' : readyLabel;
       const n = c.payload.alive.filter((id) => c.progress.done?.[id]).length;
-      readyN.textContent = `${n} of ${c.payload.alive.length} ready. The vote starts when everyone is, or the clock runs out.`;
+      readyN.textContent = talkOnly
+        ? `${n} of ${c.payload.alive.length} done. Night falls when everyone is, or the clock runs out.`
+        : `${n} of ${c.payload.alive.length} ready. The vote starts when everyone is, or the clock runs out.`;
     };
     update(ctx);
     let late = false;

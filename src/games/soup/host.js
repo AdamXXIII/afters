@@ -31,6 +31,10 @@ export class SoupHost {
     order.forEach((id, i) => { this.roles[id] = i < nPois ? 'poisoner' : 'faithful'; });
     if (this.demoRoles) Object.assign(this.roles, this.demoRoles(ids));
     this.seats = ids.slice();
+    // Small tables would reach the final after one day (a banish and a poisoning every day).
+    // 4-5 players: the first night is quiet (nobody dies). 4 players: the first round table is talk only.
+    this.quietFirstNight = ids.length <= 5;
+    this.talkOnlyFirstDay = ids.length <= 4;
     this.alive = new Set(ids);
     this.ghosts = []; // [{id, how:'banished'|'poisoned', day, role}]
     this.pot = 0;
@@ -63,6 +67,8 @@ export class SoupHost {
       poisoners: Object.values(this.roles).filter((r) => r === 'poisoner').length,
     };
   }
+  _talkOnly() { return this.talkOnlyFirstDay && this.day === 1 && !this.finalMode; }
+  _quietNight() { return this.quietFirstNight && this.day === 1; }
   _doneMap(fn) { const d = {}; for (const p of this.api.players) d[p.id] = !!fn(p.id); return d; }
   _clear() { for (const t of this.timers) clearTimeout(t); this.timers = []; }
   _later(ms, fn) { const t = setTimeout(fn, ms); this.timers.push(t); }
@@ -81,7 +87,7 @@ export class SoupHost {
       case 'soup-roles': return this._task();
       case 'soup-task': return this._result();
       case 'soup-result': return this._table();
-      case 'soup-table': return this._vote();
+      case 'soup-table': return this._talkOnly() ? this._night() : this._vote();
       case 'soup-vote': return this._banish();
       case 'soup-banish': return this._afterBanish();
       case 'soup-night': return this._morning();
@@ -212,7 +218,7 @@ export class SoupHost {
   _table() {
     this.points = {};
     this.ready = {};
-    this.api.enter('soup-table', SP.table, { ...this._base() }, {
+    this.api.enter('soup-table', SP.table, { ...this._base(), talkOnly: this._talkOnly() }, {
       priv: (p) => this._priv(p),
       progress: () => ({ done: this._doneMap((id) => this.ready[id]), counts: {}, points: { ...this.points } }),
     });
@@ -274,7 +280,7 @@ export class SoupHost {
   // ---------- night + morning ----------
   _night() {
     this.night = {};
-    this.api.enter('soup-night', SP.night, { ...this._base() }, {
+    this.api.enter('soup-night', SP.night, { ...this._base(), quiet: this._quietNight() }, {
       priv: (p) => this._priv(p),
       progress: () => ({ done: this._doneMap((id) => this.night[id] !== undefined), counts: {} }),
     });
@@ -295,13 +301,15 @@ export class SoupHost {
     const hLeaders = Object.keys(hc).filter((id) => hc[id] === hTop);
     const hunch = hTop >= 2 && hLeaders.length === 1 && hLeaders[0] !== victim ? { id: hLeaders[0], n: hTop } : null;
     let saved = false;
+    const quiet = this._quietNight();
+    if (quiet) { victim = null; auto = false; } // the Poisoners chose; the soup isn't ready yet
     if (victim && this.shields.has(victim)) { saved = true; this.shields.delete(victim); } else if (victim) {
       this.alive.delete(victim);
       this.ghosts.push({ id: victim, how: 'poisoned', day: this.day, role: 'faithful' });
       this.log.push({ day: this.day, kind: 'poisoned', id: victim });
     }
     const lines = this.api.take(MORNINGS, 'soup-morning', 1, rng);
-    this.api.enter('soup-morning', SP.morning, { ...this._base(), victim: saved ? null : victim, savedId: saved ? victim : null, saved, auto, hunch, line: lines[0]?.t || null }, {
+    this.api.enter('soup-morning', SP.morning, { ...this._base(), victim: saved ? null : victim, savedId: saved ? victim : null, saved, auto, quiet, hunch, line: lines[0]?.t || null }, {
       priv: (p) => this._priv(p),
     });
   }

@@ -10,7 +10,7 @@ const night = {
   mount({ show, sheet }, ctx) {
     const p = ctx.payload;
     document.body.classList.add('sp-night');
-    const hd = header(ctx, { title: 'Night', line: 'Everyone taps a name. Only the Poisoners’ taps count.', tone: 'dark', pot: false });
+    const hd = header(ctx, { title: p.quiet ? 'First night' : 'Night', line: p.quiet ? 'Nobody dies tonight. Tap a name anyway: the Poisoners are choosing.' : 'Everyone taps a name. Only the Poisoners’ taps count.', tone: 'dark', pot: false });
     show.append(h('div.sp-nightsky', h('span.sp-moon', { html: MOON }), Array.from({ length: 14 }, (_, i) => h('i.sp-star', { style: { '--i': i, top: `${46 + ((i * 37) % 41)}%` } }))), h('div.sp-top', hd));
     let btns = [];
     let body;
@@ -30,7 +30,7 @@ const night = {
       body = h('div.sp-sheet.sp-in.sp-nightsheet', h('div.sp-ask.dark', 'Tap a name'), h('div.sp-picks', btns), note);
     }
     sheet.append(body);
-    const cancel = say(ctx, ctx.line('spNight'), {}, 600);
+    const cancel = say(ctx, ctx.line(p.quiet ? 'spQuietNight' : 'spNight'), {}, 600);
     ctx.cyril.react('sad', { duration: ctx.frozen ? 60000 : 1200 });
     const update = (c) => {
       const mine = c.mine.game.night;
@@ -60,6 +60,8 @@ const morning = {
         h('div.sp-vd-nm', nameOf(ctx, p.victim)),
         h('div.sp-morning-l', (p.line || '{name} was poisoned in the night.').replaceAll('{name}', nameOf(ctx, p.victim))),
         me ? h('div.sp-morning-me', h('span', { html: WISP }), 'That’s you. You’re a ghost now: watch, don’t talk.') : null);
+    } else if (p.quiet) {
+      parts.push(h('div.sp-saved', h('span', { html: MOON })), h('div.sp-vd-nm', 'Nobody died'), h('div.sp-morning-l', 'The soup is still simmering. The Poisoners have chosen. Tomorrow night, they mean it.'));
     } else if (p.saved) {
       parts.push(h('div.sp-saved', h('span', { html: SHIELD })), h('div.sp-vd-nm', 'Nobody died'), h('div.sp-morning-l', 'A Shield took the poison. Someone at this table is very lucky, and someone else is furious.'));
     }
@@ -70,7 +72,9 @@ const morning = {
       card.animate([{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 500, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' });
       setTimeout(() => { ctx.audio.sfx(p.victim ? 'stamp' : 'truth'); ctx.cyril.react(p.victim ? 'sad' : 'delight'); if (p.victim === ctx.meId) ctx.haptic('fooled'); }, 1300);
     }
-    const cancel = p.saved ? say(ctx, ctx.line('spSaved'), { hold: 3200 }, 2600) : say(ctx, ctx.line('spMorning'), { hold: 1800 }, 300);
+    const cancel = p.saved ? say(ctx, ctx.line('spSaved'), { hold: 3200 }, 2600)
+      : p.quiet ? say(ctx, ctx.line('spQuietMorning'), { hold: 3200 }, 2600)
+      : say(ctx, ctx.line('spMorning'), { hold: 1800 }, 300);
     return { unmount: cancel };
   },
 };

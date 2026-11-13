@@ -146,6 +146,9 @@ export default {
     'soup-banish-wait': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-banish'; }, t: (ph) => ph.payload.stampAt + 900 },
     'soup-night': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-night'; }, me: 'idle', bots: 'some', t: 6000 },
     'soup-morning': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-morning' && !!e.phase.payload.victim; }, t: 4200 },
+    // small tables (shoot with &players=4): talk-only first day, quiet first night
+    'soup-table-talk': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-table' && !!e.phase.payload.talkOnly; }, me: 'idle', bots: 'act', t: 30000 },
+    'soup-morning-quiet': { match: (e, me) => { keepMe(e, me); return e.phase.id === 'soup-morning' && !!e.phase.payload.quiet; }, t: 4200 },
     'soup-ghost': {
       match: (e, me) => {
         const h = e.game?.host;
