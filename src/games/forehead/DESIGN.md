@@ -47,7 +47,7 @@ Timelines are driven by `ctx.elapsed()`; every phone shows the same card at the 
 ## 6. Content
 Rewritten 2026-11-13 against Heads Up! (one thing everyone in the room knows, describable or actable in seconds; themed decks with a clear name). Cards are concrete nouns: titles, famous people, places, brands, things to act out. Never copied from Heads Up!.
 - `content/family.js`: 14 decks x 64+ (Blockbusters, Telly, Famous Faces, Singalong, Animals, Act It Out, Do the Voice, Jobs, Places, Sport, Rewind, Brands, Characters, Grub).
-- `content/adult.js`: 7 decks x 64+ (Pub Bollocks, Hungover as Fuck, Fucking Work, Shit Decisions, Grown-Up Crap, Big Night Out, Holiday Hell). Adults 18+ = swearing and grown-up life, never sexual. The swearing is in the deck names and Cyril's lines.
+- `content/adult.js`: 8 decks x 63+ (Pub Bollocks, Hungover as Fuck, Fucking Work, Shit Decisions, Grown-Up Crap, Big Night Out, Holiday Hell, Bloody Box Sets). Adults 18+ = swearing and grown-up life, never sexual. The swearing is in the deck names and Cyril's lines.
 - Each deck (`content/deck.js`) has a `hint` ("you'll be describing...") and `examples` = its first three cards, which the picker shows on the tile, so the first three should be the most obvious cards in the deck.
 - Family table: offers 3 family decks. Adults 18+ table: 2 adult decks + 1 family deck per offer. Cards never repeat tonight (`api.take`, keyed per deck).
 
