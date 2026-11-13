@@ -62,9 +62,9 @@ function writeSheet(sheet, ctx, { defendant }) {
     ? h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', p.final ? 'You’re on the stand' : 'You’re in the dock'), h('div.wt-sub', p.final ? 'Answer honestly. Double points.' : 'Answer honestly. They’re about to fake it.')))
     : h('div.wt-head', dock(def, { size: 50 }), h('div.wt-head-t', h('div.wt-title', `Be ${name}`), h('div.wt-sub', `Write what ${name} would say. Fool the table.`)));
   const pay = defendant
-    ? null
+    ? h('div.wt-pay.one', h('div.wt-pay-i', h('b', '+250'), h('span', 'for every juror who picks a fake')))
     : h('div.wt-pay', h('div.wt-pay-i', h('b', '+500'), h('span', 'per person fooled')), h('div.wt-pay-i.gold', h('b', '+1000'), h('span', 'for finding the real one')));
-  const tip = defendant ? null : h('div.wt-tip', TIPS[Math.abs(Math.round(tilt(ctx.phase?.seed || 1, 'tip', 100))) % TIPS.length]);
+  const tip = defendant ? h('div.wt-tip', 'Honest, but not obvious. That\u2019s the trick.') : h('div.wt-tip', TIPS[Math.abs(Math.round(tilt(ctx.phase?.seed || 1, 'tip', 100))) % TIPS.length]);
   const sheetEl = h(`div.wt-sheet.wt-write.wt-in${defendant ? '.dockside' : ''}${p.final ? '.final' : ''}`,
     head,
     h('div.wt-ask', q, h('div.wt-field', field)),
@@ -161,7 +161,7 @@ const pick = {
     const name = nameOf(ctx, p.defendant);
     const card = dockCard(ctx, p);
     const row = pickedRow(ctx);
-    show.append(h('div.wt-top', card), h('div.wt-bottom', row));
+    show.append(h('div.wt-top', card, row));
     const btns = p.options.map((o, i) => {
       const mine = o.id === own;
       const b = h(`button.wt-opt${mine ? '.mine' : ''}`, { type: 'button', disabled: mine, 'aria-pressed': 'false', 'data-e2e': mine ? 'choice-mine' : `wt-opt-${o.id}` },
@@ -202,7 +202,7 @@ const sweat = {
     const own = ctx.priv?.ownOptionId;
     const card = dockCard(ctx, p);
     const row = pickedRow(ctx);
-    show.append(h('div.wt-top', card), h('div.wt-bottom', row));
+    show.append(h('div.wt-top', card, row));
     const list = p.options.map((o, i) => h(`div.wt-opt.view${o.id === own ? '.mine' : ''}`,
       h('span.wt-opt-l', LETTERS[i]),
       h(`span.wt-opt-t${o.text.length > 32 ? '.long' : ''}`, o.text),
