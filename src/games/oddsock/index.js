@@ -103,7 +103,7 @@ export default {
       osGuessYou: [['You’re the Odd Sock. Guess their word and the round is yours.']],
       osStolen: [['{name} guessed it! Daylight robbery.'], ['Stolen! {name} worked out the word. Disgraceful. Brilliant.']],
       osMissed: [['Wrong guess. The table keeps the round.']],
-      osEscaped: [['{name} got away with it. Nobody suspected a thing.'], ['The Odd Sock escapes. {name}, take a bow.']],
+      osEscaped: [['{name} got away with it. Smooth.'], ['The Odd Sock escapes. {name}, take a bow.']],
       osFinal: [['Last wash. Double points. Do concentrate.']],
     },
     adult: {

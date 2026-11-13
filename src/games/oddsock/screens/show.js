@@ -70,7 +70,7 @@ const reveal = {
       ? h('div.os-truth.caught', h('span.os-truth-sock', { html: sockSvg({ body: ODD, pattern: 'spot' }) }),
         h('div', h('div.os-truth-h', 'Odd Sock!'), h('div.os-truth-s', p.sock === ctx.meId ? 'Your word was ' : 'Their word was ', h('b', p.oddWord), '. Now one guess at everyone else’s word.')))
       : h('div.os-truth.escaped', h('div.os-truth-av', disc(ctx, p.sock, { size: 52 }), h('span.os-truth-mini', { html: sockSvg({ body: ODD, pattern: 'spot' }) })),
-        h('div', h('div.os-truth-h', accused ? 'Wrong sock.' : 'Got away.'), h('div.os-truth-s', accused ? 'Two wrong picks, so they walk free. The Odd Sock was ' : 'The Odd Sock was ', h('b', p.sock === ctx.meId ? 'you' : sockName), '.')));
+        h('div', h('div.os-truth-h', accused ? 'Wrong sock.' : 'Got away.'), h('div.os-truth-s', accused ? 'Two wrong picks. ' : '', 'The real Odd Sock, ', h('b', p.sock === ctx.meId ? 'you' : sockName), p.sock === ctx.meId ? ', walk free.' : ', walks free.')));
     const card = h(`div.os-card.os-reveal${p.caught ? '.caught' : p.again ? '.again' : '.escaped'}`, h('div.os-reveal-t', 'The vote'), list, verdict, truth);
     show.append(h('div.os-dim'), h('div.os-cardwrap', card));
     let shown = -1; let stamped = false; let flipped = false;
