@@ -159,8 +159,7 @@ const listen = {
         sheet.firstChild.classList.toggle('stolen', s);
         if (s && !c.frozen) { ctx.audio.sfx('page'); ctx.haptic('select'); ctx.say(ctx.line('pdSteal'), { hold: 2000, placement: 'side' }); }
       }
-      const ph = (t / 1000) % 1.6;
-      rings.style.setProperty('--k', String(ph / 1.6));
+      [...rings.children].forEach((r, i) => r.style.setProperty('--k', String(((t / 1600) + i / 3) % 1)));
     };
     frame(ctx);
     return { frame, unmount: cancel };

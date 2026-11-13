@@ -92,7 +92,7 @@ export const TUNES = [
     notes: 'B3/0.25 A3/0.25 G#3/0.25 A3/0.25 C4/1 D4/0.25 C4/0.25 B3/0.25 C4/0.25 E4/1 F4/0.25 E4/0.25 D#4/0.25 E4/0.25 B4/0.25 A4/0.25 G#4/0.25 A4/0.25 B4/0.25 A4/0.25 G#4/0.25 A4/0.25 C5/2' },
   { id: 't43', title: 'The Blue Danube', by: 'Strauss, 1866', kind: 'classical', bpm: 170,
     notes: 'G3/3 G3 B3 D4 D4/3 R D5 D5 R B4 B4 G3/3 G3 B3 D4 D4/3 R D5 D5 R C5 C5' },
-  { id: 't44', title: 'Spring (The Four Seasons)', by: 'Vivaldi, 1725', kind: 'classical', bpm: 170,
+  { id: 't44', title: 'Spring (The Four Seasons)', by: 'Vivaldi, 1725', kind: 'classical', bpm: 120,
     notes: 'E4 G#4 G#4 G#4 F#4/0.5 E4/0.5 B4/3 B4/0.5 A4/0.5 G#4 G#4 G#4 F#4/0.5 E4/0.5 B4/3 B4/0.5 A4/0.5 G#4 A4/0.5 B4/0.5 A4 G#4 F#4/2' },
   { id: 't45', title: 'Morning Mood', by: 'Grieg, 1875', kind: 'classical', bpm: 85,
     notes: 'G4/0.75 E4/0.25 D4/0.5 C4/0.5 D4/0.5 E4/0.5 G4/0.75 E4/0.25 D4/0.5 C4/0.5 D4/0.25 E4/0.25 D4/0.25 E4/0.25 G4/0.75 E4/0.25 G4/0.5 A4/0.5 E4/0.5 A4/0.5 G4/0.75 E4/0.25 D4/0.5 C4/1.5' },
