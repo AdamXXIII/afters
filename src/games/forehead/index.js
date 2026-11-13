@@ -45,7 +45,8 @@ function foreheadBot({ ph, client, later, rand, rng, still, mode }) {
 export default {
   id: 'forehead',
   title: 'Bonce',
-  dish: 'jelly',
+  dish: 'jelly',          // menu illustration (src/screens/menu-art.js)
+  mood: ['loud', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'A wobbly jelly, worn on the head',
   hint: 'Phone on head, table shouts',
   tagline: 'Phone on your forehead. Everyone else shouts.',

@@ -28,7 +28,8 @@ const normal = (e, me) => e.phase.id === 'witness-reveal' && e.phase.payload.out
 export default {
   id: 'witness',
   title: 'Character Witness',
-  dish: 'cloche',
+  dish: 'gavel',          // menu illustration (src/screens/menu-art.js)
+  mood: ['sneaky', 'talky', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'Something under the cloche. Nobody will say what.',
   hint: 'Bluff about each other',
   tagline: 'How well do you really know the people at this table?',

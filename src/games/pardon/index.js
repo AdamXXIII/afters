@@ -9,7 +9,8 @@ const readerIsMe = (e, me) => e.phase.payload?.reader === me;
 export default {
   id: 'pardon',
   title: 'Pardon?',
-  dish: 'cloche',
+  dish: 'trumpet',        // menu illustration (src/screens/menu-art.js)
+  mood: ['loud', 'clever', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'Something mumbled under a cloche',
   hint: 'Say it, hear it',
   tagline: 'Read nonsense aloud. Hear sense.',

@@ -58,7 +58,8 @@ const at = (n) => (e) => e.phase.id === n;
 export default {
   id: 'telephone',
   title: 'Crossed Wires',
-  dish: 'spaghetti',
+  dish: 'spaghetti',      // menu illustration (src/screens/menu-art.js)
+  mood: ['drawing', 'loud', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'A tangle of spaghetti, passed down the table',
   hint: 'Draw it, pass it on',
   tagline: 'Write it, draw it, guess it, ruin it.',

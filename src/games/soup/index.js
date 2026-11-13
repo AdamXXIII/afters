@@ -30,7 +30,8 @@ const task = (kind) => (e, me) => {
 export default {
   id: 'soup',
   title: 'Something in the Soup',
-  dish: 'cloche',
+  dish: 'tureen',         // menu illustration (src/screens/menu-art.js)
+  mood: ['sneaky', 'talky'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'A tureen, and a question nobody wants to ask',
   hint: 'Find the Poisoners',
   tagline: 'One of you is poisoning the soup.',

@@ -11,7 +11,8 @@ const isFaker = (e, me) => {
 export default {
   id: 'seconds',
   title: 'Who Had Seconds?',
-  dish: 'cloche',
+  dish: 'seconds',        // menu illustration (src/screens/menu-art.js)
+  mood: ['sneaky', 'loud'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'Somebody went back for more',
   hint: 'Spot the faker',
   tagline: 'Same secret task. One faker. Act it out on three.',

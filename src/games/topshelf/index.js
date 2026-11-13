@@ -14,7 +14,8 @@ const moveT = (p) => p.payload.at.move + 1400;
 export default {
   id: 'topshelf',
   title: 'Top Shelf',
-  dish: 'cloche',
+  dish: 'cabinet',        // menu illustration (src/screens/menu-art.js)
+  mood: ['clever'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'A nightcap from Cyril\'s cabinet',
   hint: 'Trivia climb',
   tagline: 'Climb the drinks cabinet, one right answer at a time.',

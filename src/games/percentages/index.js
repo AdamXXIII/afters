@@ -8,7 +8,8 @@ const knifeIsMe = (e, me) => e.phase.payload?.knife === me;
 export default {
   id: 'percentages',
   title: 'Pie Chart',
-  dish: 'pie',
+  dish: 'pie',            // menu illustration (src/screens/menu-art.js)
+  mood: ['talky', 'clever'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'A slice of pie, cut by the nation',
   hint: 'Guess the percent',
   tagline: 'What percent of people have... really?',

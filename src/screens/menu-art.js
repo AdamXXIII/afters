@@ -73,6 +73,103 @@ const DISHES = {
     <path d="M120 22 h 26 l -6 7 l 6 7 h -26z" fill="#FBF4EA" stroke="${OUT}" stroke-width="2.6" stroke-linejoin="round"/>
     <text x="131" y="33.5" text-anchor="middle" font-family="Bricolage Grotesque Variable, sans-serif" font-weight="800" font-size="10" fill="#7A1E2C">%</text>`,
 
+  // Something in the Soup: a willow-pattern tureen, lid ajar, ladle in, one suspicious green bubble.
+  tureen: () => `
+    ${plate(64)}
+    <path d="M30 56 h100 c0 22 -14 38 -50 38 C44 94 30 78 30 56z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M34 66 h92" stroke="#2F5D7C" stroke-width="5"/>
+    <g fill="none" stroke="#2F5D7C" stroke-width="2.2" stroke-linecap="round"><path d="M52 76 q 6 -6 12 0 q 6 6 12 0"/><path d="M84 76 q 6 -6 12 0 q 6 6 12 0"/></g>
+    <path d="M38 84 q 6 6 14 8" stroke="#D9C6A8" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M30 60 c -12 -2 -14 14 -2 14" fill="none" stroke="${OUT}" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M130 60 c 12 -2 14 14 2 14" fill="none" stroke="${OUT}" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M26 56 h108" stroke="${OUT}" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M38 52 C 40 38 58 30 74 31 L 72 52z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3" stroke-linejoin="round" transform="rotate(-12 56 52)"/>
+    <circle cx="50" cy="31" r="5" fill="#C89B3C" stroke="${OUT}" stroke-width="2.6"/>
+    <path d="M98 54 L 118 14" stroke="#C89B3C" stroke-width="5" stroke-linecap="round"/>
+    <path d="M98 54 L 118 14" stroke="${OUT}" stroke-width="1.6" stroke-linecap="round" opacity=".5"/>
+    <ellipse cx="121" cy="10" rx="6" ry="4" fill="#C89B3C" stroke="${OUT}" stroke-width="2.4" transform="rotate(-30 121 10)"/>
+    <ellipse cx="84" cy="52" rx="20" ry="4" fill="#E0A526" stroke="${OUT}" stroke-width="2.4"/>
+    <circle cx="80" cy="44" r="7" fill="#9BC08A" stroke="${OUT}" stroke-width="2.6"/>
+    <circle cx="77.5" cy="41.5" r="2" fill="#fff" opacity=".85"/>
+    <path d="M88 30 q -6 -6 0 -12 q 6 -6 0 -12" stroke="#FBF4EA" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
+    <path d="M66 28 q -5 -5 0 -10" stroke="#FBF4EA" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>`,
+
+  // Who Had Seconds?: a scraped-clean plate (one pea left) and a serving spoon landing a second helping.
+  seconds: () => `
+    ${plate(66)}
+    <path d="M44 92 q 18 -10 40 -4 q 16 4 30 -2" stroke="#C98A3E" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/>
+    <circle cx="104" cy="94" r="3.6" fill="#7F9A74" stroke="${OUT}" stroke-width="2"/>
+    <g fill="#C98A3E"><circle cx="60" cy="97" r="1.6"/><circle cx="70" cy="99" r="1.3"/><circle cx="92" cy="98" r="1.5"/></g>
+    <path d="M30 88 l 26 -10" stroke="#C89B3C" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M128 90 l -20 -12" stroke="#C89B3C" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M106 77 l -4 -3 M108 75 l -4 -3 M110 73 l -4 -3" stroke="${OUT}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M118 24 L 150 4" stroke="#C89B3C" stroke-width="6" stroke-linecap="round"/>
+    <path d="M118 24 L 150 4" stroke="${OUT}" stroke-width="1.6" stroke-linecap="round" opacity=".45"/>
+    <path d="M84 30 c 0 -12 14 -18 26 -14 c 12 4 14 16 8 22 c -8 8 -30 6 -34 -8z" fill="#E6D3B8" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M90 34 c 4 -12 18 -16 26 -8 c -2 10 -18 14 -26 8z" fill="#FBF4EA" stroke="${OUT}" stroke-width="2.6"/>
+    <g fill="#7F9A74" stroke="${OUT}" stroke-width="2"><circle cx="98" cy="44" r="4"/><circle cx="90" cy="51" r="3.6"/><circle cx="101" cy="54" r="3.8"/></g>
+    <path d="M86 60 q 0 10 -4 16 M100 62 q 2 8 0 12" stroke="#E0A526" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="3 5"/>
+    <text x="40" y="44" font-family="Fraunces Variable, Georgia, serif" font-weight="900" font-style="italic" font-size="26" fill="#7A1E2C" stroke="${OUT}" stroke-width="1" paint-order="stroke">2</text>`,
+
+  // Character Witness: a gavel resting across a cake stand, sound block beside it.
+  gavel: () => `
+    <ellipse cx="80" cy="104" rx="56" ry="9" fill="rgba(42,26,23,.28)"/>
+    <path d="M70 102 h20 l -4 -10 h-12z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M75 92 h10 v -16 h-10z" fill="#FBF4EA" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="80" cy="74" rx="58" ry="10" fill="#FBF4EA" stroke="${OUT}" stroke-width="3"/>
+    <path d="M28 76 q 4 6 10 4 q 6 6 12 2 q 6 6 12 2 q 6 6 12 2 q 6 6 12 2 q 6 6 12 2 q 6 6 12 2 q 6 4 12 -4" fill="none" stroke="#D9C6A8" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M30 70 q 12 -5 26 -6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".9"/>
+    <rect x="96" y="58" width="34" height="12" rx="3" fill="#7A4A2A" stroke="${OUT}" stroke-width="3"/>
+    <path d="M100 62 h22" stroke="#A8724A" stroke-width="2" stroke-linecap="round"/>
+    <g transform="rotate(-24 76 42)">
+      <rect x="40" y="38" width="72" height="9" rx="4.5" fill="#A8724A" stroke="${OUT}" stroke-width="3"/>
+      <rect x="22" y="24" width="26" height="37" rx="6" fill="#7A4A2A" stroke="${OUT}" stroke-width="3.2"/>
+      <path d="M22 32 h26 M22 53 h26" stroke="#C89B3C" stroke-width="3.4"/>
+      <path d="M27 28 v 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+    </g>
+    <path d="M118 30 l 8 -8 M126 40 l 12 -2 M110 24 l 0 -10" stroke="#E0A526" stroke-width="3" stroke-linecap="round"/>`,
+
+  // Top Shelf: Cyril's drinks cabinet, doors open, three shelves, the gold bottle at the top.
+  cabinet: () => `
+    <ellipse cx="80" cy="108" rx="54" ry="8" fill="rgba(42,26,23,.28)"/>
+    <path d="M48 104 v 4 M112 104 v 4" stroke="${OUT}" stroke-width="4" stroke-linecap="round"/>
+    <rect x="44" y="12" width="72" height="94" rx="6" fill="#7A4A2A" stroke="${OUT}" stroke-width="3.2"/>
+    <rect x="51" y="19" width="58" height="80" rx="3" fill="#3B1F18"/>
+    <path d="M51 44 h58 M51 70 h58" stroke="#C89B3C" stroke-width="3.2"/>
+    <path d="M44 14 l -22 6 v 84 l 22 -4z" fill="#8C5A3C" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M116 14 l 22 6 v 84 l -22 -4z" fill="#8C5A3C" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M28 30 v 60 M132 30 v 60" stroke="#C89B3C" stroke-width="2.2" opacity=".7"/>
+    <circle cx="40" cy="60" r="2.4" fill="#C89B3C"/><circle cx="120" cy="60" r="2.4" fill="#C89B3C"/>
+    <g stroke="${OUT}" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M58 98 v -12 q 0 -4 3 -6 v -6 h4 v 6 q 3 2 3 6 v 12z" fill="#2F5D7C"/>
+      <path d="M74 98 v -16 h10 v 16z" fill="#7F9A74"/>
+      <path d="M90 98 v -10 q 0 -5 5 -6 q 5 1 5 6 v 10z" fill="#B0243A"/>
+      <path d="M60 68 v -10 q 0 -4 4 -5 v -5 h3 v 5 q 4 1 4 5 v 10z" fill="#E2553B"/>
+      <path d="M80 68 v -14 h8 v 14z" fill="#FBF4EA"/>
+      <path d="M94 68 v -8 q 3 -6 6 0 v 8z" fill="#7F9A74"/>
+      <path d="M74 42 v -12 q 0 -4 3 -6 v -5 h6 v 5 q 3 2 3 6 v 12z" fill="#F2C94C"/>
+    </g>
+    <path d="M77 30 v 8" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+    <path d="M94 26 l 2 -5 l 2 5 l 5 2 l -5 2 l -2 5 l -2 -5 l -5 -2z" fill="#FFC86B"/>
+    <path d="M60 30 l 1.5 -3.5 l 1.5 3.5 l 3.5 1.5 l -3.5 1.5 l -1.5 3.5 l -1.5 -3.5 l -3.5 -1.5z" fill="#FFC86B" opacity=".8"/>`,
+
+  // Pardon?: a brass ear trumpet on a plate, with the words arriving muddled.
+  trumpet: () => `
+    ${plate(62)}
+    <path d="M40 88 C 52 84 72 82 92 74" stroke="${OUT}" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M40 88 C 52 84 72 82 92 74" stroke="#C89B3C" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="36" cy="89" rx="5" ry="6" fill="#9C7528" stroke="${OUT}" stroke-width="2.6"/>
+    <path d="M90 76 C 98 64 108 44 118 30 L 146 52 C 128 58 108 70 96 80z" fill="#C89B3C" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <ellipse cx="132" cy="41" rx="9" ry="18" fill="#3B1F18" stroke="${OUT}" stroke-width="3.2" transform="rotate(38 132 41)"/>
+    <ellipse cx="132" cy="41" rx="5" ry="12" fill="#5A3424" transform="rotate(38 132 41)"/>
+    <path d="M100 70 C 106 60 112 48 118 40" stroke="#F3D58A" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <path d="M88 80 l 6 -5" stroke="${OUT}" stroke-width="2" stroke-linecap="round"/>
+    <g fill="none" stroke="#E0A526" stroke-width="3" stroke-linecap="round">
+      <path d="M144 18 q 6 6 4 14"/><path d="M152 10 q 8 10 4 24"/>
+    </g>
+    <text x="40" y="40" font-family="Fraunces Variable, Georgia, serif" font-weight="900" font-style="italic" font-size="24" fill="#7A1E2C" transform="rotate(-10 52 34)">eh?</text>
+    <path d="M30 56 q 6 -4 12 0 t 12 0 t 12 0" stroke="#2F5D7C" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+
   // Fallback for a new game that hasn't drawn its own dish yet: a covered plate.
   cloche: () => `
     ${plate(60)}
@@ -107,4 +204,23 @@ export const CHERRY_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" class="ch
 // small line icons for the tiles and the "How it plays" card (currentColor)
 export const PEOPLE_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.8 20c.6-3.6 3.2-5.6 6.2-5.6s5.6 2 6.2 5.6"/><circle cx="17" cy="9" r="2.6"/><path d="M16.4 14.5c2.6.1 4.4 1.9 4.9 4.6"/></svg>`;
 export const CLOCK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.2 2"/></svg>`;
-export const INVITE_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 3h7v7H3zm2 2v3h3V5zm9-2h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zm9-2h2v2h-2zm2 2h2v2h-2zm2-2h3v2h-3zm-4 4h2v3h-2zm4 0h3v3h-2v-1h-1z"/></svg>`;
+export const BACK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>`;
+export const TICK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+export const EYE_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+export const AGAIN_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.1L20 9.5"/><path d="M20 4.5v5h-5"/><path d="M19.5 12a7.5 7.5 0 0 1-13 5.1L4 14.5"/><path d="M4 19.5v-5h5"/></svg>`;
+export const NEW_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>`;
+
+// Mood icons for the filter chips: one stroke, one weight (currentColor).
+const ic = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+export const MOOD_ICONS = {
+  all: ic('<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>'),
+  fits: PEOPLE_SVG,
+  loud: ic('<path d="M3.5 10v4h3l6 4V6l-6 4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>'),
+  talky: ic('<path d="M4 6.5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2z"/><path d="M19 9.5h1a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2h-.5v2.5L17 17.5"/>'),
+  sneaky: ic('<path d="M2.5 10c2.5-1 5.5-1.5 9.5-1.5s7 .5 9.5 1.5c-.5 4-2.5 6-5 6-2 0-3-1.5-4.5-1.5S9.5 16 7.5 16c-2.5 0-4.5-2-5-6z"/><circle cx="7.6" cy="11.6" r="1" fill="currentColor"/><circle cx="16.4" cy="11.6" r="1" fill="currentColor"/>'),
+  clever: ic('<path d="M9 17.5h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2v1.5h5V16c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>'),
+  drawing: ic('<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5z"/><path d="M13.5 7l3 3"/>'),
+  rude: ic('<path d="M4 18.5c7.5 1.5 13-3 14.5-10l-3.5-1.2C14 12.5 10 16 4.5 16.2c-1.5.1-1.8 2-.5 2.3z"/><path d="M16.8 7.6c-.2-1.8.6-3.4 2.7-4.1"/>'),
+};
+
+export const INVITE_SVG =`<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 3h7v7H3zm2 2v3h3V5zm9-2h7v7h-7zm2 2v3h3V5zM3 14h7v7H3zm2 2v3h3v-3zm9-2h2v2h-2zm2 2h2v2h-2zm2-2h3v2h-3zm-4 4h2v3h-2zm4 0h3v3h-2v-1h-1z"/></svg>`;

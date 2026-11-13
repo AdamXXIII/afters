@@ -6,7 +6,8 @@ import { CLASSIC_DEMOS } from './demos.js';
 export default {
   id: 'classic',
   title: 'Afters Classic',
-  dish: 'trifle',               // menu illustration (src/screens/menu-art.js)
+  dish: 'trifle',         // menu illustration (src/screens/menu-art.js)
+  mood: ['clever', 'sneaky', 'rude'], // menu filters: loud, talky, sneaky, clever, drawing, rude (18+)
   course: 'The house trifle',   // the line under the title on the menu card
   hint: 'Write, fib, vote',
   tagline: 'Three courses of quick wit, porkies and last orders.',
