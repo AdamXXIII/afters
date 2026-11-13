@@ -181,11 +181,18 @@
   padding: 6px 20px 8px; border-radius: 12px; border: 4px solid currentColor; background: rgba(255,251,244,.96);
   font: 900 40px/1 var(--f-display); letter-spacing: -.01em; font-variation-settings: "SOFT" 0, "WONK" 1; box-shadow: 0 10px 24px rgba(20,8,5,.45);
 }
+.sc-stamp { display: grid; }
+.sc-stamp > span { grid-area: 1 / 1; text-align: center; }
+.sc-stamp .b { visibility: hidden; }
+.sc-unmasked .sc-stamp:has(.b) { color: var(--c-willow); animation: scStamp2 380ms var(--ease-out-back) both; }
+.sc-unmasked .sc-stamp .a:has(+ .b) { visibility: hidden; }
+.sc-unmasked .sc-stamp .b { visibility: visible; }
 .sc-stamp.caught { color: var(--sc-deep); }
 .sc-stamp.framed { color: var(--c-tomato); }
 .sc-stamp.escaped { color: var(--c-willow); }
 .sc-stamp.all { color: var(--c-claret); }
 .sc-stamped .sc-stamp { animation: scStamp 380ms var(--ease-out-back) both; }
+@keyframes scStamp2 { from { opacity: 0; transform: rotate(-12deg) scale(2.2); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
 @keyframes scStamp { from { opacity: 0; transform: rotate(-12deg) scale(2.2); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
 .sc-by { display: flex; align-items: center; gap: 10px; font: 650 15px var(--f-ui); color: #F3D9B0; text-shadow: var(--shadow-on-dark); }
 .sc-by .sc-pointers .sc-av { margin-right: -6px; }
@@ -273,7 +280,7 @@
   .sc-votesheet .sc-suspects.n2 { grid-template-columns: 1fr 1fr; }
   .sc-suspect { min-height: 0; padding: 4px; gap: 2px; }
   .sc-suspect > .sc-av:first-child { width: 38px !important; height: 38px !important; }
-  .sc-votesheet .sc-suspects { grid-auto-rows: minmax(60px, 1fr); }
+  .sc-votesheet .sc-suspects { grid-auto-rows: 1fr; }
   .sc-suspect .nm { font-size: 15px; }
   .sc-wait { min-height: 46px; }
   .sc-votesheet > :first-child { padding-right: 46px; }

@@ -70,7 +70,7 @@ function verdict(show, ctx) {
   if (p.kind === 'all') unmaskText = 'Nobody had the task. You were all faking.';
   else if (p.kind === 'caught') unmaskText = p.fakers.length > 1 ? `${names(ctx, p.fakers)} both had seconds` : `${accused?.name || '?'} had seconds`;
   else unmaskText = `${names(ctx, p.fakers)} had seconds all along`;
-  const stamp = h(`div.sc-stamp.${p.kind}`, STAMP[p.kind]);
+  const stamp = h(`div.sc-stamp.${p.kind}`, h('span.a', STAMP[p.kind]), swap ? h('span.b', 'Got away!') : null);
   const caption = h('div.sc-heroline', h('span.a', lineA), h('span.b', unmaskText));
   const hero = h(`div.sc-hero${swap ? '.swap' : ''}`, caption, h('div.sc-stage', stageA, stageB), stamp, byRow);
 
