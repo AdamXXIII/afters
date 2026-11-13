@@ -123,7 +123,7 @@ const q = {
     sheet.append(h(`div.ts-sheet.ts-qsheet.ts-in${betting ? '.betting' : ''}`, banner, betting ? null : meter, h(`div.ts-opts${betting ? '.ro' : ''}`, opts), bets, status));
 
     if (p.n === 1 || p.mode !== 'normal') ctx.cyril.react(p.mode === 'normal' ? 'smug' : 'drumroll', { duration: ctx.frozen ? 60000 : 1200 });
-    const cancel = p.mode === 'normal' ? say(ctx, ctx.line(p.n === 1 ? 'tsQ' : 'tsQ2'), { hold: 2200, compact: true }, 300) : () => {};
+    const cancel = () => {};
 
     const update = (c) => {
       strip.sync(c);
