@@ -235,7 +235,7 @@
 
 .sp-seance { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 20px; color: var(--c-ink); padding: 10px 12px; border-radius: 16px; background: #EFE7F2; }
 .sp-seance .ic { width: 30px; height: 30px; flex: none; color: #5B4A66; }
-.sp-ghostsheet .sp-pick.dark { background: #F3EDF5; }
+.sp-ghostsheet .sp-pick.dark { background: #F3EDF5; color: var(--c-ink); border-color: #D9CCE0; }
 
 /* ---------- banish reveal ---------- */
 .sp-banish { display: flex; flex-direction: column; gap: 10px; }
@@ -259,8 +259,14 @@
 @keyframes spStamp { from { opacity: 0; transform: translateX(-50%) rotate(-8deg) scale(1.7); } to { opacity: 1; transform: translateX(-50%) rotate(-8deg) scale(1); } }
 .sp-vd-nm { font-family: var(--f-display); font-weight: 900; font-size: 34px; line-height: 36px; color: var(--c-ink); margin-top: 6px; }
 .sp-vd-tie { font-size: 15px; line-height: 20px; font-weight: 600; color: var(--c-toffee); text-wrap: balance; }
-.sp-rolecard { width: 100%; margin-top: 6px; padding: 12px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0; transform: rotateX(80deg); transform-origin: top; transition: opacity 200ms, transform 560ms var(--ease-out-back); }
-.sp-banish.revealed .sp-rolecard { opacity: 1; transform: none; }
+.sp-rcwrap { width: 100%; margin-top: 6px; position: relative; perspective: 700px; }
+.sp-rc-back { position: absolute; inset: 0; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--c-linen); background: repeating-linear-gradient(45deg, #2F5D7C 0 6px, #346684 6px 12px); box-shadow: inset 0 0 0 3px rgba(251,244,234,.6); backface-visibility: hidden; transition: transform 520ms var(--ease-in-out-quint); animation: spTremble 180ms ease-in-out infinite; }
+.sp-rc-back span { font-size: 14px; font-weight: 700; opacity: .85; }
+.sp-rc-back b { font: 900 34px/36px var(--f-display); }
+@keyframes spTremble { 50% { transform: rotate(-.6deg) translateY(-1px); } }
+.sp-rolecard { width: 100%; padding: 12px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 2px; transform: rotateY(-180deg); backface-visibility: hidden; transition: transform 520ms var(--ease-in-out-quint); }
+.sp-banish.revealed .sp-rc-back { transform: rotateY(180deg); animation: none; }
+.sp-banish.revealed .sp-rolecard { transform: none; }
 .sp-rolecard.faith { background: #E7EEE2; border: 2px solid var(--c-sage); color: #3F5A36; }
 .sp-rolecard.pois { background: radial-gradient(120% 90% at 50% 0%, #95283A, var(--c-claret) 60%, #4E0F1A); color: var(--c-linen); border: 2px solid var(--c-brass); }
 .sp-rc-q { font-size: 14px; font-weight: 700; opacity: .8; }

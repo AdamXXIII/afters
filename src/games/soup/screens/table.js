@@ -144,7 +144,7 @@ const banish = {
         h('div.sp-vd-av', disc(ctx, p.banished, { size: 96, cls: '.keep' }), h('div.sp-stamp', 'Banished')),
         h('div.sp-vd-nm', nameOf(ctx, p.banished)),
         p.tie ? h('div.sp-vd-tie', `A tie between ${p.leaders.map((id) => nameOf(ctx, id)).join(' and ')}. Cyril drew a straw.`) : null,
-        h(`div.sp-rolecard.${pois ? 'pois' : 'faith'}`, h('div.sp-rc-q', 'They were…'), h('div.sp-rc-a', h('span.ic', { html: pois ? VIAL : SPOON }), pois ? 'a Poisoner' : 'Faithful'))].filter(Boolean));
+        h('div.sp-rcwrap', h('div.sp-rc-back', h('span', 'They were…'), h('b', '?')), h(`div.sp-rolecard.${pois ? 'pois' : 'faith'}`, h('div.sp-rc-q', 'They were…'), h('div.sp-rc-a', h('span.ic', { html: pois ? VIAL : SPOON }), pois ? 'a Poisoner' : 'Faithful')))].filter(Boolean));
     } else verdict.append(h('div.sp-vd-nm', 'Nobody leaves.'), h('div.sp-vd-tie', 'The table couldn’t decide. The Poisoners are delighted.'));
     const card = h('div.sp-card.sp-banish', h('div.sp-banish-t', p.final ? 'Banish again' : 'The vote'), list, verdict);
     show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));
@@ -174,7 +174,7 @@ const banish = {
           revealed = true;
           card.classList.add('revealed');
           const pois = p.role === 'poisoner';
-          if (!c.frozen) { c.audio.sfx(pois ? 'truth' : 'groan'); c.cyril.react(pois ? 'delight' : 'sad'); }
+          if (!c.frozen) { c.audio.sfx(pois ? 'truth' : 'groan'); c.cyril.react(pois ? 'delight' : 'sad'); c.stage.shake(0.006, 220); c.haptic(pois ? 'win' : 'stamp'); }
           const extra = p.landslide ? c.line('spLandslide') : p.tie ? c.line('spTie') : null;
           cancel = say(c, [...(p.banished ? c.line(pois ? 'spPoisoner' : 'spFaithful', { name: nameOf(c, p.banished) }) : c.line('spNone')), ...(extra || [])].slice(0, 2), { hold: 3000 }, 500);
         }
