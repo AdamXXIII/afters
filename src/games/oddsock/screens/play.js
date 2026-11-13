@@ -129,8 +129,8 @@ const vote = {
       hint.classList.toggle('locked', !!mine);
     };
     sync(ctx);
-    const cancel = sayLater(ctx, ctx.line('osVote'), { delay: 600 });
-    return { update: sync, frame(c) { hd.timer.set(c.remaining(), c.duration); }, unmount: cancel };
+    // no Cyril line here: his bubble would sit on the live tally
+    return { update: sync, frame(c) { hd.timer.set(c.remaining(), c.duration); } };
   },
 };
 

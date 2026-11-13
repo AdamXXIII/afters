@@ -44,7 +44,7 @@
 /* ---------- show layer: header + washing line ---------- */
 .os-top { position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 10px); padding: 0 calc(var(--safe-r) + 10px) 0 calc(var(--safe-l) + 10px); display: flex; flex-direction: column; gap: 8px; z-index: 2; }
 .os-head {
-  border-radius: 20px; padding: 10px 10px 10px 14px;
+  border-radius: 20px; padding: 10px 10px 10px 10px;
   background-color: #FFFBF4; background-image: var(--paper);
   box-shadow: 0 2px 0 rgba(42,26,23,.1), 0 14px 30px rgba(30,12,8,.45), inset 0 0 0 1px rgba(122,74,42,.14);
   border-top: 6px solid #3E8E8A;
@@ -53,12 +53,12 @@
 .os-head.claret { border-top-color: var(--c-claret); }
 .os-head.go { border-top-color: var(--c-tomato); }
 @keyframes osDrop { from { opacity: 0; transform: translateY(-14px) rotate(-1deg); } to { opacity: 1; transform: none; } }
-.os-head-row { display: flex; align-items: center; gap: 10px; }
+.os-head-row { display: flex; align-items: center; gap: 12px; padding-right: 44px; }
 .os-head .timer { flex: none; width: 54px; height: 54px; }
 .os-head-t { flex: 1; min-width: 0; }
 .os-badge { display: inline-block; font: 700 12px/16px var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: #2C6C69; }
 .os-badge.x2 { color: var(--c-claret); }
-.os-title { font-family: var(--f-display); font-weight: 800; font-size: 27px; line-height: 29px; color: var(--c-ink); font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.os-title { font-family: var(--f-display); font-weight: 800; font-size: 27px; line-height: 29px; color: var(--c-ink); font-variation-settings: "SOFT" 100, "WONK" 1; letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
 .os-head.go .os-title { color: var(--c-tomato); }
 .os-line { font-size: 16px; line-height: 20px; font-weight: 550; color: var(--c-toffee); margin-top: 2px; text-wrap: balance; }
 
@@ -296,7 +296,10 @@
   .os-truth-sock { width: 40px; height: 50px; }
   .os-truth-h { font-size: 22px; line-height: 24px; }
   .os-truth-s { font-size: 14px; line-height: 18px; }
-  .os-round { gap: 5px; }
+  .os-round { gap: 4px; }
+  .os-round-top, .os-lead, .os-pw-sock { display: none; }
+  .os-pw .os-tape.small { padding: 6px 12px 8px; }
+  .os-pw .os-tape.small .os-tape-w { font-size: 21px; line-height: 23px; }
   .os-round-h { font-size: 28px; line-height: 30px; }
   .os-round-s { font-size: 14px; line-height: 18px; }
   .os-pair { margin: 0; }

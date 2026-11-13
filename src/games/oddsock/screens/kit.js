@@ -18,7 +18,8 @@ export function disc(ctx, id, { size = 34, cls = '' } = {}) {
 /** Cyril speaks after a beat (instantly in screenshots). Returns a cancel fn. */
 export function sayLater(ctx, lines, { delay = 600, ...o } = {}) {
   if (!lines) return () => {};
-  const t = setTimeout(() => ctx.say(lines, { hold: 2600, placement: 'side', ...o }), ctx.frozen ? 0 : delay);
+  const split = ctx.phase && ['oddsock-word', 'oddsock-clue', 'oddsock-vote', 'oddsock-guess'].includes(ctx.phase.id);
+  const t = setTimeout(() => ctx.say(lines, { hold: 2600, placement: 'side', ...(split ? { compact: true } : {}), ...o }), ctx.frozen ? 0 : delay);
   return () => clearTimeout(t);
 }
 
@@ -54,7 +55,7 @@ export function header(ctx, { title, line, timer = true, tone = '' } = {}) {
   const t = timer ? timerRing() : null;
   const badge = p.round ? h(`span.os-badge${p.final ? '.x2' : ''}`, p.final ? 'Last round · ×2' : `Round ${p.round} of ${p.rounds}`) : null;
   const el = h(`div.os-head${tone ? `.${tone}` : ''}`,
-    h('div.os-head-row', h('div.os-head-t', badge, h('div.os-title', title), line ? h('div.os-line', line) : null), t));
+    h('div.os-head-row', t, h('div.os-head-t', badge, h('div.os-title', title), line ? h('div.os-line', line) : null)));
   el.timer = t;
   return el;
 }
