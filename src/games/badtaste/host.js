@@ -41,6 +41,8 @@ export class BadTasteHost {
     this.hands = {};
     for (const p of api.players) this.hands[p.id] = api.take(ANSWERS, 'bt-a', HAND, rng);
     this.i = 0;
+    this.deciders = 0;
+    this.decider = null;
     api.enter('badtaste-intro', DUR.intro, { rounds: n, plays: api.plays });
   }
 
@@ -50,7 +52,7 @@ export class BadTasteHost {
       case 'badtaste-play': return this._judge();
       case 'badtaste-judge': return this._win();
       case 'badtaste-win':
-        if (this.i + 1 < this.order.length) { this.i += 1; return this._play(); }
+        if (this.i + 1 < this.order.length || this._decider()) { this.i += 1; return this._play(); }
         return this.api.finish(this.api.players.map((p) => ({ id: p.id, score: p.score })));
       default:
     }
@@ -59,7 +61,7 @@ export class BadTasteHost {
   activeFor(phaseId, connected) {
     const r = this.r;
     if (!r) return connected;
-    if (phaseId === 'badtaste-play') return connected.filter((p) => p.id !== r.critic);
+    if (phaseId === 'badtaste-play') return connected.filter((p) => p.id !== r.critic && !this._out(p.id));
     if (phaseId === 'badtaste-judge') return connected.filter((p) => p.id === r.critic);
     return connected;
   }
@@ -71,7 +73,7 @@ export class BadTasteHost {
     if (!r) return;
     switch (msg.type) {
       case 'bt-play': {
-        if (ph !== 'badtaste-play' || p.id === r.critic || r.played[p.id]) return;
+        if (ph !== 'badtaste-play' || p.id === r.critic || r.played[p.id] || this._out(p.id)) return;
         if (msg.text != null) {
           const t = this.api.clean(String(msg.text), MAX);
           if (!t) return this.api.reject(p, 'empty');
@@ -114,9 +116,26 @@ export class BadTasteHost {
     }
   }
 
+  /** A shared first place gets one deciding round, judged by someone who isn't in the tie. */
+  _decider() {
+    if (this.deciders >= 2) return false;
+    const rows = this._rows();
+    const top = rows.filter((r) => r.rank === 1).map((r) => r.id);
+    if (top.length < 2) return false;
+    const judge = this.api.connected.find((p) => !top.includes(p.id));
+    if (!judge) return false;
+    this.deciders = (this.deciders || 0) + 1;
+    this.order.push(judge.id);
+    this.decider = new Set(top);
+    const [q] = this.api.take(PROMPTS, 'bt-p', 1, this.api.sub('decider'));
+    this.prompts.push(q || this.prompts[0]);
+    return true;
+  }
+
   // ---------- phases ----------
 
   _critic() {
+    if (this.decider && this.i === this.order.length - 1) return this.order[this.i];
     // skip a Critic who has left the table
     const connected = new Set(this.api.connected.map((p) => p.id));
     for (let k = 0; k < this.order.length; k++) {
@@ -126,9 +145,15 @@ export class BadTasteHost {
     return this.order[this.i];
   }
 
+  /** In a decider only the tied players play. */
+  _out(id) {
+    return !!this.decider && this.i === this.order.length - 1 && !this.decider.has(id);
+  }
+
   _base() {
     const r = this.r;
-    return { round: this.i + 1, of: this.order.length, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length };
+    const decider = !!this.decider && this.i === this.order.length - 1;
+    return { round: this.i + 1, of: this.order.length, critic: r.critic, prompt: r.prompt.text, last: this.i + 1 === this.order.length, decider, tied: decider ? [...this.decider] : [] };
   }
 
   _play() {
@@ -141,11 +166,11 @@ export class BadTasteHost {
     }
     this.r = { critic: this._critic(), prompt: this.prompts[this.i] || this.prompts[0], played: {}, cards: [], flipped: 0, focus: -1, crowned: null };
     const r = this.r;
-    const answering = () => api.players.filter((p) => p.id !== r.critic);
+    const answering = () => api.players.filter((p) => p.id !== r.critic && !this._out(p.id));
     api.enter('badtaste-play', DUR.play, { ...this._base(), max: MAX }, {
       priv: (p) => (p.id === r.critic ? { role: 'critic' } : { role: 'player', hand: this.hands[p.id] || [] }),
       progress: () => ({
-        done: this._doneMap((p) => p.id === r.critic || !!r.played[p.id]),
+        done: this._doneMap((p) => p.id === r.critic || this._out(p.id) || !!r.played[p.id]),
         counts: { played: answering().filter((p) => r.played[p.id]).length, of: answering().length },
       }),
     });
@@ -155,22 +180,15 @@ export class BadTasteHost {
     const api = this.api;
     const r = this.r;
     const rng = api.sub(`judge-${this.i}`);
-    // anyone still at the table who didn't play gets a card played for them from their hand
-    for (const p of api.connected) {
-      if (p.id === r.critic || r.played[p.id]) continue;
-      const hand = this.hands[p.id] || [];
-      if (!hand.length) continue;
-      const c = hand[Math.floor(rng() * hand.length)];
-      r.played[p.id] = { cardId: c.id, text: c.text, written: false, auto: true };
-    }
+    // nobody gets a card played for them: no card, no chance (phones send a chosen card at the buzzer)
     // played cards leave the hand (refilled next round)
     for (const [pid, pl] of Object.entries(r.played)) {
       if (pl.cardId) this.hands[pid] = (this.hands[pid] || []).filter((c) => c.id !== pl.cardId);
     }
     const entries = Object.entries(r.played).map(([pid, pl]) => ({ by: pid, text: pl.text, written: pl.written }));
-    // too few answers for a real choice: Cyril slips one in from the deck
+    // too few answers for a real choice (a three-player table): Cyril slips his own in for cover
     let tries = 0;
-    while (entries.length < 3 && tries++ < 4) {
+    while (entries.length < 4 && tries++ < 6) {
       const [c] = api.take(ANSWERS, 'bt-a', 1, rng);
       if (c && !entries.some((e) => e.text === c.text)) entries.push({ by: 'house', text: c.text, written: false });
     }
@@ -194,7 +212,8 @@ export class BadTasteHost {
     const r = this.r;
     let k = r.crowned;
     const cyrilChose = k == null;
-    if (cyrilChose) k = Math.floor(api.sub(`cyril-${this.i}`)() * r.cards.length);
+    // the Critic dithered: Cyril picks among the cards that were read out (any, if none were)
+    if (cyrilChose) k = Math.floor(api.sub(`cyril-${this.i}`)() * Math.max(1, r.flipped || r.cards.length));
     const win = r.cards[k];
     const deltas = Object.fromEntries(api.players.map((p) => [p.id, 0]));
     if (win && win.by !== 'house' && win.by in deltas) deltas[win.by] = 1;

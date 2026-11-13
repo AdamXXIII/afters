@@ -2,7 +2,9 @@
 // named. Then the rest of the pile turns its owners' names over, and the crowns tally.
 // A pure function of ctx.elapsed() so frozen shots and sync both work.
 import { h } from '../../../ui/components.js';
-import { promptCard, answerCard, disc, tag, cyrilDisc, nameOf } from './kit.js';
+import { promptCard, disc, cyrilDisc, nameOf } from './kit.js';
+
+const CROWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 8.5l4.3 3.6L12 5l4.2 7.1 4.3-3.6-1.7 9.5H5.2z" fill="currentColor"/><rect x="5.2" y="19.2" width="13.6" height="2.3" rx="1" fill="currentColor"/></svg>';
 
 const AT = { card: 300, rosette: 1300, owner: 2100, rest: 3600, restStep: 450, tally: 5600 };
 
@@ -23,19 +25,23 @@ export default {
 
     const pc = promptCard(ctx, p, { answer: win.text, timer: false, size: 'win' });
     const rosette = h('div.bt-rosette', h('span.t1', p.cyrilChose ? 'Cyril’s' : 'Critic’s'), h('span.t2', 'pick'));
-    const owner = h('div.bt-owner',
-      h('span.lbl', house ? 'Cyril’s own card.' : 'Played by'),
-      house ? h('span.bt-tag.house.big', cyrilDisc(38), h('span.nm', 'Cyril')) : tag(ctx, win.by, { cls: '.big' }),
-      house ? h('span.bt-plus.none', 'Nobody scores') : h('span.bt-plus', '+1 crown'));
+    const pl = ctx.player(win.by);
+    const owner = h(`div.bt-owner${mine ? '.mine' : ''}`,
+      house ? cyrilDisc(60) : disc(pl, { size: 60 }),
+      h('div.bt-owner-t',
+        h('span.lbl', house ? 'Cyril’s own card' : mine ? 'Your card won' : 'Played by'),
+        h('span.nm', house ? 'Cyril' : mine ? 'You' : pl?.name || '?')),
+      house ? h('span.bt-plus.none', 'Nobody scores') : h('span.bt-plus', { html: `${CROWN}<b>+1</b>` }));
     const rest = p.cards.filter((_, i) => i !== p.winner).map((c, i) => h('div.bt-restrow', { style: { '--i': i } },
       h('span.bt-rest-t', c.text[0].toUpperCase() + c.text.slice(1)),
       c.by === 'house' ? h('span.bt-rest-by', cyrilDisc(24), 'Cyril') : h('span.bt-rest-by', disc(ctx.player(c.by), { size: 24 }), c.by === ctx.meId ? 'You' : nameOf(ctx, c.by))));
-    const restBox = h('div.bt-rest', h('div.bt-rest-h', 'The rest of the pile'), rest);
-    const tally = h('div.bt-tally', p.scores.map((r) => h(`div.bt-tallyi${r.id === win.by ? '.won' : ''}${r.id === ctx.meId ? '.me' : ''}`,
-      disc(ctx.player(r.id), { size: 28 }),
-      h('span.bt-crowns', Array.from({ length: Math.min(r.score, 6) }, () => h('i')), r.score > 6 ? h('b', `${r.score}`) : null, r.score ? null : h('span.z', '0')))));
+    const restBox = h('div.bt-rest', h('div.bt-rest-h', 'Who played the rest'), rest);
+    const tally = h('div.bt-tally', h('div.bt-tally-h', { html: `${CROWN}<span>Crowns so far</span>` }), h('div.bt-tally-l', p.scores.map((r) => h(`div.bt-tallyi${r.id === win.by ? '.won' : ''}${r.id === ctx.meId ? '.me' : ''}`,
+      disc(ctx.player(r.id), { size: 24 }),
+      h('span.nm', r.id === ctx.meId ? 'You' : nameOf(ctx, r.id)),
+      h('b', String(r.score))))));
     const note = p.cyrilChose ? h('div.bt-note', `${critic} ran out of time. Cyril picked one.`)
-      : mine ? h('div.bt-note.you', `${critic} crowned yours.`) : null;
+      : p.decider ? h('div.bt-note', 'The decider') : null;
     const wrap = h(`div.bt-win${house ? '.house' : ''}${p.cards.length > 5 ? '.many' : ''}`, h('div.bt-wincard', pc, rosette), note, owner, restBox, tally);
     show.append(wrap);
 

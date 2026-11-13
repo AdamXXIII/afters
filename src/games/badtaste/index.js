@@ -26,7 +26,7 @@ export default {
   tagline: 'Play your worst card. Please one person.',
   blurb: 'Each round one of you is the Critic. Everyone else plays the funniest answer from their hand to fill the blank. The Critic reads them out and crowns one.',
   players: [3, 8],
-  minutes: 12,
+  minutes: 15,
   steps: STEPS,
   hasAdult: true,
   colour: '#7A1E2C',
@@ -40,7 +40,7 @@ export default {
     const mine = () => client.state.mine.game || {};
     switch (ph.id) {
       case 'badtaste-play': {
-        if (p.critic === me) return true;
+        if (p.critic === me || (p.decider && !p.tied.includes(me))) return true;
         const hand = ph.private?.hand || [];
         later(rand(1500, 9000), () => {
           if (!still() || mine().played || !hand.length) return;
@@ -70,6 +70,7 @@ export default {
     if (!ph || ph.game !== 'badtaste') return null;
     if (ph.id === 'badtaste-play') {
       if (ph.payload?.critic === state.me) return 'badtaste-critic';
+      if (ph.payload?.decider && !ph.payload.tied?.includes(state.me)) return 'badtaste-played';
       return state.mine?.game?.played || state.progress?.done?.[state.me] ? 'badtaste-played' : 'badtaste-hand';
     }
     return null;
@@ -107,6 +108,8 @@ export default {
       btWin: [['{name}! Shameless. Brilliant.'], ['That was {name}. Of course it was.'], ['{name} takes the crown. {critic} has questionable taste.']],
       btHouse: [['That was mine. I win. Nobody scores. Marvellous.'], ['My card! The Critic has taste after all.']],
       btCyrilChose: [['Too slow. I picked. {name} gets the crown.']],
+      btChoose: [['All turned. Now pick one. No pressure. Lots of pressure.'], ['Which one made you laugh? That one.']],
+      btDecider: [['A tie at the top. One more round decides it.']],
     },
     adult: {
       btIntro: [
@@ -126,6 +129,7 @@ export default {
       btWin: [['{name}! Disgusting. Well done.'], ['That was {name}. Nobody’s surprised.'], ['{name} wins. {critic}, have a word with yourself.']],
       btHouse: [['That was my card, you lot. Nobody scores. Get fucked.'], ['Mine! Beaten by a candle. Shameful.']],
       btCyrilChose: [['Took too bloody long. I picked. {name}, lucky you.']],
+      btChoose: [['Pick one. Don’t overthink it, you’re not a fucking High Court judge.'], ['Which one made you snort? Crown it.']],
     },
   },
 };

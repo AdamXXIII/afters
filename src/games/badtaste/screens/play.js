@@ -41,8 +41,9 @@ const hand = {
 
     const grid = h('div.bt-hand', tiles, blank);
     const btn = button('Play this card', { onClick: () => play(), e2e: 'submit' });
+    const subEl = h('div.bt-sub');
     const page = h('div.bt-sheet.bt-handsheet',
-      h('div.bt-sheethead', h('div.bt-title', `Play a card to ${nameOf(ctx, p.critic)}`), h('div.bt-sub', 'Tap one to try it in the blank. Nobody sees who played what.')),
+      h('div.bt-sheethead', h('div.bt-title', p.decider ? `The decider: play to ${nameOf(ctx, p.critic)}` : `Play a card to ${nameOf(ctx, p.critic)}`), subEl),
       grid, writeBox,
       h('div.bt-actions', btn));
     sheet.append(page);
@@ -76,6 +77,7 @@ const hand = {
       }
       btn.disabled = !a;
       btn.textContent = writing ? 'Play my card' : 'Play this card';
+      subEl.textContent = writing ? 'Type it. It appears in the blank up top.' : 'Tap one to try it in the blank. Nobody sees who played what.';
     }
     if (ctx.frozen && ctx.demo && cards[2]) sel = cards[2].id;
     sync();
@@ -109,7 +111,7 @@ const critic = {
     const pile = h('div.bt-pile');
     const row = playedRow(ctx, ids);
     show.append(h('div.bt-criticwrap',
-      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', `Round ${p.round} of ${p.of}. Wait for the cards, then read each one out.`)), ring),
+      h('div.bt-chair', criticBadge(ctx.me, { size: 56 }), h('div', h('div.bt-chair-t', 'You’re the Critic'), h('div.bt-chair-s', `Round ${p.round} of ${p.of}. Wait while they pick their cards.`)), ring),
       pc, pile, row));
     let n = -1;
     const sync = (c) => {
@@ -142,6 +144,18 @@ const played = {
     const p = ctx.payload;
     const seed = ctx.phase?.seed || 1;
     const text = ctx.mine.game.played || '';
+    const out = p.decider && !p.tied?.includes(ctx.meId);
+    if (out) {
+      const pc = promptCard(ctx, p);
+      const names = (p.tied || []).map((id) => nameOf(ctx, id));
+      const row = playedRow(ctx, p.tied || []);
+      show.append(h('div.bt-top', pc, row));
+      sheet.append(h('div.bt-sheet.bt-playedsheet',
+        h('div.bt-sheethead.center', h('div.bt-title', 'The decider'), h('div.bt-sub', `${names.join(' and ')} are tied for first. Only they play this one. You watch.`)),
+        h('div.bt-mine', cardBack({ cls: '.under', seed, key: 'u1' }), cardBack({ cls: '.big', seed, key: 'u2' }))));
+      const cancel = sayLater(ctx, ctx.line('btDecider'), { delay: 600 });
+      return { update: (c) => row.sync(c), frame(c) { pc.timer?.set(c.remaining(), c.duration); }, unmount: cancel };
+    }
     const pc = promptCard(ctx, p, { answer: text || null });
     const row = playedRow(ctx, others(ctx));
     show.append(h('div.bt-top', pc, row));

@@ -52,7 +52,7 @@ export function promptCard(ctx, p, { answer = null, timer = true, size = '', hea
     head ? h('div.bt-phead',
       criticBadge(critic, { size: 30 }),
       h('span.bt-pwho', meCritic ? 'You’re the Critic' : `${critic?.name || '?'} is the Critic`),
-      h('span.bt-pround', `${p.round}/${p.of}`),
+      h('span.bt-pround', p.decider ? 'Decider' : `Round ${p.round}/${p.of}`),
       t) : null,
     text);
   card.timer = t;
