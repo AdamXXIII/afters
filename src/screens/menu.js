@@ -325,7 +325,8 @@ export default {
               h('p.mn-card-tag', g.tagline || g.hint || ''))),
           facts,
           duoBox,
-          h('h3.mn-how-h', 'How it plays'),
+          // At two, the duo box is the rules; the panels describe the bigger-table game, so say so.
+          h('h3.mn-how-h', duoBox ? 'With three or more' : 'How it plays'),
           how,
           fanLine),
         h('div.mn-card-act', note, h('div.mn-card-btns', extra, action)));
