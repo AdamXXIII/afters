@@ -220,6 +220,7 @@ export class PardonHost {
       index: this.i, count: this.tunes.length, mode: t.mode, kind: t.tune.kind,
       notes: t.tune.notes, bpm: t.tune.bpm, seed: this.api.seed + this.i,
       playAt: t.playAt, options: t.options,
+      scores: Object.fromEntries(this.api.players.map((p) => [p.id, p.score])),
     }, {
       progress: () => ({
         done: Object.fromEntries(this.api.players.map((p) => [p.id, !!t.answers[p.id]])),

@@ -68,17 +68,17 @@ const tune = {
       stop = play(ctx.audio, tuneObj, p.mode, p.seed, from);
     };
     // everyone at the table, greyed until they lock in, then lit with their time (never what they picked)
-    const raceDiscs = new Map(ctx.players.map((pl) => [pl.id, h('span.pd-racer', { style: { '--pc': colourOf(pl) } }, disc(pl, { size: 36 }), h('b.pd-racer-n'), h('span.pd-racer-nm', pl.name))]));
+    const raceDiscs = new Map(ctx.players.map((pl) => [pl.id, h('span.pd-racer', { style: { '--pc': colourOf(pl) } }, disc(pl, { size: 36 }), h('b.pd-racer-n'), h('span.pd-racer-nm', pl.name), h('span.pd-racer-sc', String(p.scores?.[pl.id] ?? 0)))]));
     const race = h('div.pd-race', [...raceDiscs.values()]);
     const here = h('button.pd-here', { type: 'button', 'data-e2e': 'pd-play-here' }, h('span.ic', { html: SPEAKER }), h('span', iAmSpeaker ? 'Playing here' : 'Play here too'));
     if (!iAmSpeaker) onTap(here, () => { here.classList.add('on'); startPlay(); });
     else here.classList.add('on');
     show.append(h('div.pd-tunetop',
-      h('div.pd-tunehead', timer,
+      h('div.pd-tunehead',
         h('div.pd-tunehead-t', h('b', mode ? mode.t : 'Name that tune'), h('span', mode ? mode.s : KIND[p.kind] || '')),
         pips(p.index, p.count)),
       box,
-      h('div.pd-tunefoot', h('span.pd-from', iAmSpeaker || !speaker ? 'Turn this phone up' : `Listen to ${speaker.name}’s phone`), here),
+      h('div.pd-tunefoot', h('span.pd-from', iAmSpeaker || !speaker ? '' : `Playing on ${speaker.name}’s phone`), here),
       race));
     if (mode) show.firstChild.classList.add('weird');
 
@@ -135,7 +135,6 @@ const tune = {
         lastOrder = n;
       },
       frame(c) {
-        timer.set(c.remaining(), c.duration);
         const t = (c.elapsed() - p.playAt) / 1000;
         const mineAt = c.mine.game.at;
         const shownT = picked && mineAt ? (mineAt - p.playAt) / 1000 : t;

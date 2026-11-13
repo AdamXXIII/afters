@@ -179,7 +179,7 @@
 
 /* ---------- Hum Along ---------- */
 .pd-tunetop { position: absolute; left: 0; right: 0; top: calc(var(--safe-t) + 8px); padding: 0 calc(var(--safe-r) + 62px) 0 calc(var(--safe-l) + 10px); display: flex; flex-direction: column; gap: 8px; z-index: 2; }
-.pd-tunehead { display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 20px; background: #FFFBF4; box-shadow: 0 10px 24px rgba(30,12,8,.4); border-top: 6px solid var(--c-willow); }
+.pd-tunehead { display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 14px; border-radius: 20px; background: #FFFBF4; box-shadow: 0 10px 24px rgba(30,12,8,.4); border-top: 6px solid var(--c-willow); }
 .pd-tunehead .timer { width: 46px; height: 46px; flex: none; box-shadow: none; background: transparent; }
 .pd-tunehead .timer .num { font-size: 17px; }
 .pd-tunehead-t { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -229,6 +229,7 @@
 .pd-racer-nm { font: 650 12px var(--f-ui); color: #E6D3B8; max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pd-racer-n { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); min-width: 36px; height: 19px; padding: 0 5px; border-radius: 10px; background: #FFFBF4; color: var(--c-ink); font: 850 12px/19px var(--f-ui); text-align: center; opacity: 0; font-variant-numeric: tabular-nums; z-index: 1; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
 .pd-racer.in .pd-racer-n { opacity: 1; }
+.pd-racer-sc { font: 800 12px var(--f-ui); color: #FFE3A3; font-variant-numeric: tabular-nums; }
 .pd-racer.first .pd-racer-n { background: var(--c-brass); color: #fff; }
 
 /* tune reveal */
