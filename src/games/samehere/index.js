@@ -27,6 +27,16 @@ function botAnswer(q, rating, rng) {
   if (roll < 0.35) return pick.toLowerCase();
   return pick;
 }
+/** Demo helper: make sure the sort screen has a close call on it to argue about. */
+const sortDemo = (e) => {
+  if (e.phase.id !== 'samehere-sort') return false;
+  const h = e.game?.host; const r = h?.cur;
+  if (r && !r.disputes.length && r.groups.length >= 2) {
+    r.disputes.push({ id: 'd0', a: r.groups[0].gid, b: r.groups[1].gid, by: null, votes: {} });
+    h.api.progress();
+  }
+  return true;
+};
 const stepAt = (kind, plus, fallback = 2000) => (p) => {
   const s = p.payload.steps.filter((x) => x.kind === kind);
   return s.length ? s[s.length - 1].at + plus : fallback;
@@ -99,7 +109,7 @@ export default {
     'samehere-intro': { match: (e) => e.phase.id === 'samehere-intro', t: 3200 },
     'samehere-write': { match: (e) => e.phase.id === 'samehere-write', me: 'idle', bots: 'some', t: 9000 },
     'samehere-wait': { match: (e) => e.phase.id === 'samehere-write', me: 'act', bots: 'some', t: 14000 },
-    'samehere-sort': { match: (e) => e.phase.id === 'samehere-sort' && e.game?.host?.cur?.disputes?.length > 0, me: 'idle', bots: 'some', t: 8000 },
+    'samehere-sort': { match: sortDemo, me: 'idle', bots: 'some', t: 8000 },
     'samehere-reveal': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.outcome === 'herd' && e.phase.payload.groups.length >= 3, t: stepAt('group', 700) },
     'samehere-chair': { match: (e) => e.phase.id === 'samehere-reveal' && !!e.phase.payload.lone && e.phase.payload.outcome === 'herd', t: stepAt('chair', 1900) },
     'samehere-standings': { match: (e) => e.phase.id === 'samehere-reveal' && e.phase.payload.round >= 3, t: stepAt('standings', 1600) },
