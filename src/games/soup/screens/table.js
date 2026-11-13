@@ -175,7 +175,8 @@ const banish = {
           card.classList.add('revealed');
           const pois = p.role === 'poisoner';
           if (!c.frozen) { c.audio.sfx(pois ? 'truth' : 'groan'); c.cyril.react(pois ? 'delight' : 'sad'); }
-          cancel = say(c, p.banished ? c.line(pois ? 'spPoisoner' : 'spFaithful', { name: nameOf(c, p.banished) }) : c.line('spNone'), { hold: 3000 }, 500);
+          const extra = p.landslide ? c.line('spLandslide') : p.tie ? c.line('spTie') : null;
+          cancel = say(c, [...(p.banished ? c.line(pois ? 'spPoisoner' : 'spFaithful', { name: nameOf(c, p.banished) }) : c.line('spNone')), ...(extra || [])].slice(0, 2), { hold: 3000 }, 500);
         }
       },
       unmount: () => cancel(),

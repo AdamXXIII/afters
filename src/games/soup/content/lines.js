@@ -7,6 +7,8 @@ export const LINES = {
       ['Something in the Soup. One of you has been tampering with the soup.', 'Find them before the soup finds you.'],
       ['Welcome to a perfectly normal dinner party.', 'Some of you are Poisoners. I\'m only a candle. Leave me out of it.'],
       ['Tonight: a pot to grow, a table to argue at, and a ladle I no longer trust.'],
+      ['Good evening. Somebody here is a Poisoner. Nobody look at the quiet one.'],
+      ['Something in the Soup. I\'ve been to dinners like this. I was the centrepiece. I survived.'],
     ],
     spIntroAgain: [['Back for more soup? Brave. I\'ve had the tureen washed. Twice.'], ['Same table, new Poisoners. Probably. Keep your spoons close.']],
     spRoles: [
@@ -29,7 +31,8 @@ export const LINES = {
     spVoteFinal: [['Then we banish again. Vote. Quickly. Before you lose your nerve.']],
     spFaithful: [['Faithful. Oh dear. You\'ve banished an innocent.'], ['Faithful. Wrong person. The soup thanks you.'], ['Faithful. Somebody owes {name} an apology.']],
     spPoisoner: [['A Poisoner! Well spotted, table.'], ['Poisoner! I knew it. I didn\'t. But I knew it.'], ['A Poisoner! Pour that soup away.']],
-    spTie: [['A tie. I\'ve drawn a straw. Don\'t blame me, blame the straw.']],
+    spTie: [['A tie. I drew a straw. Blame the straw.'], ['Dead heat. The straw has spoken.'], ['A tie, settled by a straw. Democracy at its finest.']],
+    spLandslide: [['Every single vote. Not one of you hesitated.'], ['Unanimous. That was quick. Suspiciously quick.'], ['The whole table, one name. Remember who started it.']],
     spNone: [['Nobody voted. A table of cowards. Lovely.']],
     spNight: [
       ['Night falls. Everyone, tap a name. The Poisoners mean it.'],
@@ -60,6 +63,8 @@ export const LINES = {
     spFaithful: [['Faithful. You\'ve banished an innocent. That\'s going in the group chat.'], ['Faithful. Oops. Somebody buy {name} a drink.']],
     spPoisoner: [['A Poisoner! Caught with their ladle out.'], ['Poisoner! Filthy. I love it. Get out.']],
     spNight: [['Night falls. Everyone taps a name. The Poisoners mean it. The rest of you just like tapping.']],
+    spLandslide: [['Every vote. Brutal. I\'d hate to be your ex.'], ['Unanimous. The table has a type, and it\'s guilty.']],
+    spIntroAgain: [['Back for more? Some of you clearly enjoy lying to your friends.'], ['Round two. Fresh Poisoners. Same filthy liars.']],
     spWinPoisoners: [['The Poisoners win. They lied to your faces and took your money. Like a wedding.']],
     spWinFaithful: [['The Faithful win! Split the pot. Spend it on something you\'ll regret.']],
     spGhost: [['You\'re dead. Sit quietly. Like a ghost at a hen do.']],

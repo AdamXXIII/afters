@@ -409,3 +409,12 @@ body.sp-night #sheet::after { box-shadow: inset 0 1px 0 rgba(243,230,207,.12); }
   .sp-bigrow { max-height: 170px; }
   .sp-finalists .sp-av { width: 32px !important; height: 32px !important; }
 }
+
+/* the day's clue on the task result */
+.sp-clue { width: 100%; margin-top: 4px; padding: 10px 12px; border-radius: 16px; background: var(--c-tablecloth); box-shadow: inset 0 0 0 1px rgba(122,74,42,.16); display: flex; flex-direction: column; align-items: center; gap: 4px; animation: spUp 420ms 1.8s var(--ease-out-quint) both; }
+.sp-clue .k { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--c-claret); }
+.sp-clue .hands { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.sp-clue .hands b { min-width: 32px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: #FFFBF4; box-shadow: 0 2px 0 var(--c-crumb); font: 900 20px var(--f-display); color: var(--c-ink); }
+.sp-clue .who { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; font-size: 18px; color: var(--c-ink); }
+.sp-clue .s { font-size: 14px; line-height: 18px; color: var(--c-toffee); font-weight: 600; text-align: center; }
+@media (orientation: landscape) and (max-height: 600px) { .sp-clue { grid-column: 2; padding: 6px 10px; } }

@@ -14,7 +14,8 @@ export const easeOut = (k) => 1 - (1 - clamp01(k)) ** 3;
 /** Cyril speaks after a beat (instantly in screenshots). Returns a cancel fn. */
 export const say = (ctx, lines, o = {}, delay = 600) => {
   if (!lines) return () => {};
-  const t = setTimeout(() => ctx.say(lines, { hold: 3000, placement: 'side', ...o }), ctx.frozen ? 0 : delay);
+  const split = ctx.phase && ['soup-roles', 'soup-task', 'soup-table', 'soup-vote', 'soup-night', 'soup-final'].includes(ctx.phase.id);
+  const t = setTimeout(() => ctx.say(lines, { hold: split ? 2400 : 3000, placement: 'side', ...(split ? { compact: true } : {}), ...o, ...(split ? { hold: Math.min(o.hold || 2400, 2600) } : {}) }), ctx.frozen ? 0 : delay);
   return () => clearTimeout(t);
 };
 

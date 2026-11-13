@@ -175,9 +175,13 @@ const result = {
     else if (p.kind === 'code') detail = `${p.right} of ${p.of} opened the safe. The code was ${p.code}.`;
     else detail = `${p.passes} passes, ${p.drops} dropped, ${p.fumbles} fumbled.`;
     const gainEl = h(`div.sp-gain${gain > 0 ? '.up' : gain < 0 ? '.down' : '.none'}`, gain > 0 ? `+${money(gain)}` : gain < 0 ? `−${money(-gain)}` : 'Nothing');
+    let clue = null;
+    if (p.kind === 'spoons' && p.hands?.length) clue = h('div.sp-clue', h('span.k', 'What went in'), h('span.hands', p.hands.map((n) => h('b', String(n)))), h('span.s', 'Anonymous. Somebody knows which one was theirs.'));
+    else if (p.kind === 'code' && p.wrongSeat) clue = h('div.sp-clue', h('span.k', 'Most-missed digit'), h('span.who', disc(ctx, p.wrongSeat, { size: 24 }), h('b', `${nameOf(ctx, p.wrongSeat)}’s`)), h('span.s', `${p.wrongN} of ${p.typed} got that one wrong. Misheard, or lied?`));
+    else if (p.kind === 'parcel' && p.dropIds?.length) clue = h('div.sp-clue', h('span.k', 'Dropped it'), h('span.who', [...new Set(p.dropIds)].map((id) => [disc(ctx, id, { size: 24 }), h('b', nameOf(ctx, id))])), h('span.s', 'Slow hands, or sabotage?'));
     const card = h('div.sp-card.sp-result',
       h('div.sp-result-t', TITLES[p.kind](p)),
-      pot, gainEl, h('div.sp-result-d', detail));
+      pot, gainEl, h('div.sp-result-d', detail), clue);
     const priv = ctx.priv || {};
     const shield = priv.newShield ? h('div.sp-psst', h('span', { html: SHIELD }), h('span', h('b', 'Psst. '), 'You found a Shield. It saves you from one poisoning. Tell nobody. Or everybody.')) : null;
     show.append(h('div.sp-dim'), h('div.sp-cardwrap', card));

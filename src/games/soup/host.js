@@ -176,13 +176,19 @@ export class SoupHost {
       const off = Math.abs(total - t.target);
       gain = off === 0 ? 1000 : off === 1 ? 400 : 0;
       contributors = alive.filter((id) => t.inputs[id] !== undefined);
-      Object.assign(res, { total, target: t.target, item: t.item, off, entered: contributors.length });
+      const hands = contributors.map((id) => t.inputs[id]).sort((a, b) => b - a);
+      Object.assign(res, { total, target: t.target, item: t.item, off, entered: contributors.length, hands });
     } else if (t.kind === 'code') {
       const code = t.code.join('');
       const right = alive.filter((id) => t.inputs[id] === code);
       gain = Math.round((1000 * right.length) / alive.length / 50) * 50;
       contributors = right;
-      Object.assign(res, { code, right: right.length, of: alive.length, room: t.room });
+      // the clue: which digit did the table get wrong most often? (a lying Poisoner's seat shows up here)
+      const typed = alive.filter((id) => t.inputs[id]);
+      const wrong = t.code.map((d, i) => typed.filter((id) => t.inputs[id][i] !== String(d)).length);
+      const worst = Math.max(0, ...wrong);
+      const worstSlot = worst > 0 && wrong.filter((w) => w === worst).length === 1 ? wrong.indexOf(worst) : -1;
+      Object.assign(res, { code, right: right.length, of: alive.length, room: t.room, typed: typed.length, wrongSeat: worstSlot >= 0 ? alive[worstSlot] : null, wrongN: worst });
     } else {
       gain = t.net;
       contributors = Object.keys(t.passedBy);
@@ -249,7 +255,8 @@ export class SoupHost {
     const stampAt = d(BANISH.first + all.length * BANISH.per + 400);
     const roleAt = stampAt + d(BANISH.role);
     const total = BANISH.first + all.length * BANISH.per + 400 + BANISH.role + BANISH.tail;
-    this.api.enter('soup-banish', total, { ...this._base(), votes: all, at, counts, banished, role, tie, leaders, stampAt, roleAt, final: this.finalMode }, {
+    const landslide = !!banished && !tie && all.length >= 3 && counts[banished] === all.length;
+    this.api.enter('soup-banish', total, { ...this._base(), landslide, votes: all, at, counts, banished, role, tie, leaders, stampAt, roleAt, final: this.finalMode }, {
       priv: (p) => this._priv(p),
     });
   }

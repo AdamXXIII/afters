@@ -40,7 +40,7 @@ export default {
   steps: [
     'One or two of you are secretly Poisoners. The rest are Faithful.',
     'By day, grow the pot, argue, then vote someone away from the table.',
-    'By night, the Poisoners strike. Last ones standing share the pot, unless a Poisoner is among them.',
+    'By night, the Poisoners strike. If any are left at the end, they take the pot.',
   ],
   hasAdult: true,
   colour: '#7A1E2C',
