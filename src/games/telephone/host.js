@@ -4,19 +4,26 @@ import { decodeDrawing, replayDuration } from '../../shared/drawing-data.js';
 import { shuffle } from '../../util/rng.js';
 import { STARTERS } from './content/starters.js';
 import { doodle, DOODLE_KEYS } from './doodles.js';
-import { MODES, TIMERS, LIMITS, holder, kindOf, kept } from './logic.js';
+import { MODES, TIMERS, LIMITS, LENGTHS, holder, kindOf, kept, stepsFor, defaultLength } from './logic.js';
 
 const INTRO = 12000;
 const VOTE = 9000;
 const AWARDS = 9500;
 const PTS = { vote: 500, kept: 250, straight: 300, flipBest: 250 };
-// reveal beats (ms at speed 1)
-const BEAT = { title: 1300, text: 2300, guess: 2700, drawHold: 1000, drawMax: 3400, blank: 1700, flipFrame: 600, flipMax: 2600, flipbook: 4200, end: 3200 };
+// album reveal: the host turns the pages. A page replays its drawing (capped) or types its words.
+const REPLAY_MAX = 3400; // longest stroke-by-stroke replay of one drawing
+const PAGE_GAP = 450; // ignore double taps on Next
+const ANYONE_AFTER = 15000; // if the host wanders off, anyone may turn the page after this long
 
 export class TelephoneHost {
   constructor(api) {
     this.api = api;
     this.mode = 'classic';
+    this.length = 'once';
+    this.stepsN = 0;
+    this.page = 0;
+    this.pageT = 0;
+    this.pageBy = null;
     this.seats = [];
     this.chains = [];
     this.step = 0;
@@ -29,21 +36,24 @@ export class TelephoneHost {
   }
 
   get n() { return this.seats.length; }
-  get steps() { return this.n; }
+  get steps() { return this.stepsN || stepsFor(this.n, this.length); }
 
   start() {
     const rng = this.api.sub('seats');
     this.seats = shuffle(this.api.players.map((p) => p.id), rng);
     this.chains = this.seats.map((id, c) => ({ id: c, ownerId: id, steps: [] }));
-    this.api.enter('telephone-intro', INTRO, { modes: MODES, plays: this.api.plays }, {
-      progress: () => ({ done: {}, counts: {}, mode: this.mode }),
+    this.length = defaultLength(this.n);
+    this.stepsN = 0;
+    const lengths = Object.fromEntries(LENGTHS.map((l) => [l, stepsFor(this.n, l)]));
+    this.api.enter('telephone-intro', INTRO, { modes: MODES, lengths, plays: this.api.plays }, {
+      progress: () => ({ done: {}, counts: {}, mode: this.mode, length: this.length }),
       active: () => [],
     });
   }
 
   advance(phaseId) {
     switch (phaseId) {
-      case 'telephone-intro': this.step = 0; return this._enterStep();
+      case 'telephone-intro': this.step = 0; this.stepsN = stepsFor(this.n, this.length); return this._enterStep();
       case 'telephone-write':
       case 'telephone-draw':
       case 'telephone-guess':
@@ -52,7 +62,7 @@ export class TelephoneHost {
         if (this.step < this.steps) return this._enterStep();
         this.revealIndex = 0;
         return this._reveal();
-      case 'telephone-reveal': return this._vote();
+      case 'telephone-reveal': return this._turn();
       case 'telephone-vote':
         this._tally();
         this.revealIndex += 1;
@@ -75,6 +85,9 @@ export class TelephoneHost {
     switch (msg.type) {
       case 'mode':
         if (isHost && ph === 'telephone-intro' && MODES.includes(msg.mode)) { this.mode = msg.mode; this.api.progress(); }
+        return;
+      case 'length':
+        if (isHost && ph === 'telephone-intro' && LENGTHS.includes(msg.length)) { this.length = msg.length; this.api.progress(); }
         return;
       case 'text': {
         if (ph !== 'telephone-write' && ph !== 'telephone-guess') return;
@@ -111,9 +124,14 @@ export class TelephoneHost {
         this.api.progress();
         return;
       }
-      case 'next':
-        if (isHost && ph === 'telephone-reveal' && this.api.now() - this.api.phase.startsAt > 1200 / this.api.speed) this.advance(ph);
+      case 'next': {
+        if (ph !== 'telephone-reveal' || msg.page !== this.page) return; // stale tap from an older page
+        const since = this.api.now() - (this.api.phase.startsAt + this.pageT);
+        if (since < PAGE_GAP / this.api.speed) return;
+        if (!isHost && since < this.api.dur(ANYONE_AFTER)) return;
+        this._turn(p.id);
         return;
+      }
       default:
     }
   }
@@ -188,25 +206,16 @@ export class TelephoneHost {
 
   // ---------- reveal ----------
 
+  /** One album per rumour. Page 0 (the first sentence) shows straight away; the host turns the rest. */
   _reveal() {
     const i = this.revealIndex;
     const chain = this.chains[i];
-    const d = (ms) => this.api.dur(ms);
-    const beats = [];
-    let t = d(BEAT.title);
     const flip = this.mode === 'flip';
-    chain.steps.forEach((st, s) => {
-      let dur;
-      if (st.kind === 'draw') {
-        const strokes = st.drawing?.strokes?.length || 0;
-        if (flip) dur = strokes ? Math.min(BEAT.flipMax, replayDuration(st.drawing, { max: BEAT.flipMax })) + BEAT.flipFrame : BEAT.blank;
-        else dur = strokes ? Math.min(BEAT.drawMax, replayDuration(st.drawing, { max: BEAT.drawMax })) + BEAT.drawHold : BEAT.blank;
-      } else dur = st.kind === 'guess' ? BEAT.guess : BEAT.text;
-      beats.push({ step: s, at: t, dur: d(dur), replay: st.kind === 'draw' ? d(dur - (flip ? BEAT.flipFrame : BEAT.drawHold)) : 0 });
-      t += d(dur);
-    });
-    const flipAt = flip ? t : null;
-    if (flip) t += d(BEAT.flipbook);
+    // how long each page animates (drawings replay stroke by stroke, capped), so phones can pace the reveal
+    const pages = chain.steps.map((st, s) => ({
+      step: s,
+      replay: st.kind === 'draw' && st.drawing?.strokes?.length ? this.api.dur(Math.min(REPLAY_MAX, replayDuration(st.drawing, { max: REPLAY_MAX }))) : 0,
+    }));
     // verdict: does the last thing written still match the first sentence?
     const texts = chain.steps.filter((st) => st.kind !== 'draw');
     const last = texts[texts.length - 1];
@@ -220,9 +229,26 @@ export class TelephoneHost {
     }
     chain.verdict = flip ? 'flip' : straight ? 'straight' : 'crossed';
     chain.crossedAt = crossed;
-    const end = { at: t, verdict: chain.verdict, crossedAt: crossed, flipAt, lastStep: chain.steps.indexOf(last) };
-    t += d(BEAT.end);
-    this.api.enter('telephone-reveal', t, { index: i, count: this.chains.length, mode: this.mode, chain: this._pub(chain), beats, end }, {});
+    const end = { verdict: chain.verdict, crossedAt: crossed, lastStep: flip ? chain.steps.length - 1 : chain.steps.indexOf(last) };
+    this.page = 0;
+    this.pageT = 0;
+    this.pageBy = null;
+    // no phase timer: the album waits for the host (anyone may turn the page if the host goes quiet)
+    this.api.enter('telephone-reveal', null, { index: i, count: this.chains.length, mode: this.mode, chain: this._pub(chain), pages, end, pageCount: chain.steps.length + 1 }, {
+      progress: () => ({ done: {}, counts: {}, page: this.page, pageT: this.pageT, pageBy: this.pageBy }),
+      active: () => [],
+    });
+  }
+
+  /** Next page of the album; after the ending page, the vote. */
+  _turn(by = null) {
+    const total = this.chains[this.revealIndex].steps.length + 1; // pages + the ending
+    if (this.page + 1 >= total) return this._vote();
+    this.page += 1;
+    this.pageT = Math.max(0, this.api.now() - this.api.phase.startsAt);
+    this.pageBy = by;
+    this.api.progress();
+    return undefined;
   }
 
   _pub(chain) {

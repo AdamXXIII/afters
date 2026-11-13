@@ -46,17 +46,19 @@ const write = {
     deal(false);
     card.querySelectorAll('.btn-secondary')[0].insertAdjacentHTML('afterbegin', `<span class="tp-btn-ic">${TP_ICONS.dice}</span>`);
     const btn = iconBtn('Pass it on', 'send', { e2e: 'submit', onClick: () => send() });
-    const title = h('div.tp-write-title', 'Start a rumour.');
+    const title = h('div.tp-write-title', 'Write a sentence.');
     const sub = h('div.tp-write-sub', next ? ['It goes to ', who(next, { size: 20 }), ' to draw.'] : 'Somebody has to draw it.');
     // where this rumour will travel: seats from me onwards (the host rotates by seat order)
     const order = ctx.payload.order || null;
     const seats = order ? order.map((id) => ctx.player(id)).filter(Boolean) : ctx.players;
     const k = Math.max(0, seats.findIndex((p) => p.id === ctx.meId));
-    const route = seats.slice(k).concat(seats.slice(0, k));
-    const kinds = route.map((_, i) => (i === 0 ? 'writes' : ctx.payload.mode === 'flip' ? 'draws' : i % 2 ? 'draws' : 'guesses'));
-    const routeEl = h('div.tp-wroute', h('div.t-eyebrow', 'Where your rumour goes'),
+    // the rumour visits seats in order, wrapping round when the table plays "twice round"
+    const route = Array.from({ length: ctx.payload.steps || seats.length }, (_, i) => seats[(k + i) % seats.length]);
+    const kinds = route.map((_, i) => (i === 0 ? 'writes' : ctx.payload.mode === 'flip' ? 'draws' : i % 2 ? 'draws' : 'describes'));
+    const tight = route.length > 6;
+    const routeEl = h(`div.tp-wroute${tight ? '.tight' : ''}`, h('div.t-eyebrow', `Where your sentence goes (${route.length} turns)`),
       h('div.tp-wroute-row', ...route.flatMap((p, i) => [
-        h('div.tp-wroute-seat', av(p, { size: route.length > 6 ? 30 : 38 }), h('i', kinds[i])),
+        h('div.tp-wroute-seat', av(p, { size: route.length > 8 ? 24 : tight ? 28 : 38 }), h('i', kinds[i])),
         i < route.length - 1 ? h('span.tp-wroute-cord', { html: cordSvg(24, 14, { loops: 2, stroke: 2.2 }) }) : null])));
     const body = h('div.tp-sheet', head(ctx, null), h('div.tp-write-card', title, sub), field, card, routeEl, h('div.tp-grow'), btn);
     sheet.append(body);
@@ -156,9 +158,9 @@ const guess = {
     const paper = h('div.tp-paper', { style: { '--tilt': `${tilt(ctx.phase.seed, ctx.meId, 1.4)}deg` } }, view.el,
       from ? h('div.tp-drawn-by', who(from, { size: 18, label: 'drawn by' })) : null,
       empty ? h('div.tp-blank', 'They drew nothing. Make something up.') : null);
-    const field = textField({ max: ctx.payload.max || 70, placeholder: 'What on earth is this?', onSubmit: () => send() });
+    const field = textField({ max: ctx.payload.max || 70, placeholder: 'A dog stuck in a lift…', onSubmit: () => send() });
     const btn = iconBtn('Pass it on', 'send', { e2e: 'submit', onClick: () => send() });
-    const body = h('div.tp-sheet.tp-guess', head(ctx, null), h('div.tp-guess-q', 'What on earth is this?'), paper, field, btn);
+    const body = h('div.tp-sheet.tp-guess', head(ctx, null), h('div.tp-guess-q', 'Describe this drawing'), paper, field, btn);
     sheet.append(body);
     function send() {
       const text = field.input.value.trim();

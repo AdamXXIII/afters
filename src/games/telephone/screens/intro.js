@@ -16,7 +16,7 @@ export default {
   mount({ show }, ctx) {
     const host = ctx.isHost;
     const steps = h('div.tp-how',
-      ...[['pencil', 'Write a rumour'], ['brush', 'Next draws it'], ['eye', 'Next guesses'], ['handset', 'Watch it fall apart']].flatMap(([ic, label], i, arr) => [
+      ...[['pencil', 'Write a sentence'], ['brush', 'Next draws it'], ['eye', 'Next describes'], ['handset', 'Turn the pages']].flatMap(([ic, label], i, arr) => [
         h('div.tp-how-step', { style: { '--i': i } }, h('span.tp-how-ic', { html: TP_ICONS[ic] }), h('span', label)),
         i < arr.length - 1 ? h('span.tp-how-cord', { html: cordSvg(40, 18, { loops: 3, stroke: 2.4 }) }) : null,
       ]));
@@ -27,6 +27,20 @@ export default {
       b.addEventListener('click', () => { if (!host) return; ctx.audio.sfx('select'); ctx.haptic('select'); ctx.client.act('mode', { mode: m.id }, { mode: m.id }); });
       return b;
     });
+    const lens = ctx.payload.lengths || {};
+    const LEN = [
+      { id: 'once', name: 'Once round', n: lens.once },
+      { id: 'twice', name: 'Twice round', n: lens.twice },
+    ].filter((l) => l.n);
+    // at 5+ players twice round is capped, so only offer it when it adds turns
+    const lenOpts = LEN.filter((l, i) => i === 0 || l.n > LEN[0].n);
+    const lenBtns = lenOpts.map((l) => {
+      const b = h('button.tp-len-opt', { type: 'button', 'data-e2e': `length-${l.id}`, 'aria-pressed': 'false', disabled: !host },
+        h('b', l.name), h('span', `${l.n} turns`));
+      b.addEventListener('click', () => { if (!host) return; ctx.audio.sfx('select'); ctx.haptic('select'); ctx.client.act('length', { length: l.id }, { length: l.id }); });
+      return b;
+    });
+    const lenRow = lenBtns.length > 1 ? h('div.tp-len', { role: 'group', 'aria-label': 'How far each sentence travels' }, lenBtns) : null;
     const startBtn = host ? button('Start writing', { e2e: 'tp-start', onClick: () => ctx.client.skip() }) : null;
     const note = h('div.tp-intro-foot', host ? null : h('span.tp-dots', h('i'), h('i'), h('i')), host ? null : h('span', `${ctx.players.find((p) => p.isHost)?.name || 'The host'} is picking the mode`));
     const card = h('div.tp-intro-card',
@@ -34,11 +48,14 @@ export default {
       h('div.tp-intro-title', 'Crossed', h('br'), 'Wires'),
       steps,
       h('div.tp-modes', tiles),
+      lenRow,
       startBtn || note);
     show.append(h('div.tp-intro', card));
     const sync = (c) => {
       const mode = c.mine.game.mode || c.progress.mode || 'classic';
       tiles.forEach((b, i) => b.setAttribute('aria-pressed', String(MODES[i].id === mode)));
+      const len = c.mine.game.length || c.progress.length || 'once';
+      lenBtns.forEach((b, i) => b.setAttribute('aria-pressed', String(lenOpts[i].id === len)));
     };
     sync(ctx);
     let said = null;

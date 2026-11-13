@@ -10,6 +10,14 @@ export const TIMERS = {
 
 export const LIMITS = { text: 70, points: 2200 };
 
+/** How far each rumour travels. 'once' = every player adds one step (Gartic-style, steps = players);
+ *  'twice' = it goes round the table twice (more drift at small tables), capped so a game stays ~15 min. */
+export const LENGTHS = ['once', 'twice'];
+export const MAX_STEPS = 10;
+export const stepsFor = (n, length) => (length === 'twice' ? Math.max(n, Math.min(2 * n, MAX_STEPS)) : n);
+/** Small tables go round twice by default so a line has room to drift. */
+export const defaultLength = (n) => (n <= 4 ? 'twice' : 'once');
+
 /** Seat holding line `c` at step `s` (N players). */
 export const holder = (c, s, n) => (c + s) % n;
 

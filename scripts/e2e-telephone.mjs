@@ -143,6 +143,10 @@ try {
         did.add(once);
         const nb = page.locator('[data-e2e=nudge]').first();
         if (await nb.count()) await nb.click({ timeout: 1000 });
+      } else if (screen === 'telephone-reveal') {
+        // the host turns the album's pages (the button re-arms after each tap)
+        const nb = page.locator('[data-e2e=tp-next]:not([disabled])');
+        if (await nb.count()) { await nb.click({ timeout: 1000 }); await sleep(Math.max(250, 900 / SPEED)); }
       } else if (screen === 'telephone-vote' && !did.has(once)) {
         did.add(once);
         await page.locator('[data-e2e=moment]').first().click({ timeout: 1000 });
