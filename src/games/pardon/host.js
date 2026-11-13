@@ -125,7 +125,7 @@ export class PardonHost {
         if (ph !== 'pardon-tune' || !t || t.answers[p.id]) return;
         if (!t.options.some((o) => o.id === msg.id)) return;
         const ms = now - this.api.phase.startsAt - t.playAt;
-        if (ms < -300) return; // can't answer before it plays
+        // phones can't tap before it plays; anything early (bots, lag) counts as instant
         t.answers[p.id] = { id: msg.id, ok: msg.id === t.tune.id, ms: Math.max(0, ms) };
         this.api.ack(p);
         this.api.progress();
@@ -268,7 +268,7 @@ export class PardonHost {
     }
     let list = [...byText.values()];
     // fewer than 3 entries? Cyril chips in with his own mishearings so there's a real vote
-    const eg = (this.line.eg || []).slice().sort(() => rng() - 0.5);
+    const eg = (this.line.eg || []).slice(1).sort(() => rng() - 0.5); // eg[0] is the on-screen example
     while (list.length < 3 && eg.length) {
       const text = eg.pop();
       if (!byText.has(norm(text))) list.push({ text, authors: [], house: true });

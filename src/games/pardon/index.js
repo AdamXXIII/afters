@@ -49,7 +49,7 @@ export default {
       }
       case 'pardon-write': {
         const line = LINES.find((l) => l.line === p.line);
-        const eg = line?.eg || [];
+        const eg = (line?.eg || []).slice(1); // eg[0] is the on-screen example
         const text = rng() < 0.7 && eg.length ? eg[Math.floor(rng() * eg.length)] : answer();
         later(rand(4000, 20000), () => { if (still() && !mine().text) client.act('pd-write', { text }, { text }); });
         return true;

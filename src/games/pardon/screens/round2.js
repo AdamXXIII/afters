@@ -72,7 +72,7 @@ const tune = {
     else here.classList.add('on');
     show.append(h('div.pd-tunetop',
       h('div.pd-tunehead', timer,
-        h('div.pd-tunehead-t', h('b', mode ? mode.t : 'Name that tune'), h('span', mode ? mode.s : KIND[p.kind] || '')),
+        h('div.pd-tunehead-t', h('b', mode ? mode.t : 'Name that tune'), h('span', mode ? mode.s : `${KIND[p.kind] || ''} · faster scores more`)),
         pips(p.index, p.count)),
       box,
       h('div.pd-tunefoot', h('span.pd-from', iAmSpeaker || !speaker ? 'Turn this phone up' : `Listen to ${speaker.name}’s phone`), here)));
@@ -81,7 +81,7 @@ const tune = {
     const btns = new Map();
     let picked = ctx.mine.game.id || null;
     const list = h('div.pd-opts', p.options.map((o, i) => {
-      const b = h('button.pd-opt', { type: 'button', 'data-e2e': `pd-opt-${o.id}`, style: { '--d': `${i * 50}ms` } }, h('span.pd-opt-n', { html: NOTE }), h('span.pd-opt-t', o.title));
+      const b = h('button.pd-opt', { type: 'button', 'data-e2e': `pd-opt-${o.id}`, style: { '--d': `${i * 50}ms` } }, h('span.pd-opt-n', 'ABCD'[i]), h('span.pd-opt-t', o.title));
       onTap(b, () => {
         if (picked || ctx.elapsed() < p.playAt - 250) return;
         picked = o.id;
@@ -92,10 +92,12 @@ const tune = {
       btns.set(o.id, b);
       return b;
     }));
-    const race = h('div.pd-race');
     const status = h('div.pd-status');
-    sheet.append(h('div.pd-sheet.pd-in', h('div.pd-ask', 'What’s the tune?'), list, h('div.pd-sheet-foot', status, race)));
-    const raceDiscs = new Map();
+    const watch = h('div.pd-watch', h('b', '0.0'), h('span', 'sec'));
+    // everyone at the table, greyed until they lock in, then stamped 1st, 2nd... (not what they picked)
+    const raceDiscs = new Map(ctx.players.map((pl) => [pl.id, h('span.pd-racer', disc(pl, { size: 34 }), h('b.pd-racer-n'), h('span.pd-racer-nm', pl.name))]));
+    const race = h('div.pd-race', [...raceDiscs.values()]);
+    sheet.append(h('div.pd-sheet.pd-in', h('div.pd-askrow', h('div.pd-ask', 'What’s the tune?'), watch), list, status, race));
     const render = (c) => {
       const early = c.elapsed() < p.playAt - 250;
       for (const [id, b] of btns) {
@@ -108,16 +110,15 @@ const tune = {
         ? `Locked in${mineAt ? ` at ${Math.max(0, (mineAt - p.playAt) / 1000).toFixed(1)}s` : ''}. No changing your mind.`
         : early ? 'Get ready…' : 'Tap as soon as you know it.';
       const order = c.progress.order || [];
-      order.forEach((id, i) => {
-        if (raceDiscs.has(id)) return;
-        const d = h('span.pd-racer', h('b', String(i + 1)), disc(c.player(id), { size: 28 }));
-        raceDiscs.set(id, d);
-        race.append(d);
-      });
+      for (const [id, d] of raceDiscs) {
+        const k = order.indexOf(id);
+        d.classList.toggle('in', k >= 0);
+        d.querySelector('.pd-racer-n').textContent = k >= 0 ? ['1st', '2nd', '3rd'][k] || `${k + 1}th` : '';
+      }
     };
     render(ctx);
     const hush = iAmSpeaker ? hushMusic(ctx.audio) : null;
-    const cancel = say(ctx, ctx.line(mode ? 'pdTuneWeird' : 'pdTune'), { hold: 1500, compact: true }, 100);
+    const cancel = say(ctx, ctx.line(p.mode === 'wonky' ? 'pdTuneWonky' : p.mode === 'backwards' ? 'pdTuneBack' : 'pdTune'), { hold: 1500, compact: true }, 100);
     let playing = false;
     let lastOrder = 0;
     return {
@@ -131,6 +132,10 @@ const tune = {
       frame(c) {
         timer.set(c.remaining(), c.duration);
         const t = (c.elapsed() - p.playAt) / 1000;
+        const mineAt = c.mine.game.at;
+        const shownT = picked && mineAt ? (mineAt - p.playAt) / 1000 : t;
+        watch.firstChild.textContent = Math.max(0, shownT).toFixed(1);
+        watch.classList.toggle('stopped', !!picked);
         box.at(Math.max(-0.5, t));
         if (!playing && t >= 0 && !c.frozen) {
           playing = true;
@@ -156,7 +161,7 @@ const tuneReveal = {
     const rows = ctx.players.map((pl) => ({ pl, a: p.answers[pl.id] || null }))
       .sort((x, y) => (y.a?.pts || 0) - (x.a?.pts || 0) || (x.a ? 0 : 1) - (y.a ? 0 : 1));
     const titleOf = (id) => p.options.find((o) => o.id === id)?.title || '';
-    const list = h('div.pd-tr-list', rows.map(({ pl, a }, i) => h(`div.pd-tr-row${a?.ok ? '.ok' : '.no'}${pl.id === p.first ? '.first' : ''}`, { style: { '--pc': colourOf(pl), '--d': `${1200 + i * 110}ms` } },
+    const list = h('div.pd-tr-list', rows.map(({ pl, a }, i) => h(`div.pd-tr-row${a?.ok ? '.ok' : a ? '.no' : '.skip'}${pl.id === p.first ? '.first' : ''}`, { style: { '--pc': colourOf(pl), '--d': `${1200 + i * 110}ms` } },
       disc(pl, { size: 32 }),
       h('span.nm', pl.name),
       h('span.what', a ? (a.ok ? `${a.secs.toFixed(1)}s${pl.id === p.first ? ' · first!' : ''}` : titleOf(a.id)) : 'no answer'),

@@ -66,7 +66,7 @@ const read = {
       timer,
       h('div.pd-readhead-t', h('b', 'Read this out loud'), h('span', `Clue at 10s: ${(HINT[p.hint] || p.hint).toLowerCase()}`)),
       h('span.pd-count', `${p.index + 1}/${p.count}`));
-    const accent = p.accent ? h('div.pd-accent', h('span.ic', { html: MOUTH }), h('span', 'Do it as ', h('b', p.accent))) : null;
+    const accent = p.accent ? h('div.pd-accent', h('span.ic', { html: MOUTH }), h('span', 'Read it as ', h('b', p.accent))) : null;
     const card = h('div.pd-readcard', head, gibCard(p.say), accent);
     // peek: press and hold to see what it really says (so the reader knows when someone's got it)
     const peek = h('button.pd-peek', { type: 'button', 'data-e2e': 'pd-peek' },
