@@ -4,12 +4,12 @@ import { TASKS, CATEGORIES, FAKE_HINT } from './content/tasks.js';
 
 export const SC = {
   intro: 12000, turn: 5000, task: 16000, count: 9000, vote: 20000,
-  hung: 5000, verdict: 12500, scores: 7000, finalIntro: 7000,
+  hung: 5000, verdict: 13000, scores: 7000, finalIntro: 7000,
 };
 // countdown beats inside seconds-count (ms, before api.dur): 3, 2, 1, NOW, then "freeze"
 export const BEATS = { three: 300, two: 1300, one: 2300, now: 3300, freeze: 7600 };
 // verdict timeline (ms, before api.dur): drumroll, stamp, faker unmasked, tasks, points
-export const VERDICT = { stamp: 1900, unmask: 3600, tasks: 5000, points: 6800 };
+export const VERDICT = { stamp: 1900, unmask: 3600, points: 5200, tasks: 6800 };
 export const CATCH = [1000, 750, 500];
 export const SURVIVE = 250; // faker, per task with no majority
 export const ESCAPE = 1000; // faker, got away (framed someone, or never caught)

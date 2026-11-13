@@ -29,7 +29,8 @@ const task = {
     const body = priv.faker
       ? h('div.sc-cardbody.faker',
         h('div.sc-secret', 'You had seconds.'),
-        h('div.sc-hint', `${priv.hint} Blend in.`),
+        h('div.sc-hint', h('b', 'You’re the faker. '), 'Everyone else has a task you don’t.'),
+        h('div.sc-hint', `${priv.hint} Copy the others. Don’t get caught.`),
         priv.two ? h('div.sc-hint2', 'Somebody else had seconds too.') : null)
       : h('div.sc-cardbody', h('div.sc-secret.task', priv.text || ''));
     const card = h('div.sc-secretcard', meta, body);
@@ -62,7 +63,7 @@ const task = {
       for (const [id, d] of ready) d.classList.toggle('in', !!c.progress.done[id]);
     };
     render(ctx);
-    const cancel = say(ctx, ctx.line(p.final ? 'scFinal' : 'scTask'), {}, 700);
+    const cancel = p.task === 0 && p.turn === 0 ? say(ctx, ctx.line('scTask'), {}, 700) : () => {};
     ctx.cyril.react('smug', { duration: ctx.frozen ? 60000 : 1200 });
     return { update: render, frame(c) { top.timer.set(c.remaining(), c.duration); }, unmount: cancel };
   },

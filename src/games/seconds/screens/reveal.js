@@ -19,11 +19,12 @@ function pointers(ctx, votes, target, size = 24) {
 
 function hung(show, ctx) {
   const p = ctx.payload;
-  const rows = Object.entries(p.tally).sort((a, b) => b[1] - a[1]).map(([target, n]) => {
+  const rows = Object.entries(p.tally).filter(([target]) => ctx.player(target)).sort((a, b) => b[1] - a[1]).map(([target, n]) => {
     const pl = ctx.player(target);
-    const label = pl ? pl.name : target === 'none' ? 'Not sure yet' : target;
-    return h(`div.sc-tallyrow${pl ? '' : '.wait'}`, pl ? disc(pl, { size: 40 }) : h('span.sc-av.blank', '?'), h('span.nm', label), pointers(ctx, p.votes, target), h('b.n', String(n)));
+    return h('div.sc-tallyrow', disc(pl, { size: 44 }), h('span.nm', pl.name), pointers(ctx, p.votes, target, 28), h('b.n', String(n)));
   });
+  const unsure = p.tally.none || 0;
+  if (unsure) rows.push(h('div.sc-tallynote', `${unsure} not sure yet`));
   show.append(h('div.sc-rv.hung',
     h('div.sc-rvcard',
       h('div.sc-where', where(p)),
@@ -43,41 +44,47 @@ function verdict(show, ctx) {
   const accused = p.accused ? ctx.player(p.accused) : null;
   const fakerIds = p.all ? [] : p.fakers;
 
-  // hero: who the table pointed at
-  let heroFace;
-  let heroLine;
+  // One big face at a time. Beat 1: who the table pointed at (and who pointed). Beat 2: the stamp,
+  // under the face, never over it. Beat 3: the faker's face takes the stage. Beat 4: points pop.
+  // Beat 5: the real tasks, so the faker finally learns what everyone was doing.
+  const big = (pl, cls = '') => h(`div.sc-bigface${cls}`, disc(pl, { size: 124 }), h('div.sc-bigname', pl?.name || '?'));
+  let stageA;
+  let lineA;
   if (p.kind === 'all') {
-    heroFace = h('div.sc-heroall', ctx.players.slice(0, 8).map((pl) => disc(pl, { size: 46 })));
-    heroLine = 'Everyone’s phone said the same thing...';
+    stageA = h('div.sc-heroall', ctx.players.slice(0, 8).map((pl) => disc(pl, { size: 58 })));
+    lineA = 'Everyone’s phone said the same thing...';
   } else if (accused) {
-    heroFace = h('div.sc-heroface', disc(accused, { size: 112 }), pointers(ctx, p.votes, accused.id, 26));
-    heroLine = `The table points at ${accused.name}`;
+    stageA = big(accused);
+    lineA = `The table points at ${accused.name}`;
   } else {
-    heroFace = h('div.sc-heroface', h('span.sc-av.blank.huge', '?'));
-    heroLine = 'Nobody could agree';
+    stageA = h('div.sc-bigface', h('span.sc-av.blank.huge', '?'), h('div.sc-bigname', 'Nobody'));
+    lineA = 'Nobody could agree';
   }
-  const stamp = h(`div.sc-stamp.${p.kind}`, STAMP[p.kind]);
-  const hero = h('div.sc-hero', h('div.sc-heroline', heroLine), heroFace, stamp);
-
-  // unmask
+  const pointedBy = accused ? Object.keys(p.votes).filter((v) => p.votes[v] === accused.id) : [];
+  const byRow = pointedBy.length
+    ? h('div.sc-by', h('span', 'Pointed by'), h('span.sc-pointers', pointedBy.map((v) => disc(ctx.player(v), { size: 30 }))))
+    : null;
+  const swap = (p.kind === 'framed' || p.kind === 'escaped') && fakerIds.length;
+  const stageB = swap ? h('div.sc-fakerface', fakerIds.map((id) => big(ctx.player(id)))) : null;
   let unmaskText;
   if (p.kind === 'all') unmaskText = 'Nobody had the task. You were all faking.';
   else if (p.kind === 'caught') unmaskText = p.fakers.length > 1 ? `${names(ctx, p.fakers)} both had seconds` : `${accused?.name || '?'} had seconds`;
-  else unmaskText = `${p.fakers.length > 1 ? 'The fakers were' : 'The faker was'} ${names(ctx, p.fakers)}`;
-  const unmask = h('div.sc-unmask', h('span.sc-unfaces', fakerIds.map((id) => disc(ctx.player(id), { size: 40 }))), h('span', unmaskText));
+  else unmaskText = `${names(ctx, p.fakers)} had seconds all along`;
+  const stamp = h(`div.sc-stamp.${p.kind}`, STAMP[p.kind]);
+  const caption = h('div.sc-heroline', h('span.a', lineA), h('span.b', unmaskText));
+  const hero = h(`div.sc-hero${swap ? '.swap' : ''}`, caption, h('div.sc-stage', stageA, stageB), stamp, byRow);
 
-  // the real tasks (the faker finally finds out what everyone was doing)
-  const tasks = h('div.sc-tasks',
-    h('div.sc-tasks-h', p.kind === 'all' ? 'The task nobody got' : 'The real tasks'),
-    p.done.map((x) => h('div.sc-taskrow', h('span.ic', { html: TYPE_ICON[x.type] }), h('span', x.t))));
-
-  // points
+  // points: big pops, yours ringed
   const rows = Object.entries(p.deltas).sort((a, b) => b[1] - a[1]);
   const pts = h('div.sc-pts', rows.length
-    ? rows.map(([id, n]) => h(`span.sc-ptchip${id === ctx.meId ? '.me' : ''}`, disc(ctx.player(id), { size: 26 }), h('span.nm', ctx.player(id)?.name || '?'), h('b', `+${n}`)))
+    ? rows.map(([id, n]) => h(`span.sc-ptchip${id === ctx.meId ? '.me' : ''}`, disc(ctx.player(id), { size: 34 }), h('span.nm', ctx.player(id)?.name || '?'), h('b', `+${n}`)))
     : h('span.sc-sub', 'Nobody scored. Shocking.'));
 
-  show.append(h(`div.sc-rv.${p.kind}`, h('div.sc-where.on-dark', where(p)), hero, unmask, tasks, pts));
+  const tasks = h('div.sc-tasks',
+    h('div.sc-tasks-h', p.kind === 'all' ? 'The task nobody got' : 'What everyone else was doing'),
+    p.done.map((x) => h('div.sc-taskrow', h('span.ic', { html: TYPE_ICON[x.type] }), h('span', x.t))));
+
+  show.append(h(`div.sc-rv.${p.kind}`, h('div.sc-where.on-dark', where(p)), hero, pts, tasks));
 
   const steps = [
     [0, () => { if (!quiet) { ctx.audio.sfx('drumroll', { duration: at.stamp / 1000 }); ctx.haptic('drumroll'); } ctx.cyril.react('drumroll', { duration: quiet ? 60000 : at.stamp }); }],
@@ -91,12 +98,15 @@ function verdict(show, ctx) {
       ctx.cyril.react(p.kind === 'caught' ? 'delight' : p.kind === 'all' ? 'guffaw' : 'shock', { duration: quiet ? 60000 : 1300 });
       if (!quiet) ctx.say(ctx.line(LINE[p.kind]), { hold: 2600, placement: 'side' });
     }],
-    [at.unmask, () => { show.classList.add('sc-unmasked'); if (!quiet) { ctx.audio.sfx('pop'); if (fakerIds.includes(ctx.meId) && p.kind !== 'caught') ctx.haptic('fooled'); } }],
-    [at.tasks, () => { show.classList.add('sc-tasksin'); if (!quiet) ctx.audio.sfx('page'); }],
+    [at.unmask, () => {
+      show.classList.add('sc-unmasked');
+      if (!quiet) { ctx.audio.sfx(swap ? 'oink' : 'pop'); if (swap) ctx.stage.shake?.(); if (fakerIds.includes(ctx.meId) && p.kind !== 'caught') ctx.haptic('fooled'); }
+    }],
     [at.points, () => {
       show.classList.add('sc-ptsin');
       if (!quiet && rows.length) { ctx.audio.sfx('countup', { ticks: 8 }); if (p.deltas[ctx.meId]) ctx.haptic('win'); }
     }],
+    [at.tasks, () => { show.classList.add('sc-tasksin'); if (!quiet) ctx.audio.sfx('page'); }],
   ];
   let next = 0;
   const run = (c) => {

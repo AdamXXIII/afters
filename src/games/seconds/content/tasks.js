@@ -92,6 +92,12 @@ const FAMILY = {
     point: ['Point at whoever drives like they are in a film.', 'Point at whoever would sing loudest on a road trip.', 'Point at whoever would get a parking ticket on day one.'],
     face: ['Pull the face you make when the train is cancelled.', 'Pull the face you make when someone sits next to you on an empty bus.', 'Pull the face of a sat nav that has given up.'],
   },
+  'Right here, right now': {
+    hands: ['Hands up if you are wearing something blue.', 'Hands up if you have a pet waiting at home.', 'Hands up if you were the last to arrive tonight.'],
+    number: ['Fingers: how many people at this table have you known for over five years?', 'Fingers: how many rings are you wearing right now?', 'Fingers: how many hours of sleep did you get last night?'],
+    point: ['Point at the tallest person at this table.', 'Point at whoever is sitting nearest the door.', 'Point at whoever has the longest hair here.'],
+    face: ['Pull the face you would make if the lights went out right now.', 'Pull the face of whoever is sitting opposite you.', 'Pull the face you make when you hear your own voice on a recording.'],
+  },
 };
 
 const ADULT = {
@@ -172,6 +178,12 @@ const ADULT = {
     number: ['Fingers: how many times have you looked up an ex this month?', 'Fingers: how much do you edit your selfies, 0 to 10?', 'Fingers: how many filthy messages are in your phone, 0 to 10?'],
     point: ['Point at whoever posts the most thirst traps.', 'Point at whoever would go viral for the wrong reasons.', 'Point at whoever has the most embarrassing search history.'],
     face: ['Pull the face you make when an unexpected naughty photo arrives.', 'Pull your selfie face.', 'Pull the face of someone whose mum just commented on their post.'],
+  },
+  'This very table': {
+    hands: ['Hands up if you have kissed someone at this table.', 'Hands up if you have ever fancied someone at this table.', 'Hands up if you are wearing matching underwear right now.'],
+    number: ['Fingers: how many people at this table have seen you naked?', 'Fingers: how many people here have you messaged this week?', 'Fingers: how many people here know your worst secret?'],
+    point: ['Point at the person here you would trust with your phone unlocked.', 'Point at whoever here you have known the longest.', 'Point at whoever here would be the worst person to be stuck in a lift with.'],
+    face: ['Pull the face you would make if your ex walked in right now.', 'Pull the face of whoever is sitting opposite you.', 'Pull the face you make when you hear your own voice on a recording.'],
   },
 };
 

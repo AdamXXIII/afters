@@ -63,7 +63,7 @@ export default {
     'seconds-count-now': { match: (e) => e.phase.id === 'seconds-count', t: (ph) => ph.payload.beats.now + 500 },
     'seconds-vote': { match: (e, me) => e.phase.id === 'seconds-vote' && !isFaker(e, me), me: 'idle', bots: 'some', t: 6000 },
     'seconds-reveal-hung': { match: (e) => e.phase.id === 'seconds-reveal' && e.phase.payload.kind === 'hung', t: 2500 },
-    'seconds-reveal': { match: (e) => e.phase.id === 'seconds-reveal' && e.phase.payload.kind !== 'hung', t: (ph) => ph.payload.at.points + 800 },
+    'seconds-reveal': { match: (e) => e.phase.id === 'seconds-reveal' && e.phase.payload.kind !== 'hung', t: (ph) => ph.payload.at.tasks + 800 },
     'seconds-scores': { match: (e) => e.phase.id === 'seconds-scores', t: 2500 },
     'seconds-final-intro': { match: (e) => e.phase.id === 'seconds-final-intro', t: 2500 },
     'seconds-final-vote': { match: (e) => e.phase.id === 'seconds-vote' && e.phase.payload.final, me: 'idle', bots: 'some', t: 6000 },
