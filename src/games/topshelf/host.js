@@ -170,7 +170,10 @@ export class TopShelfHost {
     let tied = pool.filter((p) => this._s(p.id).shelf === low);
     const fewest = Math.min(...tied.map((p) => this._s(p.id).picks));
     tied = tied.filter((p) => this._s(p.id).picks === fewest);
-    this.picker = tied[Math.floor(rng() * tied.length)].id;
+    // the very first pick goes to whoever is holding the table (the host phone)
+    const host = api.hostPlayer;
+    if (this.round === 0 && host && tied.some((p) => p.id === host.id)) this.picker = host.id;
+    else this.picker = tied[Math.floor(rng() * tied.length)].id;
     this._s(this.picker).picks += 1;
     const avail = this.cats.filter((c) => c.id !== this.lastCat).sort(() => rng() - 0.5);
     this.options = avail.slice(0, 3).map((c) => c.id);

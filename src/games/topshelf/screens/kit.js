@@ -42,7 +42,7 @@ export function qCard(p, { timer = true, compact = false } = {}) {
   const t = timer ? timerRing() : null;
   const tag = p.mode === 'steal' ? 'Steal' : p.mode === 'port' ? 'Pass the Port' : p.mode === 'final' ? 'The Last Drop' : `Round ${p.round + 1} of ${p.of}${p.perRound > 1 ? ` · ${p.n} of 2` : ''}`;
   const card = h(`div.ts-qcard${compact ? '.compact' : ''}.m-${p.mode || 'normal'}`, { style: { '--g': cat(p.cat).glass } },
-    h('div.ts-qhead', catChip(p.cat), h('span.ts-qtag', tag), t),
+    h('div.ts-qhead', t, catChip(p.cat), h('span.ts-qtag', tag)),
     h('div.ts-q', p.q));
   if (p.q.length > 70) card.classList.add('long');
   if (p.q.length > 100) card.classList.add('xlong');
@@ -56,76 +56,61 @@ export function qCard(p, { timer = true, compact = false } = {}) {
  */
 export function cabinet(ctx, { top = 12, size = 'full', labels = true } = {}) {
   const ids = ctx.players.map((p) => p.id);
+  const n = ids.length;
   const planks = [];
   for (let s = 0; s <= top; s++) {
     planks.push(h(`div.ts-plank${s === top ? '.top' : ''}${s === 0 ? '.floor' : ''}`, { style: { '--s': String(s) } },
-      labels ? h('span.ts-plank-n', s === top ? 'Top shelf' : s === 0 ? 'Floor' : String(s)) : null));
+      labels ? h('span.ts-plank-n', s === top ? 'Top' : s === 0 ? '' : String(s)) : null));
   }
+  // every player has their own lane, so bottles never pile up or jump sideways
   const toks = new Map();
-  for (const pl of ctx.players) {
+  const names = new Map();
+  ctx.players.forEach((pl, lane) => {
     const me = pl.id === ctx.meId;
-    const tok = h(`div.ts-tok${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl) } },
+    const tok = h(`div.ts-tok${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl), '--x': String(lane) } },
       h('div.ts-tok-b', { html: bottleSvg(colourOf(pl), pl.avatar) }),
-      h('span.ts-tok-ring'),
-      h('span.ts-tok-flag'),
-      me ? h('span.ts-tok-you', 'You') : null);
+      h('span.ts-tok-flag'));
     tok.title = pl.name;
     toks.set(pl.id, tok);
-  }
+    names.set(pl.id, h(`span.ts-lane-n${me ? '.me' : ''}`, { style: { '--pc': colourOf(pl) } }, me ? 'You' : pl.name));
+  });
   const shelves = h('div.ts-shelves', planks, [...toks.values()]);
-  const el = h(`div.ts-cab.${size}`, { style: { '--top': String(top) } },
-    h('div.ts-cab-crown', h('span', 'Cyril’s cabinet')),
-    h('div.ts-cab-in', shelves));
-  /** Order bottles on each shelf stably (seat order) so nothing jumps when others move. */
-  const xFor = (shelfOf) => {
-    const groups = new Map();
-    for (const id of ids) {
-      const s = Math.round(shelfOf[id] ?? 0);
-      if (!groups.has(s)) groups.set(s, []);
-      groups.get(s).push(id);
-    }
-    const x = {};
-    for (const [, g] of groups) g.forEach((id, i) => { x[id] = i - (g.length - 1) / 2; });
-    return x;
-  };
-  el.layout = xFor;
-  /** pos: {id: {s, x}}; extra: {id: {flag, cls}} */
+  const el = h(`div.ts-cab.${size}`, { style: { '--top': String(top), '--n': String(n) } },
+    h('div.ts-cab-crown', h('span', 'Cyril\u2019s cabinet')),
+    h('div.ts-cab-in', shelves),
+    h('div.ts-lanes', [...names.values()]));
+  /** pos: {id: shelfFloat}; extra: {id: {flag, kind, shield, hot, dim}} */
   el.place = (pos, extra = {}) => {
     for (const [id, tok] of toks) {
-      const p = pos[id];
-      if (!p) { tok.style.display = 'none'; continue; }
+      const s = pos[id];
+      if (s === undefined) { tok.style.display = 'none'; continue; }
       tok.style.display = '';
-      tok.style.setProperty('--s', p.s.toFixed(3));
-      tok.style.setProperty('--x', p.x.toFixed(3));
+      tok.style.setProperty('--s', s.toFixed(3));
       const e = extra[id] || {};
       tok.querySelector('.ts-tok-flag').textContent = e.flag || '';
       tok.dataset.flag = e.kind || '';
       tok.classList.toggle('shield', !!e.shield);
       tok.classList.toggle('dim', !!e.dim);
       tok.classList.toggle('hot', !!e.hot);
+      names.get(id)?.classList.toggle('hot', !!e.hot);
     }
   };
-  /** Simple static placement from a {id: shelf} map. */
   el.still = (shelves, extra) => {
-    const x = xFor(shelves);
     const pos = {};
-    for (const id of ids) pos[id] = { s: shelves[id] ?? 0, x: x[id] ?? 0 };
+    for (const id of ids) pos[id] = shelves[id] ?? 0;
     el.place(pos, extra);
   };
   return el;
 }
 
-/** Interpolate bottles from `before` to `after` shelves at progress k (0..1), staggered per player. */
-export function moveFrame(cab, ids, before, after, t, { start, dur = 900, stagger = 90 }) {
-  const xa = cab.layout(before);
-  const xb = cab.layout(after);
+/** Bottles from `before` to `after` shelves at time t, staggered per player, with a little hop. */
+export function moveFrame(ids, before, after, t, { start, dur = 900, stagger = 90 }) {
   const pos = {};
   ids.forEach((id, i) => {
     const k = easeInOut((t - start - i * stagger) / dur);
     const a = before[id] ?? 0; const b = after[id] ?? a;
-    // a little hop on the way: bottles lift off the shelf while they move
-    const hop = a !== b ? Math.sin(Math.PI * Math.min(1, Math.max(0, k))) * 0.35 : 0;
-    pos[id] = { s: a + (b - a) * k + hop, x: (xa[id] ?? 0) + ((xb[id] ?? 0) - (xa[id] ?? 0)) * k };
+    const hop = a !== b ? Math.sin(Math.PI * Math.min(1, Math.max(0, k))) * 0.4 : 0;
+    pos[id] = a + (b - a) * k + hop;
   });
   return pos;
 }

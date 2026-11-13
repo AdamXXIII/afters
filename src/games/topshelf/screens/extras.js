@@ -80,12 +80,12 @@ const summit = {
     const head = h('div.ts-sum-h',
       h('div.ts-sum-who', winners.map((w) => disc(ctx.player(w.id), { size: 44 }))),
       h('div.ts-sum-t', h('span.ts-sum-l', title), h('span.ts-sum-n', names.join(' & '))),
-      h('div.ts-sum-s', `Shelf ${best}`));
+      h('div.ts-sum-s', `Shelf ${best}`),
+      h('div.ts-sum-q', (winners.length > 1 ? ctx.line('tsSummitTie') : ctx.line('tsSummit', { name: names[0] || '?' }))?.[0] || ''));
     show.append(h('div.ts-sum', head, cab));
     ctx.cyril.react('delight', { duration: ctx.frozen ? 60000 : 1600 });
     if (!ctx.frozen) { ctx.audio.sfx('fanfare'); if (winners.some((w) => w.id === ctx.meId)) ctx.haptic('win'); }
-    const cancel = say(ctx, winners.length > 1 ? ctx.line('tsSummitTie') : ctx.line('tsSummit', { name: names[0] || '?' }), { hold: 3000 }, 900);
-    return { unmount: cancel };
+    return {};
   },
 };
 

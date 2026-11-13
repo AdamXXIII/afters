@@ -8,16 +8,16 @@ import { cabinet, disc, qCard, moveFrame, LETTERS } from './kit.js';
 const FLAME = '<svg viewBox="0 0 24 24"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 .5 2 1.5 3 2.5 3 0-3-1-5.5.5-8z" fill="currentColor"/></svg>';
 
 const FLAG = {
-  fast: (m) => ({ flag: `+${m.to - m.from} quick`, kind: 'up' }),
+  fast: (m) => ({ flag: `+${m.to - m.from}`, kind: 'up' }),
   right: (m) => ({ flag: m.to === m.from ? 'Right' : `+${m.to - m.from}`, kind: m.to === m.from ? 'same' : 'up' }),
   wrong: (m) => ({ flag: m.to === m.from ? 'Wrong' : `−${m.from - m.to}`, kind: m.to === m.from ? 'same' : 'down' }),
   none: () => ({ flag: '', kind: '' }),
   saved: () => ({ flag: 'Saved', kind: 'saved' }),
-  steal: () => ({ flag: 'Stole!', kind: 'up' }),
+  steal: () => ({ flag: 'Stole', kind: 'up' }),
   robbed: () => ({ flag: 'Robbed', kind: 'down' }),
   'port-right': (m) => ({ flag: `+${m.to - m.from}`, kind: 'up' }),
   'port-wrong': (m) => ({ flag: m.to === m.from ? 'Wrong' : `−${m.from - m.to}`, kind: 'down' }),
-  bet: (m) => ({ flag: m.to === m.from ? 'Good bet' : '+1 bet', kind: 'up' }),
+  bet: (m) => ({ flag: m.to === m.from ? 'Bet' : '+1', kind: 'up' }),
 };
 
 /** What happened to me, in one short line. */
@@ -112,7 +112,7 @@ export default {
       show.classList.toggle('ts-picked', t >= at.picks);
       show.classList.toggle('ts-moved', t >= at.move);
       const moving = t >= at.move;
-      cab.place(moveFrame(cab, ids, p.before, after, t, { start: at.move, dur: 900 / (c.phase?.speed || 1), stagger: 80 / (c.phase?.speed || 1) }), extrasAt(moving));
+      cab.place(moveFrame(ids, p.before, after, t, { start: at.move, dur: 900 / (c.phase?.speed || 1), stagger: 80 / (c.phase?.speed || 1) }), extrasAt(moving));
       if (t < at.answer) once('roll', () => { if (!quiet) { ctx.audio.sfx('drumroll', { duration: at.answer / 1000 }); ctx.cyril.react('drumroll', { duration: at.answer }); } });
       if (t >= at.answer) once('ans', () => {
         if (!quiet) { ctx.audio.sfx('stamp'); ctx.haptic('stamp'); ctx.stage.shake?.(); }

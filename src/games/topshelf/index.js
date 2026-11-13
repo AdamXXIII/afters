@@ -70,7 +70,7 @@ export default {
 
   demos: {
     'topshelf-intro': { match: ph('topshelf-intro'), t: 2600 },
-    'topshelf-pick': { match: (e, me) => e.phase.id === 'topshelf-pick' && e.phase.payload.picker === me, me: 'idle', bots: 'idle', t: 2500 },
+    'topshelf-pick': { match: (e, me) => e.phase.id === 'topshelf-pick' && e.phase.payload.picker === me && e.phase.payload.round === 0, me: 'idle', bots: 'idle', t: 2500 },
     'topshelf-pick-watch': { match: (e, me) => e.phase.id === 'topshelf-pick' && e.phase.payload.picker !== me && e.phase.payload.round > 0, me: 'idle', bots: 'idle', t: 2500 },
     'topshelf-q': { match: (e) => mode('normal')(e) && e.phase.payload.round > 0, me: 'idle', bots: 'some', t: 3200 },
     'topshelf-q-answered': { match: (e) => mode('normal')(e) && e.phase.payload.round > 1, me: 'act', bots: 'some', t: 6000 },

@@ -47,6 +47,8 @@ export default [
   'What is the name of the pub in EastEnders?|The Queen Vic|The Rovers Return|The Woolpack|The Nag\'s Head',
   'In Mastermind, what does each contender sit in?|A black chair|A red armchair|A swivel stool|A throne',
   'Which comedy series featured the Ministry of Silly Walks?|Monty Python\'s Flying Circus|The Two Ronnies|The Goodies|Morecambe and Wise',
+  'What is the Trotters\' local pub in Only Fools and Horses?|The Nag\'s Head|The Queen Vic|The Woolpack|The Rovers Return',
+  'What is the name of the Simpsons\' dog?|Santa\'s Little Helper|Snowball|Lucky|Rex',
   '!What does TARDIS stand for?|Time And Relative Dimension In Space|Time And Radial Distance In Space|Travel Across Realms, Dimensions And Space|Time Apparatus Retrieving Distant Ideas Swiftly',
   '!In the 1960s series The Prisoner, the hero is known only as...|Number Six|Number One|Number Two|Agent X',
   '!Which comedy was set in the fictional town of Royston Vasey?|The League of Gentlemen|The Fast Show|Little Britain|Psychoville',

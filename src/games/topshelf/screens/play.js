@@ -40,10 +40,10 @@ const pick = {
     }));
     const picker = ctx.player(p.picker);
     const head = mePick
-      ? h('div.ts-ask', h('div.ts-ask-t', 'Pick the next category'), h('div.ts-ask-s', 'Two questions from it, for everyone.'))
+      ? h('div.ts-ask', h('div.ts-ask-t', 'Pick the next category'), h('div.ts-ask-s', (ctx.line('tsPickMe') || [''])[0]))
       : h('div.ts-ask', h('div.ts-ask-t', disc(picker, { size: 30 }), ` ${picker?.name || '?'} is choosing`), h('div.ts-ask-s', 'Two questions from it, for everyone.'));
     sheet.append(h('div.ts-sheet.ts-in', head, list));
-    const cancel = say(ctx, mePick ? ctx.line('tsPickMe') : ctx.line('tsPick', { name: nameOf(ctx, p.picker) }), {}, 400);
+    const cancel = () => {};
     const update = (c) => {
       const chosen = c.progress.chosen || c.mine.game.cat;
       for (const [id, b] of btns) {
@@ -196,7 +196,7 @@ const port = {
     sheet.append(h('div.ts-sheet.ts-in',
       h('div.ts-ask', h('div.ts-ask-t', 'Who answers the next one alone?'), h('div.ts-ask-s', 'Most votes gets the port. Right: up two. Wrong: down two.')),
       grid));
-    const cancel = say(ctx, ctx.line('tsPort'), {}, 400);
+    const cancel = () => {};
     const update = (c) => {
       const votes = c.progress.votes || {};
       const tally = {};
@@ -237,7 +237,7 @@ const wager = {
     sheet.append(h('div.ts-sheet.ts-in',
       h('div.ts-ask', h('div.ts-ask-t', 'Bet your shelves'), h('div.ts-ask-s', `You’re on shelf ${s}. No bet means one.`)),
       h('div.ts-wrow', btns)));
-    const cancel = say(ctx, ctx.line('tsWager'), {}, 400);
+    const cancel = () => {};
     const update = (c) => {
       btns.forEach((b, i) => {
         b.setAttribute('aria-pressed', String(c.mine.game.n === i + 1));
