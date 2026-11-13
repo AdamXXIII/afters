@@ -16,8 +16,18 @@ theme, the "line" metaphor ("the line's gone fuzzy"), Cyril, the cards and the r
 - **Short turns, always moving.** Nobody waits more than one step. Speedy mode halves every timer.
 - **Something on every phone, every second.** Finished early? You get the *Nudge* button (buzzes the slowest
   phone and shows "Pip is tapping their watch at you") and a live view of who's still scribbling.
-- **Adult deck** turns it into innuendo bingo: sentences like "The vicar's melons won first prize" were
-  made for terrible drawings.
+- **Adult deck** is grown-up life with real swearing, never sexual: hangovers, bosses, stag dos, the B&Q car park.
+
+## The loop (rebuilt 2026-11-13 on Gartic Phone's full rotation, after Adam: "needs more rounds so you can see it evolve")
+Researched: in Gartic Phone everyone writes a sentence, each "book" travels round the whole table alternating draw and
+describe, so every book gets one step from every player (turns = players by default; custom settings add more), and the
+game ends with a slow album reveal the host clicks through while everyone watches it drift. Modes there vary timers,
+secrecy and animation. Ours: one rumour per player, steps = players (**Once round**), or **Twice round** (2 x players,
+max 10; the default at 3-4 players so short tables still drift). You only ever see the step before yours. The reveal is
+an **album** per rumour on every phone: the host taps **Next page** (anyone may after 15 s of silence), each page types
+out or redraws stroke by stroke, earlier pages stay in a scrollable feed with a cord down the left, the first sentence
+is pinned in the header with a trail of every page so far, descriptions get Nailed it / Lost it, the last page is the
+verdict (first vs last, the misread drawing and the description that lost it), then a quick vote for the best page.
 
 ## Players and length
 3-8 players. Chain length = players. Classic, 6 players: write 0:40, 5 steps (~45 s avg) ~4:00,
@@ -38,11 +48,11 @@ reveal 6 lines x ~30 s + votes ~4:00 => about 9-10 minutes. 8 players about 13 m
 | `telephone-draw` | input | draw timer | `{step, steps, mode}`; private `{chain, text, prev?, from}` (`prev` = flipbook onion skin) |
 | `telephone-guess` | input | guess timer | `{step, steps, mode, max}`; private `{chain, drawing, from}` |
 | `telephone-wait` | input | (screen only) | shown on your phone once you've sent this step |
-| `telephone-reveal` | show | per line, sum of beats | `{index, count, mode, chain:{id, steps:[{kind, text|drawing, authorId, auto, match}]}, beats:[{at, dur, step}], end:{at, verdict, crossedAt}}` |
+| `telephone-reveal` | show | no timer: host turns pages | `{index, count, mode, chain:{id, ownerId, steps:[{kind, text|drawing, authorId, auto, match}]}, pages:[{step, replay}], end:{verdict, crossedAt, lastStep}, pageCount}`; progress `{page, pageT, pageBy}`; message `next {page}` |
 | `telephone-vote` | split | 9 s, ends when all voted | `{index, count, moments:[{key, kind, text|drawing, authorId}]}` |
 | `telephone-awards` | show | 9 s | `{moment, straight, crossed, rows}` then `api.finish` -> shared results |
 
-Rotation: line *c* is started by seat *c*; at step *s* it is held by seat *(c + s) mod N*. Every player
+Rotation: line *c* is started by seat *c*; at step *s* it is held by seat *(c + s) mod N* (twice round wraps). Every player
 touches every line exactly once and never sees their own line until the reveal.
 
 ### What each phone shows
@@ -87,9 +97,9 @@ crossed wires (with the name of whoever crossed them), vote, moment of the night
 - Adult: "Draw it exactly as described. Yes, *exactly*. We're all adults."
 
 ## Content
-`content/starters.js`: **Family 96, Adults 18+ 96** starter sentences (stable ids). Family = absurd, visual,
-drawable ("A pigeon running a car boot sale"). Adults = cheeky innuendo, nothing hateful, no real people,
-nothing involving minors ("The vicar's prize-winning marrow"). Bots and empty steps use the same decks.
+`content/starters.js`: **Family 96, Adults 18+ 102** starter sentences (stable ids). Family = absurd, visual,
+drawable ("A pigeon running a car boot sale"). Adults = grown-up life, swearing allowed, **never sexual**, no food,
+no hate, no real people, nothing involving minors ("A bloke crying in the B&Q car park"). Bots and empty steps use the same decks.
 
 ## Bots
 Write a starter sentence; draw one of 10 hand-shaped doodles (cat, house, ghost, fish, rocket, cake, snail,
